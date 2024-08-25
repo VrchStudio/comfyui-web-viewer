@@ -2,7 +2,7 @@ from .nodes.web_viewer_node import WebViewerNode
 from .nodes.image_saver_node import ImageSaverNode
 from .nodes.audio_genres_node import AudioGenresNode
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 NODE_CLASS_MAPPINGS = {
     "WebViewerNode": WebViewerNode,
