@@ -13,3 +13,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ImageSaverNode": "Image Saver by vrch.io",
     "AudioGenresNode": "Get Audio Genres by vrch.io"
 }
+
+# WEB_DIRECTORY is the comfyui nodes directory that ComfyUI will link and auto-load.
+WEB_DIRECTORY = "./web/comfyui"
+
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]
