@@ -1,13 +1,10 @@
 # ComfyUI-Web-Viewer
 
-This is a custom node collection for ComfyUI that provides various utilities under the vrch.io category.
+Version: 1.0.0
 
-## Project Structure
+This is a custom node collection for ComfyUI that provides a Web Viewer utility under the vrch.io category.
 
-- `nodes/`: Contains all custom node implementations
-- `web/`: Web-related files for the Web Viewer node
-- `workflow/`: Example workflow JSON files
-- `__init__.py`: Node registration and initialization
+[Changelog](CHANGELOG.md)
 
 ## Installation
 
@@ -20,28 +17,34 @@ This is a custom node collection for ComfyUI that provides various utilities und
 ### Web Viewer by vrch.io (vrch.io/web)
 
 1. Add the "Web Viewer by vrch.io" node to your ComfyUI workflow.
-2. Connect an image output to this node.
-3. After running the workflow, check the console for the Web viewer URL.
-4. Open the URL in a web browser to view the generated image.
+2. The node provides an input field for the URL and a button to open the web viewer.
+3. You can customize the URL in the node's input field.
+4. Click the "Open Web Viewer" button to open the specified URL in a new browser window.
+5. You can also adjust the window size using the "window_width" and "window_height" inputs.
 
-### Image Saver by vrch.io (vrch.io/image)
+## Version Update
 
-1. Add the "Image Saver by vrch.io" node to your workflow.
-2. Connect an image output to this node.
-3. Specify the save path in the node settings.
-4. Run the workflow to save the image.
+This project uses `bump2version` for version management. To update the version:
 
-### Get Audio Genres by vrch.io (vrch.io/audio)
-
-1. Add the "Get Audio Genres by vrch.io" node to your workflow.
-2. Specify the audio file path in the node settings.
-3. Run the workflow to detect audio genres.
-4. The detected genres will be output as a string.
-
-## Example Workflow
-
-An example workflow JSON file is provided in the `workflow` directory. You can use this as a starting point or reference for creating your own workflows with these custom nodes.
+1. Ensure you have `bump2version` installed:
+   ```bash
+   pip install bump2version
+   ```
+2. To update the version, run:
+   ```bash
+   python update_version.py [major|minor|patch]
+   ```
+   Replace `[major|minor|patch]` with the part of the version you want to increment.
+3. This will automatically:
+   - Update the version number in `__init__.py`
+   - Update the CHANGELOG.md file
+   - Create a new git commit and tag (if you're using git)
+4. After running the script, review and update the CHANGELOG.md file with details about the new version's changes.
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+[MIT License](LICENSE)
