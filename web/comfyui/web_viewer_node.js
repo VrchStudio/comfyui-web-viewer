@@ -5,13 +5,17 @@ app.registerExtension({
     name: "vrch.WebViewer",
     async nodeCreated(node) {
         if (node.comfyClass === "WebViewerNode") {
-            // Find the existing url widget
+            // Find the existing widgets
             const urlWidget = node.widgets.find(w => w.name === "url");
+            const widthWidget = node.widgets.find(w => w.name === "window_width");
+            const heightWidget = node.widgets.find(w => w.name === "window_height");
             
             // Add the button widget
             const buttonWidget = node.addWidget("button", "Open Web Viewer", null, () => {
                 if (urlWidget && urlWidget.value) {
-                    window.open(urlWidget.value, "_blank", "width=1024,height=768");
+                    const width = widthWidget ? widthWidget.value : 1024;
+                    const height = heightWidget ? heightWidget.value : 768;
+                    window.open(urlWidget.value, "_blank", `width=${width},height=${height}`);
                 } else {
                     console.error("URL widget not found or empty");
                 }
