@@ -1,21 +1,24 @@
 from .nodes.web_viewer_node import WebViewerNode
 from .nodes.image_nodes import *
 from .nodes.audio_nodes import *
+from .nodes.text_nodes import *
 
 __version__ = "1.0.1"
 
 NODE_CLASS_MAPPINGS = {
-    "WebViewerNode": WebViewerNode,
-    "ImageSaverNode": ImageSaverNode,
     "AudioGenresNode": AudioGenresNode,
-    "AudioSaverNode": AudioSaverNode
+    "AudioSaverNode": AudioSaverNode,
+    "JsonUrlLoaderNode": JsonUrlLoaderNode,
+    "ImageSaverNode": ImageSaverNode,
+    "WebViewerNode": WebViewerNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "WebViewerNode": "Web Viewer by vrch.io",
-    "ImageSaverNode": "Image Saver by vrch.io",
     "AudioSaverNode": "Audio Saver by vrch.io",
     "AudioGenresNode": "Get Audio Genres by vrch.io",
+    "JsonUrlLoaderNode": "JSON URL Loader by vrch.io",
+    "ImageSaverNode": "Image Saver by vrch.io",
+    "WebViewerNode": "Web Viewer by vrch.io",
 }
 
 # WEB_DIRECTORY is the comfyui nodes directory that ComfyUI will link and auto-load.
