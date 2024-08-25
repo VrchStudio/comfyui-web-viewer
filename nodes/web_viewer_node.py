@@ -6,10 +6,12 @@ class WebViewerNode:
         return {
             "required": {
                 "url": ("STRING", {
-                    "default": "https://vrch.ai/dev/vrch-image-instant-viewer?u=vrch",
+                    "default": "https://vrch.ai/vrch-image-instant-viewer?u=vrch",
                     "multiline": True,
                     "dynamicPrompts": False
                 }),
+                "window_width": ("INT", {"default": 1024, "min": 100, "max": 4096}),
+                "window_height": ("INT", {"default": 768, "min": 100, "max": 4096}),
             }
         }
     
@@ -21,8 +23,7 @@ class WebViewerNode:
 
     DESCRIPTION = "Opens the specified Web Viewer URL in a new browser tab when button is clicked."
 
-    def dummy_function(self, url):
-        # This function does nothing, it's just a placeholder
+    def dummy_function(self, url, window_width, window_height):
         return ()
 
     @classmethod
