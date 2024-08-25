@@ -1,29 +1,34 @@
-import os
-import server
-from aiohttp import web
+import webbrowser
 
 class WebViewerNode:
     @classmethod
     def INPUT_TYPES(s):
         return {
             "required": {
-                "image": ("IMAGE",),
+                "url": ("STRING", {
+                    "default": "https://vrch.ai/dev/vrch-image-instant-viewer?u=vrch",
+                    "multiline": True,
+                    "dynamicPrompts": False
+                }),
             }
         }
     
     RETURN_TYPES = ()
-    FUNCTION = "display_image"
+    FUNCTION = "dummy_function"
     CATEGORY = "vrch.io/web"
+    
+    OUTPUT_NODE = True
 
-    def display_image(self, image):
-        # Save the image to a temporary file
-        temp_path = os.path.join(os.path.dirname(__file__), "web", "temp_image.png")
-        # Implement image saving logic here
-        
-        # Start web server to display the image
-        app = web.Application()
-        app.router.add_static('/', os.path.join(os.path.dirname(__file__), "web"))
-        server.PromptServer.instance.app.add_subapp("/web_viewer", app)
-        
-        print("Web viewer is available at: http://localhost:8188/web_viewer")
+    DESCRIPTION = "Opens the specified Web Viewer URL in a new browser tab when button is clicked."
+
+    def dummy_function(self, url):
+        # This function does nothing, it's just a placeholder
         return ()
+
+    @classmethod
+    def IS_CHANGED(s, **kwargs):
+        return False
+
+    @classmethod
+    def UI(s):
+        return {"widget": {"open_viewer": ("button", "Open Web Viewer")}}
