@@ -291,7 +291,7 @@ class AudioGenresNode:
     RETURN_NAMES = ("audio", "genres",)
     OUTPUT_NODE = True
     FUNCTION = "analysis"
-    CATEGORY = "audio"
+    CATEGORY = "vrch.io/audio"
 
     def analysis(self, audio):
         predicted_probabilities = self.predict(audio)
