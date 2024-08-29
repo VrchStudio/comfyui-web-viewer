@@ -10,8 +10,8 @@ class VrchWebViewerNode:
                     "multiline": True,
                     "dynamicPrompts": False
                 }),
-                "window_width": ("INT", {"default": 1024, "min": 100, "max": 4096}),
-                "window_height": ("INT", {"default": 768, "min": 100, "max": 4096}),
+                "window_width": ("INT", {"default": 1024, "min": 100, "max": 10240}),
+                "window_height": ("INT", {"default": 768, "min": 100, "max": 10240}),
             }
         }
     
