@@ -10,7 +10,7 @@ import torch.nn.functional as F
 import torchaudio.transforms as T
 import folder_paths
 
-class AudioSaverNode:
+class VrchAudioSaverNode:
     def __init__(self):
         self.output_dir = folder_paths.get_output_directory()
 
@@ -67,7 +67,7 @@ class AudioSaverNode:
             return {}
 
 
-class AudioGenresNode:
+class VrchAudioGenresNode:
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -136,7 +136,7 @@ class MusicGenreCNN(nn.Module):
     #     x = self.fc2(x)
     #     return x
 
-class AudioGenresNode:
+class VrchAudioGenresNode:
     
     def __init__(self):
         self.model_dir = os.path.join(folder_paths.models_dir, "audio_genres")

@@ -2,9 +2,9 @@ import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
 app.registerExtension({
-    name: "Comfy.AudioNodes",
+    name: "vrch.AudioNodes",
     async beforeRegisterNodeDef(nodeType, nodeData) {
-        if (nodeType.comfyClass === "AudioSaverNode") {
+        if (nodeType.comfyClass === "VrchAudioSaverNode") {
             nodeData.input.required.audioUI = ["AUDIO_UI"];
         }
     },
@@ -18,7 +18,7 @@ app.registerExtension({
                 const audioUIWidget = node.addDOMWidget(inputName, "audioUI", audio);
                 audioUIWidget.serialize = false;
 
-                if (node.comfyClass === "AudioSaverNode") {
+                if (node.comfyClass === "VrchAudioSaverNode") {
                     audioUIWidget.element.classList.add("empty-audio-widget");
                     node.onExecuted = function(message) {
                         const audios = message.audio;
@@ -36,7 +36,7 @@ app.registerExtension({
         };
     },
     async nodeCreated(node) {
-        if (node.comfyClass === "AudioSaverNode") {
+        if (node.comfyClass === "VrchAudioSaverNode") {
             node.onExecuted = function(message) {
                 if (message.audio) {
                     const audioUIWidget = node.widgets.find(w => w.name === "audioUI");

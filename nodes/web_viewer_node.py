@@ -1,6 +1,6 @@
 import webbrowser
 
-class WebViewerNode:
+class VrchWebViewerNode:
     @classmethod
     def INPUT_TYPES(s):
         return {

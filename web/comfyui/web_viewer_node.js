@@ -4,7 +4,7 @@ import { ComfyWidgets } from "../../scripts/widgets.js";
 app.registerExtension({
     name: "vrch.WebViewer",
     async nodeCreated(node) {
-        if (node.comfyClass === "WebViewerNode") {
+        if (node.comfyClass === "VrchWebViewerNode") {
             // Find the existing widgets
             const urlWidget = node.widgets.find(w => w.name === "url");
             const widthWidget = node.widgets.find(w => w.name === "window_width");

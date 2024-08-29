@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 import folder_paths
 
-class ImageSaverNode:
+class VrchImageSaverNode:
     @classmethod
     def INPUT_TYPES(s):
         return {

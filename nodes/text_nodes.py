@@ -1,7 +1,7 @@
 import json
 import requests
 
-class JsonUrlLoaderNode:
+class VrchJsonUrlLoaderNode:
     @classmethod
     def INPUT_TYPES(s):
         return {
