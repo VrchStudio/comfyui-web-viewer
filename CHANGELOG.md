@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+- New `VrchAudioRecorderNode` in `audio_nodes.py` for recording audio via a mic
+
+### Updated
+- update nodes name by using "Vrch" as prefix
+- update web viewer window max width/height to be 10240
+- change `VrchAudioSaverNode` default output format to mp3
+
 ## 1.0.2 - 2024-08-26
 
 ### Added
