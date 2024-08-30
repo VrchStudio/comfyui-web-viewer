@@ -96,10 +96,10 @@ class VrchAudioRecorderNode:
         buffer = io.BytesIO(audio_data)
         waveform, sample_rate = torchaudio.load(buffer)
         
-        # # Check if the audio is mono (single channel)
-        # if waveform.shape[0] == 1:
-        #     # Convert mono to stereo by duplicating the channel
-        #     waveform = waveform.repeat(2, 1)
+        # Check if the audio is mono (single channel)
+        if waveform.shape[0] == 1:
+            # Convert mono to stereo by duplicating the channel
+            waveform = waveform.repeat(2, 1)
         
         audio = {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
 
