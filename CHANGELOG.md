@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 - update nodes name by using "Vrch" as prefix
 - update web viewer window max width/height to be 10240
+- update README.md
 - change `VrchAudioSaverNode` default output format to mp3
 
 ## 1.0.2 - 2024-08-26
