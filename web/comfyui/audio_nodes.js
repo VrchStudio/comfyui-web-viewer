@@ -126,7 +126,7 @@ app.registerExtension({
                     draw(ctx, node, widget_width, y, widget_height) {
                         Object.assign(
                             this.div.style,
-                            get_position_style(ctx, widget_width, 80, node.size[1])
+                            get_position_style(ctx, widget_width, 110, node.size[1])
                         );
                     }
                 };
@@ -134,17 +134,12 @@ app.registerExtension({
                 widget.div = document.createElement('div');
 
                 const startBtn = document.createElement('button');
-                startBtn.innerText = 'START';
+                startBtn.innerText = 'Press and Hold to Record';
 
                 // Button styling
+                startBtn.className = "comfy-btn";
                 startBtn.style = `
-                    margin-top: 10px;
-                    background-color: var(--comfy-input-bg);
-                    border-radius: 15px;
-                    border: 1px solid var(--border-color);
-                    color: var(--descrip-text);
-                    padding: 5px 20px;
-                    cursor: pointer;
+                    padding: 15px 10px;
                 `;
 
                 widget.div.appendChild(startBtn);
@@ -166,24 +161,23 @@ app.registerExtension({
                     };
 
                     const onStopRecording = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });  
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                         const reader = new FileReader();
-                    
+
                         reader.onloadend = () => {
                             const base64data = reader.result.split(',')[1];
-                    
+
                             // Update the input field with the recorded base64 data
                             const audioBase64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
                             if (audioBase64Widget) {
                                 audioBase64Widget.value = base64data;
                             }
-                    
+
                             console.log('Audio recording saved.');
                         };
                         reader.readAsDataURL(audioBlob);
-                    
-                        startBtn.innerText = 'START';
-                        startBtn.className = '';
+
+                        startBtn.innerText = 'Press and Hold to Record';
                     };
 
                     navigator.mediaDevices.getUserMedia({ audio: true })
@@ -194,20 +188,31 @@ app.registerExtension({
                             mediaRecorder.ondataavailable = onMediaDataAvailable;
                             mediaRecorder.onstop = onStopRecording;
                             mediaRecorder.start();
-                            startBtn.innerText = 'STOP';
-                            startBtn.className = 'recording';
+                            startBtn.innerText = 'Recording...';
 
                             console.log('Recording started...');
                         })
                         .catch(error => console.error('Error accessing audio devices.', error));
                 };
 
-                startBtn.addEventListener('click', () => {
+                const stopRecording = () => {
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
                         mediaRecorder.stop();
                         mediaRecorder = null;
-                    } else {
-                        startRecording();
+                    }
+                };
+
+                startBtn.addEventListener('mousedown', () => {
+                    startRecording();
+                });
+
+                startBtn.addEventListener('mouseup', () => {
+                    stopRecording();
+                });
+
+                startBtn.addEventListener('mouseleave', () => {
+                    if (mediaRecorder && mediaRecorder.state === 'recording') {
+                        stopRecording();
                     }
                 });
 
@@ -224,4 +229,3 @@ app.registerExtension({
         }
     }
 });
-
