@@ -1,8 +1,11 @@
+import subprocess
+import tempfile
 import time
 import traceback
 import json
 import os
 import io
+import base64
 import torch
 import torch.nn as nn
 import torchaudio
@@ -10,7 +13,7 @@ import torch.nn.functional as F
 import torchaudio.transforms as T
 import folder_paths
 
-class AudioSaverNode:
+class VrchAudioSaverNode:
     def __init__(self):
         self.output_dir = folder_paths.get_output_directory()
 
@@ -21,7 +24,7 @@ class AudioSaverNode:
                 "audio": ("AUDIO",),
                 "filename": ("STRING", {"default": "web_viewer_audio"}),
                 "path": ("STRING", {"default": "web_viewer"}),
-                "extension": (["flac", "wav", "mp3"], {"default": "flac"}),
+                "extension": (["flac", "wav", "mp3"], {"default": "mp3"}),
                 "enable_preview": ("BOOLEAN", {"default": False}),
             }
         }
@@ -65,9 +68,44 @@ class AudioSaverNode:
             return {"ui": {"audio": results}}
         else:
             return {}
+        
+class VrchAudioRecorderNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "base64_data": ("STRING", {"multiline": False}),
+                "record_duration": ("INT", {
+                    "default": 10,  
+                    "min": 1,           
+                    "max": 120,     
+                    "step": 1,      
+                    "display": "number"
+                }),
+            }
+        }
 
+    RETURN_TYPES = ("AUDIO",)
+    RETURN_NAMES = ("AUDIO",)
+    CATEGORY = "vrch.io/audio"
+    FUNCTION = "process_audio"
+    
+    def process_audio(self, base64_data, record_duration):
+        
+        audio_data = base64.b64decode(base64_data)
+        buffer = io.BytesIO(audio_data)
+        waveform, sample_rate = torchaudio.load(buffer)
+        
+        # Check if the audio is mono (single channel)
+        if waveform.shape[0] == 1:
+            # Convert mono to stereo by duplicating the channel
+            waveform = waveform.repeat(2, 1)
+        
+        audio = {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
 
-class AudioGenresNode:
+        return (audio,)
+
+class VrchAudioGenresNode:
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -136,7 +174,7 @@ class MusicGenreCNN(nn.Module):
     #     x = self.fc2(x)
     #     return x
 
-class AudioGenresNode:
+class VrchAudioGenresNode:
     
     def __init__(self):
         self.model_dir = os.path.join(folder_paths.models_dir, "audio_genres")
