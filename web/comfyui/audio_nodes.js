@@ -55,91 +55,40 @@ app.registerExtension({
 
 function get_position_style (ctx, widget_width, y, node_height) {
     const MARGIN = 4 // the margin around the html element
-  
+
     /* Create a transform that deals with all the scrolling and zooming */
     const elRect = ctx.canvas.getBoundingClientRect()
     const transform = new DOMMatrix()
-      .scaleSelf(
+        .scaleSelf(
         elRect.width / ctx.canvas.width,
         elRect.height / ctx.canvas.height
-      )
-      .multiplySelf(ctx.getTransform())
-      .translateSelf(MARGIN, MARGIN + y)
-  
+        )
+        .multiplySelf(ctx.getTransform())
+        .translateSelf(MARGIN, MARGIN + y)
+
     return {
-      transformOrigin: '0 0',
-      transform: transform,
-      left: `0`,
-      top: `0`,
-      cursor: 'pointer',
-      position: 'absolute',
-      maxWidth: `${widget_width - MARGIN * 2}px`,
-      width: `${widget_width - MARGIN * 2}px`,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-around'
+        transformOrigin: '0 0',
+        transform: transform,
+        left: `0`,
+        top: `0`,
+        cursor: 'pointer',
+        position: 'absolute',
+        maxWidth: `${widget_width - MARGIN * 2}px`,
+        width: `${widget_width - MARGIN * 2}px`,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-around'
     }
-  }
+}
 
-const startRecording = (startBtn, node) => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        console.error('Browser does not support audio recording');
-        return;
-    }
+// Helper functions for local storage operations
+function getLocalData(key) {
+    return localStorage.getItem(key);
+}
 
-    let mediaRecorder;
-    let audioChunks = [];
-
-    const onMediaDataAvailable = (event) => {
-        if (event.data.size > 0) {
-            audioChunks.push(event.data);
-        }
-    };
-
-    const onStopRecording = () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-            const base64data = reader.result.split(',')[1];
-            localStorage.setItem('_vrch_audio_recorder', base64data);
-
-            // Update node with the recorded audio in base64 format
-            let data = getLocalData('_vrch_audio_recorder') || {};
-            data[node.id] = base64data;
-            localStorage.setItem('_vrch_audio_recorder', JSON.stringify(data));
-
-            console.log('Audio recording saved.');
-        };
-        reader.readAsDataURL(audioBlob);
-
-        startBtn.innerText = 'START';
-        startBtn.className = '';
-    };
-
-    const startMediaRecording = (stream) => {
-        mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = onMediaDataAvailable;
-        mediaRecorder.onstop = onStopRecording;
-
-        mediaRecorder.start();
-        startBtn.innerText = 'STOP';
-        startBtn.className = 'recording';
-
-        console.log('Recording started...');
-    };
-
-    startBtn.addEventListener('click', () => {
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            mediaRecorder = null;
-        } else {
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(startMediaRecording)
-                .catch(error => console.error('Error accessing audio devices.', error));
-        }
-    });
-};
+function setLocalData(key, value) {
+    localStorage.setItem(key, value);
+}
 
 app.registerExtension({
     name: 'vrch.AudioRecorderNode',  // Node name
@@ -155,8 +104,8 @@ app.registerExtension({
                         return [128, 32];  // Default widget size
                     },
                     async serializeValue(nodeId, widgetIndex) {
-                        let data = getLocalData('_vrch_audio_recorder') || {};
-                        return data[nodeId] || 'No audio recorded';
+                        let data = getLocalData('_vrch_audio_recorder') || '';
+                        return data || 'No audio recorded';
                     }
                 };
                 node.addCustomWidget(widget);
@@ -172,6 +121,10 @@ app.registerExtension({
                 orig_nodeCreated?.apply(this, arguments);
 
                 const currentNode = this;  // Ensure 'this' is referenced correctly as 'currentNode'
+
+                // Define mediaRecorder at the node level scope
+                let mediaRecorder;
+                let audioChunks = [];
 
                 // Create a container div for the button
                 const widget = {
@@ -205,24 +158,60 @@ app.registerExtension({
 
                 document.body.appendChild(widget.div);  // Append to document body
 
+                const startRecording = () => {
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        console.error('Browser does not support audio recording');
+                        return;
+                    }
+
+                    audioChunks = []; // Reset chunks
+
+                    const onMediaDataAvailable = (event) => {
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                        }
+                    };
+
+                    const onStopRecording = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                        const reader = new FileReader();
+
+                        reader.onloadend = () => {
+                            const base64data = reader.result.split(',')[1];
+
+                            // Directly save base64data to local storage
+                            setLocalData('_vrch_audio_recorder', base64data);
+
+                            console.log('Audio recording saved.');
+                        };
+                        reader.readAsDataURL(audioBlob);
+
+                        startBtn.innerText = 'START';
+                        startBtn.className = '';
+                    };
+
+                    navigator.mediaDevices.getUserMedia({ audio: true })
+                        .then((stream) => {
+                            mediaRecorder = new MediaRecorder(stream);
+                            mediaRecorder.ondataavailable = onMediaDataAvailable;
+                            mediaRecorder.onstop = onStopRecording;
+                            mediaRecorder.start();
+                            startBtn.innerText = 'STOP';
+                            startBtn.className = 'recording';
+
+                            console.log('Recording started...');
+                        })
+                        .catch(error => console.error('Error accessing audio devices.', error));
+                };
+
                 startBtn.addEventListener('click', () => {
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
                         mediaRecorder.stop();
                         mediaRecorder = null;
-                        startBtn.innerText = 'START';
-                        startBtn.className = '';
                     } else {
-                        navigator.mediaDevices.getUserMedia({ audio: true })
-                            .then((stream) => {
-                                startMediaRecording(stream);
-                                startBtn.innerText = 'STOP';
-                            })
-                            .catch(error => console.error('Error accessing audio devices.', error));
+                        startRecording();
                     }
                 });
-
-                // Make the button interactive
-                startRecording(startBtn, currentNode);
 
                 this.addCustomWidget(widget);
 
@@ -239,8 +228,8 @@ app.registerExtension({
             nodeType.prototype.onExecuted = function (message) {
                 onExecuted?.apply(this, arguments);
                 try {
-                    let data = getLocalData('_vrch_audio_recorder') || {};
-                    if (data[this.id]) {
+                    let data = getLocalData('_vrch_audio_recorder') || '';
+                    if (data) {
                         console.log('Recorded audio exists, ready for use.');
                     }
                 } catch (error) {
@@ -250,3 +239,4 @@ app.registerExtension({
         }
     }
 });
+
