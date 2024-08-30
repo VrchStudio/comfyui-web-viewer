@@ -24,7 +24,7 @@ class VrchAudioSaverNode:
                 "audio": ("AUDIO",),
                 "filename": ("STRING", {"default": "web_viewer_audio"}),
                 "path": ("STRING", {"default": "web_viewer"}),
-                "extension": (["flac", "wav", "mp3"], {"default": "flac"}),
+                "extension": (["flac", "wav", "mp3"], {"default": "mp3"}),
                 "enable_preview": ("BOOLEAN", {"default": False}),
             }
         }
