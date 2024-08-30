@@ -81,15 +81,6 @@ function get_position_style(ctx, widget_width, y, node_height) {
     };
 }
 
-// Helper functions for local storage operations
-function getLocalData(key) {
-    return localStorage.getItem(key);
-}
-
-function setLocalData(key, value) {
-    localStorage.setItem(key, value);
-}
-
 app.registerExtension({
     name: 'vrch.AudioRecorderNode',  // Node name
     async getCustomWidgets(app) {
@@ -103,10 +94,6 @@ app.registerExtension({
                     computeSize(...args) {
                         return [128, 32];  // Default widget size
                     },
-                    async serializeValue(nodeId, widgetIndex) {
-                        let data = getLocalData('_vrch_audio_recorder') || '';
-                        return data || 'No audio recorded';
-                    }
                 };
                 node.addCustomWidget(widget);
                 return widget;
@@ -126,6 +113,12 @@ app.registerExtension({
                 let mediaRecorder;
                 let audioChunks = [];
 
+                // Hide the base64_data widget
+                const base64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
+                if (base64Widget) {
+                    base64Widget.hidden = true;
+                }
+
                 // Create a container div for the button
                 const widget = {
                     type: 'div',
@@ -133,7 +126,7 @@ app.registerExtension({
                     draw(ctx, node, widget_width, y, widget_height) {
                         Object.assign(
                             this.div.style,
-                            get_position_style(ctx, widget_width, 75, node.size[1])
+                            get_position_style(ctx, widget_width, 80, node.size[1])
                         );
                     }
                 };
@@ -178,9 +171,6 @@ app.registerExtension({
                     
                         reader.onloadend = () => {
                             const base64data = reader.result.split(',')[1];
-                    
-                            // Directly save base64data to local storage
-                            setLocalData('_vrch_audio_recorder', base64data);
                     
                             // Update the input field with the recorded base64 data
                             const audioBase64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
@@ -230,19 +220,6 @@ app.registerExtension({
                 };
 
                 this.serialize_widgets = true;  // Ensure widget state is saved
-            };
-
-            const onExecuted = nodeType.prototype.onExecuted;
-            nodeType.prototype.onExecuted = function (message) {
-                onExecuted?.apply(this, arguments);
-                try {
-                    let data = getLocalData('_vrch_audio_recorder') || '';
-                    if (data) {
-                        console.log('Recorded audio exists, ready for use.');
-                    }
-                } catch (error) {
-                    console.log('###VrchAudioRecorderNode', error);
-                }
             };
         }
     }
