@@ -48,7 +48,7 @@ app.registerExtension({
                         audioUIWidget.element.classList.remove("empty-audio-widget");
                     }
                 }
-        };
+            };
         }
     }
 });
@@ -82,7 +82,7 @@ function get_position_style(ctx, widget_width, y, node_height) {
 }
 
 app.registerExtension({
-    name: 'vrch.AudioRecorderNode',  // Node name
+    name: 'vrch.AudioRecorderNode',
     async getCustomWidgets(app) {
         return {
             AUDIOINPUTMIX(node, inputName, inputData, app) {
@@ -97,12 +97,15 @@ app.registerExtension({
                 };
                 node.addCustomWidget(widget);
                 return widget;
-            }
+            },
         };
     },
 
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeType.comfyClass === 'VrchAudioRecorderNode') {
+
+            nodeData.input.required.audioUI = ["AUDIO_UI"];
+
             const orig_nodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {
                 orig_nodeCreated?.apply(this, arguments);
@@ -126,7 +129,7 @@ app.registerExtension({
                     draw(ctx, node, widget_width, y, widget_height) {
                         Object.assign(
                             this.div.style,
-                            get_position_style(ctx, widget_width, 110, node.size[1])
+                            get_position_style(ctx, widget_width, 150, node.size[1])
                         );
                     }
                 };
@@ -139,6 +142,7 @@ app.registerExtension({
                 // Button styling
                 startBtn.className = "comfy-btn";
                 startBtn.style = `
+                    font-size: 18px;
                     padding: 15px 10px;
                 `;
 
@@ -171,6 +175,13 @@ app.registerExtension({
                             const audioBase64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
                             if (audioBase64Widget) {
                                 audioBase64Widget.value = base64data;
+                            }
+
+                            // Update the audioUI widget to play the recorded base64 audio
+                            const audioUIWidget = currentNode.widgets.find(w => w.name === "audioUI");
+                            if (audioUIWidget) {
+                                audioUIWidget.element.src = `data:audio/webm;base64,${base64data}`;
+                                audioUIWidget.element.classList.remove("empty-audio-widget");
                             }
 
                             console.log('Audio recording saved.');
