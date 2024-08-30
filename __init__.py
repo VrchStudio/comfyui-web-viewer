@@ -7,6 +7,7 @@ __version__ = "1.0.2"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAudioGenresNode": VrchAudioGenresNode,
+    "VrchAudioRecorderNode": VrchAudioRecorderNode,
     "VrchAudioSaverNode": VrchAudioSaverNode,
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
     "VrchImageSaverNode": VrchImageSaverNode,
@@ -15,6 +16,7 @@ NODE_CLASS_MAPPINGS = {
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchAudioGenresNode": "Get Audio Genres by vrch.io",
+    "VrchAudioRecorderNode": "Audio Recorder by vrch.io",
     "VrchAudioSaverNode": "Audio Saver by vrch.io",
     "VrchJsonUrlLoaderNode": "JSON URL Loader by vrch.io",
     "VrchImageSaverNode": "Image Saver by vrch.io",
