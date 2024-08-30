@@ -74,13 +74,9 @@ function get_position_style (ctx, widget_width, y, node_height) {
       cursor: 'pointer',
       position: 'absolute',
       maxWidth: `${widget_width - MARGIN * 2}px`,
-      // maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
       width: `${widget_width - MARGIN * 2}px`,
-      // height: `${node_height * 0.3 - MARGIN * 2}px`,
-      // background: '#EEEEEE',
       display: 'flex',
       flexDirection: 'column',
-      // alignItems: 'center',
       justifyContent: 'space-around'
     }
   }
@@ -117,7 +113,7 @@ const startRecording = (startBtn, node) => {
         };
         reader.readAsDataURL(audioBlob);
 
-        startBtn.innerText = 'Start';
+        startBtn.innerText = 'START';
         startBtn.className = '';
     };
 
@@ -127,7 +123,7 @@ const startRecording = (startBtn, node) => {
         mediaRecorder.onstop = onStopRecording;
 
         mediaRecorder.start();
-        startBtn.innerText = 'Stop';
+        startBtn.innerText = 'STOP';
         startBtn.className = 'recording';
 
         console.log('Recording started...');
@@ -184,27 +180,24 @@ app.registerExtension({
                     draw(ctx, node, widget_width, y, widget_height) {
                         Object.assign(
                             this.div.style,
-                            get_position_style(ctx, widget_width, 78, node.size[1])
+                            get_position_style(ctx, widget_width, 75, node.size[1])
                         );
                     }
                 };
 
                 widget.div = document.createElement('div');
-                widget.div.style.display = 'flex';
-                widget.div.style.flexDirection = 'column';
-                widget.div.style.margin = '10px';
 
                 const startBtn = document.createElement('button');
-                startBtn.innerText = 'Start';
+                startBtn.innerText = 'START';
 
                 // Button styling
                 startBtn.style = `
                     margin-top: 10px;
                     background-color: var(--comfy-input-bg);
-                    border-radius: 4px;
+                    border-radius: 15px;
                     border: 1px solid var(--border-color);
                     color: var(--descrip-text);
-                    padding: 6px 12px;
+                    padding: 5px 20px;
                     cursor: pointer;
                 `;
 
@@ -216,13 +209,13 @@ app.registerExtension({
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
                         mediaRecorder.stop();
                         mediaRecorder = null;
-                        startBtn.innerText = 'Start';
+                        startBtn.innerText = 'START';
                         startBtn.className = '';
                     } else {
                         navigator.mediaDevices.getUserMedia({ audio: true })
                             .then((stream) => {
                                 startMediaRecording(stream);
-                                startBtn.innerText = 'Stop';
+                                startBtn.innerText = 'STOP';
                             })
                             .catch(error => console.error('Error accessing audio devices.', error));
                     }
