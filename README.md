@@ -1,8 +1,8 @@
 # ComfyUI-Web-Viewer
 
-Version: 1.0.0
-
 This is a custom node collection for ComfyUI that provides a Web Viewer utility under the vrch.io category.
+
+## Changelog
 
 [Changelog](CHANGELOG.md)
 
@@ -14,13 +14,21 @@ This is a custom node collection for ComfyUI that provides a Web Viewer utility 
 
 ## Usage
 
-### Web Viewer by vrch.io (vrch.io/web)
+### Node: `Web Viewer by vrch.io` (vrch.io/web)
 
-1. Add the "Web Viewer by vrch.io" node to your ComfyUI workflow.
+1. Add the `Web Viewer by vrch.io` node to your ComfyUI workflow.
 2. The node provides an input field for the URL and a button to open the web viewer.
 3. You can customize the URL in the node's input field.
 4. Click the "Open Web Viewer" button to open the specified URL in a new browser window.
 5. You can also adjust the window size using the "window_width" and "window_height" inputs.
+   
+### Node: `Audio Recorder by vrch.io` (vrch.io/audio)
+
+1. **Add the `Audio Recorder by vrch.io` node** to your ComfyUI workflow.
+2. **Press and hold the "Press and Hold to Record" button** to start recording audio.
+3. **Release the button** to stop the recording.
+4. The recorded audio will appear in the `audioUI` widget, where you can play it back.
+5. (future feature) Adjust the recording duration using the `record_duration` input.
 
 ## Version Update
 
@@ -40,6 +48,7 @@ This project uses `bump2version` for version management. To update the version:
    - Update the CHANGELOG.md file
    - Create a new git commit and tag (if you're using git)
 4. After running the script, review and update the CHANGELOG.md file with details about the new version's changes.
+   - Note: make sure you've put changes in `Unreleased` section manually
 
 ## Contributing
 
