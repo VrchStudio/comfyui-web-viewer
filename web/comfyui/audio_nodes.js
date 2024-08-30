@@ -53,6 +53,38 @@ app.registerExtension({
     }
 });
 
+function get_position_style (ctx, widget_width, y, node_height) {
+    const MARGIN = 4 // the margin around the html element
+  
+    /* Create a transform that deals with all the scrolling and zooming */
+    const elRect = ctx.canvas.getBoundingClientRect()
+    const transform = new DOMMatrix()
+      .scaleSelf(
+        elRect.width / ctx.canvas.width,
+        elRect.height / ctx.canvas.height
+      )
+      .multiplySelf(ctx.getTransform())
+      .translateSelf(MARGIN, MARGIN + y)
+  
+    return {
+      transformOrigin: '0 0',
+      transform: transform,
+      left: `0`,
+      top: `0`,
+      cursor: 'pointer',
+      position: 'absolute',
+      maxWidth: `${widget_width - MARGIN * 2}px`,
+      // maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
+      width: `${widget_width - MARGIN * 2}px`,
+      // height: `${node_height * 0.3 - MARGIN * 2}px`,
+      // background: '#EEEEEE',
+      display: 'flex',
+      flexDirection: 'column',
+      // alignItems: 'center',
+      justifyContent: 'space-around'
+    }
+  }
+
 const startRecording = (startBtn, node) => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         console.error('Browser does not support audio recording');
@@ -145,10 +177,22 @@ app.registerExtension({
 
                 const currentNode = this;  // Ensure 'this' is referenced correctly as 'currentNode'
 
-                const widgetDiv = document.createElement('div');
-                widgetDiv.style.display = 'flex';
-                widgetDiv.style.flexDirection = 'column';
-                widgetDiv.style.margin = '10px';
+                // Create a container div for the button
+                const widget = {
+                    type: 'div',
+                    name: 'audioRecorderDiv',
+                    draw(ctx, node, widget_width, y, widget_height) {
+                        Object.assign(
+                            this.div.style,
+                            get_position_style(ctx, widget_width, 78, node.size[1])
+                        );
+                    }
+                };
+
+                widget.div = document.createElement('div');
+                widget.div.style.display = 'flex';
+                widget.div.style.flexDirection = 'column';
+                widget.div.style.margin = '10px';
 
                 const startBtn = document.createElement('button');
                 startBtn.innerText = 'Start';
@@ -164,17 +208,35 @@ app.registerExtension({
                     cursor: pointer;
                 `;
 
-                widgetDiv.appendChild(startBtn);
+                widget.div.appendChild(startBtn);
 
-                // Integrate the button div into the node using LiteGraph methods
-                const customWidget = currentNode.addWidget('button', 'Record Audio', '', () => {}, {width: 150});
-                customWidget.content = widgetDiv;
-                
+                document.body.appendChild(widget.div);  // Append to document body
+
+                startBtn.addEventListener('click', () => {
+                    if (mediaRecorder && mediaRecorder.state === 'recording') {
+                        mediaRecorder.stop();
+                        mediaRecorder = null;
+                        startBtn.innerText = 'Start';
+                        startBtn.className = '';
+                    } else {
+                        navigator.mediaDevices.getUserMedia({ audio: true })
+                            .then((stream) => {
+                                startMediaRecording(stream);
+                                startBtn.innerText = 'Stop';
+                            })
+                            .catch(error => console.error('Error accessing audio devices.', error));
+                    }
+                });
+
+                // Make the button interactive
                 startRecording(startBtn, currentNode);
 
+                this.addCustomWidget(widget);
+
+                const onRemoved = this.onRemoved;
                 this.onRemoved = function () {
-                    widgetDiv.remove();  // Clean up when node is removed
-                    orig_nodeCreated?.apply(this, arguments);
+                    widget.div.remove();  // Clean up when node is removed
+                    return onRemoved?.();
                 };
 
                 this.serialize_widgets = true;  // Ensure widget state is saved
