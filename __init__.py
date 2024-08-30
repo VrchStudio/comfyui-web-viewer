@@ -1,24 +1,26 @@
-from .nodes.web_viewer_node import WebViewerNode
+from .nodes.web_viewer_node import VrchWebViewerNode
 from .nodes.image_nodes import *
 from .nodes.audio_nodes import *
 from .nodes.text_nodes import *
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 NODE_CLASS_MAPPINGS = {
-    "AudioGenresNode": AudioGenresNode,
-    "AudioSaverNode": AudioSaverNode,
-    "JsonUrlLoaderNode": JsonUrlLoaderNode,
-    "ImageSaverNode": ImageSaverNode,
-    "WebViewerNode": WebViewerNode,
+    "VrchAudioGenresNode": VrchAudioGenresNode,
+    "VrchAudioRecorderNode": VrchAudioRecorderNode,
+    "VrchAudioSaverNode": VrchAudioSaverNode,
+    "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
+    "VrchImageSaverNode": VrchImageSaverNode,
+    "VrchWebViewerNode": VrchWebViewerNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "AudioSaverNode": "Audio Saver by vrch.io",
-    "AudioGenresNode": "Get Audio Genres by vrch.io",
-    "JsonUrlLoaderNode": "JSON URL Loader by vrch.io",
-    "ImageSaverNode": "Image Saver by vrch.io",
-    "WebViewerNode": "Web Viewer by vrch.io",
+    "VrchAudioGenresNode": "Get Audio Genres by vrch.io",
+    "VrchAudioRecorderNode": "Audio Recorder by vrch.io",
+    "VrchAudioSaverNode": "Audio Saver by vrch.io",
+    "VrchJsonUrlLoaderNode": "JSON URL Loader by vrch.io",
+    "VrchImageSaverNode": "Image Saver by vrch.io",
+    "VrchWebViewerNode": "Web Viewer by vrch.io",
 }
 
 # WEB_DIRECTORY is the comfyui nodes directory that ComfyUI will link and auto-load.
