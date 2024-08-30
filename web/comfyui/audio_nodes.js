@@ -53,18 +53,18 @@ app.registerExtension({
     }
 });
 
-function get_position_style (ctx, widget_width, y, node_height) {
-    const MARGIN = 4 // the margin around the html element
+function get_position_style(ctx, widget_width, y, node_height) {
+    const MARGIN = 4; // the margin around the html element
 
     /* Create a transform that deals with all the scrolling and zooming */
-    const elRect = ctx.canvas.getBoundingClientRect()
+    const elRect = ctx.canvas.getBoundingClientRect();
     const transform = new DOMMatrix()
         .scaleSelf(
-        elRect.width / ctx.canvas.width,
-        elRect.height / ctx.canvas.height
+            elRect.width / ctx.canvas.width,
+            elRect.height / ctx.canvas.height
         )
         .multiplySelf(ctx.getTransform())
-        .translateSelf(MARGIN, MARGIN + y)
+        .translateSelf(MARGIN, MARGIN + y);
 
     return {
         transformOrigin: '0 0',
@@ -78,7 +78,7 @@ function get_position_style (ctx, widget_width, y, node_height) {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-around'
-    }
+    };
 }
 
 // Helper functions for local storage operations
@@ -173,26 +173,34 @@ app.registerExtension({
                     };
 
                     const onStopRecording = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });  
                         const reader = new FileReader();
-
+                    
                         reader.onloadend = () => {
                             const base64data = reader.result.split(',')[1];
-
+                    
                             // Directly save base64data to local storage
                             setLocalData('_vrch_audio_recorder', base64data);
-
+                    
+                            // Update the input field with the recorded base64 data
+                            const audioBase64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
+                            if (audioBase64Widget) {
+                                audioBase64Widget.value = base64data;
+                            }
+                    
                             console.log('Audio recording saved.');
                         };
                         reader.readAsDataURL(audioBlob);
-
+                    
                         startBtn.innerText = 'START';
                         startBtn.className = '';
                     };
 
                     navigator.mediaDevices.getUserMedia({ audio: true })
                         .then((stream) => {
-                            mediaRecorder = new MediaRecorder(stream);
+                            mediaRecorder = new MediaRecorder(stream, {
+                                mimeType: 'audio/webm'
+                            });
                             mediaRecorder.ondataavailable = onMediaDataAvailable;
                             mediaRecorder.onstop = onStopRecording;
                             mediaRecorder.start();

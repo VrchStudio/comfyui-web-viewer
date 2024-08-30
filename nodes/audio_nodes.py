@@ -1,8 +1,11 @@
+import subprocess
+import tempfile
 import time
 import traceback
 import json
 import os
 import io
+import base64
 import torch
 import torch.nn as nn
 import torchaudio
@@ -68,44 +71,39 @@ class VrchAudioSaverNode:
         
 class VrchAudioRecorderNode:
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
-            "required": {},
-            "optional": {
+            "required": {
+                "base64_data": ("STRING", {"multiline": False}),
                 "record_duration": ("INT", {
-                    "default": 10,  # Default duration for recording in seconds
-                    "min": 1,       # Minimum recording duration
-                    "max": 300,     # Maximum recording duration
-                    "step": 1,      # Slider's step
-                    "display": "number"  # Display as "number" or "slider"
+                    "default": 10,  
+                    "min": 1,           
+                    "max": 120,     
+                    "step": 1,      
+                    "display": "number"
                 }),
             }
         }
 
-    RETURN_TYPES = ("AUDIO", )  # Updated to "AUDIO" type to be compatible with PreviewAudio
-    RETURN_NAMES = ("recorded_audio",)
+    RETURN_TYPES = ("AUDIO",)
+    RETURN_NAMES = ("AUDIO",)
+    CATEGORY = "vrch.io/audio"
+    FUNCTION = "process_audio"
+    
+    def process_audio(self, base64_data, record_duration):
+        
+        audio_data = base64.b64decode(base64_data)
+        buffer = io.BytesIO(audio_data)
+        waveform, sample_rate = torchaudio.load(buffer)
+        
+        # # Check if the audio is mono (single channel)
+        # if waveform.shape[0] == 1:
+        #     # Convert mono to stereo by duplicating the channel
+        #     waveform = waveform.repeat(2, 1)
+        
+        audio = {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
 
-    FUNCTION = "run"
-
-    CATEGORY = "vrch.io/audio"  # Updated category
-
-    INPUT_IS_LIST = False
-    OUTPUT_IS_LIST = (False,)
-
-    def run(self, record_duration):
-        # Placeholder implementation for audio recording logic
-        audio_data = self.record_audio(record_duration)
-        return (audio_data, )  # Return audio data in a format compatible with PreviewAudio
-
-    def record_audio(self, duration):
-        # Implement actual audio recording logic here
-        # This is just a placeholder; replace with real recording code
-        audio = {
-            "waveform": torch.randn(1, int(duration * 16000)),  # Dummy waveform for example
-            "sample_rate": 16000
-        }
-        return audio
-
+        return (audio,)
 
 class VrchAudioGenresNode:
     @classmethod
