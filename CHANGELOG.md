@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Updated
+- update node `VrchAudioRecorderNode` with `record_mode` options:
+  - `press_and_hold` mode
+  - `start_and_stop` mode
+- update node `VrchAudioRecorderNode` with `loop` and `loop_interval` options
+- update README.md
+
 ## 1.0.3 - 2024-08-30
 
 ### Added
