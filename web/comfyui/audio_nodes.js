@@ -115,6 +115,7 @@ app.registerExtension({
                 let mediaRecorder;
                 let audioChunks = [];
                 let isRecording = false;
+                let recordingTimer;
 
                 // Hide the base64_data widget
                 const base64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
@@ -211,6 +212,15 @@ app.registerExtension({
                             switchButtonMode(recordModeWidget.value);
                             
                             console.log('Recording started...');
+
+                            // Start the timer for maximum recording duration
+                            const recordDurationMaxWidget = currentNode.widgets.find(w => w.name === 'record_duration_max');
+                            const maxDuration = (recordDurationMaxWidget ? recordDurationMaxWidget.value : 10) * 1000; // Convert to milliseconds
+                            recordingTimer = setTimeout(() => {
+                                if (isRecording) {
+                                    stopRecording();
+                                }
+                            }, maxDuration);
                         })
                         .catch(error => console.error('Error accessing audio devices.', error));
                 };
@@ -220,6 +230,11 @@ app.registerExtension({
                         mediaRecorder.stop();
                         mediaRecorder = null;
                         isRecording = false;
+                        
+                        if (recordingTimer) {
+                            clearTimeout(recordingTimer);
+                            recordingTimer = null;
+                        }
                         
                         const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
                         switchButtonMode(recordModeWidget.value);
@@ -244,11 +259,14 @@ app.registerExtension({
                 const onRemoved = this.onRemoved;
                 this.onRemoved = function () {
                     widget.div.remove();  // Clean up when node is removed
+                    if (recordingTimer) {
+                        clearTimeout(recordingTimer);
+                    }
                     return onRemoved?.();
                 };
 
                 this.serialize_widgets = true;  // Ensure widget state is saved
             };
         }
-    },
+    }
 });
