@@ -123,7 +123,7 @@ app.registerExtension({
                     base64Widget.hidden = true;
                 }
 
-                // Create a container div for the button
+                // Create a container div for the button and countdown
                 const widget = {
                     type: 'div',
                     name: 'audioRecorderDiv',
@@ -142,7 +142,18 @@ app.registerExtension({
                 startBtn.style = `
                     font-size: 18px;
                     padding: 15px 10px;
+                    width: 100%;
                 `;
+
+                const countdownDisplay = document.createElement('div');
+                countdownDisplay.style = `
+                    font-size: 14px;
+                    margin-top: 5px;
+                    text-align: center;
+                `;
+
+                widget.div.appendChild(startBtn);
+                widget.div.appendChild(countdownDisplay);
 
                 const switchButtonMode = (mode) => {
                     if (mode === 'press_and_hold') {
@@ -213,14 +224,33 @@ app.registerExtension({
                             
                             console.log('Recording started...');
 
-                            // Start the timer for maximum recording duration
+                            // Start the countdown for maximum recording duration
                             const recordDurationMaxWidget = currentNode.widgets.find(w => w.name === 'record_duration_max');
-                            const maxDuration = (recordDurationMaxWidget ? recordDurationMaxWidget.value : 10) * 1000; // Convert to milliseconds
-                            recordingTimer = setTimeout(() => {
-                                if (isRecording) {
-                                    stopRecording();
+                            const maxDuration = recordDurationMaxWidget ? recordDurationMaxWidget.value : 10;
+                            
+                            let remainingTime = maxDuration;
+                            const startCountdown = Math.min(10, maxDuration);
+
+                            const updateCountdown = () => {
+                                if (remainingTime <= startCountdown) {
+                                    countdownDisplay.textContent = `Recording will stop in ${remainingTime} seconds`;
+                                } else {
+                                    countdownDisplay.textContent = 'Recording...';
                                 }
-                            }, maxDuration);
+                                
+                                if (remainingTime <= 0) {
+                                    clearInterval(recordingTimer);
+                                    if (isRecording) {
+                                        stopRecording();
+                                    }
+                                }
+                                remainingTime--;
+                            };
+                            
+                            // execute immidiately
+                            updateCountdown();
+                            // start timer
+                            recordingTimer = setInterval(updateCountdown, 1000);
                         })
                         .catch(error => console.error('Error accessing audio devices.', error));
                 };
@@ -232,9 +262,11 @@ app.registerExtension({
                         isRecording = false;
                         
                         if (recordingTimer) {
-                            clearTimeout(recordingTimer);
+                            clearInterval(recordingTimer);
                             recordingTimer = null;
                         }
+                        
+                        countdownDisplay.textContent = ''; // Clear countdown display
                         
                         const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
                         switchButtonMode(recordModeWidget.value);
@@ -251,7 +283,6 @@ app.registerExtension({
                 // Initial button setup
                 switchButtonMode(recordModeWidget.value);
 
-                widget.div.appendChild(startBtn);
                 document.body.appendChild(widget.div);
 
                 this.addCustomWidget(widget);
@@ -260,7 +291,7 @@ app.registerExtension({
                 this.onRemoved = function () {
                     widget.div.remove();  // Clean up when node is removed
                     if (recordingTimer) {
-                        clearTimeout(recordingTimer);
+                        clearInterval(recordingTimer);
                     }
                     return onRemoved?.();
                 };
