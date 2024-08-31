@@ -92,7 +92,7 @@ app.registerExtension({
                     size: [128, 32],
                     draw(ctx, node, width, y) {},
                     computeSize(...args) {
-                        return [128, 32];  // Default widget size
+                        return [128, 32]; // Default widget size
                     },
                 };
                 node.addCustomWidget(widget);
@@ -103,7 +103,6 @@ app.registerExtension({
 
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeType.comfyClass === 'VrchAudioRecorderNode') {
-
             nodeData.input.required.audioUI = ["AUDIO_UI"];
 
             const orig_nodeCreated = nodeType.prototype.onNodeCreated;
@@ -116,6 +115,7 @@ app.registerExtension({
                 let audioChunks = [];
                 let isRecording = false;
                 let recordingTimer;
+                let loopIntervalTimer;
 
                 // Hide the base64_data widget
                 const base64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
@@ -130,7 +130,7 @@ app.registerExtension({
                     draw(ctx, node, widget_width, y, widget_height) {
                         Object.assign(
                             this.div.style,
-                            get_position_style(ctx, widget_width, 200, node.size[1])
+                            get_position_style(ctx, widget_width, 220, node.size[1])
                         );
                     }
                 };
@@ -156,20 +156,27 @@ app.registerExtension({
                 widget.div.appendChild(countdownDisplay);
 
                 const switchButtonMode = (mode) => {
+                    const loopWidget = currentNode.widgets.find(w => w.name === 'loop');
+                    const isLoopEnabled = loopWidget && loopWidget.value === true;
+
                     if (mode === 'press_and_hold') {
                         startBtn.innerText = isRecording ? 'Recording...' : 'Press and Hold to Record';
                         startBtn.onmousedown = startRecording;
-                        startBtn.onmouseup = stopRecording;
-                        startBtn.onmouseleave = stopRecording;
+                        startBtn.onmouseup = () => stopRecording(true); // manual stop
+                        startBtn.onmouseleave = () => stopRecording(true); // manual stop
                         startBtn.onclick = null;
                     } else if (mode === 'start_and_stop') {
-                        startBtn.innerText = isRecording ? 'STOP' : 'START';
+                        if (isRecording) {
+                            startBtn.innerText = isLoopEnabled ? 'STOP LOOPING' : 'STOP';
+                        } else {
+                            startBtn.innerText = 'START';
+                        }
                         startBtn.onmousedown = null;
                         startBtn.onmouseup = null;
                         startBtn.onmouseleave = null;
                         startBtn.onclick = () => {
                             if (isRecording) {
-                                stopRecording();
+                                stopRecording(true); // manual stop
                             } else {
                                 startRecording();
                             }
@@ -178,9 +185,18 @@ app.registerExtension({
                 };
 
                 const startRecording = () => {
+                    if (isRecording) {
+                        return; // Don't start a new recording if we're not supposed to continue the loop
+                    }
+
                     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                         console.error('Browser does not support audio recording');
                         return;
+                    }
+
+                    if (loopIntervalTimer) {
+                        clearInterval(loopIntervalTimer);
+                        loopIntervalTimer = null;
                     }
 
                     audioChunks = [];
@@ -240,14 +256,15 @@ app.registerExtension({
                                 
                                 if (remainingTime <= 0) {
                                     clearInterval(recordingTimer);
+                                    remainingTime = 0;
                                     if (isRecording) {
-                                        stopRecording();
+                                        stopRecording(false); //auto stop
                                     }
                                 }
                                 remainingTime--;
                             };
-                            
-                            // execute immidiately
+
+                            // execute immediately
                             updateCountdown();
                             // start timer
                             recordingTimer = setInterval(updateCountdown, 1000);
@@ -255,7 +272,8 @@ app.registerExtension({
                         .catch(error => console.error('Error accessing audio devices.', error));
                 };
 
-                const stopRecording = () => {
+                
+                const stopRecording = (isManualStop = false) => {
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
                         mediaRecorder.stop();
                         mediaRecorder = null;
@@ -269,6 +287,35 @@ app.registerExtension({
                         countdownDisplay.textContent = ''; // Clear countdown display
                         
                         const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
+                        const loopWidget = currentNode.widgets.find(w => w.name === 'loop');
+                        
+                        if (isManualStop) {
+                            // If it's a manual stop, always stop the loop and update the button
+                            if (loopWidget) {
+                                loopWidget.value = false;
+                                if (loopWidget.callback) {
+                                    loopWidget.callback(loopWidget.value);
+                                }
+                            }
+                            
+                            if (loopIntervalTimer) {
+                                clearInterval(loopIntervalTimer);
+                                loopIntervalTimer = null;
+                            }
+
+                            console.log('Recording stopped manually');
+
+                        } else if (loopWidget.value === true && recordModeWidget.value === 'start_and_stop') {
+                            // If it's an automatic stop and loop is enabled, restart recording after the interval
+                            const loopIntervalWidget = currentNode.widgets.find(w => w.name === 'loop_interval');
+                            const loopInterval = (loopIntervalWidget && loopIntervalWidget.value) ? loopIntervalWidget.value : 0.5;
+                            loopIntervalTimer = setTimeout(() => {
+                                startRecording();
+                            }, loopInterval * 1000);
+
+                            console.log('Recording is restarted in a loop');
+                        }
+                        
                         switchButtonMode(recordModeWidget.value);
                     }
                 };
@@ -289,15 +336,20 @@ app.registerExtension({
 
                 const onRemoved = this.onRemoved;
                 this.onRemoved = function () {
-                    widget.div.remove();  // Clean up when node is removed
+                    // Clean up when node is removed
+                    widget.div.remove();
                     if (recordingTimer) {
                         clearInterval(recordingTimer);
+                    }
+                    if (loopIntervalTimer) {
+                        clearInterval(loopIntervalTimer);
                     }
                     return onRemoved?.();
                 };
 
-                this.serialize_widgets = true;  // Ensure widget state is saved
+                this.serialize_widgets = true; // Ensure widget state is saved
             };
         }
     }
 });
+

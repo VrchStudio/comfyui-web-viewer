@@ -78,13 +78,18 @@ class VrchAudioRecorderNode:
                 "base64_data": ("STRING", {"multiline": False}),
                 "record_mode": (["press_and_hold", "start_and_stop"],{"default":"press_and_hold",}),
                 "record_duration_max": ("INT", {
-                    "default": 10,  
+                    "default": 15,  
                     "min": 1,           
-                    "max": 120,     
-                    "step": 1,      
-                    "display": "number"
+                    "max": 60,     
+                    "step": 1,
                 }),
                 "loop": ("BOOLEAN", {"default": False}),
+                "loop_interval": ("FLOAT", {
+                    "default": 1.0,  
+                    "min": 0.1,           
+                    "max": 60.0,     
+                    "step": 0.1,
+                }),
             }
         }
 
@@ -93,7 +98,7 @@ class VrchAudioRecorderNode:
     CATEGORY = "vrch.io/audio"
     FUNCTION = "process_audio"
     
-    def process_audio(self, base64_data, record_mode, record_duration_max, loop):
+    def process_audio(self, base64_data, record_mode, record_duration_max, loop, loop_interval):
         
         audio_data = base64.b64decode(base64_data)
         buffer = io.BytesIO(audio_data)
@@ -109,7 +114,7 @@ class VrchAudioRecorderNode:
         return (audio,)
     
     @classmethod
-    def IS_CHANGED(s, base64_data, record_mode, record_duration_max, loop):
+    def IS_CHANGED(s, base64_data, record_mode, record_duration_max, loop, loop_interval):
         
         # Create a new SHA-256 hash object
         m = hashlib.sha256()
