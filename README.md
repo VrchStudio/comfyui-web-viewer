@@ -24,11 +24,21 @@ This is a custom node collection for ComfyUI that provides a Web Viewer utility 
    
 ### Node: `Audio Recorder by vrch.io` (vrch.io/audio)
 
-1. **Add the `Audio Recorder by vrch.io` node** to your ComfyUI workflow.
-2. **Press and hold the "Press and Hold to Record" button** to start recording audio.
-3. **Release the button** to stop the recording.
-4. The recorded audio will appear in the `audioUI` widget, where you can play it back.
-5. (future feature) Adjust the recording duration using the `record_duration` input.
+
+1. Add the `Audio Recorder by vrch.io` node to your ComfyUI workflow.
+2. Configure the node:
+   - `record_mode`: Choose between "press_and_hold" or "start_and_stop".
+   - `record_duration_max`: Set maximum recording duration (1-60 seconds).
+   - `loop`: Enable/disable loop recording.
+   - `loop_interval`: Set interval between loop recordings (if loop is enabled).
+3. Record audio:
+   - "Press and Hold" mode: Hold the button to record, release to stop.
+   - "Start and Stop" mode: Click "START" to begin, "STOP" to end.
+   - In loop mode (Start and Stop): Click "START" to begin loop, "STOP LOOPING" to end.
+4. The recorded audio will appear in the `audioUI` widget for playback.
+5. Use the `AUDIO` output to connect the recorded audio to other nodes.
+
+Note: A countdown displays for the last 10 seconds of recording.
 
 ## Version Update
 
