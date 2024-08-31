@@ -1,3 +1,4 @@
+import hashlib
 import subprocess
 import tempfile
 import time
@@ -71,17 +72,19 @@ class VrchAudioSaverNode:
         
 class VrchAudioRecorderNode:
     @classmethod
-    def INPUT_TYPES(cls):
+    def INPUT_TYPES(s):
         return {
             "required": {
                 "base64_data": ("STRING", {"multiline": False}),
-                "record_duration": ("INT", {
+                "record_mode": (["press_and_hold", "start_and_stop"],{"default":"press_and_hold",}),
+                "record_duration_max": ("INT", {
                     "default": 10,  
                     "min": 1,           
                     "max": 120,     
                     "step": 1,      
                     "display": "number"
                 }),
+                "loop": ("BOOLEAN", {"default": False}),
             }
         }
 
@@ -90,7 +93,7 @@ class VrchAudioRecorderNode:
     CATEGORY = "vrch.io/audio"
     FUNCTION = "process_audio"
     
-    def process_audio(self, base64_data, record_duration):
+    def process_audio(self, base64_data, record_mode, record_duration_max, loop):
         
         audio_data = base64.b64decode(base64_data)
         buffer = io.BytesIO(audio_data)
@@ -104,6 +107,18 @@ class VrchAudioRecorderNode:
         audio = {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
 
         return (audio,)
+    
+    @classmethod
+    def IS_CHANGED(s, base64_data, record_mode, record_duration_max, loop):
+        
+        # Create a new SHA-256 hash object
+        m = hashlib.sha256()
+        
+        # Update the hash object with the encoded base64 data
+        m.update(base64_data.encode())
+        
+        # Return the hexadecimal digest of the hash
+        return m.hexdigest()
 
 class VrchAudioGenresNode:
     @classmethod
