@@ -301,26 +301,27 @@ class MusicGenresClassifier:
 
         return model
 
-    def predict(self, model, audio_file, enable_debug=False):
+    def predict(self, model, waveform, enable_debug=False):
         """
-        Predict the genre of a given audio file.
+        Predict the genre of a given audio waveform.
         """
         if enable_debug:
             start_time = time.time()
             print("Starting audio prediction...")
 
         try:
-            wav_file = self.convert_to_wav(audio_file)
+            # Ensure the waveform is correctly formatted
+            if waveform.dim() == 3:  # If input is (batch_size, 1, time)
+                waveform = waveform.squeeze(1)  # Remove the channel dimension for processing
 
-            features = self.extract_features(
-                file_path=wav_file)
+            features = self.extract_features(waveform=waveform)
             if features is None:
-                return "Error: Unable to extract features from the audio file."
+                return "Error: Unable to extract features from the audio waveform."
 
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
             model.to(device)
 
-            features = features.unsqueeze(0).to(device)
+            features = features.unsqueeze(0).to(device)  # Add batch dimension
 
             with torch.no_grad():
                 outputs = model(features)
@@ -336,9 +337,6 @@ class MusicGenresClassifier:
         except Exception as e:
             print(str(e))
             sorted_predicted_probabilities = None  # Assign to prevent UnboundLocalError
-
-        finally:
-            os.remove(wav_file)
 
         return sorted_predicted_probabilities
 
