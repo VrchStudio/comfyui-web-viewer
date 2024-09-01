@@ -92,7 +92,7 @@ app.registerExtension({
                     size: [128, 32],
                     draw(ctx, node, width, y) {},
                     computeSize(...args) {
-                        return [128, 32];  // Default widget size
+                        return [128, 32]; // Default widget size
                     },
                 };
                 node.addCustomWidget(widget);
@@ -103,18 +103,19 @@ app.registerExtension({
 
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeType.comfyClass === 'VrchAudioRecorderNode') {
-
             nodeData.input.required.audioUI = ["AUDIO_UI"];
 
             const orig_nodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {
                 orig_nodeCreated?.apply(this, arguments);
 
-                const currentNode = this;  // Ensure 'this' is referenced correctly as 'currentNode'
+                const currentNode = this;
 
-                // Define mediaRecorder at the node level scope
                 let mediaRecorder;
                 let audioChunks = [];
+                let isRecording = false;
+                let recordingTimer;
+                let loopIntervalTimer;
 
                 // Hide the base64_data widget
                 const base64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
@@ -122,14 +123,14 @@ app.registerExtension({
                     base64Widget.hidden = true;
                 }
 
-                // Create a container div for the button
+                // Create a container div for the button and countdown
                 const widget = {
                     type: 'div',
                     name: 'audioRecorderDiv',
                     draw(ctx, node, widget_width, y, widget_height) {
                         Object.assign(
                             this.div.style,
-                            get_position_style(ctx, widget_width, 150, node.size[1])
+                            get_position_style(ctx, widget_width, 220, node.size[1])
                         );
                     }
                 };
@@ -137,106 +138,218 @@ app.registerExtension({
                 widget.div = document.createElement('div');
 
                 const startBtn = document.createElement('button');
-                startBtn.innerText = 'Press and Hold to Record';
-
-                // Button styling
                 startBtn.className = "comfy-btn";
                 startBtn.style = `
                     font-size: 18px;
                     padding: 15px 10px;
+                    width: 100%;
+                `;
+
+                const countdownDisplay = document.createElement('div');
+                countdownDisplay.style = `
+                    font-size: 14px;
+                    margin-top: 5px;
+                    text-align: center;
                 `;
 
                 widget.div.appendChild(startBtn);
+                widget.div.appendChild(countdownDisplay);
 
-                document.body.appendChild(widget.div);  // Append to document body
+                const switchButtonMode = (mode) => {
+                    const loopWidget = currentNode.widgets.find(w => w.name === 'loop');
+                    const isLoopEnabled = loopWidget && loopWidget.value === true;
+
+                    if (mode === 'press_and_hold') {
+                        startBtn.innerText = isRecording ? 'Recording...' : 'Press and Hold to Record';
+                        startBtn.onmousedown = startRecording;
+                        startBtn.onmouseup = () => stopRecording(true); // manual stop
+                        startBtn.onmouseleave = () => stopRecording(true); // manual stop
+                        startBtn.onclick = null;
+                    } else if (mode === 'start_and_stop') {
+                        if (isRecording) {
+                            startBtn.innerText = isLoopEnabled ? 'STOP LOOPING' : 'STOP';
+                        } else {
+                            startBtn.innerText = 'START';
+                        }
+                        startBtn.onmousedown = null;
+                        startBtn.onmouseup = null;
+                        startBtn.onmouseleave = null;
+                        startBtn.onclick = () => {
+                            if (isRecording) {
+                                stopRecording(true); // manual stop
+                            } else {
+                                startRecording();
+                            }
+                        };
+                    }
+                };
 
                 const startRecording = () => {
+                    if (isRecording) {
+                        return; // Don't start a new recording if we're not supposed to continue the loop
+                    }
+
                     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                         console.error('Browser does not support audio recording');
                         return;
                     }
 
-                    audioChunks = []; // Reset chunks
+                    if (loopIntervalTimer) {
+                        clearInterval(loopIntervalTimer);
+                        loopIntervalTimer = null;
+                    }
 
-                    const onMediaDataAvailable = (event) => {
-                        if (event.data.size > 0) {
-                            audioChunks.push(event.data);
-                        }
-                    };
-
-                    const onStopRecording = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                        const reader = new FileReader();
-
-                        reader.onloadend = () => {
-                            const base64data = reader.result.split(',')[1];
-
-                            // Update the input field with the recorded base64 data
-                            const audioBase64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
-                            if (audioBase64Widget) {
-                                audioBase64Widget.value = base64data;
-                            }
-
-                            // Update the audioUI widget to play the recorded base64 audio
-                            const audioUIWidget = currentNode.widgets.find(w => w.name === "audioUI");
-                            if (audioUIWidget) {
-                                audioUIWidget.element.src = `data:audio/webm;base64,${base64data}`;
-                                audioUIWidget.element.classList.remove("empty-audio-widget");
-                            }
-
-                            console.log('Audio recording saved.');
-                        };
-                        reader.readAsDataURL(audioBlob);
-
-                        startBtn.innerText = 'Press and Hold to Record';
-                    };
+                    audioChunks = [];
+                    isRecording = true;
 
                     navigator.mediaDevices.getUserMedia({ audio: true })
                         .then((stream) => {
                             mediaRecorder = new MediaRecorder(stream, {
                                 mimeType: 'audio/webm'
                             });
-                            mediaRecorder.ondataavailable = onMediaDataAvailable;
-                            mediaRecorder.onstop = onStopRecording;
-                            mediaRecorder.start();
-                            startBtn.innerText = 'Recording...';
+                            mediaRecorder.ondataavailable = (event) => {
+                                if (event.data.size > 0) {
+                                    audioChunks.push(event.data);
+                                }
+                            };
+                            mediaRecorder.onstop = () => {
+                                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                                const reader = new FileReader();
 
+                                reader.onloadend = () => {
+                                    const base64data = reader.result.split(',')[1];
+                                    const audioBase64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
+                                    if (audioBase64Widget) {
+                                        audioBase64Widget.value = base64data;
+                                    }
+
+                                    const audioUIWidget = currentNode.widgets.find(w => w.name === "audioUI");
+                                    if (audioUIWidget) {
+                                        audioUIWidget.element.src = `data:audio/webm;base64,${base64data}`;
+                                        audioUIWidget.element.classList.remove("empty-audio-widget");
+                                    }
+
+                                    console.log('Audio recording saved.');
+                                };
+                                reader.readAsDataURL(audioBlob);
+                            };
+                            mediaRecorder.start();
+                            
+                            const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
+                            switchButtonMode(recordModeWidget.value);
+                            
                             console.log('Recording started...');
+
+                            // Start the countdown for maximum recording duration
+                            const recordDurationMaxWidget = currentNode.widgets.find(w => w.name === 'record_duration_max');
+                            const maxDuration = recordDurationMaxWidget ? recordDurationMaxWidget.value : 10;
+                            
+                            let remainingTime = maxDuration;
+                            const startCountdown = Math.min(10, maxDuration);
+
+                            const updateCountdown = () => {
+                                if (remainingTime <= startCountdown) {
+                                    countdownDisplay.textContent = `Recording will stop in ${remainingTime} seconds`;
+                                } else {
+                                    countdownDisplay.textContent = 'Recording...';
+                                }
+                                
+                                if (remainingTime <= 0) {
+                                    clearInterval(recordingTimer);
+                                    remainingTime = 0;
+                                    if (isRecording) {
+                                        stopRecording(false); //auto stop
+                                    }
+                                }
+                                remainingTime--;
+                            };
+
+                            // execute immediately
+                            updateCountdown();
+                            // start timer
+                            recordingTimer = setInterval(updateCountdown, 1000);
                         })
                         .catch(error => console.error('Error accessing audio devices.', error));
                 };
 
-                const stopRecording = () => {
+                
+                const stopRecording = (isManualStop = false) => {
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
                         mediaRecorder.stop();
                         mediaRecorder = null;
+                        isRecording = false;
+                        
+                        if (recordingTimer) {
+                            clearInterval(recordingTimer);
+                            recordingTimer = null;
+                        }
+                        
+                        countdownDisplay.textContent = ''; // Clear countdown display
+                        
+                        const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
+                        const loopWidget = currentNode.widgets.find(w => w.name === 'loop');
+                        
+                        if (isManualStop) {
+                            // If it's a manual stop, always stop the loop and update the button
+                            if (loopWidget) {
+                                loopWidget.value = false;
+                                if (loopWidget.callback) {
+                                    loopWidget.callback(loopWidget.value);
+                                }
+                            }
+                            
+                            if (loopIntervalTimer) {
+                                clearInterval(loopIntervalTimer);
+                                loopIntervalTimer = null;
+                            }
+
+                            console.log('Recording stopped manually');
+
+                        } else if (loopWidget.value === true && recordModeWidget.value === 'start_and_stop') {
+                            // If it's an automatic stop and loop is enabled, restart recording after the interval
+                            const loopIntervalWidget = currentNode.widgets.find(w => w.name === 'loop_interval');
+                            const loopInterval = (loopIntervalWidget && loopIntervalWidget.value) ? loopIntervalWidget.value : 0.5;
+                            loopIntervalTimer = setTimeout(() => {
+                                startRecording();
+                            }, loopInterval * 1000);
+
+                            console.log('Recording is restarted in a loop');
+                        }
+                        
+                        switchButtonMode(recordModeWidget.value);
                     }
                 };
 
-                startBtn.addEventListener('mousedown', () => {
-                    startRecording();
-                });
+                const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
+                if (recordModeWidget) {
+                    recordModeWidget.callback = () => {
+                        switchButtonMode(recordModeWidget.value);
+                    };
+                }
 
-                startBtn.addEventListener('mouseup', () => {
-                    stopRecording();
-                });
+                // Initial button setup
+                switchButtonMode(recordModeWidget.value);
 
-                startBtn.addEventListener('mouseleave', () => {
-                    if (mediaRecorder && mediaRecorder.state === 'recording') {
-                        stopRecording();
-                    }
-                });
+                document.body.appendChild(widget.div);
 
                 this.addCustomWidget(widget);
 
                 const onRemoved = this.onRemoved;
                 this.onRemoved = function () {
-                    widget.div.remove();  // Clean up when node is removed
+                    // Clean up when node is removed
+                    widget.div.remove();
+                    if (recordingTimer) {
+                        clearInterval(recordingTimer);
+                    }
+                    if (loopIntervalTimer) {
+                        clearInterval(loopIntervalTimer);
+                    }
                     return onRemoved?.();
                 };
 
-                this.serialize_widgets = true;  // Ensure widget state is saved
+                this.serialize_widgets = true; // Ensure widget state is saved
             };
         }
     }
 });
+
