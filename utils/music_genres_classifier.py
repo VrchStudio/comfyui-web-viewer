@@ -7,11 +7,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-import numpy as np
 import torchaudio
 import torchaudio.transforms as T
-import librosa
-import librosa.display
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset, DataLoader
@@ -52,6 +49,7 @@ class MusicGenreCNN(nn.Module):
         # Initialize fully connected layers
         self.fc1 = nn.Linear(self.flattened_size, 128)
         self.fc2 = nn.Linear(128, num_genres)
+        self.dropout_fc = nn.Dropout(0.5)  # Additional dropout for the FC layer
 
     def _forward_conv(self, x):
         """
@@ -66,8 +64,8 @@ class MusicGenreCNN(nn.Module):
         Forward pass through the entire network.
         """
         x = self._forward_conv(x)
-        x = x.view(x.size(0), -1)  # Flatten the tensor
-        x = self.dropout(F.relu(self.fc1(x)))
+        x = x.view(x.size(0), -1)
+        x = self.dropout_fc(F.relu(self.fc1(x)))
         x = self.fc2(x)
         return x
 
@@ -76,9 +74,12 @@ class MusicGenresClassifier:
     """
     Classifier class for training and predicting music genres.
     """
-    def __init__(self, num_genres):
+    def __init__(self, num_genres, target_length=1291):
         self.genres = []
-        self.model = MusicGenreCNN(num_genres=num_genres)  # Initialize model instance
+        self.target_length = target_length
+        self.model = MusicGenreCNN(
+            input_length=self.target_length,
+            num_genres=num_genres)
 
     def save_genres(self, file_path):
         """
@@ -132,7 +133,7 @@ class MusicGenresClassifier:
 
         return waveform, target_sample_rate
 
-    def extract_features(self, waveform=None, file_path=None, duration=None, target_length=1291, n_mfcc=13):
+    def extract_features(self, waveform=None, file_path=None, duration=None, n_mfcc=13):
         """
         Extracts MFCC features from the waveform or file.
 
@@ -171,6 +172,8 @@ class MusicGenresClassifier:
                 mfcc = mfcc.unsqueeze(0)  # Add a channel dimension if missing
 
             # Ensure consistent feature length
+            target_length = self.target_length
+            
             current_length = mfcc.shape[-1]
             if current_length < target_length:
                 pad_size = target_length - current_length
@@ -186,24 +189,19 @@ class MusicGenresClassifier:
             return None
 
     def load_dataset(self, dataset_path, enable_debug=False):
-        """
-        Load the dataset from a specified path and extract features.
-        """
         self.genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
         features = []
         labels = []
 
         if enable_debug:
             print("Starting to load dataset...")
-
-        target_length = 1291  # Fixed length for all features
-
+            
         for genre in self.genres:
             genre_path = os.path.join(dataset_path, genre)
             for file in os.listdir(genre_path):
                 if file.endswith('.wav'):
                     file_path = os.path.join(genre_path, file)
-                    mfcc_features = self.extract_features(file_path=file_path, target_length=target_length)
+                    mfcc_features = self.extract_features(file_path=file_path)
                     if mfcc_features is not None:
                         features.append(mfcc_features)
                         labels.append(self.genres.index(genre))
@@ -242,7 +240,9 @@ class MusicGenresClassifier:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = self.model.to(device)
         criterion = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(model.parameters(), lr=0.001)
+        
+        # Initialize optimizer with weight decay (L2 regularization)
+        optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)  # Add weight_decay for L2 regularization
 
         num_epochs = 50
         train_losses, val_losses = [], []
@@ -306,13 +306,10 @@ class MusicGenresClassifier:
 
         try:
             wav_file = self.convert_to_wav(audio_file)
-
-            target_length = 1291  # Ensure consistency with training length
             n_mfcc = 13
 
             features = self.extract_features(
-                file_path=wav_file, 
-                target_length=target_length, 
+                file_path=wav_file,
                 n_mfcc=n_mfcc)
             if features is None:
                 return "Error: Unable to extract features from the audio file."
