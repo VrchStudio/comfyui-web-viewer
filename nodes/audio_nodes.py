@@ -137,7 +137,13 @@ class VrchAudioGenresNode:
         return {
             "required": { 
                 "audio": ("AUDIO", ),
-            }
+                "threshold": ("FLOAT", {
+                    "default": 0.01,
+                    "min": 0.0,           
+                    "max": 1.0,     
+                    "step": 0.01,
+                }), 
+            },
         }
     
     RETURN_TYPES = ("AUDIO", "STRING",)
@@ -146,8 +152,7 @@ class VrchAudioGenresNode:
     FUNCTION = "analysis"
     CATEGORY = "vrch.io/audio"
 
-    def analysis(self, audio):
-        # Get waveform data from input audio
+    def analysis(self, audio, threshold=0.015):  # Add threshold parameter with default value
         waveform = audio["waveform"]
         
         # Check and adjust waveform dimensions
@@ -159,12 +164,11 @@ class VrchAudioGenresNode:
             waveform = waveform.unsqueeze(1)  # Convert to [batch_size, 1, time] to add channel dimension
         elif waveform.dim() != 3:
             raise ValueError(f"Expected 2D or 3D waveform tensor, but got {waveform.dim()}D tensor")
-
-        # Predict the genre using the classifier
+        
         predicted_probabilities = self.classfier.predict(
             model=self.model,
             waveform=waveform,
-            enable_debug=True
+            threshold=threshold
         )
         
         result = ""
