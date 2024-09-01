@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- New `MusicGenresClassifier` in `utils/music_genres_classifier.py` for getting music genre(s)
+- New CNN model `music_genre_cnn.pth` in `assets/models` for `MusicGenresClassifier`
+
 ### Updated
+- rework on node `VrchAudioGenresNode` to work with the new `MusicGenresClassifier`
 - update node `VrchAudioRecorderNode` with `record_mode` options:
   - `press_and_hold` mode
   - `start_and_stop` mode
