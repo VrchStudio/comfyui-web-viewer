@@ -36,35 +36,31 @@ class MusicGenreCNN(nn.Module):
         self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
         self.pool = nn.MaxPool2d(2, 2)
+        self.dropout = nn.Dropout(0.5)
 
-        # Dynamically calculate the size of the flattened feature map after convolutions
-        example_input = torch.zeros(1, 1, n_mfcc, input_length)  # Example input tensor
+        # Calculate the flattened size dynamically
+        example_input = torch.zeros(1, 1, n_mfcc, input_length)
         conv_output = self._forward_conv(example_input)
         self.flattened_size = conv_output.view(1, -1).size(1)
 
-        # Initialize fully connected layers with the dynamically calculated input size
         self.fc1 = nn.Linear(self.flattened_size, 128)
         self.fc2 = nn.Linear(128, num_genres)
-        self.dropout = nn.Dropout(0.5)
 
     def _forward_conv(self, x):
         x = self.pool(F.relu(self.conv1(x)))
-        # print(f"Shape after conv1 and pool: {x.shape}")
         x = self.pool(F.relu(self.conv2(x)))
-        # print(f"Shape after conv2 and pool: {x.shape}")
         return x
 
     def forward(self, x):
         x = self._forward_conv(x)
-        x = x.view(x.size(0), -1)  # Flatten the tensor
-        # print(f"Shape after flattening: {x.shape}")
-        # Check if the current flattened size matches the expected size
+        x = x.view(x.size(0), -1)
+        
+        # Dynamically check and adjust fc1 size only if necessary
         if x.size(1) != self.flattened_size:
-            # print(f"Updating fc1 input size from {self.flattened_size} to {x.size(1)}")
             self.fc1 = nn.Linear(x.size(1), 128).to(x.device)
-            self.flattened_size = x.size(1)
-        x = F.relu(self.fc1(x))
-        x = self.dropout(x)
+            self.flattened_size = x.size(1)  # Update the stored flattened size
+        
+        x = self.dropout(F.relu(self.fc1(x)))
         x = self.fc2(x)
         return x
 
@@ -111,53 +107,24 @@ class MusicGenresClassifier:
         # Assume working with normalized 32-bit floats
         return waveform, target_sample_rate
 
-    def extract_features(self, waveform=None, file_path=None, duration=None, target_length=1320, n_mfcc=13):
-        """
-        Extract multiple audio features from an audio waveform or file.
-
-        Args:
-            waveform (torch.Tensor, optional): A waveform tensor.
-            file_path (str, optional): Path to the audio file.
-            duration (float, optional): Duration in seconds to which the audio should be truncated.
-            target_length (int, optional): Target length (in samples) for the features.
-            n_mfcc (int): Number of MFCC features to extract.
-
-        Returns:
-            torch.Tensor: Combined features tensor.
-        """
+    def extract_features(self, waveform=None, file_path=None, duration=None, target_length=1291, n_mfcc=13):
         try:
-            # Load the audio file if waveform is not provided
             if waveform is None and file_path is not None:
                 waveform, sr = torchaudio.load(file_path)
             elif waveform is not None:
-                sr = 44100  # Assume a default sample rate (adjust if necessary)
+                sr = 44100
             else:
                 raise ValueError("Either waveform or file_path must be provided")
 
-            # Ensure the waveform is a 2D tensor after loading
-            if waveform.dim() != 2:
-                print(f"File {file_path} has a waveform with unexpected dimensions: {waveform.shape}. Skipping.")
-                return None
-
-            # Check if the waveform is empty or has incorrect dimensions
-            if waveform.shape[1] < 2048:  # Assuming at least 2048 samples are needed
-                print(f"File {file_path} has a waveform that is too short: {waveform.shape[1]} samples. Skipping.")
-                return None
-
-            # Normalize waveform
-            waveform = waveform / waveform.abs().max()
-
-            # Process the waveform (resample, adjust channels)
+            waveform = waveform / waveform.abs().max()  # Normalize waveform
             waveform, sr = self.process_waveform(waveform, sr)
 
-            # Truncate or pad the waveform to the desired duration
-            if duration is not None:
-                max_samples = int(sr * duration)
-                waveform = waveform[:, :max_samples]  # Truncate the audio to 'duration' seconds
-
-            # Ensure waveform is sufficiently long for MFCC extraction
-            if waveform.shape[1] < 2048:
-                waveform = F.pad(waveform, (0, 2048 - waveform.shape[1]))
+            # Ensure all waveforms have the same length
+            if waveform.shape[1] < target_length:
+                pad_size = target_length - waveform.shape[1]
+                waveform = F.pad(waveform, (0, pad_size), "constant", 0)
+            else:
+                waveform = waveform[:, :target_length]
 
             # Extract MFCC features
             mfcc_transform = torchaudio.transforms.MFCC(
@@ -167,19 +134,14 @@ class MusicGenresClassifier:
             )
             mfcc = mfcc_transform(waveform)
 
-            # Ensure the MFCC tensor has the correct shape
+            # Ensure MFCC dimensions are correct
             if mfcc.dim() == 2:
-                mfcc = mfcc.unsqueeze(0)  # Add a channel dimension if missing
-
-            # Adjust the dimensions of the MFCC to match the target length
+                mfcc = mfcc.unsqueeze(0)
             if mfcc.shape[-1] < target_length:
                 pad_size = target_length - mfcc.shape[-1]
                 mfcc = F.pad(mfcc, (0, pad_size), "constant", 0)
             elif mfcc.shape[-1] > target_length:
-                if mfcc.dim() == 3:
-                    mfcc = mfcc[:, :, :target_length]  # Trim to the target length
-                elif mfcc.dim() == 4:
-                    mfcc = mfcc[:, :, :, :target_length]  # Trim to the target length
+                mfcc = mfcc[:, :, :target_length]
 
             return mfcc
 
@@ -257,8 +219,8 @@ class MusicGenresClassifier:
         num_epochs = 50
         train_losses, val_losses = [], []
         best_val_loss = float('inf')
-        early_stop_counter = 0
-        early_stop_patience = 5  # Number of epochs with no improvement after which training will be stopped
+        # early_stop_counter = 0
+        # early_stop_patience = 5  # Number of epochs with no improvement after which training will be stopped
 
         for epoch in range(num_epochs):
             model.train()
@@ -289,16 +251,16 @@ class MusicGenresClassifier:
 
             if epoch_val_loss < best_val_loss:
                 best_val_loss = epoch_val_loss
-                early_stop_counter = 0
-            else:
-                early_stop_counter += 1
+            #     early_stop_counter = 0
+            # else:
+            #     early_stop_counter += 1
             
             if enable_debug and (epoch + 1) % 10 == 0:
                 print(f"Epoch [{epoch + 1}/{num_epochs}] completed, Training Loss: {epoch_train_loss / len(train_loader):.4f}, Validation Loss: {epoch_val_loss / len(val_loader):.4f}")
 
-            if early_stop_counter >= early_stop_patience:
-                print("Early stopping triggered")
-                break
+            # if early_stop_counter >= early_stop_patience:
+            #     print("Early stopping triggered")
+            #     break
 
         if enable_debug:
             end_time = time.time()
@@ -381,21 +343,23 @@ class MusicGenresClassifier:
 
         map_location = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        # Initialize model
         model = MusicGenreCNN(num_genres=num_genres)
 
-        # Load the state dict
+        # Dynamically determine the input size for fc1 based on a sample input
+        example_input = torch.zeros(1, 1, 13, 1291)  # Ensure input length matches feature extraction
+        conv_output = model._forward_conv(example_input)
+        conv_output_size = conv_output.view(1, -1).size(1)
+
+        if model.fc1.in_features != conv_output_size:
+            if enable_debug:
+                print(f"Updating fc1 input size from {model.fc1.in_features} to {conv_output_size}")
+            model.fc1 = nn.Linear(conv_output_size, 128)  # Update input size dynamically
+
+        # Load the state dict and handle the size mismatch by setting strict=False
         state_dict = torch.load(file_path, map_location=map_location)
+        state_dict['fc1.weight'] = state_dict['fc1.weight'][:, :conv_output_size]  # Adjust weight size dynamically
+        model.load_state_dict(state_dict, strict=False)
 
-        # Check for size mismatch in fc1
-        if state_dict['fc1.weight'].shape[1] != model.fc1.in_features:
-            print(f"Size mismatch detected for fc1: expected {model.fc1.in_features}, got {state_dict['fc1.weight'].shape[1]}")
-            
-            # Adjust fc1 layer dynamically
-            model.fc1 = nn.Linear(state_dict['fc1.weight'].shape[1], 128).to(map_location)
-            model.flattened_size = state_dict['fc1.weight'].shape[1]
-
-        model.load_state_dict(state_dict, strict=False)  # Use strict=False to allow partial loading
         model.eval()
 
         if enable_debug:
