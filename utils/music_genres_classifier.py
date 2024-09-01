@@ -301,9 +301,18 @@ class MusicGenresClassifier:
 
         return model
 
-    def predict(self, model, waveform, enable_debug=False):
+    def predict(self, model, waveform, enable_debug=False, threshold=0.015):
         """
         Predict the genre of a given audio waveform.
+
+        Args:
+            model (torch.nn.Module): The trained model for genre classification.
+            waveform (torch.Tensor): The input audio waveform tensor.
+            enable_debug (bool): Flag to enable debug mode. Defaults to False.
+            threshold (float): The minimum probability threshold to include a prediction in the results. Defaults to 0.015.
+
+        Returns:
+            dict: A dictionary of genres and their probabilities that exceed the threshold.
         """
         if enable_debug:
             start_time = time.time()
@@ -327,8 +336,13 @@ class MusicGenresClassifier:
                 outputs = model(features)
                 probabilities = torch.softmax(outputs, dim=1).cpu().numpy().flatten()
 
-            predicted_probabilities = {genre: prob for genre, prob in zip(self.genres, probabilities)}
-            sorted_predicted_probabilities = dict(sorted(predicted_probabilities.items(), key=lambda item: item[1], reverse=True))
+            # Filter predictions by the threshold
+            predicted_probabilities = {
+                genre: prob for genre, prob in zip(self.genres, probabilities) if prob > threshold
+            }
+            sorted_predicted_probabilities = dict(
+                sorted(predicted_probabilities.items(), key=lambda item: item[1], reverse=True)
+            )
 
             if enable_debug:
                 end_time = time.time()
