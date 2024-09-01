@@ -19,6 +19,9 @@ from pydub import AudioSegment
 
 
 class MusicGenreDataset(Dataset):
+    """
+    Custom dataset class for loading music genre data.
+    """
     def __init__(self, X, y):
         self.X = torch.FloatTensor(X)
         self.y = torch.LongTensor(y)
@@ -31,52 +34,70 @@ class MusicGenreDataset(Dataset):
 
 
 class MusicGenreCNN(nn.Module):
-    def __init__(self, num_genres, input_length=1320, n_mfcc=13):
+    """
+    Convolutional Neural Network model for music genre classification.
+    """
+    def __init__(self, num_genres, input_length=1291, n_mfcc=13):  # Use the same input_length as target_length in extract_features
         super(MusicGenreCNN, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
         self.pool = nn.MaxPool2d(2, 2)
         self.dropout = nn.Dropout(0.5)
 
-        # Calculate the flattened size dynamically
+        # Calculate flattened size dynamically based on input length
         example_input = torch.zeros(1, 1, n_mfcc, input_length)
         conv_output = self._forward_conv(example_input)
         self.flattened_size = conv_output.view(1, -1).size(1)
 
+        # Initialize fully connected layers
         self.fc1 = nn.Linear(self.flattened_size, 128)
         self.fc2 = nn.Linear(128, num_genres)
 
     def _forward_conv(self, x):
+        """
+        Forward pass through convolutional layers.
+        """
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         return x
 
     def forward(self, x):
+        """
+        Forward pass through the entire network.
+        """
         x = self._forward_conv(x)
-        x = x.view(x.size(0), -1)
-        
-        # Dynamically check and adjust fc1 size only if necessary
-        if x.size(1) != self.flattened_size:
-            self.fc1 = nn.Linear(x.size(1), 128).to(x.device)
-            self.flattened_size = x.size(1)  # Update the stored flattened size
-        
+        x = x.view(x.size(0), -1)  # Flatten the tensor
         x = self.dropout(F.relu(self.fc1(x)))
         x = self.fc2(x)
         return x
 
+
 class MusicGenresClassifier:
-    def __init__(self):
+    """
+    Classifier class for training and predicting music genres.
+    """
+    def __init__(self, num_genres):
         self.genres = []
+        self.model = MusicGenreCNN(num_genres=num_genres)  # Initialize model instance
 
     def save_genres(self, file_path):
+        """
+        Save the list of genres to a file.
+        """
         with open(file_path, 'w') as f:
             json.dump(self.genres, f)
 
     def load_genres(self, file_path):
+        """
+        Load the list of genres from a file.
+        """
         with open(file_path, 'r') as f:
             self.genres = json.load(f)
 
     def convert_to_wav(self, audio_file):
+        """
+        Convert audio files to WAV format.
+        """
         temp_dir = os.path.join(os.getcwd(), "temp")
         os.makedirs(temp_dir, exist_ok=True)
 
@@ -89,42 +110,53 @@ class MusicGenresClassifier:
         return wav_file_path
 
     def inspect_audio(self, file_path):
+        """
+        Print audio information.
+        """
         info = torchaudio.info(file_path)
         print(info)
-        
+
     def process_waveform(self, waveform, sample_rate, target_sample_rate=44100, num_channels=1):
-        # Resample the waveform to the target sample rate
+        """
+        Resample the waveform and adjust the number of channels.
+        """
         if sample_rate != target_sample_rate:
             resample_transform = T.Resample(orig_freq=sample_rate, new_freq=target_sample_rate)
             waveform = resample_transform(waveform)
-        
+
         # Convert to mono if num_channels is 1
         if waveform.shape[0] > 1 and num_channels == 1:
             waveform = torch.mean(waveform, dim=0, keepdim=True)
         elif waveform.shape[0] == 1 and num_channels > 1:
             waveform = waveform.repeat(num_channels, 1)
 
-        # Assume working with normalized 32-bit floats
         return waveform, target_sample_rate
 
     def extract_features(self, waveform=None, file_path=None, duration=None, target_length=1291, n_mfcc=13):
+        """
+        Extracts MFCC features from the waveform or file.
+
+        Args:
+            waveform (torch.Tensor, optional): Audio waveform tensor.
+            file_path (str, optional): Path to the audio file.
+            duration (float, optional): Duration to truncate the audio to.
+            target_length (int, optional): Target length for the features.
+            n_mfcc (int): Number of MFCC features to extract.
+
+        Returns:
+            torch.Tensor: Extracted MFCC features tensor.
+        """
         try:
             if waveform is None and file_path is not None:
                 waveform, sr = torchaudio.load(file_path)
             elif waveform is not None:
-                sr = 44100
+                sr = 44100  # Assume a default sample rate (adjust if necessary)
             else:
                 raise ValueError("Either waveform or file_path must be provided")
 
-            waveform = waveform / waveform.abs().max()  # Normalize waveform
+            # Normalize waveform
+            waveform = waveform / waveform.abs().max()
             waveform, sr = self.process_waveform(waveform, sr)
-
-            # Ensure all waveforms have the same length
-            if waveform.shape[1] < target_length:
-                pad_size = target_length - waveform.shape[1]
-                waveform = F.pad(waveform, (0, pad_size), "constant", 0)
-            else:
-                waveform = waveform[:, :target_length]
 
             # Extract MFCC features
             mfcc_transform = torchaudio.transforms.MFCC(
@@ -134,14 +166,17 @@ class MusicGenresClassifier:
             )
             mfcc = mfcc_transform(waveform)
 
-            # Ensure MFCC dimensions are correct
+            # Ensure MFCC tensor has the correct shape
             if mfcc.dim() == 2:
-                mfcc = mfcc.unsqueeze(0)
-            if mfcc.shape[-1] < target_length:
-                pad_size = target_length - mfcc.shape[-1]
+                mfcc = mfcc.unsqueeze(0)  # Add a channel dimension if missing
+
+            # Ensure consistent feature length
+            current_length = mfcc.shape[-1]
+            if current_length < target_length:
+                pad_size = target_length - current_length
                 mfcc = F.pad(mfcc, (0, pad_size), "constant", 0)
-            elif mfcc.shape[-1] > target_length:
-                mfcc = mfcc[:, :, :target_length]
+            elif current_length > target_length:
+                mfcc = mfcc[:, :, :target_length]  # Trim to the target length
 
             return mfcc
 
@@ -151,6 +186,9 @@ class MusicGenresClassifier:
             return None
 
     def load_dataset(self, dataset_path, enable_debug=False):
+        """
+        Load the dataset from a specified path and extract features.
+        """
         self.genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
         features = []
         labels = []
@@ -158,7 +196,7 @@ class MusicGenresClassifier:
         if enable_debug:
             print("Starting to load dataset...")
 
-        target_length = 1291  # Or determine this dynamically based on your needs
+        target_length = 1291  # Fixed length for all features
 
         for genre in self.genres:
             genre_path = os.path.join(dataset_path, genre)
@@ -175,21 +213,8 @@ class MusicGenresClassifier:
         if len(features) == 0:
             raise ValueError("No valid features extracted from the dataset")
 
-        # Find the maximum length of all extracted features
-        max_length = max(f.shape[-1] for f in features)
-
-        # Pad all features to the maximum length
-        padded_features = []
-        for f in features:
-            if f.shape[-1] < max_length:
-                pad_size = max_length - f.shape[-1]
-                padded_f = F.pad(f, (0, pad_size), "constant", 0)
-                padded_features.append(padded_f)
-            else:
-                padded_features.append(f)
-
-        # Stack the padded features
-        features = torch.stack(padded_features)
+        # Ensure all features have the same length
+        features = torch.stack(features)
         labels = torch.tensor(labels)
 
         if enable_debug:
@@ -198,6 +223,9 @@ class MusicGenresClassifier:
         return features, labels
 
     def train_model(self, features, labels, num_genres=10, enable_debug=False):
+        """
+        Train the model using the provided features and labels.
+        """
         if enable_debug:
             start_time = time.time()
             print("Starting model training...")
@@ -212,15 +240,13 @@ class MusicGenresClassifier:
         val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model = MusicGenreCNN(num_genres=num_genres).to(device)
+        model = self.model.to(device)
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(model.parameters(), lr=0.001)
 
         num_epochs = 50
         train_losses, val_losses = [], []
         best_val_loss = float('inf')
-        # early_stop_counter = 0
-        # early_stop_patience = 5  # Number of epochs with no improvement after which training will be stopped
 
         for epoch in range(num_epochs):
             model.train()
@@ -251,16 +277,9 @@ class MusicGenresClassifier:
 
             if epoch_val_loss < best_val_loss:
                 best_val_loss = epoch_val_loss
-            #     early_stop_counter = 0
-            # else:
-            #     early_stop_counter += 1
-            
+
             if enable_debug and (epoch + 1) % 10 == 0:
                 print(f"Epoch [{epoch + 1}/{num_epochs}] completed, Training Loss: {epoch_train_loss / len(train_loader):.4f}, Validation Loss: {epoch_val_loss / len(val_loader):.4f}")
-
-            # if early_stop_counter >= early_stop_patience:
-            #     print("Early stopping triggered")
-            #     break
 
         if enable_debug:
             end_time = time.time()
@@ -278,6 +297,9 @@ class MusicGenresClassifier:
         return model
 
     def predict(self, model, audio_file, enable_debug=False):
+        """
+        Predict the genre of a given audio file.
+        """
         if enable_debug:
             start_time = time.time()
             print("Starting audio prediction...")
@@ -285,7 +307,7 @@ class MusicGenresClassifier:
         try:
             wav_file = self.convert_to_wav(audio_file)
 
-            target_length = 1320  # Update this to the length used in training
+            target_length = 1291  # Ensure consistency with training length
             n_mfcc = 13
 
             features = self.extract_features(
@@ -299,14 +321,6 @@ class MusicGenresClassifier:
             model.to(device)
 
             features = features.unsqueeze(0).to(device)
-
-            # Adjust input size dynamically to match the FC layer if needed
-            conv_output = model._forward_conv(features)
-            conv_output_size = conv_output.view(1, -1).size(1)
-            
-            # Reinitialize fc1 if necessary
-            if model.fc1.in_features != conv_output_size:
-                model.fc1 = nn.Linear(conv_output_size, 128).to(device)
 
             with torch.no_grad():
                 outputs = model(features)
@@ -329,6 +343,9 @@ class MusicGenresClassifier:
         return sorted_predicted_probabilities
 
     def save_model(self, model, file_path, enable_debug=False):
+        """
+        Save the trained model to a file.
+        """
         if enable_debug:
             print(f"Saving model to {file_path}...")
 
@@ -338,34 +355,23 @@ class MusicGenresClassifier:
             print(f"Model successfully saved to {file_path}")
 
     def load_model(self, file_path, num_genres=10, enable_debug=False):
+        """
+        Load a pre-trained model from a file.
+        """
         if enable_debug:
             print(f"Loading model from {file_path}...")
 
         map_location = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        model = MusicGenreCNN(num_genres=num_genres)
-
-        # Dynamically determine the input size for fc1 based on a sample input
-        example_input = torch.zeros(1, 1, 13, 1291)  # Ensure input length matches feature extraction
-        conv_output = model._forward_conv(example_input)
-        conv_output_size = conv_output.view(1, -1).size(1)
-
-        if model.fc1.in_features != conv_output_size:
-            if enable_debug:
-                print(f"Updating fc1 input size from {model.fc1.in_features} to {conv_output_size}")
-            model.fc1 = nn.Linear(conv_output_size, 128)  # Update input size dynamically
-
-        # Load the state dict and handle the size mismatch by setting strict=False
-        state_dict = torch.load(file_path, map_location=map_location)
-        state_dict['fc1.weight'] = state_dict['fc1.weight'][:, :conv_output_size]  # Adjust weight size dynamically
-        model.load_state_dict(state_dict, strict=False)
-
-        model.eval()
+        self.model = MusicGenreCNN(num_genres=num_genres)
+        self.model.load_state_dict(torch.load(file_path, map_location=map_location), strict=False)
+        self.model.eval()
 
         if enable_debug:
             print("Model loaded successfully")
 
-        return model
+        return self.model
+
 
 def main():
     parser = argparse.ArgumentParser(description="Music Genre Classification")
@@ -377,16 +383,15 @@ def main():
 
     args = parser.parse_args()
 
-    classifier = MusicGenresClassifier()
+    num_genres = 10
+    classifier = MusicGenresClassifier(num_genres=num_genres)
 
     if args.mode == 'train':
         if args.model_path is None:
             args.model_path = 'music_genre_cnn.pth'
 
         X, y = classifier.load_dataset(args.dataset, enable_debug=args.debug)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-        model = classifier.train_model(X_train, y_train, num_genres=len(classifier.genres), enable_debug=args.debug)
+        model = classifier.train_model(X, y, enable_debug=args.debug)
         classifier.save_model(model, args.model_path, enable_debug=args.debug)
         print(f"Model trained and saved to {args.model_path}")
 
