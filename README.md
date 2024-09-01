@@ -24,11 +24,42 @@ This is a custom node collection for ComfyUI that provides a Web Viewer utility 
    
 ### Node: `Audio Recorder by vrch.io` (vrch.io/audio)
 
-1. **Add the `Audio Recorder by vrch.io` node** to your ComfyUI workflow.
-2. **Press and hold the "Press and Hold to Record" button** to start recording audio.
-3. **Release the button** to stop the recording.
-4. The recorded audio will appear in the `audioUI` widget, where you can play it back.
-5. (future feature) Adjust the recording duration using the `record_duration` input.
+
+1. Add the `Audio Recorder by vrch.io` node to your ComfyUI workflow.
+2. Configure the node:
+   - `record_mode`: Choose between "press_and_hold" or "start_and_stop".
+   - `record_duration_max`: Set maximum recording duration (1-60 seconds).
+   - `loop`: Enable/disable loop recording.
+   - `loop_interval`: Set interval between loop recordings (if loop is enabled).
+3. Record audio:
+   - "Press and Hold" mode: Hold the button to record, release to stop.
+   - "Start and Stop" mode: Click "START" to begin, "STOP" to end.
+   - In loop mode (Start and Stop): Click "START" to begin loop, "STOP LOOPING" to end.
+4. The recorded audio will appear in the `audioUI` widget for playback.
+5. Use the `AUDIO` output to connect the recorded audio to other nodes.
+
+Note: A countdown displays for the last 10 seconds of recording.
+
+### Node: `Get Music Genres by vrch.io` (vrch.io/audio)
+
+1. **Add the `Get Music Genres by vrch.io` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - `audio`: Provide an `AUDIO` input from a previous node in the workflow, such as an audio recorder or a file loader.
+
+3. **Analyze Audio:**
+   - The node processes the input audio to predict its music genre(s).
+   - It uses a pre-trained model to analyze the waveform and outputs the predicted genres along with their probabilities.
+
+4. **View Results:**
+   - The predicted genres and their associated probabilities are displayed in a text output format.
+   - The results indicate the likelihood of the audio belonging to specific music genres.
+
+5. **Connect to Other Nodes:**
+   - Use the `AUDIO` output to pass the analyzed audio to other nodes for further processing or playback.
+   - Use the `STRING` output to connect the genre predictions to nodes that require textual input or visualization.
+
+**Note:** Ensure that the input audio is properly preprocessed and normalized for accurate genre prediction. The node's output is influenced by the quality and clarity of the input audio.
 
 ## Version Update
 
