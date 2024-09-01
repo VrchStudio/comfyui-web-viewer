@@ -34,7 +34,7 @@ class MusicGenreCNN(nn.Module):
     """
     Convolutional Neural Network model for music genre classification.
     """
-    def __init__(self, num_genres, input_length=1291, n_mfcc=40):  # Use the same input_length as target_length in extract_features
+    def __init__(self, num_genres, input_length=1291, n_mfcc=20):  # Use the same input_length as target_length in extract_features
         super(MusicGenreCNN, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
@@ -74,7 +74,7 @@ class MusicGenresClassifier:
     """
     Classifier class for training and predicting music genres.
     """
-    def __init__(self, num_genres, target_length=1291, n_mfcc=40):
+    def __init__(self, num_genres, target_length=1291, n_mfcc=20):
         self.genres = []
         self.target_length = target_length
         self.n_mfcc=n_mfcc
