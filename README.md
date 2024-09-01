@@ -40,6 +40,27 @@ This is a custom node collection for ComfyUI that provides a Web Viewer utility 
 
 Note: A countdown displays for the last 10 seconds of recording.
 
+### Node: `Get Music Genres by vrch.io` (vrch.io/audio)
+
+1. **Add the `Get Music Genres by vrch.io` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - `audio`: Provide an `AUDIO` input from a previous node in the workflow, such as an audio recorder or a file loader.
+
+3. **Analyze Audio:**
+   - The node processes the input audio to predict its music genre(s).
+   - It uses a pre-trained model to analyze the waveform and outputs the predicted genres along with their probabilities.
+
+4. **View Results:**
+   - The predicted genres and their associated probabilities are displayed in a text output format.
+   - The results indicate the likelihood of the audio belonging to specific music genres.
+
+5. **Connect to Other Nodes:**
+   - Use the `AUDIO` output to pass the analyzed audio to other nodes for further processing or playback.
+   - Use the `STRING` output to connect the genre predictions to nodes that require textual input or visualization.
+
+**Note:** Ensure that the input audio is properly preprocessed and normalized for accurate genre prediction. The node's output is influenced by the quality and clarity of the input audio.
+
 ## Version Update
 
 This project uses `bump2version` for version management. To update the version:
