@@ -34,7 +34,7 @@ class MusicGenreCNN(nn.Module):
     """
     Convolutional Neural Network model for music genre classification.
     """
-    def __init__(self, num_genres, input_length=1291, n_mfcc=13):  # Use the same input_length as target_length in extract_features
+    def __init__(self, num_genres, input_length=1291, n_mfcc=40):  # Use the same input_length as target_length in extract_features
         super(MusicGenreCNN, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
@@ -74,11 +74,13 @@ class MusicGenresClassifier:
     """
     Classifier class for training and predicting music genres.
     """
-    def __init__(self, num_genres, target_length=1291):
+    def __init__(self, num_genres, target_length=1291, n_mfcc=40):
         self.genres = []
         self.target_length = target_length
+        self.n_mfcc=n_mfcc
         self.model = MusicGenreCNN(
             input_length=self.target_length,
+            n_mfcc=self.n_mfcc,
             num_genres=num_genres)
 
     def save_genres(self, file_path):
@@ -133,7 +135,7 @@ class MusicGenresClassifier:
 
         return waveform, target_sample_rate
 
-    def extract_features(self, waveform=None, file_path=None, duration=None, n_mfcc=13):
+    def extract_features(self, waveform=None, file_path=None, duration=None):
         """
         Extracts MFCC features from the waveform or file.
 
@@ -141,7 +143,6 @@ class MusicGenresClassifier:
             waveform (torch.Tensor, optional): Audio waveform tensor.
             file_path (str, optional): Path to the audio file.
             duration (float, optional): Duration to truncate the audio to.
-            target_length (int, optional): Target length for the features.
             n_mfcc (int): Number of MFCC features to extract.
 
         Returns:
@@ -151,7 +152,7 @@ class MusicGenresClassifier:
             if waveform is None and file_path is not None:
                 waveform, sr = torchaudio.load(file_path)
             elif waveform is not None:
-                sr = 44100  # Assume a default sample rate (adjust if necessary)
+                sr = 44100
             else:
                 raise ValueError("Either waveform or file_path must be provided")
 
@@ -159,27 +160,31 @@ class MusicGenresClassifier:
             waveform = waveform / waveform.abs().max()
             waveform, sr = self.process_waveform(waveform, sr)
 
+            # Data augmentation: Add noise
+            noise = torch.randn(waveform.size()) * 0.005
+            waveform = waveform + noise
+
             # Extract MFCC features
             mfcc_transform = torchaudio.transforms.MFCC(
                 sample_rate=sr,
-                n_mfcc=n_mfcc,
+                n_mfcc=self.n_mfcc,
                 melkwargs={'n_mels': 64, 'n_fft': 2048}
             )
             mfcc = mfcc_transform(waveform)
 
-            # Ensure MFCC tensor has the correct shape
+            # Ensure MFCC dimensions are correct
             if mfcc.dim() == 2:
-                mfcc = mfcc.unsqueeze(0)  # Add a channel dimension if missing
-
+                mfcc = mfcc.unsqueeze(0)  # Add a channel dimension
             # Ensure consistent feature length
             target_length = self.target_length
             
+            # Ensure feature length consistency
             current_length = mfcc.shape[-1]
             if current_length < target_length:
                 pad_size = target_length - current_length
                 mfcc = F.pad(mfcc, (0, pad_size), "constant", 0)
             elif current_length > target_length:
-                mfcc = mfcc[:, :, :target_length]  # Trim to the target length
+                mfcc = mfcc[:, :, :target_length]
 
             return mfcc
 
@@ -229,7 +234,7 @@ class MusicGenresClassifier:
             print("Starting model training...")
 
         # Split the data into training and validation sets
-        X_train, X_val, y_train, y_val = train_test_split(features, labels, test_size=0.2, random_state=42)
+        X_train, X_val, y_train, y_val = train_test_split(features, labels, test_size=0.1, random_state=42)
 
         train_dataset = MusicGenreDataset(X_train, y_train)
         val_dataset = MusicGenreDataset(X_val, y_val)
@@ -306,11 +311,9 @@ class MusicGenresClassifier:
 
         try:
             wav_file = self.convert_to_wav(audio_file)
-            n_mfcc = 13
 
             features = self.extract_features(
-                file_path=wav_file,
-                n_mfcc=n_mfcc)
+                file_path=wav_file)
             if features is None:
                 return "Error: Unable to extract features from the audio file."
 
