@@ -116,6 +116,7 @@ app.registerExtension({
                 let isRecording = false;
                 let recordingTimer;
                 let loopIntervalTimer;
+                let shortcutKeyPressed = false; // Flag to handle shortcut key status
 
                 // Hide the base64_data widget
                 const base64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
@@ -130,7 +131,7 @@ app.registerExtension({
                     draw(ctx, node, widget_width, y, widget_height) {
                         Object.assign(
                             this.div.style,
-                            get_position_style(ctx, widget_width, 220, node.size[1])
+                            get_position_style(ctx, widget_width, 250, node.size[1])
                         );
                     }
                 };
@@ -154,6 +155,67 @@ app.registerExtension({
 
                 widget.div.appendChild(startBtn);
                 widget.div.appendChild(countdownDisplay);
+                document.body.appendChild(widget.div);
+                this.addCustomWidget(widget);
+
+                // Default shortcut settings
+                let enableShortcut = false;
+                let selectedShortcut = 'F1';
+
+                // Retrieve settings from widgets
+                const enableShortcutWidget = currentNode.widgets.find(w => w.name === 'shortcut');
+                const shortcutOptionWidget = currentNode.widgets.find(w => w.name === 'shortcut_key');
+                const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
+
+                if (enableShortcutWidget) {
+                    enableShortcut = enableShortcutWidget.value;
+                    enableShortcutWidget.callback = (value) => {
+                        enableShortcut = value;
+                    };
+                }
+
+                if (shortcutOptionWidget) {
+                    selectedShortcut = shortcutOptionWidget.value;
+                    shortcutOptionWidget.callback = (value) => {
+                        selectedShortcut = value;
+                    };
+                }
+
+                // Handle keyboard press events based on record mode
+                const handleKeyPress = (event) => {
+                    if (enableShortcut && event.key === selectedShortcut) {
+                        console.log("shortcut key pressed");
+                        if (recordModeWidget.value === 'press_and_hold') {
+                            if (!shortcutKeyPressed) {
+                                shortcutKeyPressed = true; // Mark shortcut as pressed
+                                startRecording();
+                            }
+                        } else if (recordModeWidget.value === 'start_and_stop') {
+                            if (isRecording) {
+                                stopRecording(true); // Manual stop
+                            } else {
+                                startRecording();
+                            }
+                        }
+                    }
+                };
+
+                const handleKeyRelease = (event) => {
+                    if (enableShortcut && event.key === selectedShortcut && recordModeWidget.value === 'press_and_hold') {
+                        console.log("shortcut key released");
+                        if (shortcutKeyPressed) {
+                            // Delay stopRecording to ensure startRecording has enough time
+                            setTimeout(() => {
+                                stopRecording(true); // Manual stop on key release
+                                shortcutKeyPressed = false; // Reset flag
+                            }, 100); // Adjust the delay if necessary
+                        }
+                    }
+                };
+
+                // Add global keydown and keyup event listeners
+                window.addEventListener('keydown', handleKeyPress);
+                window.addEventListener('keyup', handleKeyRelease);
 
                 const switchButtonMode = (mode) => {
                     const loopWidget = currentNode.widgets.find(w => w.name === 'loop');
@@ -234,10 +296,9 @@ app.registerExtension({
                                 reader.readAsDataURL(audioBlob);
                             };
                             mediaRecorder.start();
-                            
-                            const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
+
                             switchButtonMode(recordModeWidget.value);
-                            
+
                             console.log('Recording started...');
 
                             // Start the countdown for maximum recording duration
@@ -272,23 +333,21 @@ app.registerExtension({
                         .catch(error => console.error('Error accessing audio devices.', error));
                 };
 
-                
                 const stopRecording = (isManualStop = false) => {
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
                         mediaRecorder.stop();
                         mediaRecorder = null;
                         isRecording = false;
-                        
+
                         if (recordingTimer) {
                             clearInterval(recordingTimer);
                             recordingTimer = null;
                         }
-                        
+
                         countdownDisplay.textContent = ''; // Clear countdown display
-                        
-                        const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
+
                         const loopWidget = currentNode.widgets.find(w => w.name === 'loop');
-                        
+
                         if (isManualStop) {
                             // If it's a manual stop, always stop the loop and update the button
                             if (loopWidget) {
@@ -297,7 +356,7 @@ app.registerExtension({
                                     loopWidget.callback(loopWidget.value);
                                 }
                             }
-                            
+
                             if (loopIntervalTimer) {
                                 clearInterval(loopIntervalTimer);
                                 loopIntervalTimer = null;
@@ -315,19 +374,12 @@ app.registerExtension({
 
                             console.log('Recording is restarted in a loop');
                         }
-                        
+
                         switchButtonMode(recordModeWidget.value);
                     }
                 };
 
-                const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
-                if (recordModeWidget) {
-                    recordModeWidget.callback = () => {
-                        switchButtonMode(recordModeWidget.value);
-                    };
-                }
-
-                // Initial button setup
+                // Initialize button mode based on the record mode
                 switchButtonMode(recordModeWidget.value);
 
                 document.body.appendChild(widget.div);
@@ -344,6 +396,8 @@ app.registerExtension({
                     if (loopIntervalTimer) {
                         clearInterval(loopIntervalTimer);
                     }
+                    window.removeEventListener('keydown', handleKeyPress);
+                    window.removeEventListener('keyup', handleKeyRelease);
                     return onRemoved?.();
                 };
 

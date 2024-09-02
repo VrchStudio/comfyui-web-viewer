@@ -3,7 +3,7 @@ from .nodes.image_nodes import *
 from .nodes.audio_nodes import *
 from .nodes.text_nodes import *
 
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAudioGenresNode": VrchAudioGenresNode,
