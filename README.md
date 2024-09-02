@@ -24,21 +24,26 @@ This is a custom node collection for ComfyUI that provides a Web Viewer utility 
    
 ### Node: `Audio Recorder by vrch.io` (vrch.io/audio)
 
-
 1. Add the `Audio Recorder by vrch.io` node to your ComfyUI workflow.
 2. Configure the node:
    - `record_mode`: Choose between "press_and_hold" or "start_and_stop".
    - `record_duration_max`: Set maximum recording duration (1-60 seconds).
    - `loop`: Enable/disable loop recording.
    - `loop_interval`: Set interval between loop recordings (if loop is enabled).
+   - `shortcut`: Enable or disable the keyboard shortcut for controlling recording.
+   - `shortcut_key`: Select the desired shortcut key (e.g., F1, F2, ... F10) for controlling the recording.
 3. Record audio:
-   - "Press and Hold" mode: Hold the button to record, release to stop.
-   - "Start and Stop" mode: Click "START" to begin, "STOP" to end.
-   - In loop mode (Start and Stop): Click "START" to begin loop, "STOP LOOPING" to end.
+   - **"Press and Hold" mode**: 
+     - **Button Control**: Hold the button to record, release to stop.
+     - **Shortcut Control**: Press and hold the selected shortcut key to record, release the key to stop.
+   - **"Start and Stop" mode**: 
+     - **Button Control**: Click "START" to begin recording, click "STOP" to end.
+     - **Shortcut Control**: Press the selected shortcut key once to start recording, press again to stop.
+   - **In Loop mode (Start and Stop)**: Click "START" to begin loop recording, "STOP LOOPING" to end.
 4. The recorded audio will appear in the `audioUI` widget for playback.
 5. Use the `AUDIO` output to connect the recorded audio to other nodes.
 
-Note: A countdown displays for the last 10 seconds of recording.
+**Note**: A countdown displays for the last 10 seconds of recording.
 
 ### Node: `Get Music Genres by vrch.io` (vrch.io/audio)
 
