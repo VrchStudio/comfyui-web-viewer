@@ -116,6 +116,7 @@ app.registerExtension({
                 let isRecording = false;
                 let recordingTimer;
                 let loopIntervalTimer;
+                let shortcutKeyPressed = false; // Flag to handle shortcut key status
 
                 // Hide the base64_data widget
                 const base64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
@@ -183,8 +184,12 @@ app.registerExtension({
                 // Handle keyboard press events based on record mode
                 const handleKeyPress = (event) => {
                     if (enableShortcut && event.key === selectedShortcut) {
+                        console.log("shortcut key pressed");
                         if (recordModeWidget.value === 'press_and_hold') {
-                            startRecording();
+                            if (!shortcutKeyPressed) {
+                                shortcutKeyPressed = true; // Mark shortcut as pressed
+                                startRecording();
+                            }
                         } else if (recordModeWidget.value === 'start_and_stop') {
                             if (isRecording) {
                                 stopRecording(true); // Manual stop
@@ -197,7 +202,14 @@ app.registerExtension({
 
                 const handleKeyRelease = (event) => {
                     if (enableShortcut && event.key === selectedShortcut && recordModeWidget.value === 'press_and_hold') {
-                        stopRecording(true); // Manual stop on key release
+                        console.log("shortcut key released");
+                        if (shortcutKeyPressed) {
+                            // Delay stopRecording to ensure startRecording has enough time
+                            setTimeout(() => {
+                                stopRecording(true); // Manual stop on key release
+                                shortcutKeyPressed = false; // Reset flag
+                            }, 100); // Adjust the delay if necessary
+                        }
                     }
                 };
 
@@ -334,7 +346,6 @@ app.registerExtension({
 
                         countdownDisplay.textContent = ''; // Clear countdown display
 
-                        const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
                         const loopWidget = currentNode.widgets.find(w => w.name === 'loop');
 
                         if (isManualStop) {
@@ -395,5 +406,4 @@ app.registerExtension({
         }
     }
 });
-
 
