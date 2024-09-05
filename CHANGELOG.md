@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Updated
+- update node `VrchAudioRecorderNode` to support work on Windows
+
 ### Fixed
-- Fix node `VrchAudioRecorderNode` button incorrect display string issue when switching record mode
+- fix node `VrchAudioRecorderNode` button incorrect display string issue when switching record mode
 
 ## 1.0.5 - 2024-09-03
 
