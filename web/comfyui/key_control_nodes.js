@@ -3,6 +3,9 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
+// Debug flag to control log outputs
+const ENABLE_DEBUG = true;
+
 /**
  * VrchIntKeyControlNode allows users to control an integer output value (0-100)
  * using keyboard shortcuts. Users can adjust the step size and choose different
@@ -35,14 +38,18 @@ app.registerExtension({
             valueDisplay.textContent = `Value: ${currentValue}`;
             node.addDOMWidget("int_value_display", "int_value_display", valueDisplay);
 
-            console.log("[VrchIntKeyControlNode] Initialized with value:", currentValue);
+            if (ENABLE_DEBUG) {
+                console.log("[VrchIntKeyControlNode] Initialized with value:", currentValue);
+            }
 
             // Update display when current_value changes
             node.onInputChanged = function(inputName, value) {
                 if (inputName === "current_value") {
                     currentValue = parseInt(value) || 50;
                     valueDisplay.textContent = `Value: ${currentValue}`;
-                    console.log(`[VrchIntKeyControlNode] current_value updated to: ${currentValue}`);
+                    if (ENABLE_DEBUG) {
+                        console.log(`[VrchIntKeyControlNode] current_value updated to: ${currentValue}`);
+                    }
                 }
             };
 
@@ -78,7 +85,7 @@ app.registerExtension({
                     // Check if a direction key is pressed
                     for (const dirKey of directionKeys) {
                         if (event.key === dirKey && isShortcutKey1Pressed) {
-                            if (dirKey === "ArrowUp" || dirKey === "ArrowLeft") {
+                            if (dirKey === "ArrowUp" || dirKey === "ArrowRight") {
                                 // Increment the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
                                 const stepSize = parseInt(stepSizeWidget ? stepSizeWidget.value : 1) || 1;
@@ -89,9 +96,11 @@ app.registerExtension({
                                     if (currentValueWidget) {
                                         currentValueWidget.value = currentValue;
                                     }
-                                    console.log(`[VrchIntKeyControlNode] Value incremented to: ${currentValue}`);
+                                    if (ENABLE_DEBUG) {
+                                        console.log(`[VrchIntKeyControlNode] Value incremented to: ${currentValue}`);
+                                    }
                                 }
-                            } else if (dirKey === "ArrowDown" || dirKey === "ArrowRight") {
+                            } else if (dirKey === "ArrowDown" || dirKey === "ArrowLeft") {
                                 // Decrement the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
                                 const stepSize = parseInt(stepSizeWidget ? stepSizeWidget.value : 1) || 1;
@@ -102,7 +111,9 @@ app.registerExtension({
                                     if (currentValueWidget) {
                                         currentValueWidget.value = currentValue;
                                     }
-                                    console.log(`[VrchIntKeyControlNode] Value decremented to: ${currentValue}`);
+                                    if (ENABLE_DEBUG) {
+                                        console.log(`[VrchIntKeyControlNode] Value decremented to: ${currentValue}`);
+                                    }
                                 }
                             }
 
@@ -122,13 +133,17 @@ app.registerExtension({
             // Add the keydown and keyup listeners
             window.addEventListener("keydown", handleKeyDown);
             window.addEventListener("keyup", handleKeyUp);
-            console.log("[VrchIntKeyControlNode] Keydown and Keyup event listeners added.");
+            if (ENABLE_DEBUG) {
+                console.log("[VrchIntKeyControlNode] Keydown and Keyup event listeners added.");
+            }
 
             // Cleanup when the node is removed
             node.onRemoved = function () {
                 window.removeEventListener("keydown", handleKeyDown);
                 window.removeEventListener("keyup", handleKeyUp);
-                console.log("[VrchIntKeyControlNode] Keydown and Keyup event listeners removed.");
+                if (ENABLE_DEBUG) {
+                    console.log("[VrchIntKeyControlNode] Keydown and Keyup event listeners removed.");
+                }
             };
         }
     }
@@ -166,14 +181,18 @@ app.registerExtension({
             valueDisplay.textContent = `Value: ${currentValue.toFixed(2)}`;
             node.addDOMWidget("float_value_display", "float_value_display", valueDisplay);
 
-            console.log("[VrchFloatKeyControlNode] Initialized with value:", currentValue);
+            if (ENABLE_DEBUG) {
+                console.log("[VrchFloatKeyControlNode] Initialized with value:", currentValue);
+            }
 
             // Update display when current_value changes
             node.onInputChanged = function(inputName, value) {
                 if (inputName === "current_value") {
                     currentValue = parseFloat(value) || 0.50;
                     valueDisplay.textContent = `Value: ${currentValue.toFixed(2)}`;
-                    console.log(`[VrchFloatKeyControlNode] current_value updated to: ${currentValue.toFixed(2)}`);
+                    if (ENABLE_DEBUG) {
+                        console.log(`[VrchFloatKeyControlNode] current_value updated to: ${currentValue.toFixed(2)}`);
+                    }
                 }
             };
 
@@ -209,7 +228,7 @@ app.registerExtension({
                     // Check if a direction key is pressed
                     for (const dirKey of directionKeys) {
                         if (event.key === dirKey && isShortcutKey1Pressed) {
-                            if (dirKey === "ArrowUp" || dirKey === "ArrowLeft") {
+                            if (dirKey === "ArrowUp" || dirKey === "ArrowRight") {
                                 // Increment the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
                                 const stepSize = parseFloat(stepSizeWidget ? stepSizeWidget.value : 0.01) || 0.01;
@@ -220,9 +239,11 @@ app.registerExtension({
                                     if (currentValueWidget) {
                                         currentValueWidget.value = currentValue.toFixed(2);
                                     }
-                                    console.log(`[VrchFloatKeyControlNode] Value incremented to: ${currentValue.toFixed(2)}`);
+                                    if (ENABLE_DEBUG) {
+                                        console.log(`[VrchFloatKeyControlNode] Value incremented to: ${currentValue.toFixed(2)}`);
+                                    }
                                 }
-                            } else if (dirKey === "ArrowDown" || dirKey === "ArrowRight") {
+                            } else if (dirKey === "ArrowDown" || dirKey === "ArrowLeft") {
                                 // Decrement the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
                                 const stepSize = parseFloat(stepSizeWidget ? stepSizeWidget.value : 0.01) || 0.01;
@@ -233,7 +254,9 @@ app.registerExtension({
                                     if (currentValueWidget) {
                                         currentValueWidget.value = currentValue.toFixed(2);
                                     }
-                                    console.log(`[VrchFloatKeyControlNode] Value decremented to: ${currentValue.toFixed(2)}`);
+                                    if (ENABLE_DEBUG) {
+                                        console.log(`[VrchFloatKeyControlNode] Value decremented to: ${currentValue.toFixed(2)}`);
+                                    }
                                 }
                             }
 
@@ -253,13 +276,17 @@ app.registerExtension({
             // Add the keydown and keyup listeners
             window.addEventListener("keydown", handleKeyDown);
             window.addEventListener("keyup", handleKeyUp);
-            console.log("[VrchFloatKeyControlNode] Keydown and Keyup event listeners added.");
+            if (ENABLE_DEBUG) {
+                console.log("[VrchFloatKeyControlNode] Keydown and Keyup event listeners added.");
+            }
 
             // Cleanup when the node is removed
             node.onRemoved = function () {
                 window.removeEventListener("keydown", handleKeyDown);
                 window.removeEventListener("keyup", handleKeyUp);
-                console.log("[VrchFloatKeyControlNode] Keydown and Keyup event listeners removed.");
+                if (ENABLE_DEBUG) {
+                    console.log("[VrchFloatKeyControlNode] Keydown and Keyup event listeners removed.");
+                }
             };
         }
     }
