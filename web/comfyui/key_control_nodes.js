@@ -292,6 +292,107 @@ app.registerExtension({
     }
 });
 
+/**
+ * VrchBooleanKeyControlNode allows users to toggle a boolean output value (True/False)
+ * using a keyboard shortcut. Users can choose a shortcut key from F1-F12.
+ */
+app.registerExtension({
+    name: "vrch.BooleanKeyControlNode",
+    async beforeRegisterNodeDef(nodeType, nodeData) {
+        if (nodeType.comfyClass === "VrchBooleanKeyControlNode") {
+            // Removed the block that defines required inputs to prevent UI issues
+            // nodeData.input.required = nodeData.input.required || {};
+            // nodeData.input.required.shortcut_key = ["shortcut_key"];
+            // nodeData.input.required.current_value = ["current_value"];
+        }
+    },
+    getCustomWidgets() {
+        return {};
+    },
+    async nodeCreated(node) {
+        if (node.comfyClass === "VrchBooleanKeyControlNode") {
+            // Initialize node state from inputs
+            let currentValueWidget = node.widgets.find(w => w.name === "current_value");
+            let currentValue = currentValueWidget ? (currentValueWidget.value === "True" || currentValueWidget.value === true) : false; // Default value
+
+            // Create a display element for the current value
+            const valueDisplay = document.createElement("div");
+            valueDisplay.classList.add("comfy-value-display");
+            valueDisplay.textContent = `Value: ${currentValue}`;
+            node.addDOMWidget("boolean_value_display", "boolean_value_display", valueDisplay);
+
+            if (ENABLE_DEBUG) {
+                console.log("[VrchBooleanKeyControlNode] Initialized with value:", currentValue);
+            }
+
+            // Update display when current_value changes
+            node.onInputChanged = function(inputName, value) {
+                if (inputName === "current_value") {
+                    currentValue = value === "True" || value === true;
+                    valueDisplay.textContent = `Value: ${currentValue}`;
+                    if (ENABLE_DEBUG) {
+                        console.log(`[VrchBooleanKeyControlNode] current_value updated to: ${currentValue}`);
+                    }
+                }
+            };
+
+            // Set to keep track of pressed keys
+            const pressedKeys = new Set();
+
+            // Handler for keydown events
+            const handleKeyDown = (event) => {
+                const fxKeys = ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"];
+
+                // Add the key to the pressedKeys Set
+                pressedKeys.add(event.key);
+
+                // Get the currently selected shortcut_key
+                const shortcutKeyWidget = node.widgets.find(w => w.name === "shortcut_key");
+                const shortcutKey = shortcutKeyWidget ? shortcutKeyWidget.value : "F1";
+
+                // Check if the pressed key matches shortcut_key
+                if (event.key.toUpperCase() === shortcutKey.toUpperCase() && fxKeys.includes(event.key.toUpperCase())) {
+                    // Toggle the current_value
+                    currentValue = !currentValue;
+                    valueDisplay.textContent = `Value: ${currentValue}`;
+                    if (currentValueWidget) {
+                        currentValueWidget.value = currentValue;
+                    }
+
+                    if (ENABLE_DEBUG) {
+                        console.log(`[VrchBooleanKeyControlNode] Value toggled to: ${currentValue}`);
+                    }
+
+                    // Prevent default behavior (if any)
+                    event.preventDefault();
+                }
+            };
+
+            // Handler for keyup events
+            const handleKeyUp = (event) => {
+                // Remove the key from the pressedKeys Set
+                pressedKeys.delete(event.key);
+            };
+
+            // Add the keydown and keyup listeners
+            window.addEventListener("keydown", handleKeyDown);
+            window.addEventListener("keyup", handleKeyUp);
+            if (ENABLE_DEBUG) {
+                console.log("[VrchBooleanKeyControlNode] Keydown and Keyup event listeners added.");
+            }
+
+            // Cleanup when the node is removed
+            node.onRemoved = function () {
+                window.removeEventListener("keydown", handleKeyDown);
+                window.removeEventListener("keyup", handleKeyUp);
+                if (ENABLE_DEBUG) {
+                    console.log("[VrchBooleanKeyControlNode] Keydown and Keyup event listeners removed.");
+                }
+            };
+        }
+    }
+});
+
 // Additional styles for the widget (optional)
 const style = document.createElement("style");
 style.textContent = `

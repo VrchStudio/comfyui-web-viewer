@@ -167,3 +167,68 @@ class VrchFloatKeyControlNode:
         m.update(str(current_value).encode())
         return m.hexdigest()
     
+    
+class VrchBooleanKeyControlNode:
+    """
+    VrchBooleanKeyControlNode allows users to toggle a boolean output value (True/False)
+    using a keyboard shortcut. Users can choose a shortcut key from F1-F12.
+    """
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "shortcut_key": (
+                    [
+                        "F1",
+                        "F2",
+                        "F3",
+                        "F4",
+                        "F5",
+                        "F6",
+                        "F7",
+                        "F8",
+                        "F9",
+                        "F10",
+                        "F11",
+                        "F12",
+                    ],
+                    {"default": "F1"},
+                ),
+                "current_value": ("BOOLEAN", {"default": False}),
+            }
+        }
+
+    RETURN_TYPES = ("BOOLEAN",)
+    FUNCTION = "get_current_value"
+    CATEGORY = CATEGORY
+
+    def get_current_value(self, shortcut_key="F1", current_value=False):
+        """
+        Returns the current boolean value from the UI widget.
+
+        Args:
+            shortcut_key (str): The selected shortcut key (F1-F12).
+            current_value (bool): The current boolean value from the UI widget.
+
+        Returns:
+            tuple: A tuple containing the current boolean value.
+        """
+        return (current_value,)
+
+    @classmethod
+    def IS_CHANGED(cls, shortcut_key, current_value):
+        """
+        Determines if the node's state has changed based on inputs.
+
+        Args:
+            shortcut_key (str): The current shortcut key.
+            current_value (bool): The current boolean value.
+
+        Returns:
+            str: A hash representing the current state.
+        """
+        m = hashlib.sha256()
+        m.update(shortcut_key.encode())
+        m.update(str(current_value).encode())
+        return m.hexdigest()
