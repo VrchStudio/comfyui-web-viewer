@@ -2,6 +2,7 @@ import hashlib
 import os
 import io
 import base64
+import ffmpeg
 from pathlib import Path
 import torchaudio
 import folder_paths
@@ -87,7 +88,23 @@ class VrchAudioRecorderNode:
                     "step": 0.1,
                 }),
                 "shortcut": ("BOOLEAN", {"default": True}),
-                "shortcut_key":(["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"],{"default":"F1",}),
+                "shortcut_key":(
+                    [
+                        "F1", 
+                        "F2", 
+                        "F3", 
+                        "F4", 
+                        "F5",
+                        "F6", 
+                        "F7", 
+                        "F8", 
+                        "F9", 
+                        "F10", 
+                        "F11", 
+                        "F12",
+                    ],
+                    {"default":"F1"},
+                ),
             }
         }
 
@@ -100,8 +117,20 @@ class VrchAudioRecorderNode:
                       loop, loop_interval, shortcut, shortcut_key):
         
         audio_data = base64.b64decode(base64_data)
-        buffer = io.BytesIO(audio_data)
-        waveform, sample_rate = torchaudio.load(buffer)
+        input_buffer = io.BytesIO(audio_data)
+
+        output_buffer = io.BytesIO()
+        process = (
+            ffmpeg
+            .input('pipe:0', format='webm')
+            .output('pipe:1', format='wav')
+            .run_async(pipe_stdin=True, pipe_stdout=True, pipe_stderr=True)
+        )
+        output, _ = process.communicate(input=input_buffer.read())
+        output_buffer.write(output)
+        output_buffer.seek(0)
+
+        waveform, sample_rate = torchaudio.load(output_buffer)
         
         # Check if the audio is mono (single channel)
         if waveform.shape[0] == 1:

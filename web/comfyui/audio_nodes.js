@@ -181,6 +181,14 @@ app.registerExtension({
                     };
                 }
 
+                if (recordModeWidget) {
+                    recordModeWidget.callback = (value) => {
+                        switchButtonMode(recordModeWidget.value);
+                        // Save the current record mode to localStorage
+                        localStorage.setItem('vrch_audio_recorder_record_mode', recordModeWidget.value);
+                    };
+                }
+
                 // Handle keyboard press events based on record mode
                 const handleKeyPress = (event) => {
                     if (enableShortcut && event.key === selectedShortcut) {
@@ -379,12 +387,17 @@ app.registerExtension({
                     }
                 };
 
-                // Initialize button mode based on the record mode
-                switchButtonMode(recordModeWidget.value);
-
                 document.body.appendChild(widget.div);
 
                 this.addCustomWidget(widget);
+
+                // Initialize button mode based on the record mode
+                // Load settings from localStorage if available
+                const savedRecordMode = localStorage.getItem('vrch_audio_recorder_record_mode');
+                if (savedRecordMode) {
+                    recordModeWidget.value = savedRecordMode;
+                }
+                switchButtonMode(recordModeWidget.value);
 
                 const onRemoved = this.onRemoved;
                 this.onRemoved = function () {
