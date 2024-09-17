@@ -54,8 +54,8 @@ app.registerExtension({
                 const fxKeys = ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"];
                 const directionOptions = ["Down/Up", "Left/Right"];
                 const directionKeysMap = {
-                    "Down/Up": ["Down", "Up"],
-                    "Left/Right": ["Left", "Right"]
+                    "Down/Up": ["ArrowDown", "ArrowUp"],
+                    "Left/Right": ["ArrowLeft", "ArrowRight"]
                 };
 
                 // Add the key to the pressedKeys Set
@@ -73,12 +73,12 @@ app.registerExtension({
                     const isShortcutKey1Pressed = pressedKeys.has(shortcutKey1.toUpperCase());
 
                     // Get the list of direction keys based on shortcut_key2
-                    const directionKeys = directionKeysMap[shortcutKey2] || ["Down", "Up"];
+                    const directionKeys = directionKeysMap[shortcutKey2] || ["ArrowDown", "ArrowUp"];
 
                     // Check if a direction key is pressed
                     for (const dirKey of directionKeys) {
                         if (event.key === dirKey && isShortcutKey1Pressed) {
-                            if (dirKey === "Up" || dirKey === "Left") {
+                            if (dirKey === "ArrowUp" || dirKey === "ArrowLeft") {
                                 // Increment the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
                                 const stepSize = parseInt(stepSizeWidget ? stepSizeWidget.value : 1) || 1;
@@ -91,7 +91,7 @@ app.registerExtension({
                                     }
                                     console.log(`[VrchIntKeyControlNode] Value incremented to: ${currentValue}`);
                                 }
-                            } else if (dirKey === "Down" || dirKey === "Right") {
+                            } else if (dirKey === "ArrowDown" || dirKey === "ArrowRight") {
                                 // Decrement the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
                                 const stepSize = parseInt(stepSizeWidget ? stepSizeWidget.value : 1) || 1;
@@ -185,8 +185,8 @@ app.registerExtension({
                 const fxKeys = ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"];
                 const directionOptions = ["Down/Up", "Left/Right"];
                 const directionKeysMap = {
-                    "Down/Up": ["Down", "Up"],
-                    "Left/Right": ["Left", "Right"]
+                    "Down/Up": ["ArrowDown", "ArrowUp"],
+                    "Left/Right": ["ArrowLeft", "ArrowRight"]
                 };
 
                 // Add the key to the pressedKeys Set
@@ -204,12 +204,12 @@ app.registerExtension({
                     const isShortcutKey1Pressed = pressedKeys.has(shortcutKey1.toUpperCase());
 
                     // Get the list of direction keys based on shortcut_key2
-                    const directionKeys = directionKeysMap[shortcutKey2] || ["Down", "Up"];
+                    const directionKeys = directionKeysMap[shortcutKey2] || ["ArrowDown", "ArrowUp"];
 
                     // Check if a direction key is pressed
                     for (const dirKey of directionKeys) {
                         if (event.key === dirKey && isShortcutKey1Pressed) {
-                            if (dirKey === "Up" || dirKey === "Left") {
+                            if (dirKey === "ArrowUp" || dirKey === "ArrowLeft") {
                                 // Increment the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
                                 const stepSize = parseFloat(stepSizeWidget ? stepSizeWidget.value : 0.01) || 0.01;
@@ -222,7 +222,7 @@ app.registerExtension({
                                     }
                                     console.log(`[VrchFloatKeyControlNode] Value incremented to: ${currentValue.toFixed(2)}`);
                                 }
-                            } else if (dirKey === "Down" || dirKey === "Right") {
+                            } else if (dirKey === "ArrowDown" || dirKey === "ArrowRight") {
                                 // Decrement the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
                                 const stepSize = parseFloat(stepSizeWidget ? stepSizeWidget.value : 0.01) || 0.01;
