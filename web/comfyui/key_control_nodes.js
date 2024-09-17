@@ -4,7 +4,7 @@ import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
 // Debug flag to control log outputs
-const ENABLE_DEBUG = true;
+const ENABLE_DEBUG = false;
 
 /**
  * VrchIntKeyControlNode allows users to control an integer output value (0-100)
