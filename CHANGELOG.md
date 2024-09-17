@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- New Key Control nodes, including
+  - `VrchIntKeyControlNode`
+  - `VrchFloatKeyControlNode`
+  - `VrchBooleanKeyControlNode`
+
+### Updated
+- update node `VrchAudioRecorderNode` shortcut keys
+
 ### Updated
 - update node `VrchAudioRecorderNode` to support work on Windows
 
