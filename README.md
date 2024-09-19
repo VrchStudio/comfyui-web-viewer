@@ -162,6 +162,39 @@ This is a custom node collection for ComfyUI that provides a Web Viewer utility 
 
 **Note:** Ensure that the ComfyUI window/tab is focused when using the shortcut key. Prevent browser-specific shortcuts from interfering with the node's functionality.
 
+---
+
+### Node: `TEXT Key Control by vrch.io` (vrch.io/control)
+
+1. **Add the `TEXT Key Control by vrch.io` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Text Inputs (`text1` - `text4`):** Enter text for each option. Supports multiple lines. Defaults are empty (`""`).
+   - **Jump Empty Option (`jump_empty_option`):** Enable or disable skipping empty text options when cycling. Default is `True`.
+   - **Shortcut Key (`shortcut_key`):** Select a function key (`F1` to `F12`) to cycle through texts. Default is `F2`.
+   - **Current Value (`current_value`):** Set the initial selection (`1`, `2`, `3`, `4`). Default is `1`.
+
+3. **Cycle Through Text Options:**
+   - **Using Shortcut Key:**
+     - Press the selected `shortcut_key` (e.g., `F2`) to cycle through the text options.
+     - **With `jump_empty_option` Enabled (`True`):**
+       - Skips any empty `text` inputs.
+     - **With `jump_empty_option` Disabled (`False`):**
+       - Cycles through all texts, including empty ones.
+
+4. **Display and Output:**
+   - **Display:**
+     - Shows `Value: X`, where `X` is the current selection (`1`, `2`, `3`, or `4`).
+     
+   - **Output:**
+     - **Type:** `STRING`
+     - Outputs the selected text based on `current_value`. Connect to other nodes as needed.
+
+**Note:**  
+Ensure the ComfyUI window/tab is focused when using the shortcut key to prevent conflicts with browser shortcuts.
+
+---
+
 
 ## Version Update
 
