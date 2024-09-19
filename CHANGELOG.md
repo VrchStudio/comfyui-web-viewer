@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+- add a new Key Control node `VrchTextKeyControlNode`
+
+### Updated
+- update `VrchIntKeyControlNode` node with new `min_value` and `max_value` input options
+- adjust `VrchIntKeyControlNode` node range to -9999 - 9999
+- change default shortcut_key to be `F2`
+
+### Fixed
+- fix the issue that when crecreating a key control node, a label remained on the screen
+
 ## 1.0.6 - 2024-09-18
 
 ### Added
