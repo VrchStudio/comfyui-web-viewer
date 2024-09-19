@@ -523,6 +523,204 @@ app.registerExtension({
     }
 });
 
+
+/**
+ * VrchTextKeyControlNode allows users to select one of four text inputs
+ * using a keyboard shortcut. Users can choose a shortcut key (F1-F12),
+ * define the current selection (1-4), and optionally skip empty text options
+ * when cycling through selections.
+ */
+app.registerExtension({
+    name: "vrch.TextKeyControlNode",
+    async beforeRegisterNodeDef(nodeType, nodeData) {
+        if (nodeType.comfyClass === "VrchTextKeyControlNode") {
+            // Modify nodeData if necessary
+        }
+    },
+    getCustomWidgets() {
+        return {};
+    },
+    async nodeCreated(node) {
+        if (node.comfyClass === "VrchTextKeyControlNode") {
+            // Initialize node state from inputs
+            let text1Widget = node.widgets.find(w => w.name === "text1");
+            let text2Widget = node.widgets.find(w => w.name === "text2");
+            let text3Widget = node.widgets.find(w => w.name === "text3");
+            let text4Widget = node.widgets.find(w => w.name === "text4");
+            let jumpEmptyOptionWidget = node.widgets.find(w => w.name === "jump_empty_option");
+            let shortcutKeyWidget = node.widgets.find(w => w.name === "shortcut_key");
+            let currentValueWidget = node.widgets.find(w => w.name === "current_value");
+
+            // Retrieve initial values
+            let currentValue = parseInt(currentValueWidget ? currentValueWidget.value : "1", 10);
+            currentValue = [1, 2, 3, 4].includes(currentValue) ? currentValue : 1;
+            let jumpEmptyOption = jumpEmptyOptionWidget ? jumpEmptyOptionWidget.value : true;
+
+            // Create display element for the current value
+            const valueDisplay = document.createElement("div");
+            valueDisplay.classList.add("comfy-value-display");
+            valueDisplay.textContent = `Value: ${currentValue}`;
+            node.addDOMWidget("text_value_display", "text_value_display", valueDisplay);
+
+            if (ENABLE_DEBUG) {
+                console.log("[VrchTextKeyControlNode] Initialized with current_value:", currentValue);
+                console.log("[VrchTextKeyControlNode] jump_empty_option:", jumpEmptyOption);
+            }
+
+            // Function to get all texts and filter based on jumpEmptyOption
+            const getValidKeys = () => {
+                const texts = {
+                    "1": text1Widget ? text1Widget.value.trim() : "",
+                    "2": text2Widget ? text2Widget.value.trim() : "",
+                    "3": text3Widget ? text3Widget.value.trim() : "",
+                    "4": text4Widget ? text4Widget.value.trim() : "",
+                };
+
+                if (jumpEmptyOption) {
+                    return Object.keys(texts).filter(k => texts[k] !== "");
+                } else {
+                    return ["1", "2", "3", "4"];
+                }
+            };
+
+            // Update display based on currentValue
+            const updateDisplay = () => {
+                const validKeys = getValidKeys();
+                if (validKeys.length === 0) {
+                    valueDisplay.textContent = `Value: None`;
+                    if (currentValueWidget) {
+                        currentValueWidget.value = "";
+                    }
+                    return;
+                }
+
+                // Ensure currentValue is within validKeys
+                if (!validKeys.includes(currentValue.toString())) {
+                    currentValue = parseInt(validKeys[0], 10);
+                    if (currentValueWidget) {
+                        currentValueWidget.value = currentValue.toString();
+                    }
+                }
+
+                valueDisplay.textContent = `Value: ${currentValue}`;
+                if (ENABLE_DEBUG) {
+                    console.log(`[VrchTextKeyControlNode] current_value updated to: ${currentValue}`);
+                }
+            };
+
+            // Handle changes to current_value
+            const handleCurrentValueChange = (value) => {
+                let val = parseInt(value, 10);
+                if (![1, 2, 3, 4].includes(val)) {
+                    val = 1;
+                }
+                currentValue = val;
+                updateDisplay();
+            };
+
+            if (currentValueWidget) {
+                currentValueWidget.callback = (value) => {
+                    handleCurrentValueChange(value);
+                };
+            }
+
+            // Handle changes to jump_empty_option
+            const handleJumpEmptyOptionChange = (value) => {
+                jumpEmptyOption = value;
+                updateDisplay();
+                if (ENABLE_DEBUG) {
+                    console.log(`[VrchTextKeyControlNode] jump_empty_option set to: ${jumpEmptyOption}`);
+                }
+            };
+
+            if (jumpEmptyOptionWidget) {
+                jumpEmptyOptionWidget.callback = (value) => {
+                    handleJumpEmptyOptionChange(value);
+                };
+            }
+
+            // Initialize display after ensuring all widgets are loaded
+            function delayedInit() {
+                if (ENABLE_DEBUG) {
+                    console.log("[VrchTextKeyControlNode] delayedInit called");
+                }
+                updateDisplay();
+            }
+            setTimeout(delayedInit, 1000);
+
+            // Set to keep track of pressed keys
+            const pressedKeys = new Set();
+
+            // Handler for keydown events
+            const handleKeyDown = (event) => {
+                const fxKeys = ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12"];
+
+                // Add the key to the pressedKeys Set
+                pressedKeys.add(event.key.toUpperCase());
+
+                // Get the currently selected shortcut_key
+                const shortcutKey = shortcutKeyWidget ? shortcutKeyWidget.value.toUpperCase() : "F2";
+
+                // Check if the pressed key matches the shortcut key
+                if (event.key.toUpperCase() === shortcutKey && fxKeys.includes(event.key.toUpperCase())) {
+                    const validKeys = getValidKeys();
+                    if (validKeys.length === 0) {
+                        if (ENABLE_DEBUG) {
+                            console.log("[VrchTextKeyControlNode] No valid texts to select.");
+                        }
+                        return;
+                    }
+
+                    // Find the current index in validKeys
+                    const currentIndex = validKeys.indexOf(currentValue.toString());
+                    // Calculate the next index
+                    const nextIndex = (currentIndex + 1) % validKeys.length;
+                    // Update currentValue
+                    currentValue = parseInt(validKeys[nextIndex], 10);
+                    if (currentValueWidget) {
+                        currentValueWidget.value = currentValue.toString();
+                    }
+                    updateDisplay();
+
+                    if (ENABLE_DEBUG) {
+                        console.log(`[VrchTextKeyControlNode] current_value toggled to: ${currentValue}`);
+                    }
+
+                    // Prevent default behavior
+                    event.preventDefault();
+                }
+            };
+
+            // Handler for keyup events
+            const handleKeyUp = (event) => {
+                // Remove the key from the pressedKeys Set
+                pressedKeys.delete(event.key.toUpperCase());
+            };
+
+            // Add the keydown and keyup listeners
+            window.addEventListener("keydown", handleKeyDown);
+            window.addEventListener("keyup", handleKeyUp);
+            if (ENABLE_DEBUG) {
+                console.log("[VrchTextKeyControlNode] Keydown and Keyup event listeners added.");
+            }
+
+            // Cleanup when the node is removed
+            node.onRemoved = function () {
+                window.removeEventListener("keydown", handleKeyDown);
+                window.removeEventListener("keyup", handleKeyUp);
+                // Remove the valueDisplay widget
+                if (valueDisplay.parentNode) {
+                    valueDisplay.parentNode.removeChild(valueDisplay);
+                }
+                if (ENABLE_DEBUG) {
+                    console.log("[VrchTextKeyControlNode] Keydown and Keyup event listeners removed.");
+                }
+            };
+        }
+    }
+});
+
+
 // Additional styles for the widget (optional)
 const style = document.createElement("style");
 style.textContent = `
