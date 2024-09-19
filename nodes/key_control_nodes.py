@@ -8,16 +8,18 @@ CATEGORY = "vrch.io/control"
 
 class VrchIntKeyControlNode:
     """
-    VrchIntKeyControlNode allows users to control an integer output value (0-100)
-    using keyboard shortcuts. Users can adjust the step size and choose different
-    shortcut key combinations.
+    VrchIntKeyControlNode allows users to control an integer output value within
+    a customizable range using keyboard shortcuts. Users can adjust the step size,
+    choose different shortcut key combinations, and define minimum and maximum values.
     """
 
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "step_size": ("INT", {"default": 1, "min": 1, "max": 10}),
+                "min_value": ("INT", {"default": 0, "min": -9999, "max": 9999}),
+                "max_value": ("INT", {"default": 100, "min": -9999, "max": 9999}),
+                "step_size": ("INT", {"default": 1, "min": 1, "max": 1000}),
                 "shortcut_key1": (
                     [
                         "F1",
@@ -33,7 +35,7 @@ class VrchIntKeyControlNode:
                         "F11",
                         "F12",
                     ],
-                    {"default": "F2"},
+                    {"default": "F2"},  # Updated default from "F1" to "F2"
                 ),
                 "shortcut_key2": (
                     [
@@ -42,7 +44,7 @@ class VrchIntKeyControlNode:
                     ],
                     {"default": "Down/Up"},
                 ),
-                "current_value": ("INT", {"default": 50, "min": 0, "max": 100}),
+                "current_value": ("INT", {"default": 50, "min": -9999, "max": 9999}),
             }
         }
 
@@ -50,7 +52,7 @@ class VrchIntKeyControlNode:
     FUNCTION = "get_current_value"
     CATEGORY = CATEGORY
 
-    def get_current_value(self, step_size=1, shortcut_key1="F1", shortcut_key2="Down/Up", current_value=50):
+    def get_current_value(self, step_size=1, shortcut_key1="F2", shortcut_key2="Down/Up", min_value=0, max_value=100, current_value=50):
         """
         Returns the current integer value from the UI widget.
 
@@ -58,15 +60,19 @@ class VrchIntKeyControlNode:
             step_size (int): The amount to increment/decrement.
             shortcut_key1 (str): The selected first shortcut key (F1-F12).
             shortcut_key2 (str): The selected second shortcut key combination (Down/Up or Left/Right).
+            min_value (int): The minimum allowable value.
+            max_value (int): The maximum allowable value.
             current_value (int): The current value from the UI widget.
 
         Returns:
             tuple: A tuple containing the current integer value.
         """
+        # Ensure current_value is within min and max bounds
+        current_value = max(min(current_value, max_value), min_value)
         return (current_value,)
 
     @classmethod
-    def IS_CHANGED(cls, step_size, shortcut_key1, shortcut_key2, current_value):
+    def IS_CHANGED(cls, step_size, shortcut_key1, shortcut_key2, min_value, max_value, current_value):
         """
         Determines if the node's state has changed based on inputs.
 
@@ -74,6 +80,8 @@ class VrchIntKeyControlNode:
             step_size (int): The current step size.
             shortcut_key1 (str): The current first shortcut key.
             shortcut_key2 (str): The current second shortcut key combination.
+            min_value (int): The current minimum value.
+            max_value (int): The current maximum value.
             current_value (int): The current value.
 
         Returns:
@@ -83,6 +91,8 @@ class VrchIntKeyControlNode:
         m.update(str(step_size).encode())
         m.update(shortcut_key1.encode())
         m.update(shortcut_key2.encode())
+        m.update(str(min_value).encode())
+        m.update(str(max_value).encode())
         m.update(str(current_value).encode())
         return m.hexdigest()
 

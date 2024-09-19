@@ -4,12 +4,12 @@ import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
 // Debug flag to control log outputs
-const ENABLE_DEBUG = false;
+const ENABLE_DEBUG = true;
 
 /**
- * VrchIntKeyControlNode allows users to control an integer output value (0-100)
- * using keyboard shortcuts. Users can adjust the step size and choose different
- * shortcut key combinations.
+ * VrchIntKeyControlNode allows users to control an integer output value within
+ * a customizable range using keyboard shortcuts. Users can adjust the step size,
+ * choose different shortcut key combinations, and define minimum and maximum values.
  */
 app.registerExtension({
     name: "vrch.IntKeyControlNode",
@@ -17,6 +17,8 @@ app.registerExtension({
         if (nodeType.comfyClass === "VrchIntKeyControlNode") {
             // Removed the block that defines required inputs to prevent UI issues
             // nodeData.input.required = nodeData.input.required || {};
+            // nodeData.input.required.min_value = ["min_value"];
+            // nodeData.input.required.max_value = ["max_value"];
             // nodeData.input.required.step_size = ["step_size"];
             // nodeData.input.required.shortcut_key1 = ["shortcut_key1"];
             // nodeData.input.required.shortcut_key2 = ["shortcut_key2"];
@@ -30,9 +32,17 @@ app.registerExtension({
         if (node.comfyClass === "VrchIntKeyControlNode") {
             // Initialize node state from inputs
             let currentValueWidget = node.widgets.find(w => w.name === "current_value");
-            let currentValue = parseInt(currentValueWidget ? currentValueWidget.value : 50) || 50; // Default value
+            let minValueWidget = node.widgets.find(w => w.name === "min_value");
+            let maxValueWidget = node.widgets.find(w => w.name === "max_value");
 
-            // Create a display element for the current value
+            let currentValue = parseInt(currentValueWidget ? currentValueWidget.value : 50) || 50; // Default value
+            let minValue = parseInt(minValueWidget ? minValueWidget.value : 0) || 0;
+            let maxValue = parseInt(maxValueWidget ? maxValueWidget.value : 100) || 100;
+
+            // Ensure initial currentValue is within min and max bounds
+            currentValue = Math.max(Math.min(currentValue, maxValue), minValue);
+
+            // Create display elements for the current value
             const valueDisplay = document.createElement("div");
             valueDisplay.classList.add("comfy-value-display");
             valueDisplay.textContent = `Value: ${currentValue}`;
@@ -40,16 +50,58 @@ app.registerExtension({
 
             if (ENABLE_DEBUG) {
                 console.log("[VrchIntKeyControlNode] Initialized with value:", currentValue);
+                console.log("[VrchIntKeyControlNode] Min value:", minValue);
+                console.log("[VrchIntKeyControlNode] Max value:", maxValue);
+            }
+
+            // Function to update the display
+            const updateDisplay = () => {
+                currentValue = Math.max(Math.min(currentValue, maxValue), minValue);
+                valueDisplay.textContent = `Value: ${currentValue}`;
+                if (currentValueWidget) {
+                    currentValueWidget.value = currentValue;
+                }
+                if (ENABLE_DEBUG) {
+                    console.log(`[VrchIntKeyControlNode] current_value updated to: ${currentValue}`);
+                }
+            };
+
+            // Set up callbacks for min_value and max_value changes
+            if (minValueWidget) {
+                minValueWidget.callback = (value) => {
+                    minValue = parseInt(value) || 0;
+                    if (minValue > maxValue) {
+                        minValue = maxValue;
+                        if (ENABLE_DEBUG) {
+                            console.log(`[VrchIntKeyControlNode] min_value adjusted to not exceed max_value: ${minValue}`);
+                        }
+                    }
+                    // Clamp currentValue within new minValue
+                    currentValue = Math.max(currentValue, minValue);
+                    updateDisplay();
+                };
+            }
+
+            if (maxValueWidget) {
+                maxValueWidget.callback = (value) => {
+                    maxValue = parseInt(value) || 100;
+                    if (maxValue < minValue) {
+                        maxValue = minValue;
+                        if (ENABLE_DEBUG) {
+                            console.log(`[VrchIntKeyControlNode] max_value adjusted to not be below min_value: ${maxValue}`);
+                        }
+                    }
+                    // Clamp currentValue within new maxValue
+                    currentValue = Math.min(currentValue, maxValue);
+                    updateDisplay();
+                };
             }
 
             // Update display when current_value changes
             node.onInputChanged = function(inputName, value) {
                 if (inputName === "current_value") {
                     currentValue = parseInt(value) || 50;
-                    valueDisplay.textContent = `Value: ${currentValue}`;
-                    if (ENABLE_DEBUG) {
-                        console.log(`[VrchIntKeyControlNode] current_value updated to: ${currentValue}`);
-                    }
+                    updateDisplay();
                 }
             };
 
@@ -59,7 +111,6 @@ app.registerExtension({
             // Handler for keydown events
             const handleKeyDown = (event) => {
                 const fxKeys = ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"];
-                const directionOptions = ["Down/Up", "Left/Right"];
                 const directionKeysMap = {
                     "Down/Up": ["ArrowDown", "ArrowUp"],
                     "Left/Right": ["ArrowLeft", "ArrowRight"]
@@ -70,12 +121,12 @@ app.registerExtension({
 
                 // Get the currently selected shortcut_key1 and shortcut_key2
                 const shortcutKey1Widget = node.widgets.find(w => w.name === "shortcut_key1");
-                const shortcutKey1 = shortcutKey1Widget ? shortcutKey1Widget.value : "F1";
+                const shortcutKey1 = shortcutKey1Widget ? shortcutKey1Widget.value : "F2"; // Default is now F2
 
                 const shortcutKey2Widget = node.widgets.find(w => w.name === "shortcut_key2");
                 const shortcutKey2 = shortcutKey2Widget ? shortcutKey2Widget.value : "Down/Up";
 
-                // Check if shortcut_key1 is pressed
+                // Check if shortcut_key1 is pressed and is a valid fxKey
                 if (fxKeys.includes(shortcutKey1.toUpperCase())) {
                     const isShortcutKey1Pressed = pressedKeys.has(shortcutKey1.toUpperCase());
 
@@ -89,13 +140,10 @@ app.registerExtension({
                                 // Increment the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
                                 const stepSize = parseInt(stepSizeWidget ? stepSizeWidget.value : 1) || 1;
-                                const newValue = Math.min(currentValue + stepSize, 100);
+                                const newValue = Math.min(currentValue + stepSize, maxValue);
                                 if (newValue !== currentValue) {
                                     currentValue = newValue;
-                                    valueDisplay.textContent = `Value: ${currentValue}`;
-                                    if (currentValueWidget) {
-                                        currentValueWidget.value = currentValue;
-                                    }
+                                    updateDisplay();
                                     if (ENABLE_DEBUG) {
                                         console.log(`[VrchIntKeyControlNode] Value incremented to: ${currentValue}`);
                                     }
@@ -104,13 +152,10 @@ app.registerExtension({
                                 // Decrement the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
                                 const stepSize = parseInt(stepSizeWidget ? stepSizeWidget.value : 1) || 1;
-                                const newValue = Math.max(currentValue - stepSize, 0);
+                                const newValue = Math.max(currentValue - stepSize, minValue);
                                 if (newValue !== currentValue) {
                                     currentValue = newValue;
-                                    valueDisplay.textContent = `Value: ${currentValue}`;
-                                    if (currentValueWidget) {
-                                        currentValueWidget.value = currentValue;
-                                    }
+                                    updateDisplay();
                                     if (ENABLE_DEBUG) {
                                         console.log(`[VrchIntKeyControlNode] Value decremented to: ${currentValue}`);
                                     }
@@ -213,7 +258,7 @@ app.registerExtension({
 
                 // Get the currently selected shortcut_key1 and shortcut_key2
                 const shortcutKey1Widget = node.widgets.find(w => w.name === "shortcut_key1");
-                const shortcutKey1 = shortcutKey1Widget ? shortcutKey1Widget.value : "F1";
+                const shortcutKey1 = shortcutKey1Widget ? shortcutKey1Widget.value : "F2";
 
                 const shortcutKey2Widget = node.widgets.find(w => w.name === "shortcut_key2");
                 const shortcutKey2 = shortcutKey2Widget ? shortcutKey2Widget.value : "Down/Up";
@@ -348,7 +393,7 @@ app.registerExtension({
 
                 // Get the currently selected shortcut_key
                 const shortcutKeyWidget = node.widgets.find(w => w.name === "shortcut_key");
-                const shortcutKey = shortcutKeyWidget ? shortcutKeyWidget.value : "F1";
+                const shortcutKey = shortcutKeyWidget ? shortcutKeyWidget.value : "F2";
 
                 // Check if the pressed key matches shortcut_key
                 if (event.key.toUpperCase() === shortcutKey.toUpperCase() && fxKeys.includes(event.key.toUpperCase())) {
