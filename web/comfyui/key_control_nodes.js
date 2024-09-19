@@ -15,14 +15,7 @@ app.registerExtension({
     name: "vrch.IntKeyControlNode",
     async beforeRegisterNodeDef(nodeType, nodeData) {
         if (nodeType.comfyClass === "VrchIntKeyControlNode") {
-            // Removed the block that defines required inputs to prevent UI issues
-            // nodeData.input.required = nodeData.input.required || {};
-            // nodeData.input.required.min_value = ["min_value"];
-            // nodeData.input.required.max_value = ["max_value"];
-            // nodeData.input.required.step_size = ["step_size"];
-            // nodeData.input.required.shortcut_key1 = ["shortcut_key1"];
-            // nodeData.input.required.shortcut_key2 = ["shortcut_key2"];
-            // nodeData.input.required.current_value = ["current_value"];
+            // No changes needed here
         }
     },
     getCustomWidgets() {
@@ -34,15 +27,24 @@ app.registerExtension({
             let currentValueWidget = node.widgets.find(w => w.name === "current_value");
             let minValueWidget = node.widgets.find(w => w.name === "min_value");
             let maxValueWidget = node.widgets.find(w => w.name === "max_value");
+            let stepSizeWidget = node.widgets.find(w => w.name === "step_size");
 
-            let currentValue = parseInt(currentValueWidget ? currentValueWidget.value : 50) || 50; // Default value
-            let minValue = parseInt(minValueWidget ? minValueWidget.value : 0) || 0;
-            let maxValue = parseInt(maxValueWidget ? maxValueWidget.value : 100) || 100;
+            // Retrieve values from the node's inputs
+            let currentValue = parseInt(currentValueWidget ? currentValueWidget.value : 50);
+            let minValue = parseInt(minValueWidget ? minValueWidget.value : 0);
+            let maxValue = parseInt(maxValueWidget ? maxValueWidget.value : 100);
+            let stepSize = parseInt(stepSizeWidget ? stepSizeWidget.value : 1);
+
+            // Ensure values are valid numbers
+            currentValue = isNaN(currentValue) ? 50 : currentValue;
+            minValue = isNaN(minValue) ? 0 : minValue;
+            maxValue = isNaN(maxValue) ? 100 : maxValue;
+            stepSize = isNaN(stepSize) || stepSize < 1 ? 1 : stepSize;
 
             // Ensure initial currentValue is within min and max bounds
             currentValue = Math.max(Math.min(currentValue, maxValue), minValue);
 
-            // Create display elements for the current value
+            // Create display element for the current value
             const valueDisplay = document.createElement("div");
             valueDisplay.classList.add("comfy-value-display");
             valueDisplay.textContent = `Value: ${currentValue}`;
@@ -52,6 +54,7 @@ app.registerExtension({
                 console.log("[VrchIntKeyControlNode] Initialized with value:", currentValue);
                 console.log("[VrchIntKeyControlNode] Min value:", minValue);
                 console.log("[VrchIntKeyControlNode] Max value:", maxValue);
+                console.log("[VrchIntKeyControlNode] Step size:", stepSize);
             }
 
             // Function to update the display
@@ -66,44 +69,103 @@ app.registerExtension({
                 }
             };
 
-            // Set up callbacks for min_value and max_value changes
+            // Functions to handle widget changes
+            const handleMinValueChange = (value) => {
+                minValue = parseInt(value);
+                if (isNaN(minValue)) {
+                    minValue = 0;
+                }
+                if (minValue > maxValue) {
+                    minValue = maxValue;
+                    if (ENABLE_DEBUG) {
+                        console.log(`[VrchIntKeyControlNode] min_value adjusted to not exceed max_value: ${minValue}`);
+                    }
+                }
+                currentValue = Math.max(currentValue, minValue);
+                updateDisplay();
+            };
+
+            const handleMaxValueChange = (value) => {
+                maxValue = parseInt(value);
+                if (isNaN(maxValue)) {
+                    maxValue = 100;
+                }
+                if (maxValue < minValue) {
+                    maxValue = minValue;
+                    if (ENABLE_DEBUG) {
+                        console.log(`[VrchIntKeyControlNode] max_value adjusted to not be below min_value: ${maxValue}`);
+                    }
+                }
+                currentValue = Math.min(currentValue, maxValue);
+                updateDisplay();
+            };
+
+            const handleStepSizeChange = (value) => {
+                stepSize = parseInt(value);
+                if (isNaN(stepSize) || stepSize < 1) {
+                    stepSize = 1;
+                }
+                if (ENABLE_DEBUG) {
+                    console.log(`[VrchIntKeyControlNode] step_size updated to: ${stepSize}`);
+                }
+            };
+
+            // Set up callbacks for widget changes
             if (minValueWidget) {
                 minValueWidget.callback = (value) => {
-                    minValue = parseInt(value) || 0;
-                    if (minValue > maxValue) {
-                        minValue = maxValue;
-                        if (ENABLE_DEBUG) {
-                            console.log(`[VrchIntKeyControlNode] min_value adjusted to not exceed max_value: ${minValue}`);
-                        }
-                    }
-                    // Clamp currentValue within new minValue
-                    currentValue = Math.max(currentValue, minValue);
-                    updateDisplay();
+                    handleMinValueChange(value);
                 };
             }
 
             if (maxValueWidget) {
                 maxValueWidget.callback = (value) => {
-                    maxValue = parseInt(value) || 100;
-                    if (maxValue < minValue) {
-                        maxValue = minValue;
-                        if (ENABLE_DEBUG) {
-                            console.log(`[VrchIntKeyControlNode] max_value adjusted to not be below min_value: ${maxValue}`);
-                        }
-                    }
-                    // Clamp currentValue within new maxValue
-                    currentValue = Math.min(currentValue, maxValue);
-                    updateDisplay();
+                    handleMaxValueChange(value);
                 };
             }
 
-            // Update display when current_value changes
-            node.onInputChanged = function(inputName, value) {
-                if (inputName === "current_value") {
-                    currentValue = parseInt(value) || 50;
-                    updateDisplay();
+            if (stepSizeWidget) {
+                stepSizeWidget.callback = (value) => {
+                    handleStepSizeChange(value);
+                };
+            }
+
+            // Function to initialize or re-initialize values on document load
+            const initializeValues = () => {
+                // Re-read widget values
+                currentValue = parseInt(currentValueWidget ? currentValueWidget.value : 50);
+                minValue = parseInt(minValueWidget ? minValueWidget.value : 0);
+                maxValue = parseInt(maxValueWidget ? maxValueWidget.value : 100);
+                stepSize = parseInt(stepSizeWidget ? stepSizeWidget.value : 1);
+
+                // Ensure values are valid numbers
+                currentValue = isNaN(currentValue) ? 50 : currentValue;
+                minValue = isNaN(minValue) ? 0 : minValue;
+                maxValue = isNaN(maxValue) ? 100 : maxValue;
+                stepSize = isNaN(stepSize) || stepSize < 1 ? 1 : stepSize;
+
+                // Ensure currentValue is within bounds
+                currentValue = Math.max(Math.min(currentValue, maxValue), minValue);
+
+                updateDisplay();
+
+                if (ENABLE_DEBUG) {
+                    console.log("[VrchIntKeyControlNode] Values re-initialized on document load:");
+                    console.log("[VrchIntKeyControlNode] current_value:", currentValue);
+                    console.log("[VrchIntKeyControlNode] min_value:", minValue);
+                    console.log("[VrchIntKeyControlNode] max_value:", maxValue);
+                    console.log("[VrchIntKeyControlNode] step_size:", stepSize);
                 }
             };
+
+            // Listen for the document's DOMContentLoaded event to initialize values
+            document.addEventListener("DOMContentLoaded", () => {
+                initializeValues();
+            });
+
+            // Also call initializeValues immediately in case DOMContentLoaded has already fired
+            if (document.readyState === "interactive" || document.readyState === "complete") {
+                initializeValues();
+            }
 
             // Set to keep track of pressed keys
             const pressedKeys = new Set();
@@ -139,7 +201,9 @@ app.registerExtension({
                             if (dirKey === "ArrowUp" || dirKey === "ArrowRight") {
                                 // Increment the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
+                                const maxValueWidget = node.widgets.find(w => w.name === "max_value");
                                 const stepSize = parseInt(stepSizeWidget ? stepSizeWidget.value : 1) || 1;
+                                const maxValue = parseInt(maxValueWidget ? maxValueWidget.value : 100) || 100;
                                 const newValue = Math.min(currentValue + stepSize, maxValue);
                                 if (newValue !== currentValue) {
                                     currentValue = newValue;
@@ -151,7 +215,9 @@ app.registerExtension({
                             } else if (dirKey === "ArrowDown" || dirKey === "ArrowLeft") {
                                 // Decrement the value
                                 const stepSizeWidget = node.widgets.find(w => w.name === "step_size");
+                                const minValueWidget = node.widgets.find(w => w.name === "min_value");
                                 const stepSize = parseInt(stepSizeWidget ? stepSizeWidget.value : 1) || 1;
+                                const minValue = parseInt(minValueWidget ? minValueWidget.value : 0) || 0;
                                 const newValue = Math.max(currentValue - stepSize, minValue);
                                 if (newValue !== currentValue) {
                                     currentValue = newValue;
@@ -186,12 +252,16 @@ app.registerExtension({
             node.onRemoved = function () {
                 window.removeEventListener("keydown", handleKeyDown);
                 window.removeEventListener("keyup", handleKeyUp);
+                // Remove the valueDisplay widget
+                if (valueDisplay.parentNode) {
+                    valueDisplay.parentNode.removeChild(valueDisplay);
+                }
                 if (ENABLE_DEBUG) {
                     console.log("[VrchIntKeyControlNode] Keydown and Keyup event listeners removed.");
                 }
             };
         }
-    }
+   }
 });
 
 /**
@@ -329,6 +399,10 @@ app.registerExtension({
             node.onRemoved = function () {
                 window.removeEventListener("keydown", handleKeyDown);
                 window.removeEventListener("keyup", handleKeyUp);
+                // Remove the valueDisplay widget
+                if (valueDisplay.parentNode) {
+                    valueDisplay.parentNode.removeChild(valueDisplay);
+                }
                 if (ENABLE_DEBUG) {
                     console.log("[VrchFloatKeyControlNode] Keydown and Keyup event listeners removed.");
                 }
@@ -430,6 +504,10 @@ app.registerExtension({
             node.onRemoved = function () {
                 window.removeEventListener("keydown", handleKeyDown);
                 window.removeEventListener("keyup", handleKeyUp);
+                // Remove the valueDisplay widget
+                if (valueDisplay.parentNode) {
+                    valueDisplay.parentNode.removeChild(valueDisplay);
+                }
                 if (ENABLE_DEBUG) {
                     console.log("[VrchBooleanKeyControlNode] Keydown and Keyup event listeners removed.");
                 }
