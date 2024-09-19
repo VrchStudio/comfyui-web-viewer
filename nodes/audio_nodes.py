@@ -103,7 +103,7 @@ class VrchAudioRecorderNode:
                         "F11", 
                         "F12",
                     ],
-                    {"default":"F1"},
+                    {"default": "F2"},
                 ),
             }
         }
