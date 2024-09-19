@@ -33,7 +33,7 @@ class VrchIntKeyControlNode:
                         "F11",
                         "F12",
                     ],
-                    {"default": "F1"},
+                    {"default": "F2"},
                 ),
                 "shortcut_key2": (
                     [
@@ -114,7 +114,7 @@ class VrchFloatKeyControlNode:
                         "F11",
                         "F12",
                     ],
-                    {"default": "F1"},
+                    {"default": "F2"},
                 ),
                 "shortcut_key2": (
                     [
@@ -193,7 +193,7 @@ class VrchBooleanKeyControlNode:
                         "F11",
                         "F12",
                     ],
-                    {"default": "F1"},
+                    {"default": "F2"},
                 ),
                 "current_value": ("BOOLEAN", {"default": False}),
             }
