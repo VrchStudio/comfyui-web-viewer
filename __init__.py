@@ -4,7 +4,7 @@ from .nodes.audio_nodes import *
 from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
 
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAudioGenresNode": VrchAudioGenresNode,
@@ -15,6 +15,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
     "VrchImageSaverNode": VrchImageSaverNode,
     "VrchIntKeyControlNode": VrchIntKeyControlNode,
+    "VrchTextKeyControlNode": VrchTextKeyControlNode,
     "VrchWebViewerNode": VrchWebViewerNode,
 }
 
@@ -27,6 +28,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchJsonUrlLoaderNode": "JSON URL Loader by vrch.io",
     "VrchImageSaverNode": "Image Saver by vrch.io",
     "VrchIntKeyControlNode": "INT Key Control by vrch.io",
+    "VrchTextKeyControlNode": "TEXT Key Control by vrch.io",
     "VrchWebViewerNode": "Web Viewer by vrch.io",
 }
 
