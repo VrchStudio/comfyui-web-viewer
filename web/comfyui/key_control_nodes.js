@@ -4,7 +4,7 @@ import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
 // Debug flag to control log outputs
-const ENABLE_DEBUG = true;
+const ENABLE_DEBUG = false;
 
 /**
  * VrchIntKeyControlNode allows users to control an integer output value within
@@ -157,15 +157,22 @@ app.registerExtension({
                 }
             };
 
-            // Listen for the document's DOMContentLoaded event to initialize values
-            document.addEventListener("DOMContentLoaded", () => {
+            // FIXME
+            // the widget value is NOT properly initilised when the node is created and the document is loaded
+            // to workaround this issie, I have to introduce this delayed initialization operation
+            // which will call initializeValues() again after 1 second when the node has been created
+            function delayedInit() {
+                if (ENABLE_DEBUG) {
+                    console.log("[VrchIntKeyControlNode] delayedInit currentValueWidget.value->", currentValueWidget.value);
+                }
+                
                 initializeValues();
-            });
 
-            // Also call initializeValues immediately in case DOMContentLoaded has already fired
-            if (document.readyState === "interactive" || document.readyState === "complete") {
-                initializeValues();
+                if (ENABLE_DEBUG) {
+                    console.log("[VrchIntKeyControlNode] delayedInit currentValueWidget.value->", currentValueWidget.value);
+                }
             }
+            setTimeout(delayedInit, 1000);
 
             // Set to keep track of pressed keys
             const pressedKeys = new Set();
@@ -261,7 +268,7 @@ app.registerExtension({
                 }
             };
         }
-   }
+    }
 });
 
 /**
