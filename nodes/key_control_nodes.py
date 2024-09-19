@@ -242,3 +242,111 @@ class VrchBooleanKeyControlNode:
         m.update(shortcut_key.encode())
         m.update(str(current_value).encode())
         return m.hexdigest()
+
+
+class VrchTextKeyControlNode:
+    """
+    VrchTextKeyControlNode allows users to select one of four text inputs
+    using a keyboard shortcut. Users can choose a shortcut key (F1-F12),
+    define the current selection (1-4), and optionally skip empty text options
+    when cycling through selections.
+    """
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "text1": ("STRING", {"default": "", "multiline": True}),
+                "text2": ("STRING", {"default": "", "multiline": True}),
+                "text3": ("STRING", {"default": "", "multiline": True}),
+                "text4": ("STRING", {"default": "", "multiline": True}),
+                "jump_empty_option": ("BOOLEAN", {"default": True}),
+                "shortcut_key": (
+                    [
+                        "F1",
+                        "F2",
+                        "F3",
+                        "F4",
+                        "F5",
+                        "F6",
+                        "F7",
+                        "F8",
+                        "F9",
+                        "F10",
+                        "F11",
+                        "F12",
+                    ],
+                    {"default": "F2"},
+                ),
+                "current_value": (
+                    ["1", "2", "3", "4"],
+                    {"default": "1"},
+                ),
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    FUNCTION = "get_current_value"
+    CATEGORY = CATEGORY
+
+    def get_current_value(self, text1="", text2="", text3="", text4="", jump_empty_option=True, shortcut_key="F2", current_value="1"):
+        """
+        Returns the currently selected text based on current_value.
+        If jump_empty_option is True, it skips any empty texts.
+
+        Args:
+            text1 (str): First text input.
+            text2 (str): Second text input.
+            text3 (str): Third text input.
+            text4 (str): Fourth text input.
+            jump_empty_option (bool): Whether to skip empty texts when cycling.
+            shortcut_key (str): The selected shortcut key (F1-F12).
+            current_value (str): The current selected value ("1", "2", "3", "4").
+
+        Returns:
+            tuple: A tuple containing the selected text.
+        """
+        texts = {
+            "1": text1,
+            "2": text2,
+            "3": text3,
+            "4": text4,
+        }
+
+        if jump_empty_option:
+            # Filter out empty texts and sort keys
+            valid_keys = sorted([k for k, v in texts.items() if v.strip() != ""], key=lambda x: int(x))
+            selected_key = str(current_value)
+            if selected_key not in valid_keys:
+                selected_key = valid_keys[0] if valid_keys else "1"
+        else:
+            selected_key = current_value
+
+        return (texts.get(selected_key, ""),)
+
+    @classmethod
+    def IS_CHANGED(cls, text1, text2, text3, text4, jump_empty_option, shortcut_key, current_value):
+        """
+        Determines if the node's state has changed based on inputs.
+
+        Args:
+            text1 (str): First text input.
+            text2 (str): Second text input.
+            text3 (str): Third text input.
+            text4 (str): Fourth text input.
+            jump_empty_option (bool): Whether to skip empty texts.
+            shortcut_key (str): The selected shortcut key.
+            current_value (str): The current selected value.
+
+        Returns:
+            str: A hash representing the current state.
+        """
+        m = hashlib.sha256()
+        m.update(text1.encode())
+        m.update(text2.encode())
+        m.update(text3.encode())
+        m.update(text4.encode())
+        m.update(str(jump_empty_option).encode())
+        m.update(shortcut_key.encode())
+        m.update(current_value.encode())
+        return m.hexdigest()
