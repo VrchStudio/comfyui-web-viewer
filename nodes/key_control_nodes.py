@@ -8,16 +8,18 @@ CATEGORY = "vrch.io/control"
 
 class VrchIntKeyControlNode:
     """
-    VrchIntKeyControlNode allows users to control an integer output value (0-100)
-    using keyboard shortcuts. Users can adjust the step size and choose different
-    shortcut key combinations.
+    VrchIntKeyControlNode allows users to control an integer output value within
+    a customizable range using keyboard shortcuts. Users can adjust the step size,
+    choose different shortcut key combinations, and define minimum and maximum values.
     """
 
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "step_size": ("INT", {"default": 1, "min": 1, "max": 10}),
+                "min_value": ("INT", {"default": 0, "min": -9999, "max": 9999}),
+                "max_value": ("INT", {"default": 100, "min": -9999, "max": 9999}),
+                "step_size": ("INT", {"default": 1, "min": 1, "max": 1000}),
                 "shortcut_key1": (
                     [
                         "F1",
@@ -33,7 +35,7 @@ class VrchIntKeyControlNode:
                         "F11",
                         "F12",
                     ],
-                    {"default": "F1"},
+                    {"default": "F2"},  # Updated default from "F1" to "F2"
                 ),
                 "shortcut_key2": (
                     [
@@ -42,7 +44,7 @@ class VrchIntKeyControlNode:
                     ],
                     {"default": "Down/Up"},
                 ),
-                "current_value": ("INT", {"default": 50, "min": 0, "max": 100}),
+                "current_value": ("INT", {"default": 50, "min": -9999, "max": 9999}),
             }
         }
 
@@ -50,7 +52,7 @@ class VrchIntKeyControlNode:
     FUNCTION = "get_current_value"
     CATEGORY = CATEGORY
 
-    def get_current_value(self, step_size=1, shortcut_key1="F1", shortcut_key2="Down/Up", current_value=50):
+    def get_current_value(self, step_size=1, shortcut_key1="F2", shortcut_key2="Down/Up", min_value=0, max_value=100, current_value=50):
         """
         Returns the current integer value from the UI widget.
 
@@ -58,15 +60,19 @@ class VrchIntKeyControlNode:
             step_size (int): The amount to increment/decrement.
             shortcut_key1 (str): The selected first shortcut key (F1-F12).
             shortcut_key2 (str): The selected second shortcut key combination (Down/Up or Left/Right).
+            min_value (int): The minimum allowable value.
+            max_value (int): The maximum allowable value.
             current_value (int): The current value from the UI widget.
 
         Returns:
             tuple: A tuple containing the current integer value.
         """
+        # Ensure current_value is within min and max bounds
+        current_value = max(min(current_value, max_value), min_value)
         return (current_value,)
 
     @classmethod
-    def IS_CHANGED(cls, step_size, shortcut_key1, shortcut_key2, current_value):
+    def IS_CHANGED(cls, step_size, shortcut_key1, shortcut_key2, min_value, max_value, current_value):
         """
         Determines if the node's state has changed based on inputs.
 
@@ -74,6 +80,8 @@ class VrchIntKeyControlNode:
             step_size (int): The current step size.
             shortcut_key1 (str): The current first shortcut key.
             shortcut_key2 (str): The current second shortcut key combination.
+            min_value (int): The current minimum value.
+            max_value (int): The current maximum value.
             current_value (int): The current value.
 
         Returns:
@@ -83,6 +91,8 @@ class VrchIntKeyControlNode:
         m.update(str(step_size).encode())
         m.update(shortcut_key1.encode())
         m.update(shortcut_key2.encode())
+        m.update(str(min_value).encode())
+        m.update(str(max_value).encode())
         m.update(str(current_value).encode())
         return m.hexdigest()
 
@@ -114,7 +124,7 @@ class VrchFloatKeyControlNode:
                         "F11",
                         "F12",
                     ],
-                    {"default": "F1"},
+                    {"default": "F2"},
                 ),
                 "shortcut_key2": (
                     [
@@ -193,7 +203,7 @@ class VrchBooleanKeyControlNode:
                         "F11",
                         "F12",
                     ],
-                    {"default": "F1"},
+                    {"default": "F2"},
                 ),
                 "current_value": ("BOOLEAN", {"default": False}),
             }
@@ -231,4 +241,112 @@ class VrchBooleanKeyControlNode:
         m = hashlib.sha256()
         m.update(shortcut_key.encode())
         m.update(str(current_value).encode())
+        return m.hexdigest()
+
+
+class VrchTextKeyControlNode:
+    """
+    VrchTextKeyControlNode allows users to select one of four text inputs
+    using a keyboard shortcut. Users can choose a shortcut key (F1-F12),
+    define the current selection (1-4), and optionally skip empty text options
+    when cycling through selections.
+    """
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "text1": ("STRING", {"default": "", "multiline": True}),
+                "text2": ("STRING", {"default": "", "multiline": True}),
+                "text3": ("STRING", {"default": "", "multiline": True}),
+                "text4": ("STRING", {"default": "", "multiline": True}),
+                "jump_empty_option": ("BOOLEAN", {"default": True}),
+                "shortcut_key": (
+                    [
+                        "F1",
+                        "F2",
+                        "F3",
+                        "F4",
+                        "F5",
+                        "F6",
+                        "F7",
+                        "F8",
+                        "F9",
+                        "F10",
+                        "F11",
+                        "F12",
+                    ],
+                    {"default": "F2"},
+                ),
+                "current_value": (
+                    ["1", "2", "3", "4"],
+                    {"default": "1"},
+                ),
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    FUNCTION = "get_current_value"
+    CATEGORY = CATEGORY
+
+    def get_current_value(self, text1="", text2="", text3="", text4="", jump_empty_option=True, shortcut_key="F2", current_value="1"):
+        """
+        Returns the currently selected text based on current_value.
+        If jump_empty_option is True, it skips any empty texts.
+
+        Args:
+            text1 (str): First text input.
+            text2 (str): Second text input.
+            text3 (str): Third text input.
+            text4 (str): Fourth text input.
+            jump_empty_option (bool): Whether to skip empty texts when cycling.
+            shortcut_key (str): The selected shortcut key (F1-F12).
+            current_value (str): The current selected value ("1", "2", "3", "4").
+
+        Returns:
+            tuple: A tuple containing the selected text.
+        """
+        texts = {
+            "1": text1,
+            "2": text2,
+            "3": text3,
+            "4": text4,
+        }
+
+        if jump_empty_option:
+            # Filter out empty texts and sort keys
+            valid_keys = sorted([k for k, v in texts.items() if v.strip() != ""], key=lambda x: int(x))
+            selected_key = str(current_value)
+            if selected_key not in valid_keys:
+                selected_key = valid_keys[0] if valid_keys else "1"
+        else:
+            selected_key = current_value
+
+        return (texts.get(selected_key, ""),)
+
+    @classmethod
+    def IS_CHANGED(cls, text1, text2, text3, text4, jump_empty_option, shortcut_key, current_value):
+        """
+        Determines if the node's state has changed based on inputs.
+
+        Args:
+            text1 (str): First text input.
+            text2 (str): Second text input.
+            text3 (str): Third text input.
+            text4 (str): Fourth text input.
+            jump_empty_option (bool): Whether to skip empty texts.
+            shortcut_key (str): The selected shortcut key.
+            current_value (str): The current selected value.
+
+        Returns:
+            str: A hash representing the current state.
+        """
+        m = hashlib.sha256()
+        m.update(text1.encode())
+        m.update(text2.encode())
+        m.update(text3.encode())
+        m.update(text4.encode())
+        m.update(str(jump_empty_option).encode())
+        m.update(shortcut_key.encode())
+        m.update(current_value.encode())
         return m.hexdigest()
