@@ -260,7 +260,7 @@ class VrchTextKeyControlNode:
                 "text2": ("STRING", {"default": "", "multiline": True}),
                 "text3": ("STRING", {"default": "", "multiline": True}),
                 "text4": ("STRING", {"default": "", "multiline": True}),
-                "jump_empty_option": ("BOOLEAN", {"default": True}),
+                "skip_empty_option": ("BOOLEAN", {"default": True}),
                 "shortcut_key": (
                     [
                         "F1",
@@ -289,17 +289,17 @@ class VrchTextKeyControlNode:
     FUNCTION = "get_current_value"
     CATEGORY = CATEGORY
 
-    def get_current_value(self, text1="", text2="", text3="", text4="", jump_empty_option=True, shortcut_key="F2", current_value="1"):
+    def get_current_value(self, text1="", text2="", text3="", text4="", skip_empty_option=True, shortcut_key="F2", current_value="1"):
         """
         Returns the currently selected text based on current_value.
-        If jump_empty_option is True, it skips any empty texts.
+        If skip_empty_option is True, it skips any empty texts.
 
         Args:
             text1 (str): First text input.
             text2 (str): Second text input.
             text3 (str): Third text input.
             text4 (str): Fourth text input.
-            jump_empty_option (bool): Whether to skip empty texts when cycling.
+            skip_empty_option (bool): Whether to skip empty texts when cycling.
             shortcut_key (str): The selected shortcut key (F1-F12).
             current_value (str): The current selected value ("1", "2", "3", "4").
 
@@ -313,7 +313,7 @@ class VrchTextKeyControlNode:
             "4": text4,
         }
 
-        if jump_empty_option:
+        if skip_empty_option:
             # Filter out empty texts and sort keys
             valid_keys = sorted([k for k, v in texts.items() if v.strip() != ""], key=lambda x: int(x))
             selected_key = str(current_value)
@@ -325,7 +325,7 @@ class VrchTextKeyControlNode:
         return (texts.get(selected_key, ""),)
 
     @classmethod
-    def IS_CHANGED(cls, text1, text2, text3, text4, jump_empty_option, shortcut_key, current_value):
+    def IS_CHANGED(cls, text1, text2, text3, text4, skip_empty_option, shortcut_key, current_value):
         """
         Determines if the node's state has changed based on inputs.
 
@@ -334,7 +334,7 @@ class VrchTextKeyControlNode:
             text2 (str): Second text input.
             text3 (str): Third text input.
             text4 (str): Fourth text input.
-            jump_empty_option (bool): Whether to skip empty texts.
+            skip_empty_option (bool): Whether to skip empty texts.
             shortcut_key (str): The selected shortcut key.
             current_value (str): The current selected value.
 
@@ -346,7 +346,7 @@ class VrchTextKeyControlNode:
         m.update(text2.encode())
         m.update(text3.encode())
         m.update(text4.encode())
-        m.update(str(jump_empty_option).encode())
+        m.update(str(skip_empty_option).encode())
         m.update(shortcut_key.encode())
         m.update(current_value.encode())
         return m.hexdigest()

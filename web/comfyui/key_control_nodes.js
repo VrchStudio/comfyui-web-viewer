@@ -547,7 +547,7 @@ app.registerExtension({
             let text2Widget = node.widgets.find(w => w.name === "text2");
             let text3Widget = node.widgets.find(w => w.name === "text3");
             let text4Widget = node.widgets.find(w => w.name === "text4");
-            let jumpEmptyOptionWidget = node.widgets.find(w => w.name === "jump_empty_option");
+            let jumpEmptyOptionWidget = node.widgets.find(w => w.name === "skip_empty_option");
             let shortcutKeyWidget = node.widgets.find(w => w.name === "shortcut_key");
             let currentValueWidget = node.widgets.find(w => w.name === "current_value");
 
@@ -564,7 +564,7 @@ app.registerExtension({
 
             if (ENABLE_DEBUG) {
                 console.log("[VrchTextKeyControlNode] Initialized with current_value:", currentValue);
-                console.log("[VrchTextKeyControlNode] jump_empty_option:", jumpEmptyOption);
+                console.log("[VrchTextKeyControlNode] skip_empty_option:", jumpEmptyOption);
             }
 
             // Function to get all texts and filter based on jumpEmptyOption
@@ -624,12 +624,12 @@ app.registerExtension({
                 };
             }
 
-            // Handle changes to jump_empty_option
+            // Handle changes to skip_empty_option
             const handleJumpEmptyOptionChange = (value) => {
                 jumpEmptyOption = value;
                 updateDisplay();
                 if (ENABLE_DEBUG) {
-                    console.log(`[VrchTextKeyControlNode] jump_empty_option set to: ${jumpEmptyOption}`);
+                    console.log(`[VrchTextKeyControlNode] skip_empty_option set to: ${jumpEmptyOption}`);
                 }
             };
 
