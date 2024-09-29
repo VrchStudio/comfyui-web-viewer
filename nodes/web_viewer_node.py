@@ -8,7 +8,7 @@ class VrchWebViewerNode:
                 "page": (["image", "audio", "depthmap"], {"default": "image"}),
                 "server": ("STRING", {"default": "127.0.0.1:8188", "multiline": False, "dynamicPrompts": False}),
                 "ssl": ("BOOLEAN", {"default": False}),
-                "file": ("STRING", {"default": "web_viewer_image.jpeg", "multiline": False, "dynamicPrompts": False}),
+                "filename": ("STRING", {"default": "web_viewer_image.jpeg", "multiline": False, "dynamicPrompts": False}),
                 "path": ("STRING", {"default": "web_viewer", "multiline": False, "dynamicPrompts": False}),
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),

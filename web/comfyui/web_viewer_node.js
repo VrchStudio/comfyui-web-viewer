@@ -8,7 +8,7 @@ app.registerExtension({
             // Find the existing widgets
             const serverWidget = node.widgets.find(w => w.name === "server");
             const sslWidget = node.widgets.find(w => w.name === "ssl");
-            const fileWidget = node.widgets.find(w => w.name === "file");
+            const filenameWidget = node.widgets.find(w => w.name === "filename");
             const pathWidget = node.widgets.find(w => w.name === "path");
             const pageWidget = node.widgets.find(w => w.name === "page");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
@@ -21,17 +21,17 @@ app.registerExtension({
                 // Store the current values in variables
                 let server = serverWidget ? serverWidget.value : "127.0.0.1:8188";
                 let ssl = sslWidget ? sslWidget.value : false;
-                let file = fileWidget ? fileWidget.value : "web_viewer_image.jpeg";
+                let filename = filenameWidget ? filenameWidget.value : "web_viewer_image.jpeg";
                 let path = pathWidget ? pathWidget.value : "web_viewer";
                 let page = pageWidget ? pageWidget.value : "image";
-                const newUrl = `https://vrch.ai/web-viewer?page=${page}&server=${server}&ssl=${ssl}&file=${file}&path=${path}`;
+                const newUrl = `https://vrch.ai/web-viewer?page=${page}&server=${server}&ssl=${ssl}&file=${filename}&path=${path}`;
                 if (urlWidget) {
                     urlWidget.value = newUrl;
                 }
             }
 
             // List of widgets that trigger URL update
-            const widgets = [serverWidget, sslWidget, fileWidget, pathWidget, pageWidget];
+            const widgets = [serverWidget, sslWidget, filenameWidget, pathWidget, pageWidget];
 
             // Add callback listeners to update values and the URL when inputs change
             widgets.forEach(widget => {
@@ -71,8 +71,8 @@ app.registerExtension({
             button.classList.add("comfy-big-button");
             button.onclick = () => {
                 if (urlWidget && urlWidget.value) {
-                    const width = widthWidget ? widthWidget.value : 1024;
-                    const height = heightWidget ? heightWidget.value : 768;
+                    const width = widthWidget ? widthWidget.value : 1280;
+                    const height = heightWidget ? heightWidget.value : 960;
                     window.open(urlWidget.value, "_blank", `width=${width},height=${height}`);
                 } else {
                     console.error("URL widget not found or empty");
@@ -81,6 +81,9 @@ app.registerExtension({
 
             // Add the button to the node using addDOMWidget
             node.addDOMWidget("button_widget", "Open Web Viewer", button);
+
+            // Hide urlWidget initially
+            hideWidget(node, urlWidget);
 
             function init() {
                 // update urlWidget visibility
