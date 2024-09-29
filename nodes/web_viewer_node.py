@@ -5,13 +5,19 @@ class VrchWebViewerNode:
     def INPUT_TYPES(s):
         return {
             "required": {
+                "page": (["image", "audio", "depthmap"], {"default": "image"}),
+                "server": ("STRING", {"default": "127.0.0.1:8188", "multiline": False, "dynamicPrompts": False}),
+                "ssl": ("BOOLEAN", {"default": False}),
+                "file": ("STRING", {"default": "web_viewer_image.jpeg", "multiline": False, "dynamicPrompts": False}),
+                "path": ("STRING", {"default": "web_viewer", "multiline": False, "dynamicPrompts": False}),
+                "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
+                "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
+                "show_url":("BOOLEAN", {"default": False}),
                 "url": ("STRING", {
-                    "default": "https://vrch.ai/vrch-image-instant-viewer?u=vrch",
+                    "default": "https://vrch.ai/web-viewer",
                     "multiline": True,
                     "dynamicPrompts": False
                 }),
-                "window_width": ("INT", {"default": 1024, "min": 100, "max": 10240}),
-                "window_height": ("INT", {"default": 768, "min": 100, "max": 10240}),
             }
         }
     
@@ -23,13 +29,9 @@ class VrchWebViewerNode:
 
     DESCRIPTION = "Opens the specified Web Viewer URL in a new browser tab when button is clicked."
 
-    def dummy_function(self, url, window_width, window_height):
+    def dummy_function(self, **kwargs):
         return ()
 
     @classmethod
     def IS_CHANGED(s, **kwargs):
         return False
-
-    @classmethod
-    def UI(s):
-        return {"widget": {"open_viewer": ("button", "Open Web Viewer")}}
