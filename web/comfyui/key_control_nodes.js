@@ -525,9 +525,9 @@ app.registerExtension({
 
 
 /**
- * VrchTextKeyControlNode allows users to select one of four text inputs
+ * VrchTextKeyControlNode allows users to select one of eight text inputs
  * using a keyboard shortcut. Users can choose a shortcut key (F1-F12),
- * define the current selection (1-4), and optionally skip empty text options
+ * define the current selection (1-8), and optionally skip empty text options
  * when cycling through selections.
  */
 app.registerExtension({
@@ -547,13 +547,17 @@ app.registerExtension({
             let text2Widget = node.widgets.find(w => w.name === "text2");
             let text3Widget = node.widgets.find(w => w.name === "text3");
             let text4Widget = node.widgets.find(w => w.name === "text4");
+            let text5Widget = node.widgets.find(w => w.name === "text5");
+            let text6Widget = node.widgets.find(w => w.name === "text6");
+            let text7Widget = node.widgets.find(w => w.name === "text7");
+            let text8Widget = node.widgets.find(w => w.name === "text8");
             let jumpEmptyOptionWidget = node.widgets.find(w => w.name === "skip_empty_option");
             let shortcutKeyWidget = node.widgets.find(w => w.name === "shortcut_key");
             let currentValueWidget = node.widgets.find(w => w.name === "current_value");
 
             // Retrieve initial values
             let currentValue = parseInt(currentValueWidget ? currentValueWidget.value : "1", 10);
-            currentValue = [1, 2, 3, 4].includes(currentValue) ? currentValue : 1;
+            currentValue = [1, 2, 3, 4, 5, 6, 7, 8].includes(currentValue) ? currentValue : 1;
             let jumpEmptyOption = jumpEmptyOptionWidget ? jumpEmptyOptionWidget.value : true;
 
             // Create display element for the current value
@@ -574,12 +578,16 @@ app.registerExtension({
                     "2": text2Widget ? text2Widget.value.trim() : "",
                     "3": text3Widget ? text3Widget.value.trim() : "",
                     "4": text4Widget ? text4Widget.value.trim() : "",
+                    "5": text5Widget ? text5Widget.value.trim() : "",
+                    "6": text6Widget ? text6Widget.value.trim() : "",
+                    "7": text7Widget ? text7Widget.value.trim() : "",
+                    "8": text8Widget ? text8Widget.value.trim() : "",
                 };
 
                 if (jumpEmptyOption) {
                     return Object.keys(texts).filter(k => texts[k] !== "");
                 } else {
-                    return ["1", "2", "3", "4"];
+                    return ["1", "2", "3", "4", "5", "6", "7", "8"];
                 }
             };
 
@@ -611,7 +619,7 @@ app.registerExtension({
             // Handle changes to current_value
             const handleCurrentValueChange = (value) => {
                 let val = parseInt(value, 10);
-                if (![1, 2, 3, 4].includes(val)) {
+                if (![1, 2, 3, 4, 5, 6, 7, 8].includes(val)) {
                     val = 1;
                 }
                 currentValue = val;
@@ -719,7 +727,6 @@ app.registerExtension({
         }
     }
 });
-
 
 // Additional styles for the widget (optional)
 const style = document.createElement("style");
