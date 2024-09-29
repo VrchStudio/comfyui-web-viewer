@@ -551,14 +551,14 @@ app.registerExtension({
             let text6Widget = node.widgets.find(w => w.name === "text6");
             let text7Widget = node.widgets.find(w => w.name === "text7");
             let text8Widget = node.widgets.find(w => w.name === "text8");
-            let jumpEmptyOptionWidget = node.widgets.find(w => w.name === "skip_empty_option");
+            let skipEmptyOptionWidget = node.widgets.find(w => w.name === "skip_empty_option");
             let shortcutKeyWidget = node.widgets.find(w => w.name === "shortcut_key");
             let currentValueWidget = node.widgets.find(w => w.name === "current_value");
 
             // Retrieve initial values
             let currentValue = parseInt(currentValueWidget ? currentValueWidget.value : "1", 10);
             currentValue = [1, 2, 3, 4, 5, 6, 7, 8].includes(currentValue) ? currentValue : 1;
-            let jumpEmptyOption = jumpEmptyOptionWidget ? jumpEmptyOptionWidget.value : true;
+            let skipEmptyOption = skipEmptyOptionWidget ? skipEmptyOptionWidget.value : true;
 
             // Create display element for the current value
             const valueDisplay = document.createElement("div");
@@ -568,10 +568,10 @@ app.registerExtension({
 
             if (ENABLE_DEBUG) {
                 console.log("[VrchTextKeyControlNode] Initialized with current_value:", currentValue);
-                console.log("[VrchTextKeyControlNode] skip_empty_option:", jumpEmptyOption);
+                console.log("[VrchTextKeyControlNode] skip_empty_option:", skipEmptyOption);
             }
 
-            // Function to get all texts and filter based on jumpEmptyOption
+            // Function to get all texts and filter based on skipEmptyOption
             const getValidKeys = () => {
                 const texts = {
                     "1": text1Widget ? text1Widget.value.trim() : "",
@@ -584,7 +584,7 @@ app.registerExtension({
                     "8": text8Widget ? text8Widget.value.trim() : "",
                 };
 
-                if (jumpEmptyOption) {
+                if (skipEmptyOption) {
                     return Object.keys(texts).filter(k => texts[k] !== "");
                 } else {
                     return ["1", "2", "3", "4", "5", "6", "7", "8"];
@@ -633,17 +633,17 @@ app.registerExtension({
             }
 
             // Handle changes to skip_empty_option
-            const handleJumpEmptyOptionChange = (value) => {
-                jumpEmptyOption = value;
+            const handleSkipEmptyOptionChange = (value) => {
+                skipEmptyOption = value;
                 updateDisplay();
                 if (ENABLE_DEBUG) {
-                    console.log(`[VrchTextKeyControlNode] skip_empty_option set to: ${jumpEmptyOption}`);
+                    console.log(`[VrchTextKeyControlNode] skip_empty_option set to: ${skipEmptyOption}`);
                 }
             };
 
-            if (jumpEmptyOptionWidget) {
-                jumpEmptyOptionWidget.callback = (value) => {
-                    handleJumpEmptyOptionChange(value);
+            if (skipEmptyOptionWidget) {
+                skipEmptyOptionWidget.callback = (value) => {
+                    handleSkipEmptyOptionChange(value);
                 };
             }
 
