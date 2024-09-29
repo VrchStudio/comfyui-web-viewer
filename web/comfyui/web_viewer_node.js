@@ -65,17 +65,11 @@ app.registerExtension({
                 };
             }
 
-            // update urlWidget visibility
-            showUrlWidget.value ? 
-                showWidget(node, urlWidget):
-                hideWidget(node, urlWidget);
-
             // Create a custom button element
             const button = document.createElement("button");
             button.textContent = "Open Web Viewer";
             button.classList.add("comfy-big-button");
             button.onclick = () => {
-                updateUrl();
                 if (urlWidget && urlWidget.value) {
                     const width = widthWidget ? widthWidget.value : 1024;
                     const height = heightWidget ? heightWidget.value : 768;
@@ -87,6 +81,21 @@ app.registerExtension({
 
             // Add the button to the node using addDOMWidget
             node.addDOMWidget("button_widget", "Open Web Viewer", button);
+
+            function init() {
+                // update urlWidget visibility
+                showUrlWidget.value ? 
+                showWidget(node, urlWidget):
+                hideWidget(node, urlWidget);
+                // update url
+                updateUrl();
+            }
+
+            // Initialize display after ensuring all widgets are loaded
+            function delayedInit() {
+                init();
+            }
+            setTimeout(delayedInit, 1000);
         }
     }
 });
