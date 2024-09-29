@@ -14,10 +14,6 @@ This is a custom node collection for ComfyUI that provides a Web Viewer utility 
 
 ## Usage
 
-以下是更新后的 `Web Viewer by vrch.io` 相关的 README 内容，反映了代码中的最新更改和功能：
-
----
-
 ### Node: `Web Viewer by vrch.io` (vrch.io/web)
 
 1. **Add the `Web Viewer by vrch.io` node to your ComfyUI workflow.**
