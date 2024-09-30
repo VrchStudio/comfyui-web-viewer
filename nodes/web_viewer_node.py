@@ -14,7 +14,7 @@ class VrchWebViewerNode:
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url":("BOOLEAN", {"default": False}),
                 "url": ("STRING", {
-                    "default": "https://vrch.ai/web-viewer",
+                    "default": "https://vrch.ai/viewer",
                     "multiline": True,
                     "dynamicPrompts": False
                 }),
