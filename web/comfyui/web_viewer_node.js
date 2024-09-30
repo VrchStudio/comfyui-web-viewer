@@ -24,7 +24,7 @@ app.registerExtension({
                 let filename = filenameWidget ? filenameWidget.value : "web_viewer_image.jpeg";
                 let path = pathWidget ? pathWidget.value : "web_viewer";
                 let page = pageWidget ? pageWidget.value : "image";
-                const newUrl = `https://vrch.ai/web-viewer?page=${page}&server=${server}&ssl=${ssl}&file=${filename}&path=${path}`;
+                const newUrl = `https://vrch.ai/viewer?page=${page}&server=${server}&ssl=${ssl}&file=${filename}&path=${path}`;
                 if (urlWidget) {
                     urlWidget.value = newUrl;
                 }
