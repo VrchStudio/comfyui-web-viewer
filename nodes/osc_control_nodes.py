@@ -215,3 +215,150 @@ class VrchXYZOSCControlNode:
             self.y = value
         elif address.endswith("/z"):
             self.z = value
+
+class VrchIntOSCControlNode:
+
+    def __init__(self):
+        self.value = 0
+        self.server_manager = None
+        self.path = None
+        self.debug = False
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+                "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+                "path": ("STRING", {"default": "/path"}),
+                "output_min": ("INT", {"default": 0, "min": -9999, "max": 9999}),
+                "output_max": ("INT", {"default": 100, "min": -9999, "max": 9999}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+
+    RETURN_TYPES = ("INT", "FLOAT")
+    RETURN_NAMES = ("VALUE", "RAW_VALUE")
+    FUNCTION = "load_int_osc"
+    CATEGORY = CATEGORY
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("NaN")
+
+    def load_int_osc(
+        self, server_ip, port, path, output_min, output_max, debug
+    ):
+
+        if output_min > output_max:
+            raise ValueError("Output min value cannot be greater than max value.")
+
+        # Check if server parameters have changed
+        server_params_changed = (
+            self.server_manager is None
+            or self.server_manager.ip != server_ip
+            or self.server_manager.port != port
+            or self.debug != debug
+        )
+
+        if server_params_changed:
+            # Unregister previous handler if it exists
+            if self.server_manager and self.path:
+                self.server_manager.unregister_handler(
+                    self.path, self.handle_osc_message
+                )
+            # Get or create the server manager
+            self.server_manager = VrchOSCServerManager.get_instance(
+                server_ip, port, debug
+            )
+            self.debug = debug
+            # Register new handler
+            self.path = path
+            self.server_manager.register_handler(self.path, self.handle_osc_message)
+            if debug:
+                print(f"Registered Int handler at path {self.path}")
+
+        mapped_value = int(
+            VrchNodeUtils.remap(float(self.value), float(output_min), float(output_max))
+        )
+        return mapped_value, self.value
+
+    def handle_osc_message(self, address, *args):
+        value = args[0] if args else 0
+        if self.debug:
+            print(f"[Int Node] Received OSC message: addr={address}, value={value}")
+        self.value = value
+
+
+class VrchFloatOSCControlNode:
+
+    def __init__(self):
+        self.value = 0.0
+        self.server_manager = None
+        self.path = None
+        self.debug = False
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+                "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+                "path": ("STRING", {"default": "/path"}),
+                "output_min": ("FLOAT", {"default": 0.00, "min": -9999.00, "max": 9999.00, "step": 0.01}),
+                "output_max": ("FLOAT", {"default": 100.00, "min": -9999.00, "max": 9999.00, "step": 0.01}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+
+    RETURN_TYPES = ("FLOAT", "FLOAT")
+    RETURN_NAMES = ("VALUE", "RAW_VALUE")
+    FUNCTION = "load_float_osc"
+    CATEGORY = CATEGORY
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("NaN")
+
+    def load_float_osc(
+        self, server_ip, port, path, output_min, output_max, debug
+    ):
+
+        if output_min > output_max:
+            raise ValueError("Output min value cannot be greater than max value.")
+
+        # Check if server parameters have changed
+        server_params_changed = (
+            self.server_manager is None
+            or self.server_manager.ip != server_ip
+            or self.server_manager.port != port
+            or self.debug != debug
+        )
+
+        if server_params_changed:
+            # Unregister previous handler if it exists
+            if self.server_manager and self.path:
+                self.server_manager.unregister_handler(
+                    self.path, self.handle_osc_message
+                )
+            # Get or create the server manager
+            self.server_manager = VrchOSCServerManager.get_instance(
+                server_ip, port, debug
+            )
+            self.debug = debug
+            # Register new handler
+            self.path = path
+            self.server_manager.register_handler(self.path, self.handle_osc_message)
+            if debug:
+                print(f"Registered Float handler at path {self.path}")
+
+        mapped_value = VrchNodeUtils.remap(
+            float(self.value), float(output_min), float(output_max)
+        )
+        return mapped_value, float(self.value)
+
+    def handle_osc_message(self, address, *args):
+        value = args[0] if args else 0.0
+        if self.debug:
+            print(f"[Float Node] Received OSC message: addr={address}, value={value}")
+        self.value = value
