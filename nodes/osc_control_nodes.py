@@ -22,21 +22,61 @@ class VrchNodeUtils:
     def remap(value, out_min, out_max):
         return out_min + (value * (out_max - out_min))
 
+class VrchOSCServerManager:
+    _instances = {}
+
+    def __init__(self, ip, port, debug=False):
+        self.ip = ip
+        self.port = port
+        self.debug = debug
+        self.dispatcher = dispatcher.Dispatcher()
+        self.server = osc_server.ThreadingOSCUDPServer((ip, port), self.dispatcher)
+        self.server_thread = threading.Thread(target=self.server.serve_forever)
+        self.server_thread.start()
+        if debug:
+            print(f"OSC server is running at {ip}:{port}")
+        self.nodes = []
+
+    @classmethod
+    def get_instance(cls, ip, port, debug=False):
+        key = (ip, port)
+        if key not in cls._instances:
+            cls._instances[key] = cls(ip, port, debug)
+        return cls._instances[key]
+
+    def register_handler(self, path, handler):
+        if self.debug:
+            print(f"Registering handler for path: {path}")
+        self.dispatcher.map(path, handler)
+        self.nodes.append((path, handler))
+
+    def unregister_handler(self, path, handler):
+        if self.debug:
+            print(f"Unregistering handler for path: {path}")
+        self.dispatcher.unmap(path, handler)
+        self.nodes.remove((path, handler))
+
+    def shutdown(self):
+        if self.debug:
+            print("Shutting down OSC server...")
+        self.server.shutdown()
+        self.server.server_close()
+        self.server_thread.join()
+
+
 class VrchXYOSCControlNode:
 
     def __init__(self):
         self.x, self.y = 0.0, 0.0
-        self.server_thread = None
-        self.server = None
-        self.dispatcher = None
-        self.initialized = False
+        self.server_manager = None
+        self.path = None
+        self.debug = False
 
         # Store server parameters
         self.server_ip = None
         self.port = None
         self.path = None
-        self.debug = None
-
+        
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -62,82 +102,51 @@ class VrchXYOSCControlNode:
         return float("NaN")
 
     def load_xy_osc(self, server_ip, port, path, x_output_min, x_output_max, y_output_min, y_output_max, debug):
-        
+
         if x_output_min > x_output_max or y_output_min > y_output_max:
             raise ValueError("Output min value cannot be greater than max value.")
 
         # Check if server parameters have changed
         server_params_changed = (
-            self.server_ip != server_ip or
-            self.port != port or
-            self.path != path or
+            self.server_manager is None or
+            self.server_manager.ip != server_ip or
+            self.server_manager.port != port or
             self.debug != debug
         )
 
-        if not self.initialized or not self.server_thread.is_alive() or server_params_changed:
-            self.shut_down_existing()
-            if debug:
-                print(f"Loading OSC server with IP: {server_ip}, Port: {port}, Path: {path + '/*'}")
-            self.setup_osc_server(server_ip, port, path + '/*', debug)
-            # Store the new parameters
-            self.server_ip = server_ip
-            self.port = port
-            self.path = path
+        if server_params_changed:
+            # Unregister previous handler if exists
+            if self.server_manager and self.path:
+                self.server_manager.unregister_handler(f"{self.path}/*", self.handle_osc_message)
+            # Get or create the server manager
+            self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
             self.debug = debug
+            # Register new handler
+            self.path = path
+            self.server_manager.register_handler(f"{self.path}/*", self.handle_osc_message)
+            if debug:
+                print(f"Registered XY handler at path {self.path}/*")
 
         x_mapped = int(VrchNodeUtils.remap(float(self.x), float(x_output_min), float(x_output_max)))
         y_mapped = int(VrchNodeUtils.remap(float(self.y), float(y_output_min), float(y_output_max)))
         return x_mapped, y_mapped, self.x, self.y
 
-    def handle_osc_message(self, address, value):
-        debug = self.debug
-        if debug:
-            print(f"Received OSC message: addr={address}, value={value}")
+    def handle_osc_message(self, address, *args):
+        value = args[0] if args else 0.0
+        if self.debug:
+            print(f"[XY Node] Received OSC message: addr={address}, value={value}")
         if address.endswith("/x"):
             self.x = value
         elif address.endswith("/y"):
             self.y = value
 
-    def setup_osc_server(self, ip, port, path, debug):
-        if self.server_thread and self.server_thread.is_alive():
-            self.server.shutdown()
-        self.dispatcher = dispatcher.Dispatcher()
-        self.dispatcher.map(f"{path}", self.handle_osc_message)
-        self.debug = debug
-
-        self.server = osc_server.ThreadingOSCUDPServer((ip, port), self.dispatcher)
-        self.server_thread = threading.Thread(target=self.server.serve_forever)
-        self.server_thread.start()
-        self.initialized = True
-        if debug:
-            print(f"OSC server is running at {ip}:{port} and listening on path {path}")
-
-    def shut_down_existing(self):
-        if self.server:
-            if self.debug:
-                print("Shutting down existing OSC server...")
-            self.server.shutdown()
-            self.server.server_close()
-        if self.server_thread:
-            self.server_thread.join()
-            self.server_thread = None
-        self.server = None
-        self.initialized = False
-
 class VrchXYZOSCControlNode:
 
     def __init__(self):
         self.x, self.y, self.z = 0.0, 0.0, 0.0
-        self.server_thread = None
-        self.server = None
-        self.dispatcher = None
-        self.initialized = False
-
-        # Store server parameters
-        self.server_ip = None
-        self.port = None
+        self.server_manager = None
         self.path = None
-        self.debug = None
+        self.debug = False
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -166,67 +175,43 @@ class VrchXYZOSCControlNode:
         return float("NaN")
 
     def load_xyz_osc(self, server_ip, port, path, x_output_min, x_output_max, y_output_min, y_output_max, z_output_min, z_output_max, debug):
-        
+
         if x_output_min > x_output_max or y_output_min > y_output_max or z_output_min > z_output_max:
             raise ValueError("Output min value cannot be greater than max value.")
 
         # Check if server parameters have changed
         server_params_changed = (
-            self.server_ip != server_ip or
-            self.port != port or
-            self.path != path or
+            self.server_manager is None or
+            self.server_manager.ip != server_ip or
+            self.server_manager.port != port or
             self.debug != debug
         )
 
-        if not self.initialized or not self.server_thread.is_alive() or server_params_changed:
-            self.shut_down_existing()
-            if debug:
-                print(f"Loading OSC server with IP: {server_ip}, Port: {port}, Path: {path + '/*'}")
-            self.setup_osc_server(server_ip, port, path + '/*', debug)
-            # Store the new parameters
-            self.server_ip = server_ip
-            self.port = port
-            self.path = path
+        if server_params_changed:
+            # Unregister previous handler if exists
+            if self.server_manager and self.path:
+                self.server_manager.unregister_handler(f"{self.path}/*", self.handle_osc_message)
+            # Get or create the server manager
+            self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
             self.debug = debug
+            # Register new handler
+            self.path = path
+            self.server_manager.register_handler(f"{self.path}/*", self.handle_osc_message)
+            if debug:
+                print(f"Registered XYZ handler at path {self.path}/*")
 
         x_mapped = int(VrchNodeUtils.remap(float(self.x), float(x_output_min), float(x_output_max)))
         y_mapped = int(VrchNodeUtils.remap(float(self.y), float(y_output_min), float(y_output_max)))
         z_mapped = int(VrchNodeUtils.remap(float(self.z), float(z_output_min), float(z_output_max)))
         return x_mapped, y_mapped, z_mapped, self.x, self.y, self.z
 
-    def handle_osc_message(self, address, value):
-        debug = self.debug
-        if debug:
-            print(f"Received OSC message: addr={address}, value={value}")
+    def handle_osc_message(self, address, *args):
+        value = args[0] if args else 0.0
+        if self.debug:
+            print(f"[XYZ Node] Received OSC message: addr={address}, value={value}")
         if address.endswith("/x"):
             self.x = value
         elif address.endswith("/y"):
             self.y = value
         elif address.endswith("/z"):
             self.z = value
-
-    def setup_osc_server(self, ip, port, path, debug):
-        if self.server_thread and self.server_thread.is_alive():
-            self.server.shutdown()
-        self.dispatcher = dispatcher.Dispatcher()
-        self.dispatcher.map(f"{path}", self.handle_osc_message)
-        self.debug = debug
-
-        self.server = osc_server.ThreadingOSCUDPServer((ip, port), self.dispatcher)
-        self.server_thread = threading.Thread(target=self.server.serve_forever)
-        self.server_thread.start()
-        self.initialized = True
-        if debug:
-            print(f"OSC server is running at {ip}:{port} and listening on path {path}")
-
-    def shut_down_existing(self):
-        if self.server:
-            if self.debug:
-                print("Shutting down existing OSC server...")
-            self.server.shutdown()
-            self.server.server_close()
-        if self.server_thread:
-            self.server_thread.join()
-            self.server_thread = None
-        self.server = None
-        self.initialized = False
