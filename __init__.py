@@ -3,6 +3,7 @@ from .nodes.image_nodes import *
 from .nodes.audio_nodes import *
 from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
+from .nodes.osc_control_nodes import *
 
 __version__ = "1.0.9"
 
@@ -17,6 +18,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchIntKeyControlNode": VrchIntKeyControlNode,
     "VrchTextKeyControlNode": VrchTextKeyControlNode,
     "VrchWebViewerNode": VrchWebViewerNode,
+    "VrchXYOSCControlNode": VrchXYOSCControlNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -30,6 +32,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchIntKeyControlNode": "INT Key Control by vrch.io",
     "VrchTextKeyControlNode": "TEXT Key Control by vrch.io",
     "VrchWebViewerNode": "Web Viewer by vrch.io",
+    "VrchXYOSCControlNode": "XY OSC Control by vrch.io",
 }
 
 # WEB_DIRECTORY is the comfyui nodes directory that ComfyUI will link and auto-load.
