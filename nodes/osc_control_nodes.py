@@ -34,7 +34,7 @@ class VrchOSCServerManager:
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()
         if debug:
-            print(f"OSC server is running at {ip}:{port}")
+            print(f"[VrchOSCServerManager] OSC server is running at {ip}:{port}")
         self.nodes = []
 
     @classmethod
@@ -46,11 +46,11 @@ class VrchOSCServerManager:
 
     def register_handler(self, path, handler, *args):
         if self.debug:
-            if len(args) >= 1 :
+            if len(args) >= 1:
                 message = f"path: {path}, args: {args}"
             else:
                 message = f"path: {path}"
-            print(f"Registering handler for {message}")
+            print(f"[VrchOSCServerManager] Registering handler for {message}")
         
         if len(args) >= 1:
             self.dispatcher.map(path, handler, args)
@@ -60,7 +60,7 @@ class VrchOSCServerManager:
 
     def unregister_handler(self, path, handler):
         if self.debug:
-            print(f"Unregistering handler for path: {path}")
+            print(f"[VrchOSCServerManager] Unregistering handler for path: {path}")
         try:
             self.dispatcher.unmap(path, handler)
             self.nodes.remove((path, handler))
@@ -69,7 +69,7 @@ class VrchOSCServerManager:
 
     def shutdown(self):
         if self.debug:
-            print("Shutting down OSC server...")
+            print(f"[VrchOSCServerManager] Shutting down OSC server...")
         self.server.shutdown()
         self.server.server_close()
         self.server_thread.join()
@@ -115,7 +115,7 @@ class VrchXYOSCControlNode:
     def load_xy_osc(self, server_ip, port, path, x_output_min, x_output_max, y_output_min, y_output_max, debug):
 
         if x_output_min > x_output_max or y_output_min > y_output_max:
-            raise ValueError("Output min value cannot be greater than max value.")
+            raise ValueError("[VrchXYOSCControlNode] Output min value cannot be greater than max value.")
 
         # Check if server parameters have changed
         server_params_changed = (
@@ -136,7 +136,7 @@ class VrchXYOSCControlNode:
             self.path = path
             self.server_manager.register_handler(f"{self.path}/*", self.handle_osc_message)
             if debug:
-                print(f"Registered XY handler at path {self.path}/*")
+                print(f"[VrchXYOSCControlNode] Registered XY handler at path {self.path}/*")
 
         x_mapped = int(VrchNodeUtils.remap(float(self.x), float(x_output_min), float(x_output_max)))
         y_mapped = int(VrchNodeUtils.remap(float(self.y), float(y_output_min), float(y_output_max)))
@@ -145,7 +145,7 @@ class VrchXYOSCControlNode:
     def handle_osc_message(self, address, *args):
         value = args[0] if args else 0.0
         if self.debug:
-            print(f"[XY Node] Received OSC message: addr={address}, value={value}")
+            print(f"[VrchXYOSCControlNode] Received OSC message: addr={address}, value={value}")
         if address.endswith("/x"):
             self.x = value
         elif address.endswith("/y"):
@@ -188,7 +188,7 @@ class VrchXYZOSCControlNode:
     def load_xyz_osc(self, server_ip, port, path, x_output_min, x_output_max, y_output_min, y_output_max, z_output_min, z_output_max, debug):
 
         if x_output_min > x_output_max or y_output_min > y_output_max or z_output_min > z_output_max:
-            raise ValueError("Output min value cannot be greater than max value.")
+            raise ValueError("[VrchXYZOSCControlNode] Output min value cannot be greater than max value.")
 
         # Check if server parameters have changed
         server_params_changed = (
@@ -209,7 +209,7 @@ class VrchXYZOSCControlNode:
             self.path = path
             self.server_manager.register_handler(f"{self.path}/*", self.handle_osc_message)
             if debug:
-                print(f"Registered XYZ handler at path {self.path}/*")
+                print(f"[VrchXYZOSCControlNode] Registered XYZ handler at path {self.path}/*")
 
         x_mapped = int(VrchNodeUtils.remap(float(self.x), float(x_output_min), float(x_output_max)))
         y_mapped = int(VrchNodeUtils.remap(float(self.y), float(y_output_min), float(y_output_max)))
@@ -219,7 +219,7 @@ class VrchXYZOSCControlNode:
     def handle_osc_message(self, address, *args):
         value = args[0] if args else 0.0
         if self.debug:
-            print(f"[XYZ Node] Received OSC message: addr={address}, value={value}")
+            print(f"[VrchXYZOSCControlNode] Received OSC message: addr={address}, value={value}")
         if address.endswith("/x"):
             self.x = value
         elif address.endswith("/y"):
@@ -262,7 +262,7 @@ class VrchIntOSCControlNode:
     ):
 
         if output_min > output_max:
-            raise ValueError("Output min value cannot be greater than max value.")
+            raise ValueError("[VrchIntOSCControlNode] Output min value cannot be greater than max value.")
 
         # Check if server parameters have changed
         server_params_changed = (
@@ -287,7 +287,7 @@ class VrchIntOSCControlNode:
             self.path = path
             self.server_manager.register_handler(self.path, self.handle_osc_message)
             if debug:
-                print(f"Registered Int handler at path {self.path}")
+                print(f"[VrchIntOSCControlNode] Registered Int handler at path {self.path}")
 
         mapped_value = int(
             VrchNodeUtils.remap(float(self.value), float(output_min), float(output_max))
@@ -297,7 +297,7 @@ class VrchIntOSCControlNode:
     def handle_osc_message(self, address, *args):
         value = args[0] if args else 0
         if self.debug:
-            print(f"[Int Node] Received OSC message: addr={address}, value={value}")
+            print(f"[VrchIntOSCControlNode] Received OSC message: addr={address}, value={value}")
         self.value = value
 
 
@@ -336,7 +336,7 @@ class VrchFloatOSCControlNode:
     ):
 
         if output_min > output_max:
-            raise ValueError("Output min value cannot be greater than max value.")
+            raise ValueError("[VrchFloatOSCControlNode] Output min value cannot be greater than max value.")
 
         # Check if server parameters have changed
         server_params_changed = (
@@ -361,7 +361,7 @@ class VrchFloatOSCControlNode:
             self.path = path
             self.server_manager.register_handler(self.path, self.handle_osc_message)
             if debug:
-                print(f"Registered Float handler at path {self.path}")
+                print(f"[VrchFloatOSCControlNode] Registered Float handler at path {self.path}")
 
         mapped_value = VrchNodeUtils.remap(
             float(self.value), float(output_min), float(output_max)
@@ -371,7 +371,7 @@ class VrchFloatOSCControlNode:
     def handle_osc_message(self, address, *args):
         value = args[0] if args else 0.0
         if self.debug:
-            print(f"[Float Node] Received OSC message: addr={address}, value={value}")
+            print(f"[VrchFloatOSCControlNode] Received OSC message: addr={address}, value={value}")
         self.value = value
 
 class VrchSwitchOSCControlNode:
@@ -451,7 +451,7 @@ class VrchSwitchOSCControlNode:
                 for path, handler in self.handlers:
                     self.server_manager.unregister_handler(path, handler)
                     if debug:
-                        print(f"Unregistered Switch handler at path {path}")
+                        print(f"[VrchSwitchOSCControlNode] Unregistered Switch handler at path {path}")
                 self.handlers = []
 
             # Get or create the server manager
@@ -465,14 +465,14 @@ class VrchSwitchOSCControlNode:
                 self.server_manager.register_handler(path, handler)
                 self.handlers.append((path, handler))
                 if debug:
-                    print(f"Registered Switch handler at path {path} with index {i}")
+                    print(f"[VrchSwitchOSCControlNode] Registered Switch handler at path {path} with index {i}")
 
         return tuple(self.switches)
 
     def create_handler(self, index):
         def handler(address, *args):
             if self.debug:
-                print(f"[Switch Node] Received OSC message: addr={address}, args={args}, index={index}")
+                print(f"[VrchSwitchOSCControlNode] Received OSC message: addr={address}, args={args}, index={index}")
             value = args[0] if args else 0.0
             self.switches[index] = bool(int(value))
         return handler
