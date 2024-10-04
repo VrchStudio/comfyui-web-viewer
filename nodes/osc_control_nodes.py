@@ -31,6 +31,12 @@ class VrchXYOSCControlNode:
         self.dispatcher = None
         self.initialized = False
 
+        # Store server parameters
+        self.server_ip = None
+        self.port = None
+        self.path = None
+        self.debug = None
+
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -59,20 +65,32 @@ class VrchXYOSCControlNode:
         
         if x_output_min > x_output_max or y_output_min > y_output_max:
             raise ValueError("Output min value cannot be greater than max value.")
-        
-        self.shut_down_existing()
-        if debug:
-            print(f"Loading OSC server with IP: {server_ip}, Port: {port}, Path: {path + '/*'}")
 
-        if not self.initialized or not self.server_thread.is_alive():
+        # Check if server parameters have changed
+        server_params_changed = (
+            self.server_ip != server_ip or
+            self.port != port or
+            self.path != path or
+            self.debug != debug
+        )
+
+        if not self.initialized or not self.server_thread.is_alive() or server_params_changed:
+            self.shut_down_existing()
+            if debug:
+                print(f"Loading OSC server with IP: {server_ip}, Port: {port}, Path: {path + '/*'}")
             self.setup_osc_server(server_ip, port, path + '/*', debug)
+            # Store the new parameters
+            self.server_ip = server_ip
+            self.port = port
+            self.path = path
+            self.debug = debug
 
         x_mapped = int(VrchNodeUtils.remap(float(self.x), float(x_output_min), float(x_output_max)))
         y_mapped = int(VrchNodeUtils.remap(float(self.y), float(y_output_min), float(y_output_max)))
         return x_mapped, y_mapped, self.x, self.y
 
-    def handle_osc_message(self, address, args, value):
-        debug = args[0].get("debug", False) if isinstance(args[0], dict) else False
+    def handle_osc_message(self, address, value):
+        debug = self.debug
         if debug:
             print(f"Received OSC message: addr={address}, value={value}")
         if address.endswith("/x"):
@@ -84,7 +102,8 @@ class VrchXYOSCControlNode:
         if self.server_thread and self.server_thread.is_alive():
             self.server.shutdown()
         self.dispatcher = dispatcher.Dispatcher()
-        self.dispatcher.map(f"{path}", self.handle_osc_message, {"debug": debug})
+        self.dispatcher.map(f"{path}", self.handle_osc_message)
+        self.debug = debug
 
         self.server = osc_server.ThreadingOSCUDPServer((ip, port), self.dispatcher)
         self.server_thread = threading.Thread(target=self.server.serve_forever)
@@ -95,7 +114,8 @@ class VrchXYOSCControlNode:
 
     def shut_down_existing(self):
         if self.server:
-            print("Shutting down existing OSC server...")
+            if self.debug:
+                print("Shutting down existing OSC server...")
             self.server.shutdown()
             self.server.server_close()
         if self.server_thread:
