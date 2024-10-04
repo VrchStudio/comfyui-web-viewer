@@ -63,9 +63,9 @@ class VrchOSCServerManager:
             print(f"Unregistering handler for path: {path}")
         try:
             self.dispatcher.unmap(path, handler)
+            self.nodes.remove((path, handler))
         except Exception as e:
             print(f"[VrchOSCServerManager] unregister_handler() call with error: {e}")
-        self.nodes.remove((path, handler))
 
     def shutdown(self):
         if self.debug:
@@ -380,6 +380,7 @@ class VrchSwitchOSCControlNode:
         self.switches = [False] * 8
         self.server_manager = None
         self.paths = []
+        self.handlers = []
         self.debug = False
 
     @classmethod
@@ -446,32 +447,32 @@ class VrchSwitchOSCControlNode:
 
         if server_params_changed or self.paths != new_paths:
             # Unregister previous handlers if they exist
-            if self.server_manager and self.paths:
-                for path in self.paths:
-                    self.server_manager.unregister_handler(path, self.handle_osc_message)
+            if self.server_manager and self.handlers:
+                for path, handler in self.handlers:
+                    self.server_manager.unregister_handler(path, handler)
                     if debug:
                         print(f"Unregistered Switch handler at path {path}")
+                self.handlers = []
 
             # Get or create the server manager
             self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
             self.debug = debug
             # Register new handlers
             self.paths = new_paths
+            self.handlers = []
             for i, path in enumerate(self.paths):
-                self.server_manager.register_handler(path, self.handle_osc_message, i)
+                handler = self.create_handler(i)
+                self.server_manager.register_handler(path, handler)
+                self.handlers.append((path, handler))
                 if debug:
                     print(f"Registered Switch handler at path {path} with index {i}")
 
         return tuple(self.switches)
 
-    def handle_osc_message(self, address, args, value):
-        if self.debug:
-            print(f"[Switch Node] Received OSC message: addr={address}, args={args}, value={value}")
-            
-        if len(args) >= 1:
-            index = args[0][0]
-            # Convert the received float value to boolean (0.0 -> False, 1.0 -> True)
-            self.switches[index] = bool(int(value))
-        else:
+    def create_handler(self, index):
+        def handler(address, *args):
             if self.debug:
-                print(f"No value received in OSC message at {address}")
+                print(f"[Switch Node] Received OSC message: addr={address}, args={args}, index={index}")
+            value = args[0] if args else 0.0
+            self.switches[index] = bool(int(value))
+        return handler
