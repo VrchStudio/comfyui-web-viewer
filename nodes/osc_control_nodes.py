@@ -44,16 +44,27 @@ class VrchOSCServerManager:
             cls._instances[key] = cls(ip, port, debug)
         return cls._instances[key]
 
-    def register_handler(self, path, handler):
+    def register_handler(self, path, handler, *args):
         if self.debug:
-            print(f"Registering handler for path: {path}")
-        self.dispatcher.map(path, handler)
+            if len(args) >= 1 :
+                message = f"path: {path}, args: {args}"
+            else:
+                message = f"path: {path}"
+            print(f"Registering handler for {message}")
+        
+        if len(args) >= 1:
+            self.dispatcher.map(path, handler, args)
+        else:
+            self.dispatcher.map(path, handler)
         self.nodes.append((path, handler))
 
     def unregister_handler(self, path, handler):
         if self.debug:
             print(f"Unregistering handler for path: {path}")
-        self.dispatcher.unmap(path, handler)
+        try:
+            self.dispatcher.unmap(path, handler)
+        except Exception as e:
+            print(f"[VrchOSCServerManager] unregister_handler() call with error: {e}")
         self.nodes.remove((path, handler))
 
     def shutdown(self):
@@ -362,3 +373,105 @@ class VrchFloatOSCControlNode:
         if self.debug:
             print(f"[Float Node] Received OSC message: addr={address}, value={value}")
         self.value = value
+
+class VrchSwitchOSCControlNode:
+
+    def __init__(self):
+        self.switches = [False] * 8
+        self.server_manager = None
+        self.paths = []
+        self.debug = False
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "server_ip": (
+                    "STRING",
+                    {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()},
+                ),
+                "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+                "path1": ("STRING", {"default": "/toggle1"}),
+                "path2": ("STRING", {"default": "/toggle2"}),
+                "path3": ("STRING", {"default": "/toggle3"}),
+                "path4": ("STRING", {"default": "/toggle4"}),
+                "path5": ("STRING", {"default": "/toggle5"}),
+                "path6": ("STRING", {"default": "/toggle6"}),
+                "path7": ("STRING", {"default": "/toggle7"}),
+                "path8": ("STRING", {"default": "/toggle8"}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+
+    RETURN_TYPES = ("BOOLEAN",) * 8
+    RETURN_NAMES = (
+        "SWITCH_1",
+        "SWITCH_2",
+        "SWITCH_3",
+        "SWITCH_4",
+        "SWITCH_5",
+        "SWITCH_6",
+        "SWITCH_7",
+        "SWITCH_8",
+    )
+    FUNCTION = "load_switches_osc"
+    CATEGORY = CATEGORY
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("NaN")
+
+    def load_switches_osc(
+        self,
+        server_ip,
+        port,
+        path1,
+        path2,
+        path3,
+        path4,
+        path5,
+        path6,
+        path7,
+        path8,
+        debug,
+    ):
+        # Check if server parameters or paths have changed
+        server_params_changed = (
+            self.server_manager is None
+            or self.server_manager.ip != server_ip
+            or self.server_manager.port != port
+            or self.debug != debug
+        )
+        new_paths = [path1, path2, path3, path4, path5, path6, path7, path8]
+
+        if server_params_changed or self.paths != new_paths:
+            # Unregister previous handlers if they exist
+            if self.server_manager and self.paths:
+                for path in self.paths:
+                    self.server_manager.unregister_handler(path, self.handle_osc_message)
+                    if debug:
+                        print(f"Unregistered Switch handler at path {path}")
+
+            # Get or create the server manager
+            self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
+            self.debug = debug
+            # Register new handlers
+            self.paths = new_paths
+            for i, path in enumerate(self.paths):
+                self.server_manager.register_handler(path, self.handle_osc_message, i)
+                if debug:
+                    print(f"Registered Switch handler at path {path} with index {i}")
+
+        return tuple(self.switches)
+
+    def handle_osc_message(self, address, args, value):
+        if self.debug:
+            print(f"[Switch Node] Received OSC message: addr={address}, args={args}, value={value}")
+            
+        if len(args) >= 1:
+            index = args[0][0]
+            # Convert the received float value to boolean (0.0 -> False, 1.0 -> True)
+            self.switches[index] = bool(int(value))
+        else:
+            if self.debug:
+                print(f"No value received in OSC message at {address}")
