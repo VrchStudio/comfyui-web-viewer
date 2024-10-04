@@ -17,10 +17,32 @@ class VrchNodeUtils:
             return local_ip
         except Exception:
             return "127.0.0.1"
-        
+    
     @staticmethod
     def remap(value, out_min, out_max):
+        """
+        Remap a scalar value to the range [out_min, out_max].
+        """
         return out_min + (value * (out_max - out_min))
+
+    @staticmethod
+    def remap_invert(value, out_min, out_max):
+        """
+        Invert the value within the range [out_min, out_max].
+        
+        Parameters:
+        value: the value to be inverted, expected to be in the range [0.0, 1.0]
+        out_min: minimum value for the range
+        out_max: maximum value for the range
+        
+        Returns:
+        The inverted value within the specified range.
+        """
+        return out_max - (value * (out_max - out_min))
+    
+    def select_remap_func(invert:bool):
+        return VrchNodeUtils.remap_invert if invert else VrchNodeUtils.remap
+
 
 class VrchOSCServerManager:
     _instances = {}
@@ -97,8 +119,10 @@ class VrchXYOSCControlNode:
                 "path": ("STRING", {"default": "/xy"}),
                 "x_output_min": ("INT", {"default": 0, "max": 9999, "min": -9999}),
                 "x_output_max": ("INT", {"default": 100, "max": 9999, "min": -9999}),
+                "x_output_invert": ("BOOLEAN", {"default": False}),
                 "y_output_min": ("INT", {"default": 0, "max": 9999, "min": -9999}),
                 "y_output_max": ("INT", {"default": 100, "max": 9999, "min": -9999}),
+                "y_output_invert": ("BOOLEAN", {"default": False}),
                 "debug": ("BOOLEAN", {"default": False})
             }
         }
@@ -112,7 +136,8 @@ class VrchXYOSCControlNode:
     def IS_CHANGED(cls, **kwargs):
         return float("NaN")
 
-    def load_xy_osc(self, server_ip, port, path, x_output_min, x_output_max, y_output_min, y_output_max, debug):
+    def load_xy_osc(self, server_ip, port, path, x_output_min, x_output_max, 
+                    x_output_invert, y_output_min, y_output_max, y_output_invert, debug):
 
         if x_output_min > x_output_max or y_output_min > y_output_max:
             raise ValueError("[VrchXYOSCControlNode] Output min value cannot be greater than max value.")
@@ -137,9 +162,12 @@ class VrchXYOSCControlNode:
             self.server_manager.register_handler(f"{self.path}/*", self.handle_osc_message)
             if debug:
                 print(f"[VrchXYOSCControlNode] Registered XY handler at path {self.path}/*")
+            
+        x_remap_func = VrchNodeUtils.select_remap_func(x_output_invert)
+        y_remap_func = VrchNodeUtils.select_remap_func(y_output_invert)       
 
-        x_mapped = int(VrchNodeUtils.remap(float(self.x), float(x_output_min), float(x_output_max)))
-        y_mapped = int(VrchNodeUtils.remap(float(self.y), float(y_output_min), float(y_output_max)))
+        x_mapped = int(x_remap_func(float(self.x), float(x_output_min), float(x_output_max)))
+        y_mapped = int(y_remap_func(float(self.y), float(y_output_min), float(y_output_max)))
         return x_mapped, y_mapped, self.x, self.y
 
     def handle_osc_message(self, address, *args):
