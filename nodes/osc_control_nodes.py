@@ -29,19 +29,13 @@ class VrchNodeUtils:
     def remap_invert(value, out_min, out_max):
         """
         Invert the value within the range [out_min, out_max].
-        
-        Parameters:
-        value: the value to be inverted, expected to be in the range [0.0, 1.0]
-        out_min: minimum value for the range
-        out_max: maximum value for the range
-        
-        Returns:
-        The inverted value within the specified range.
         """
         return out_max - (value * (out_max - out_min))
     
-    def select_remap_func(invert:bool):
+    @staticmethod
+    def select_remap_func(invert: bool):
         return VrchNodeUtils.remap_invert if invert else VrchNodeUtils.remap
+
 
 
 class VrchOSCServerManager:
@@ -196,10 +190,13 @@ class VrchXYZOSCControlNode:
                 "path": ("STRING", {"default": "/xyz"}),
                 "x_output_min": ("INT", {"default": 0, "max": 9999, "min": -9999}),
                 "x_output_max": ("INT", {"default": 100, "max": 9999, "min": -9999}),
+                "x_output_invert": ("BOOLEAN", {"default": False}),
                 "y_output_min": ("INT", {"default": 0, "max": 9999, "min": -9999}),
                 "y_output_max": ("INT", {"default": 100, "max": 9999, "min": -9999}),
+                "y_output_invert": ("BOOLEAN", {"default": False}),
                 "z_output_min": ("INT", {"default": 0, "max": 9999, "min": -9999}),
                 "z_output_max": ("INT", {"default": 100, "max": 9999, "min": -9999}),
+                "z_output_invert": ("BOOLEAN", {"default": False}),
                 "debug": ("BOOLEAN", {"default": False})
             }
         }
@@ -213,7 +210,10 @@ class VrchXYZOSCControlNode:
     def IS_CHANGED(cls, **kwargs):
         return float("NaN")
 
-    def load_xyz_osc(self, server_ip, port, path, x_output_min, x_output_max, y_output_min, y_output_max, z_output_min, z_output_max, debug):
+    def load_xyz_osc(self, server_ip, port, path,
+                     x_output_min, x_output_max, x_output_invert,
+                     y_output_min, y_output_max, y_output_invert,
+                     z_output_min, z_output_max, z_output_invert, debug):
 
         if x_output_min > x_output_max or y_output_min > y_output_max or z_output_min > z_output_max:
             raise ValueError("[VrchXYZOSCControlNode] Output min value cannot be greater than max value.")
@@ -239,9 +239,15 @@ class VrchXYZOSCControlNode:
             if debug:
                 print(f"[VrchXYZOSCControlNode] Registered XYZ handler at path {self.path}/*")
 
-        x_mapped = int(VrchNodeUtils.remap(float(self.x), float(x_output_min), float(x_output_max)))
-        y_mapped = int(VrchNodeUtils.remap(float(self.y), float(y_output_min), float(y_output_max)))
-        z_mapped = int(VrchNodeUtils.remap(float(self.z), float(z_output_min), float(z_output_max)))
+        # Select remap functions based on invert options
+        x_remap_func = VrchNodeUtils.select_remap_func(x_output_invert)
+        y_remap_func = VrchNodeUtils.select_remap_func(y_output_invert)
+        z_remap_func = VrchNodeUtils.select_remap_func(z_output_invert)
+
+        # Remap the values
+        x_mapped = int(x_remap_func(float(self.x), float(x_output_min), float(x_output_max)))
+        y_mapped = int(y_remap_func(float(self.y), float(y_output_min), float(y_output_max)))
+        z_mapped = int(z_remap_func(float(self.z), float(z_output_min), float(z_output_max)))
         return x_mapped, y_mapped, z_mapped, self.x, self.y, self.z
 
     def handle_osc_message(self, address, *args):
@@ -272,6 +278,7 @@ class VrchIntOSCControlNode:
                 "path": ("STRING", {"default": "/path"}),
                 "output_min": ("INT", {"default": 0, "min": -9999, "max": 9999}),
                 "output_max": ("INT", {"default": 100, "min": -9999, "max": 9999}),
+                "output_invert": ("BOOLEAN", {"default": False}),
                 "debug": ("BOOLEAN", {"default": False}),
             }
         }
@@ -286,7 +293,7 @@ class VrchIntOSCControlNode:
         return float("NaN")
 
     def load_int_osc(
-        self, server_ip, port, path, output_min, output_max, debug
+        self, server_ip, port, path, output_min, output_max, output_invert, debug
     ):
 
         if output_min > output_max:
@@ -317,8 +324,11 @@ class VrchIntOSCControlNode:
             if debug:
                 print(f"[VrchIntOSCControlNode] Registered Int handler at path {self.path}")
 
+        # Select remap function based on invert option
+        remap_func = VrchNodeUtils.select_remap_func(output_invert)
+
         mapped_value = int(
-            VrchNodeUtils.remap(float(self.value), float(output_min), float(output_max))
+            remap_func(float(self.value), float(output_min), float(output_max))
         )
         return mapped_value, self.value
 
@@ -327,6 +337,7 @@ class VrchIntOSCControlNode:
         if self.debug:
             print(f"[VrchIntOSCControlNode] Received OSC message: addr={address}, value={value}")
         self.value = value
+
 
 
 class VrchFloatOSCControlNode:
@@ -346,6 +357,7 @@ class VrchFloatOSCControlNode:
                 "path": ("STRING", {"default": "/path"}),
                 "output_min": ("FLOAT", {"default": 0.00, "min": -9999.00, "max": 9999.00, "step": 0.01}),
                 "output_max": ("FLOAT", {"default": 100.00, "min": -9999.00, "max": 9999.00, "step": 0.01}),
+                "output_invert": ("BOOLEAN", {"default": False}),
                 "debug": ("BOOLEAN", {"default": False}),
             }
         }
@@ -360,7 +372,7 @@ class VrchFloatOSCControlNode:
         return float("NaN")
 
     def load_float_osc(
-        self, server_ip, port, path, output_min, output_max, debug
+        self, server_ip, port, path, output_min, output_max, output_invert, debug
     ):
 
         if output_min > output_max:
@@ -391,7 +403,10 @@ class VrchFloatOSCControlNode:
             if debug:
                 print(f"[VrchFloatOSCControlNode] Registered Float handler at path {self.path}")
 
-        mapped_value = VrchNodeUtils.remap(
+        # Select remap function based on invert option
+        remap_func = VrchNodeUtils.select_remap_func(output_invert)
+
+        mapped_value = remap_func(
             float(self.value), float(output_min), float(output_max)
         )
         return mapped_value, float(self.value)
@@ -401,6 +416,7 @@ class VrchFloatOSCControlNode:
         if self.debug:
             print(f"[VrchFloatOSCControlNode] Received OSC message: addr={address}, value={value}")
         self.value = value
+
 
 class VrchSwitchOSCControlNode:
 
