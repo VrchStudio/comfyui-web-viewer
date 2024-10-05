@@ -641,3 +641,110 @@ class VrchTextConcatOSCControlNode:
             value = args[0] if args else 0.0
             self.switches[index] = bool(int(value))
         return handler
+
+class VrchTextSwitchOSCControlNode:
+    
+    def __init__(self):
+        self.texts = [""] * 8
+        self.current_output = ""
+        self.server_manager = None
+        self.path = None
+        self.debug = False
+        self.last_index = None  # To keep track of the last valid index
+    
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "text1": ("STRING", {"multiline": True, "default": ""}),
+                "text2": ("STRING", {"multiline": True, "default": ""}),
+                "text3": ("STRING", {"multiline": True, "default": ""}),
+                "text4": ("STRING", {"multiline": True, "default": ""}),
+                "text5": ("STRING", {"multiline": True, "default": ""}),
+                "text6": ("STRING", {"multiline": True, "default": ""}),
+                "text7": ("STRING", {"multiline": True, "default": ""}),
+                "text8": ("STRING", {"multiline": True, "default": ""}),
+                "server_ip": (
+                    "STRING",
+                    {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()},
+                ),
+                "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+                "path": ("STRING", {"default": "/radio1"}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+    
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("TEXT_OUTPUT",)
+    FUNCTION = "load_text_switch_osc"
+    CATEGORY = CATEGORY
+    
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("NaN")
+    
+    def load_text_switch_osc(
+        self,
+        text1,
+        text2,
+        text3,
+        text4,
+        text5,
+        text6,
+        text7,
+        text8,
+        server_ip,
+        port,
+        path,
+        debug,
+    ):
+        # Update texts
+        self.texts = [text1, text2, text3, text4, text5, text6, text7, text8]
+        self.debug = debug
+
+        # Check if server parameters or path have changed
+        server_params_changed = (
+            self.server_manager is None
+            or self.server_manager.ip != server_ip
+            or self.server_manager.port != port
+            or self.debug != debug
+        )
+        if server_params_changed or self.path != path:
+            # Unregister previous handler if it exists
+            if self.server_manager and self.path:
+                self.server_manager.unregister_handler(
+                    self.path, self.handle_osc_message
+                )
+                if debug:
+                    print(f"[VrchTextSwitchOSCControlNode] Unregistered handler at path {self.path}")
+            # Get or create the server manager
+            self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
+            self.debug = debug
+            # Register new handler
+            self.path = path
+            self.server_manager.register_handler(self.path, self.handle_osc_message)
+            if debug:
+                print(f"[VrchTextSwitchOSCControlNode] Registered handler at path {self.path}")
+
+        # Return the current output as a tuple
+        return (self.current_output,)
+
+    def handle_osc_message(self, address, *args):
+        if self.debug:
+            print(f"[VrchTextSwitchOSCControlNode] Received OSC message: addr={address}, args={args}")
+        value = args[0] if args else 0
+        try:
+            index = int(value)
+            if 0 <= index < len(self.texts):
+                self.current_output = self.texts[index]
+                self.last_index = index
+                if self.debug:
+                    print(f"[VrchTextSwitchOSCControlNode] Updated output to text at index {index}")
+            else:
+                if self.debug:
+                    print(f"[VrchTextSwitchOSCControlNode] Index {index} out of range, keeping current output")
+                # Do not change current_output, keep last valid output
+        except ValueError:
+            if self.debug:
+                print(f"[VrchTextSwitchOSCControlNode] Received invalid value: {value}, keeping current output")
+            # Do not change current_output
