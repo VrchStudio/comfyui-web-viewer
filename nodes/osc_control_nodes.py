@@ -237,13 +237,13 @@ class VrchXYZOSCControlNode:
         if server_params_changed:
             # Unregister previous handler if exists
             if self.server_manager and self.path:
-                self.server_manager.unregister_handler(f"{self.path}/*", self.handle_osc_message)
+                self.server_manager.unregister_handler(f"{self.path}*", self.handle_osc_message)
             # Get or create the server manager
             self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
             self.debug = debug
             # Register new handler
             self.path = path
-            self.server_manager.register_handler(f"{self.path}/*", self.handle_osc_message)
+            self.server_manager.register_handler(f"{self.path}*", self.handle_osc_message)
             if debug:
                 print(f"[VrchXYZOSCControlNode] Registered XYZ handler at path {self.path}/*")
 
@@ -259,15 +259,23 @@ class VrchXYZOSCControlNode:
         return x_mapped, y_mapped, z_mapped, self.x, self.y, self.z
 
     def handle_osc_message(self, address, *args):
-        value = args[0] if args else 0.0
         if self.debug:
-            print(f"[VrchXYZOSCControlNode] Received OSC message: addr={address}, value={value}")
-        if address.endswith("/x"):
-            self.x = value
-        elif address.endswith("/y"):
-            self.y = value
-        elif address.endswith("/z"):
-            self.z = value
+            print(f"[VrchXYZOSCControlNode] Received OSC message: addr={address}, args={args}")
+            
+        if len(args) == 1:
+            value = args[0] if args else 0.0
+            if address.endswith("/x"):
+                self.x = value
+            elif address.endswith("/y"):
+                self.y = value
+            elif address.endswith("/z"):
+                self.z = value
+        elif len(args) == 3:
+            self.x = args[0]
+            self.y = args[1]
+            self.z = args[2]
+        else:
+            print(f"[VrchXYZOSCControlNode] handle_osc_message() call with invalid args: {args}")
 
 class VrchIntOSCControlNode:
 
@@ -345,8 +353,6 @@ class VrchIntOSCControlNode:
         if self.debug:
             print(f"[VrchIntOSCControlNode] Received OSC message: addr={address}, value={value}")
         self.value = value
-
-
 
 class VrchFloatOSCControlNode:
 
