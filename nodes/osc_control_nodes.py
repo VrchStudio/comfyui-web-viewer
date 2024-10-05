@@ -94,7 +94,9 @@ class VrchOSCServerManager:
 class VrchXYOSCControlNode:
 
     def __init__(self):
-        self.x, self.y = 0.0, 0.0
+        self.x_raw, self.y_raw = 0.0, 0.0  # Raw captured values
+        self.x, self.y = 0.0, 0.0          # Remapped float values
+        self.x_int, self.y_int = 0, 0       # Remapped integer values
         self.server_manager = None
         self.path = None
         self.debug = False
@@ -121,8 +123,8 @@ class VrchXYOSCControlNode:
             }
         }
 
-    RETURN_TYPES = ("INT", "INT", "FLOAT", "FLOAT")
-    RETURN_NAMES = ("X", "Y", "X_RAW", "Y_RAW")
+    RETURN_TYPES = ("INT", "INT", "FLOAT", "FLOAT", "FLOAT", "FLOAT")
+    RETURN_NAMES = ("X_INT", "Y_INT", "X_FLOAT", "Y_FLOAT", "X_RAW", "Y_RAW")
     FUNCTION = "load_xy_osc"
     CATEGORY = CATEGORY
 
@@ -155,31 +157,37 @@ class VrchXYOSCControlNode:
             self.path = path
             self.server_manager.register_handler(f"{self.path}*", self.handle_osc_message)
             if debug:
-                print(f"[VrchXYOSCControlNode] Registered XY handler at path {self.path}/*")
+                print(f"[VrchXYOSCControlNode] Registered XY handler at path {self.path}*")
             
         x_remap_func = VrchNodeUtils.select_remap_func(x_output_invert)
         y_remap_func = VrchNodeUtils.select_remap_func(y_output_invert)       
 
-        x_mapped = int(x_remap_func(float(self.x), float(x_output_min), float(x_output_max)))
-        y_mapped = int(y_remap_func(float(self.y), float(y_output_min), float(y_output_max)))
-        return x_mapped, y_mapped, self.x, self.y
+        # Remap the raw values to float values
+        self.x = x_remap_func(float(self.x_raw), float(x_output_min), float(x_output_max))
+        self.y = y_remap_func(float(self.y_raw), float(y_output_min), float(y_output_max))
+
+        # Convert to integers
+        self.x_int = int(self.x)
+        self.y_int = int(self.y)
+
+        return self.x_int, self.y_int, self.x, self.y, self.x_raw, self.y_raw
 
     def handle_osc_message(self, address, *args):
-        
         if self.debug:
              print(f"[VrchXYOSCControlNode] Received OSC message: addr={address}, args={args}")
                 
-        if len(args) == 1 :
+        if len(args) == 1:
             value = args[0] if args else 0.0
             if address.endswith("/x"):
-                self.x = value
+                self.x_raw = value
             elif address.endswith("/y"):
-                self.y = value
+                self.y_raw = value
         elif len(args) == 2:
-            self.x = args[0]
-            self.y = args[1]
+            self.x_raw = args[0]
+            self.y_raw = args[1]
         else:
             print(f"[VrchXYOSCControlNode] handle_osc_message() call with invalid args: {args}")
+
 
 class VrchXYZOSCControlNode:
 
