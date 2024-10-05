@@ -192,7 +192,9 @@ class VrchXYOSCControlNode:
 class VrchXYZOSCControlNode:
 
     def __init__(self):
-        self.x, self.y, self.z = 0.0, 0.0, 0.0
+        self.x_raw, self.y_raw, self.z_raw = 0.0, 0.0, 0.0  # Raw captured values
+        self.x, self.y, self.z = 0.0, 0.0, 0.0              # Remapped float values
+        self.x_int, self.y_int, self.z_int = 0, 0, 0        # Remapped integer values
         self.server_manager = None
         self.path = None
         self.debug = False
@@ -217,8 +219,12 @@ class VrchXYZOSCControlNode:
             }
         }
 
-    RETURN_TYPES = ("INT", "INT", "INT", "FLOAT", "FLOAT", "FLOAT")
-    RETURN_NAMES = ("X", "Y", "Z", "X_RAW", "Y_RAW", "Z_RAW")
+    RETURN_TYPES = ("INT", "INT", "INT", "FLOAT", "FLOAT", "FLOAT", "FLOAT", "FLOAT", "FLOAT")
+    RETURN_NAMES = (
+        "X_INT", "Y_INT", "Z_INT",
+        "X_FLOAT", "Y_FLOAT", "Z_FLOAT",
+        "X_RAW", "Y_RAW", "Z_RAW"
+    )
     FUNCTION = "load_xyz_osc"
     CATEGORY = CATEGORY
 
@@ -253,18 +259,28 @@ class VrchXYZOSCControlNode:
             self.path = path
             self.server_manager.register_handler(f"{self.path}*", self.handle_osc_message)
             if debug:
-                print(f"[VrchXYZOSCControlNode] Registered XYZ handler at path {self.path}/*")
+                print(f"[VrchXYZOSCControlNode] Registered XYZ handler at path {self.path}*")
 
         # Select remap functions based on invert options
         x_remap_func = VrchNodeUtils.select_remap_func(x_output_invert)
         y_remap_func = VrchNodeUtils.select_remap_func(y_output_invert)
         z_remap_func = VrchNodeUtils.select_remap_func(z_output_invert)
 
-        # Remap the values
-        x_mapped = int(x_remap_func(float(self.x), float(x_output_min), float(x_output_max)))
-        y_mapped = int(y_remap_func(float(self.y), float(y_output_min), float(y_output_max)))
-        z_mapped = int(z_remap_func(float(self.z), float(z_output_min), float(z_output_max)))
-        return x_mapped, y_mapped, z_mapped, self.x, self.y, self.z
+        # Remap the raw values to float values
+        self.x = x_remap_func(float(self.x_raw), float(x_output_min), float(x_output_max))
+        self.y = y_remap_func(float(self.y_raw), float(y_output_min), float(y_output_max))
+        self.z = z_remap_func(float(self.z_raw), float(z_output_min), float(z_output_max))
+
+        # Convert to integers
+        self.x_int = int(self.x)
+        self.y_int = int(self.y)
+        self.z_int = int(self.z)
+
+        return (
+            self.x_int, self.y_int, self.z_int,
+            self.x, self.y, self.z,
+            self.x_raw, self.y_raw, self.z_raw
+        )
 
     def handle_osc_message(self, address, *args):
         if self.debug:
@@ -273,17 +289,18 @@ class VrchXYZOSCControlNode:
         if len(args) == 1:
             value = args[0] if args else 0.0
             if address.endswith("/x"):
-                self.x = value
+                self.x_raw = value
             elif address.endswith("/y"):
-                self.y = value
+                self.y_raw = value
             elif address.endswith("/z"):
-                self.z = value
+                self.z_raw = value
         elif len(args) == 3:
-            self.x = args[0]
-            self.y = args[1]
-            self.z = args[2]
+            self.x_raw = args[0]
+            self.y_raw = args[1]
+            self.z_raw = args[2]
         else:
             print(f"[VrchXYZOSCControlNode] handle_osc_message() call with invalid args: {args}")
+
 
 class VrchIntOSCControlNode:
 
