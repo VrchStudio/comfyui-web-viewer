@@ -884,3 +884,100 @@ class VrchTextSwitchOSCControlNode:
             if self.debug:
                 print(f"[VrchTextSwitchOSCControlNode] Received invalid value: {value}, keeping current output")
             # Do not change current_output
+
+
+class VrchAnyOSCControlNode:
+
+    def __init__(self):
+        self.int_value = 0
+        self.float_value = 0.0
+        self.text_value = ""
+        self.bool_value = False
+        self.server_manager = None
+        self.path = None
+        self.debug = False
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {
+            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+            "path": ("STRING", {"default": "/path"}),
+            "debug": ("BOOLEAN", {"default": False}),
+        }}
+
+    RETURN_TYPES = ("INT", "FLOAT", "STRING", "BOOLEAN")
+    RETURN_NAMES = ("INT", "FLOAT", "TEXT", "BOOL")
+    FUNCTION = "load_any_osc"
+    CATEGORY = CATEGORY
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("NaN")
+
+    def load_any_osc(self, server_ip, port, path, debug):
+        # Check if server parameters have changed
+        server_params_changed = (
+            self.server_manager is None
+            or self.server_manager.ip != server_ip
+            or self.server_manager.port != port
+            or self.path != path
+            or self.debug != debug
+        )
+
+        if server_params_changed:
+            # Unregister previous handler if it exists
+            if self.server_manager and self.path:
+                self.server_manager.unregister_handler(self.path, self.handle_osc_message)
+                if debug:
+                    print(f"[VrchAnyOSCControlNode] Unregistered handler at path {self.path}")
+            # Get or create the server manager
+            self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
+            self.debug = debug
+            # Register new handler
+            self.path = path
+            self.server_manager.register_handler(self.path, self.handle_osc_message)
+            if debug:
+                print(f"[VrchAnyOSCControlNode] Registered handler at path {self.path}")
+
+        # Return the current values
+        return self.int_value, self.float_value, self.text_value, self.bool_value
+
+    def handle_osc_message(self, address, *args):
+        if self.debug:
+            print(f"[VrchAnyOSCControlNode] Received OSC message: addr={address}, args={args}")
+
+        if not args:
+            if self.debug:
+                print(f"[VrchAnyOSCControlNode] No arguments received.")
+            return
+
+        value = args[0]
+
+        # Reset all outputs
+        self.int_value = 0
+        self.float_value = 0.0
+        self.text_value = ""
+        self.bool_value = False
+
+        # Determine the type of the value
+        if isinstance(value, bool):
+            self.bool_value = value
+            if self.debug:
+                print(f"[VrchAnyOSCControlNode] Detected BOOLEAN value: {value}")
+        elif isinstance(value, int):
+            self.int_value = value
+            if self.debug:
+                print(f"[VrchAnyOSCControlNode] Detected INT value: {value}")
+        elif isinstance(value, float):
+            self.float_value = value
+            if self.debug:
+                print(f"[VrchAnyOSCControlNode] Detected FLOAT value: {value}")
+        elif isinstance(value, str):
+            self.text_value = value
+            if self.debug:
+                print(f"[VrchAnyOSCControlNode] Detected STRING value: {value}")
+        else:
+            # Handle other types if necessary
+            if self.debug:
+                print(f"[VrchAnyOSCControlNode] Received unsupported value type: {type(value)}")
