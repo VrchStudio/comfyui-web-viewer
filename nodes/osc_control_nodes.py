@@ -563,8 +563,8 @@ class VrchSwitchOSCControlNode:
 class VrchTextConcatOSCControlNode:
 
     def __init__(self):
-        self.texts = ["", "", "", ""]
-        self.switches = [False] * 4
+        self.texts = [""] * 8
+        self.switches = [False] * 8
         self.server_manager = None
         self.paths = []
         self.handlers = []
@@ -579,6 +579,10 @@ class VrchTextConcatOSCControlNode:
                 "text2": ("STRING", {"multiline": True, "default": ""}),
                 "text3": ("STRING", {"multiline": True, "default": ""}),
                 "text4": ("STRING", {"multiline": True, "default": ""}),
+                "text5": ("STRING", {"multiline": True, "default": ""}),
+                "text6": ("STRING", {"multiline": True, "default": ""}),
+                "text7": ("STRING", {"multiline": True, "default": ""}),
+                "text8": ("STRING", {"multiline": True, "default": ""}),
                 "server_ip": (
                     "STRING",
                     {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()},
@@ -588,6 +592,10 @@ class VrchTextConcatOSCControlNode:
                 "path2": ("STRING", {"default": "/toggle2"}),
                 "path3": ("STRING", {"default": "/toggle3"}),
                 "path4": ("STRING", {"default": "/toggle4"}),
+                "path5": ("STRING", {"default": "/toggle5"}),
+                "path6": ("STRING", {"default": "/toggle6"}),
+                "path7": ("STRING", {"default": "/toggle7"}),
+                "path8": ("STRING", {"default": "/toggle8"}),
                 "separator": ("STRING", {"default": ","}),
                 "debug": ("BOOLEAN", {"default": False}),
             }
@@ -608,17 +616,25 @@ class VrchTextConcatOSCControlNode:
         text2,
         text3,
         text4,
+        text5,
+        text6,
+        text7,
+        text8,
         server_ip,
         port,
         path1,
         path2,
         path3,
         path4,
+        path5,
+        path6,
+        path7,
+        path8,
         separator,
         debug,
     ):
         # Update texts and separator
-        self.texts = [text1, text2, text3, text4]
+        self.texts = [text1, text2, text3, text4, text5, text6, text7, text8]
         self.separator = separator
         self.debug = debug
 
@@ -629,7 +645,7 @@ class VrchTextConcatOSCControlNode:
             or self.server_manager.port != port
             or self.debug != debug
         )
-        new_paths = [path1, path2, path3, path4]
+        new_paths = [path1, path2, path3, path4, path5, path6, path7, path8]
 
         if server_params_changed or self.paths != new_paths:
             # Unregister previous handlers if they exist
@@ -666,6 +682,7 @@ class VrchTextConcatOSCControlNode:
             value = args[0] if args else 0.0
             self.switches[index] = bool(int(value))
         return handler
+    
 
 class VrchTextSwitchOSCControlNode:
     
