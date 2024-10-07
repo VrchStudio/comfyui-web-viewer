@@ -8,6 +8,7 @@ from .nodes.osc_control_nodes import *
 __version__ = "1.0.9"
 
 NODE_CLASS_MAPPINGS = {
+    "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
     "VrchAudioGenresNode": VrchAudioGenresNode,
     "VrchAudioRecorderNode": VrchAudioRecorderNode,
     "VrchAudioSaverNode": VrchAudioSaverNode,
@@ -28,6 +29,7 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
+    "VrchAnyOSCControlNode": "ANY Value OSC Control by vrch.io",
     "VrchAudioGenresNode": "Get Audio Genres by vrch.io",
     "VrchAudioRecorderNode": "Audio Recorder by vrch.io",
     "VrchAudioSaverNode": "Audio Saver by vrch.io",
