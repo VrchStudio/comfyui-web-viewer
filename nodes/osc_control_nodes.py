@@ -106,7 +106,7 @@ class VrchXYOSCControlNode:
     def __init__(self):
         self.x_raw, self.y_raw = 0.0, 0.0  # Raw captured values
         self.x, self.y = 0.0, 0.0          # Remapped float values
-        self.x_int, self.y_int = 0, 0       # Remapped integer values
+        self.x_int, self.y_int = 0, 0      # Remapped integer values
         self.server_manager = None
         self.path = None
         self.debug = False
@@ -115,23 +115,25 @@ class VrchXYOSCControlNode:
         self.server_ip = None
         self.port = None
         self.path = None
-        
+
     @classmethod
     def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
-                "port": ("INT", {"default": 8000}),
-                "path": ("STRING", {"default": "/xy"}),
-                "x_output_min": ("INT", {"default": 0, "max": 9999, "min": -9999}),
-                "x_output_max": ("INT", {"default": 100, "max": 9999, "min": -9999}),
-                "x_output_invert": ("BOOLEAN", {"default": False}),
-                "y_output_min": ("INT", {"default": 0, "max": 9999, "min": -9999}),
-                "y_output_max": ("INT", {"default": 100, "max": 9999, "min": -9999}),
-                "y_output_invert": ("BOOLEAN", {"default": False}),
-                "debug": ("BOOLEAN", {"default": False})
-            }
-        }
+        return {"required": {
+            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "port": ("INT", {"default": 8000}),
+            "path": ("STRING", {"default": "/xy"}),
+            "x_input_min": ("FLOAT", {"default": 0.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
+            "x_input_max": ("FLOAT", {"default": 1.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
+            "x_output_min": ("INT", {"default": 0, "min": -9999, "max": 9999}),
+            "x_output_max": ("INT", {"default": 100, "min": -9999, "max": 9999}),
+            "x_output_invert": ("BOOLEAN", {"default": False}),
+            "y_input_min": ("FLOAT", {"default": 0.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
+            "y_input_max": ("FLOAT", {"default": 1.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
+            "y_output_min": ("INT", {"default": 0, "min": -9999, "max": 9999}),
+            "y_output_max": ("INT", {"default": 100, "min": -9999, "max": 9999}),
+            "y_output_invert": ("BOOLEAN", {"default": False}),
+            "debug": ("BOOLEAN", {"default": False})
+        }}
 
     RETURN_TYPES = ("INT", "INT", "FLOAT", "FLOAT", "FLOAT", "FLOAT")
     RETURN_NAMES = ("X_INT", "Y_INT", "X_FLOAT", "Y_FLOAT", "X_RAW", "Y_RAW")
@@ -142,11 +144,18 @@ class VrchXYOSCControlNode:
     def IS_CHANGED(cls, **kwargs):
         return float("NaN")
 
-    def load_xy_osc(self, server_ip, port, path, x_output_min, x_output_max, 
-                    x_output_invert, y_output_min, y_output_max, y_output_invert, debug):
+    def load_xy_osc(self, server_ip, port, path,
+                    x_input_min, x_input_max, x_output_min, x_output_max, x_output_invert,
+                    y_input_min, y_input_max, y_output_min, y_output_max, y_output_invert, debug):
 
-        if x_output_min > x_output_max or y_output_min > y_output_max:
-            raise ValueError("[VrchXYOSCControlNode] Output min value cannot be greater than max value.")
+        if x_output_min > x_output_max:
+            raise ValueError("[VrchXYOSCControlNode] X output min value cannot be greater than max value.")
+        if y_output_min > y_output_max:
+            raise ValueError("[VrchXYOSCControlNode] Y output min value cannot be greater than max value.")
+        if x_input_min > x_input_max:
+            raise ValueError("[VrchXYOSCControlNode] X input min value cannot be greater than max value.")
+        if y_input_min > y_input_max:
+            raise ValueError("[VrchXYOSCControlNode] Y input min value cannot be greater than max value.")
 
         # Check if server parameters have changed
         server_params_changed = (
@@ -168,13 +177,25 @@ class VrchXYOSCControlNode:
             self.server_manager.register_handler(f"{self.path}*", self.handle_osc_message)
             if debug:
                 print(f"[VrchXYOSCControlNode] Registered XY handler at path {self.path}*")
-            
+
         x_remap_func = VrchNodeUtils.select_remap_func(x_output_invert)
-        y_remap_func = VrchNodeUtils.select_remap_func(y_output_invert)       
+        y_remap_func = VrchNodeUtils.select_remap_func(y_output_invert)
 
         # Remap the raw values to float values
-        self.x = x_remap_func(float(self.x_raw), float(x_output_min), float(x_output_max))
-        self.y = y_remap_func(float(self.y_raw), float(y_output_min), float(y_output_max))
+        self.x = x_remap_func(
+            float(self.x_raw),
+            float(x_input_min),
+            float(x_input_max),
+            float(x_output_min),
+            float(x_output_max)
+        )
+        self.y = y_remap_func(
+            float(self.y_raw),
+            float(y_input_min),
+            float(y_input_max),
+            float(y_output_min),
+            float(y_output_max)
+        )
 
         # Convert to integers
         self.x_int = int(self.x)
@@ -184,8 +205,8 @@ class VrchXYOSCControlNode:
 
     def handle_osc_message(self, address, *args):
         if self.debug:
-             print(f"[VrchXYOSCControlNode] Received OSC message: addr={address}, args={args}")
-                
+            print(f"[VrchXYOSCControlNode] Received OSC message: addr={address}, args={args}")
+
         if len(args) == 1:
             value = args[0] if args else 0.0
             if address.endswith("/x"):
@@ -211,23 +232,27 @@ class VrchXYZOSCControlNode:
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
-                "port": ("INT", {"default": 8000, "max": 65535, "min": 0}),
-                "path": ("STRING", {"default": "/xyz"}),
-                "x_output_min": ("INT", {"default": 0, "max": 9999, "min": -9999}),
-                "x_output_max": ("INT", {"default": 100, "max": 9999, "min": -9999}),
-                "x_output_invert": ("BOOLEAN", {"default": False}),
-                "y_output_min": ("INT", {"default": 0, "max": 9999, "min": -9999}),
-                "y_output_max": ("INT", {"default": 100, "max": 9999, "min": -9999}),
-                "y_output_invert": ("BOOLEAN", {"default": False}),
-                "z_output_min": ("INT", {"default": 0, "max": 9999, "min": -9999}),
-                "z_output_max": ("INT", {"default": 100, "max": 9999, "min": -9999}),
-                "z_output_invert": ("BOOLEAN", {"default": False}),
-                "debug": ("BOOLEAN", {"default": False})
-            }
-        }
+        return {"required": {
+            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+            "path": ("STRING", {"default": "/xyz"}),
+            "x_input_min": ("FLOAT", {"default": 0.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
+            "x_input_max": ("FLOAT", {"default": 1.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
+            "x_output_min": ("INT", {"default": 0, "min": -9999, "max": 9999}),
+            "x_output_max": ("INT", {"default": 100, "min": -9999, "max": 9999}),
+            "x_output_invert": ("BOOLEAN", {"default": False}),
+            "y_input_min": ("FLOAT", {"default": 0.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
+            "y_input_max": ("FLOAT", {"default": 1.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
+            "y_output_min": ("INT", {"default": 0, "min": -9999, "max": 9999}),
+            "y_output_max": ("INT", {"default": 100, "min": -9999, "max": 9999}),
+            "y_output_invert": ("BOOLEAN", {"default": False}),
+            "z_input_min": ("FLOAT", {"default": 0.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
+            "z_input_max": ("FLOAT", {"default": 1.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
+            "z_output_min": ("INT", {"default": 0, "min": -9999, "max": 9999}),
+            "z_output_max": ("INT", {"default": 100, "min": -9999, "max": 9999}),
+            "z_output_invert": ("BOOLEAN", {"default": False}),
+            "debug": ("BOOLEAN", {"default": False})
+        }}
 
     RETURN_TYPES = ("INT", "INT", "INT", "FLOAT", "FLOAT", "FLOAT", "FLOAT", "FLOAT", "FLOAT")
     RETURN_NAMES = (
@@ -243,12 +268,23 @@ class VrchXYZOSCControlNode:
         return float("NaN")
 
     def load_xyz_osc(self, server_ip, port, path,
-                     x_output_min, x_output_max, x_output_invert,
-                     y_output_min, y_output_max, y_output_invert,
-                     z_output_min, z_output_max, z_output_invert, debug):
+                     x_input_min, x_input_max, x_output_min, x_output_max, x_output_invert,
+                     y_input_min, y_input_max, y_output_min, y_output_max, y_output_invert,
+                     z_input_min, z_input_max, z_output_min, z_output_max, z_output_invert, debug):
 
-        if x_output_min > x_output_max or y_output_min > y_output_max or z_output_min > z_output_max:
-            raise ValueError("[VrchXYZOSCControlNode] Output min value cannot be greater than max value.")
+        if x_output_min > x_output_max:
+            raise ValueError("[VrchXYZOSCControlNode] X output min value cannot be greater than max value.")
+        if y_output_min > y_output_max:
+            raise ValueError("[VrchXYZOSCControlNode] Y output min value cannot be greater than max value.")
+        if z_output_min > z_output_max:
+            raise ValueError("[VrchXYZOSCControlNode] Z output min value cannot be greater than max value.")
+
+        if x_input_min > x_input_max:
+            raise ValueError("[VrchXYZOSCControlNode] X input min value cannot be greater than max value.")
+        if y_input_min > y_input_max:
+            raise ValueError("[VrchXYZOSCControlNode] Y input min value cannot be greater than max value.")
+        if z_input_min > z_input_max:
+            raise ValueError("[VrchXYZOSCControlNode] Z input min value cannot be greater than max value.")
 
         # Check if server parameters have changed
         server_params_changed = (
@@ -277,9 +313,27 @@ class VrchXYZOSCControlNode:
         z_remap_func = VrchNodeUtils.select_remap_func(z_output_invert)
 
         # Remap the raw values to float values
-        self.x = x_remap_func(float(self.x_raw), float(x_output_min), float(x_output_max))
-        self.y = y_remap_func(float(self.y_raw), float(y_output_min), float(y_output_max))
-        self.z = z_remap_func(float(self.z_raw), float(z_output_min), float(z_output_max))
+        self.x = x_remap_func(
+            float(self.x_raw),
+            float(x_input_min),
+            float(x_input_max),
+            float(x_output_min),
+            float(x_output_max)
+        )
+        self.y = y_remap_func(
+            float(self.y_raw),
+            float(y_input_min),
+            float(y_input_max),
+            float(y_output_min),
+            float(y_output_max)
+        )
+        self.z = z_remap_func(
+            float(self.z_raw),
+            float(z_input_min),
+            float(z_input_max),
+            float(z_output_min),
+            float(z_output_max)
+        )
 
         # Convert to integers
         self.x_int = int(self.x)
@@ -295,7 +349,7 @@ class VrchXYZOSCControlNode:
     def handle_osc_message(self, address, *args):
         if self.debug:
             print(f"[VrchXYZOSCControlNode] Received OSC message: addr={address}, args={args}")
-            
+
         if len(args) == 1:
             value = args[0] if args else 0.0
             if address.endswith("/x"):
@@ -310,6 +364,7 @@ class VrchXYZOSCControlNode:
             self.z_raw = args[2]
         else:
             print(f"[VrchXYZOSCControlNode] handle_osc_message() call with invalid args: {args}")
+
 
 
 class VrchIntOSCControlNode:
@@ -419,17 +474,17 @@ class VrchFloatOSCControlNode:
 
     @classmethod
     def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
-                "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
-                "path": ("STRING", {"default": "/path"}),
-                "output_min": ("FLOAT", {"default": 0.00, "min": -9999.00, "max": 9999.00, "step": 0.01}),
-                "output_max": ("FLOAT", {"default": 100.00, "min": -9999.00, "max": 9999.00, "step": 0.01}),
-                "output_invert": ("BOOLEAN", {"default": False}),
-                "debug": ("BOOLEAN", {"default": False}),
-            }
-        }
+        return {"required": {
+            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+            "path": ("STRING", {"default": "/path"}),
+            "input_min": ("FLOAT", {"default": 0.0, "min": -9999.00, "max": 9999.00, "step": 0.01}),
+            "input_max": ("FLOAT", {"default": 1.0, "min": -9999.00, "max": 9999.00, "step": 0.01}),
+            "output_min": ("FLOAT", {"default": 0.00, "min": -9999.00, "max": 9999.00, "step": 0.01}),
+            "output_max": ("FLOAT", {"default": 100.00, "min": -9999.00, "max": 9999.00, "step": 0.01}),
+            "output_invert": ("BOOLEAN", {"default": False}),
+            "debug": ("BOOLEAN", {"default": False}),
+        }}
 
     RETURN_TYPES = ("FLOAT", "FLOAT")
     RETURN_NAMES = ("VALUE", "RAW_VALUE")
@@ -441,11 +496,14 @@ class VrchFloatOSCControlNode:
         return float("NaN")
 
     def load_float_osc(
-        self, server_ip, port, path, output_min, output_max, output_invert, debug
+        self, server_ip, port, path, input_min, input_max, output_min, output_max, output_invert, debug
     ):
 
         if output_min > output_max:
             raise ValueError("[VrchFloatOSCControlNode] Output min value cannot be greater than max value.")
+
+        if input_min > input_max:
+            raise ValueError("[VrchFloatOSCControlNode] Input min value cannot be greater than max value.")
 
         # Check if server parameters have changed
         server_params_changed = (
@@ -475,8 +533,13 @@ class VrchFloatOSCControlNode:
         # Select remap function based on invert option
         remap_func = VrchNodeUtils.select_remap_func(output_invert)
 
+        # Perform the remapping
         mapped_value = remap_func(
-            float(self.value), float(output_min), float(output_max)
+            float(self.value),
+            float(input_min),
+            float(input_max),
+            float(output_min),
+            float(output_max),
         )
         return mapped_value, float(self.value)
 
@@ -485,6 +548,7 @@ class VrchFloatOSCControlNode:
         if self.debug:
             print(f"[VrchFloatOSCControlNode] Received OSC message: addr={address}, value={value}")
         self.value = value
+
 
 
 class VrchSwitchOSCControlNode:
