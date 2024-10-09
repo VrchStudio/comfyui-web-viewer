@@ -1068,3 +1068,120 @@ class VrchChannelOSCControlNode:
         self.channel_on = bool(int(value))
         if self.debug:
             print(f"[VrchChannelOSCControlNode] Channel is {'ON' if self.channel_on else 'OFF'}")
+            
+
+class VrchChannelX4OSCControlNode:
+
+    def __init__(self):
+        self.output_values = [None] * 4
+        self.server_manager = None
+        self.paths = [None] * 4
+        self.debug = False
+        self.channel_states = [False] * 4
+        self.any_channel_on = [None] * 4
+        self.any_channel_off = [None] * 4
+        self.handlers = [None] * 4  # Store handlers for unregistering
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {
+            "any_channel_1_on": (AlwaysEqualProxy("*"), {}),
+            "any_channel_1_off": (AlwaysEqualProxy("*"), {}),
+            "any_channel_2_on": (AlwaysEqualProxy("*"), {}),
+            "any_channel_2_off": (AlwaysEqualProxy("*"), {}),
+            "any_channel_3_on": (AlwaysEqualProxy("*"), {}),
+            "any_channel_3_off": (AlwaysEqualProxy("*"), {}),
+            "any_channel_4_on": (AlwaysEqualProxy("*"), {}),
+            "any_channel_4_off": (AlwaysEqualProxy("*"), {}),
+            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+            "path1": ("STRING", {"default": "/channel1"}),
+            "path2": ("STRING", {"default": "/channel2"}),
+            "path3": ("STRING", {"default": "/channel3"}),
+            "path4": ("STRING", {"default": "/channel4"}),
+            "debug": ("BOOLEAN", {"default": False}),
+        }}
+
+    RETURN_TYPES = (
+        AlwaysEqualProxy("*"),
+        AlwaysEqualProxy("*"),
+        AlwaysEqualProxy("*"),
+        AlwaysEqualProxy("*"),
+    )
+    RETURN_NAMES = ("ANY_OUTPUT_1", "ANY_OUTPUT_2", "ANY_OUTPUT_3", "ANY_OUTPUT_4")
+    FUNCTION = "load_channel_x4_osc"
+    CATEGORY = CATEGORY
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("NaN")
+
+    def load_channel_x4_osc(
+        self,
+        any_channel_1_on, any_channel_1_off,
+        any_channel_2_on, any_channel_2_off,
+        any_channel_3_on, any_channel_3_off,
+        any_channel_4_on, any_channel_4_off,
+        server_ip, port, path1, path2, path3, path4, debug,
+    ):
+        # Store input values
+        self.any_channel_on = [
+            any_channel_1_on, any_channel_2_on, any_channel_3_on, any_channel_4_on
+        ]
+        self.any_channel_off = [
+            any_channel_1_off, any_channel_2_off, any_channel_3_off, any_channel_4_off
+        ]
+        self.debug = debug
+
+        new_paths = [path1, path2, path3, path4]
+
+        # Check if server parameters or paths have changed
+        server_params_changed = (
+            self.server_manager is None
+            or self.server_manager.ip != server_ip
+            or self.server_manager.port != port
+            or self.paths != new_paths
+            or self.debug != debug
+        )
+
+        if server_params_changed:
+            # Unregister previous handlers if they exist
+            if self.server_manager and any(self.paths):
+                for i, handler in enumerate(self.handlers):
+                    if handler:
+                        self.server_manager.unregister_handler(self.paths[i], handler)
+                        if debug:
+                            print(f"[VrchChannelX4OSCControlNode] Unregistered handler at path {self.paths[i]}")
+            # Get or create the server manager
+            self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
+            self.debug = debug
+            # Register new handlers
+            self.paths = new_paths
+            self.handlers = []
+            for i, path in enumerate(self.paths):
+                handler = self.create_handler(i)
+                self.server_manager.register_handler(path, handler)
+                self.handlers.append(handler)
+                if debug:
+                    print(f"[VrchChannelX4OSCControlNode] Registered handler at path {path} for channel {i+1}")
+
+        # Update output values based on channel states
+        for i in range(4):
+            if self.channel_states[i]:
+                self.output_values[i] = self.any_channel_on[i]
+            else:
+                self.output_values[i] = self.any_channel_off[i]
+
+        return tuple(self.output_values)
+
+    def create_handler(self, index):
+        # Create a handler function for the specified channel index
+        def handler(address, *args):
+            if self.debug:
+                print(f"[VrchChannelX4OSCControlNode] Received OSC message: addr={address}, args={args}, channel={index+1}")
+            value = args[0] if args else 0.0
+            # Simplified check: Convert value to int, then to bool
+            self.channel_states[index] = bool(int(value))
+            if self.debug:
+                print(f"[VrchChannelX4OSCControlNode] Channel {index+1} is {'ON' if self.channel_states[index] else 'OFF'}")
+        return handler
