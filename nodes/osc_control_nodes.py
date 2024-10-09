@@ -981,3 +981,90 @@ class VrchAnyOSCControlNode:
             # Handle other types if necessary
             if self.debug:
                 print(f"[VrchAnyOSCControlNode] Received unsupported value type: {type(value)}")
+
+class AlwaysEqualProxy(str):
+        def __eq__(self, _):
+            return True
+
+        def __ne__(self, _):
+            return False
+
+
+class VrchChannelOSCControlNode:
+
+    def __init__(self):
+        self.output_value = None
+        self.server_manager = None
+        self.path = None
+        self.debug = False
+        self.channel_on = False
+        self.any_channel_on = None
+        self.any_channel_off = None
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {
+            "any_channel_on": (AlwaysEqualProxy("*"), {}),
+            "any_channel_off": (AlwaysEqualProxy("*"), {}),
+            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+            "path": ("STRING", {"default": "/channel"}),
+            "debug": ("BOOLEAN", {"default": False}),
+        }}
+
+    RETURN_TYPES = (AlwaysEqualProxy("*"),)
+    RETURN_NAMES = ("ANY_OUTPUT",)
+    FUNCTION = "load_channel_osc"
+    CATEGORY = CATEGORY
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("NaN")
+
+    def load_channel_osc(self, any_channel_on, any_channel_off, server_ip, port, path, debug):
+        # Store the input values
+        self.any_channel_on = any_channel_on
+        self.any_channel_off = any_channel_off
+        self.debug = debug
+
+        # Check if server parameters have changed
+        server_params_changed = (
+            self.server_manager is None
+            or self.server_manager.ip != server_ip
+            or self.server_manager.port != port
+            or self.path != path
+            or self.debug != debug
+        )
+
+        if server_params_changed:
+            # Unregister previous handler if it exists
+            if self.server_manager and self.path:
+                self.server_manager.unregister_handler(self.path, self.handle_osc_message)
+                if debug:
+                    print(f"[VrchChannelOSCControlNode] Unregistered handler at path {self.path}")
+            # Get or create the server manager
+            self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
+            self.debug = debug
+            # Register new handler
+            self.path = path
+            self.server_manager.register_handler(self.path, self.handle_osc_message)
+            if debug:
+                print(f"[VrchChannelOSCControlNode] Registered handler at path {self.path}")
+
+        # Output the appropriate value based on channel state
+        if self.channel_on:
+            self.output_value = self.any_channel_on
+        else:
+            self.output_value = self.any_channel_off
+
+        return (self.output_value,)
+
+    def handle_osc_message(self, address, *args):
+        if self.debug:
+            print(f"[VrchChannelOSCControlNode] Received OSC message: addr={address}, args={args}")
+
+        value = args[0] if args else 0.0
+        # Simplified check: Convert value to int, then to bool
+        self.channel_on = bool(int(value))
+        if self.debug:
+            print(f"[VrchChannelOSCControlNode] Channel is {'ON' if self.channel_on else 'OFF'}")
