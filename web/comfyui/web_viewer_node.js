@@ -10,7 +10,7 @@ app.registerExtension({
             const sslWidget = node.widgets.find(w => w.name === "ssl");
             const filenameWidget = node.widgets.find(w => w.name === "filename");
             const pathWidget = node.widgets.find(w => w.name === "path");
-            const pageWidget = node.widgets.find(w => w.name === "page");
+            const modeWidget = node.widgets.find(w => w.name === "mode");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
             const heightWidget = node.widgets.find(w => w.name === "window_height");
             const urlWidget = node.widgets.find(w => w.name === "url");
@@ -23,15 +23,15 @@ app.registerExtension({
                 let ssl = sslWidget ? sslWidget.value : false;
                 let filename = filenameWidget ? filenameWidget.value : "web_viewer_image.jpeg";
                 let path = pathWidget ? pathWidget.value : "web_viewer";
-                let page = pageWidget ? pageWidget.value : "image";
-                const newUrl = `https://vrch.ai/viewer?page=${page}&server=${server}&ssl=${ssl}&file=${filename}&path=${path}`;
+                let mode = modeWidget ? modeWidget.value : "image";
+                const newUrl = `https://vrch.ai/viewer?mode=${mode}&server=${server}&ssl=${ssl}&file=${filename}&path=${path}`;
                 if (urlWidget) {
                     urlWidget.value = newUrl;
                 }
             }
 
             // List of widgets that trigger URL update
-            const widgets = [serverWidget, sslWidget, filenameWidget, pathWidget, pageWidget];
+            const widgets = [serverWidget, sslWidget, filenameWidget, pathWidget, modeWidget];
 
             // Add callback listeners to update values and the URL when inputs change
             widgets.forEach(widget => {
