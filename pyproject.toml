@@ -1,0 +1,15 @@
+[project]
+name = "comfyui-web-viewer"
+description = "This is a custom node collection for ComfyUI that provides a Web Viewer utility under the vrch.ai category."
+version = "1.0.9"
+license = {file = "LICENSE"}
+dependencies = ["aiohttp","ffmpeg-python","pydub","python-osc"]
+
+[project.urls]
+Repository = "https://github.com/VrchStudio/comfyui-web-viewer"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = "vrchdev"
+DisplayName = "Vrch Studio"
+Icon = ""
