@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 - update `VrchWebViewerNode` to rename `page` to be `mode`
+- rework on README.md
 
 ## 1.0.9 - 2024-09-30
 
