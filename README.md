@@ -2,6 +2,8 @@
 
 This is a custom node collection for ComfyUI that provides a Web Viewer utility under the [vrch.ai](https://vrch.ai) category.
 
+It's a framework for real-time AI generated interactive experience. Turn your ComfyUI workflow into interactive media art.
+
 ## Changelog
 
 see [CHANGELOG](CHANGELOG.md)
