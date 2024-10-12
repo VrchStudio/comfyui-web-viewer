@@ -1,6 +1,6 @@
 [project]
 name = "comfyui-web-viewer"
-description = "This is a custom node collection for ComfyUI that provides a Web Viewer utility under the vrch.ai category."
+description = "This is a custom node collection for ComfyUI that provides a Web Viewer utility under the vrch.ai category. It's a framework for real-time AI generated interactive experience. Turn your ComfyUI workflow into interactive media art."
 version = "1.0.9"
 license = {file = "LICENSE"}
 dependencies = ["aiohttp","ffmpeg-python","pydub","python-osc"]
