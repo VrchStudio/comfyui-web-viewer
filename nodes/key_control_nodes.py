@@ -3,7 +3,7 @@
 import hashlib
 
 # Define the category for organizational purposes
-CATEGORY = "vrch.io/control/keyboard"
+CATEGORY = "vrch.ai/control/keyboard"
 
 
 class VrchIntKeyControlNode:
