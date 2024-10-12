@@ -1,6 +1,6 @@
-### Node: `Image Web Viewer by vrch.io` (vrch.io/image)
+### Node: `Image Web Viewer by vrch.ai` (vrch.ai/image)
 
-1. **Add the `Image Web Viewer by vrch.io` node to your ComfyUI workflow.**
+1. **Add the `Image Web Viewer by vrch.ai` node to your ComfyUI workflow.**
 
 2. **Configure the Node:**
    - **Image Input:**
@@ -25,9 +25,9 @@
 
 ----
 
-### Node: `Web Viewer by vrch.io` (vrch.io/web)
+### Node: `Web Viewer by vrch.ai` (vrch.ai/web)
 
-1. **Add the `Web Viewer by vrch.io` node to your ComfyUI workflow.**
+1. **Add the `Web Viewer by vrch.ai` node to your ComfyUI workflow.**
 2. **Configure the Node:**
    - **Page Type:** Select the type of page to open from `image`, `audio`, or `depthmap`.
    - **Server:** Set the ComfyUI server's domain name (default is `127.0.0.1:8188`).

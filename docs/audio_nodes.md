@@ -1,6 +1,6 @@
-### Node: `Audio Recorder by vrch.io` (vrch.io/audio)
+### Node: `Audio Recorder by vrch.ai` (vrch.ai/audio)
 
-1. **Add the `Audio Recorder by vrch.io` node to your ComfyUI workflow.**
+1. **Add the `Audio Recorder by vrch.ai` node to your ComfyUI workflow.**
 2. **Configure the Node:**
    - **Record Mode (`record_mode`):**
      - **"Press and Hold":**
@@ -34,9 +34,9 @@
 
 ---
 
-### Node: `Get Music Genres by vrch.io` (vrch.io/audio)
+### Node: `Get Music Genres by vrch.ai` (vrch.ai/audio)
 
-1. **Add the `Get Music Genres by vrch.io` node to your ComfyUI workflow.**
+1. **Add the `Get Music Genres by vrch.ai` node to your ComfyUI workflow.**
 2. **Configure the Node:**
    - **Audio Input (`audio`):** Provide an `AUDIO` input from a previous node in the workflow, such as an audio recorder or a file loader.
 3. **Analyze Audio:**
