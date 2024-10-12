@@ -5,6 +5,12 @@ import socket
 # Define the category for organizational purposes
 CATEGORY = "vrch.io/control/osc"
 
+class AlwaysEqualProxy(str):
+        def __eq__(self, _):
+            return True
+
+        def __ne__(self, _):
+            return False
 class VrchNodeUtils:
     
     @staticmethod
@@ -885,6 +891,121 @@ class VrchTextSwitchOSCControlNode:
                 print(f"[VrchTextSwitchOSCControlNode] Received invalid value: {value}, keeping current output")
             # Do not change current_output
 
+class VrchImageSwitchOSCControlNode:
+
+    DEFAULT_IMAGE_NUM = 4  # Number of image inputs
+
+    def __init__(self):
+        self.images = [None] * self.DEFAULT_IMAGE_NUM
+        self.current_output = None
+        self.server_manager = None
+        self.path = None
+        self.debug = False
+        self.last_index = 0
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        inputs = {
+            "required": {
+                "server_ip": (
+                    "STRING",
+                    {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()},
+                ),
+                "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+                "path": ("STRING", {"default": "/radio1"}),
+                "debug": ("BOOLEAN", {"default": False}),
+            },
+            "optional": {},
+        }
+        for i in range(cls.DEFAULT_IMAGE_NUM):
+            inputs["optional"][f"image{i}"] = ("IMAGE", {})
+        return inputs
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("IMAGE",)
+    FUNCTION = "load_image_switch_osc"
+    CATEGORY = CATEGORY
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("NaN")
+
+    def check_lazy_status(self, **kwargs):
+        index = self.last_index
+        if index is None:
+            return []  # No index selected yet
+        key = f"image{index}"
+        if kwargs.get(key, None) is None:
+            return [key]
+        return []
+
+    def load_image_switch_osc(
+        self,
+        server_ip,
+        port,
+        path,
+        debug,
+        **kwargs,
+    ):
+        # Update images
+        for i in range(self.DEFAULT_IMAGE_NUM):
+            key = f"image{i}"
+            if key in kwargs:
+                self.images[i] = kwargs[key]
+            else:
+                self.images[i] = None
+        self.debug = debug
+
+        # Check if server parameters or path have changed
+        server_params_changed = (
+            self.server_manager is None
+            or self.server_manager.ip != server_ip
+            or self.server_manager.port != port
+            or self.debug != debug
+        )
+        if server_params_changed or self.path != path:
+            # Unregister previous handler if it exists
+            if self.server_manager and self.path:
+                self.server_manager.unregister_handler(
+                    self.path, self.handle_osc_message
+                )
+                if debug:
+                    print(f"[VrchImageSwitchOSCControlNode] Unregistered handler at path {self.path}")
+            # Get or create the server manager
+            self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
+            self.debug = debug
+            # Register new handler
+            self.path = path
+            self.server_manager.register_handler(self.path, self.handle_osc_message)
+            if debug:
+                print(f"[VrchImageSwitchOSCControlNode] Registered handler at path {self.path}")
+
+        # Set current output based on last index
+        if self.last_index is not None and 0 <= self.last_index < len(self.images):
+            self.current_output = self.images[self.last_index]
+        else:
+            self.current_output = None
+
+        # Return the current output as a tuple
+        return (self.current_output,)
+
+    def handle_osc_message(self, address, *args):
+        if self.debug:
+            print(f"[VrchImageSwitchOSCControlNode] Received OSC message: addr={address}, args={args}")
+        value = args[0] if args else 0
+        try:
+            index = int(value)
+            if 0 <= index < len(self.images):
+                self.last_index = index
+                if self.debug:
+                    print(f"[VrchImageSwitchOSCControlNode] Selected image at index {index}")
+            else:
+                if self.debug:
+                    print(f"[VrchImageSwitchOSCControlNode] Index {index} out of range")
+        except (ValueError, TypeError):
+            if self.debug:
+                print(f"[VrchImageSwitchOSCControlNode] Received invalid value: {value}")
+
 
 class VrchAnyOSCControlNode:
 
@@ -981,13 +1102,6 @@ class VrchAnyOSCControlNode:
             # Handle other types if necessary
             if self.debug:
                 print(f"[VrchAnyOSCControlNode] Received unsupported value type: {type(value)}")
-
-class AlwaysEqualProxy(str):
-        def __eq__(self, _):
-            return True
-
-        def __ne__(self, _):
-            return False
 
 
 class VrchChannelOSCControlNode:
