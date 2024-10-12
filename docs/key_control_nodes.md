@@ -1,4 +1,4 @@
-### Node: `INT Key Control by vrch.ai` (vrch.ai/control)
+### Node: `INT Key Control by vrch.ai` (vrch.ai/control/keyboard)
 
 1. **Add the `INT Key Control by vrch.ai` to your ComfyUI workflow.**
 2. **Configure the Node:**
@@ -29,7 +29,7 @@
 
 ---
 
-### Node: `FLOAT Key Control by vrch.ai` (vrch.ai/control)
+### Node: `FLOAT Key Control by vrch.ai` (vrch.ai/control/keyboard)
 
 1. **Add the `FLOAT Key Control by vrch.ai` to your ComfyUI workflow.**
 2. **Configure the Node:**
@@ -58,7 +58,7 @@
 
 ---
 
-### Node: `BOOLEAN Key Control by vrch.ai` (vrch.ai/control)
+### Node: `BOOLEAN Key Control by vrch.ai` (vrch.ai/control/keyboard)
 
 1. **Add the `BOOLEAN Key Control by vrch.ai` to your ComfyUI workflow.**
 2. **Configure the Node:**
@@ -76,7 +76,7 @@
 
 ---
 
-### Node: `TEXT Key Control by vrch.ai` (vrch.ai/control)
+### Node: `TEXT Key Control by vrch.ai` (vrch.ai/control/keyboard)
 
 1. **Add the `TEXT Key Control by vrch.ai` node to your ComfyUI workflow.**
 2. **Configure the Node:**
@@ -100,3 +100,5 @@
 
 **Note:**  
 Ensure the ComfyUI window/tab is focused when using the shortcut key to prevent conflicts with browser shortcuts.
+
+----
