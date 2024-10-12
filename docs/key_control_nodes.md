@@ -1,6 +1,6 @@
-### Node: `INT Key Control by vrch.ai` (vrch.ai/control/keyboard)
+### Node: `INT Key Control @ vrch.ai` (vrch.ai/control/keyboard)
 
-1. **Add the `INT Key Control by vrch.ai` to your ComfyUI workflow.**
+1. **Add the `INT Key Control @ vrch.ai` to your ComfyUI workflow.**
 2. **Configure the Node:**
    - **Minimum Value (`min_value`):** Set the minimum allowable integer value (integer between `-9999` and `9999`). Default is `0`.
    - **Maximum Value (`max_value`):** Set the maximum allowable integer value (integer between `-9999` and `9999`). Default is `100`.
@@ -29,9 +29,9 @@
 
 ---
 
-### Node: `FLOAT Key Control by vrch.ai` (vrch.ai/control/keyboard)
+### Node: `FLOAT Key Control @ vrch.ai` (vrch.ai/control/keyboard)
 
-1. **Add the `FLOAT Key Control by vrch.ai` to your ComfyUI workflow.**
+1. **Add the `FLOAT Key Control @ vrch.ai` to your ComfyUI workflow.**
 2. **Configure the Node:**
    - **Step Size (`step_size`):** Set the increment/decrement value (float between `0.01-0.10`). Default is `0.01`.
    - **Shortcut Key 1 (`shortcut_key1`):** Select a key from `F1` to `F12` to serve as the primary shortcut key. Default is `F1`.
@@ -58,9 +58,9 @@
 
 ---
 
-### Node: `BOOLEAN Key Control by vrch.ai` (vrch.ai/control/keyboard)
+### Node: `BOOLEAN Key Control @ vrch.ai` (vrch.ai/control/keyboard)
 
-1. **Add the `BOOLEAN Key Control by vrch.ai` to your ComfyUI workflow.**
+1. **Add the `BOOLEAN Key Control @ vrch.ai` to your ComfyUI workflow.**
 2. **Configure the Node:**
    - **Shortcut Key (`shortcut_key`):** Select a key from `F1` to `F12` to serve as the toggle shortcut. Default is `F1`.
    - **Current Value (`current_value`):** Set the initial boolean value (`True`/`False`). Default is `False`.
@@ -76,9 +76,9 @@
 
 ---
 
-### Node: `TEXT Key Control by vrch.ai` (vrch.ai/control/keyboard)
+### Node: `TEXT Key Control @ vrch.ai` (vrch.ai/control/keyboard)
 
-1. **Add the `TEXT Key Control by vrch.ai` node to your ComfyUI workflow.**
+1. **Add the `TEXT Key Control @ vrch.ai` node to your ComfyUI workflow.**
 2. **Configure the Node:**
    - **Text Inputs (`text1` - `text8`):** Enter text for each option. Supports multiple lines. Defaults are empty (`""`).
    - **Jump Empty Option (`skip_empty_option`):** Enable or disable skipping empty text options when cycling. Default is `True`.
