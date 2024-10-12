@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `VrchTextSwitchOSCControlNode`
   - `VrchXYOSCControlNode`
   - `VrchXYZOSCControlNode`
+- add a new Web Viewer node `VrchImageWebViewerNode`
 
 ### Updated
 - update `VrchWebViewerNode` to rename `page` to be `mode`
