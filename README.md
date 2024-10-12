@@ -1,6 +1,6 @@
 # ComfyUI-Web-Viewer
 
-This is a custom node collection for ComfyUI that provides a Web Viewer utility under the vrch.ai category.
+This is a custom node collection for ComfyUI that provides a Web Viewer utility under the [vrch.ai](https://vrch.ai) category.
 
 ## Changelog
 
@@ -56,7 +56,7 @@ This project uses `bump2version` for version management. To update the version:
 
 ## Contributing
 
-Created and maintained by vrch.io team.
+Created and maintained by the [vrch.io](https://vrch.io) team.
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
