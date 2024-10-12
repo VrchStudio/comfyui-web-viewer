@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- add OSC Cotnrol nodes, including
+  - `VrchAnyOSCControlNode`
+  - `VrchFloatOSCControlNode`
+  - `VrchImageSwitchOSCControlNode`
+  - `VrchIntOSCControlNode`
+  - `VrchSwitchOSCControlNode`
+  - `VrchTextConcatOSCControlNode`
+  - `VrchTextSwitchOSCControlNode`
+  - `VrchXYOSCControlNode`
+  - `VrchXYZOSCControlNode`
+
 ### Updated
 - update `VrchWebViewerNode` to rename `page` to be `mode`
 
