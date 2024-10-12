@@ -25,7 +25,7 @@ class VrchImageSaverNode:
     RETURN_TYPES = ()
     FUNCTION = "save_images"
     OUTPUT_NODE = True
-    CATEGORY = "vrch.io/image"
+    CATEGORY = "vrch.ai/image"
 
     def __init__(self):
         self.output_dir = folder_paths.output_directory

@@ -3,7 +3,7 @@ import threading
 import socket
 
 # Define the category for organizational purposes
-CATEGORY = "vrch.io/control/osc"
+CATEGORY = "vrch.ai/control/osc"
 
 class AlwaysEqualProxy(str):
         def __eq__(self, _):

@@ -6,7 +6,7 @@ from PIL import Image
 import folder_paths
 from .image_nodes import VrchImageSaverNode
 
-CATEGORY = "vrch.io/viewer"
+CATEGORY = "vrch.ai/viewer"
 class VrchWebViewerNode:
     @classmethod
     def INPUT_TYPES(s):
