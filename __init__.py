@@ -1,4 +1,4 @@
-from .nodes.web_viewer_node import VrchWebViewerNode
+from .nodes.web_viewer_nodes import *
 from .nodes.image_nodes import *
 from .nodes.audio_nodes import *
 from .nodes.text_nodes import *
