@@ -61,7 +61,7 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 ### `Image Nodes`
 
 - Documentation: [Usage of Image nodes](./docs/image_nodes.md)
-- Example workflow: n/a
+- Example workflows: n/a
 
 ## Version Update
 
