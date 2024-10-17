@@ -4,6 +4,8 @@ import numpy as np
 from PIL import Image
 import folder_paths
 
+CATEGORY = "vrch.ai/image"
+
 class VrchImageSaverNode:
     @classmethod
     def INPUT_TYPES(s):
@@ -25,7 +27,7 @@ class VrchImageSaverNode:
     RETURN_TYPES = ()
     FUNCTION = "save_images"
     OUTPUT_NODE = True
-    CATEGORY = "vrch.ai/image"
+    CATEGORY = CATEGORY
 
     def __init__(self):
         self.output_dir = folder_paths.output_directory

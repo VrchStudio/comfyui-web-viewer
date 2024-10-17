@@ -11,6 +11,8 @@ from ..utils.music_genres_classifier import *
 ASSETS_DIR = os.path.join(Path(__file__).parent.parent, "assets")
 UTILS_DIR = os.path.join(Path(__file__).parent.parent, "utils")
 
+CATEGORY = "vrch.ai/audio"
+
 class VrchAudioSaverNode:
     def __init__(self):
         self.output_dir = folder_paths.get_output_directory()
@@ -30,7 +32,7 @@ class VrchAudioSaverNode:
     RETURN_TYPES = ()
     FUNCTION = "save_audio"
     OUTPUT_NODE = True
-    CATEGORY = "vrch.io/audio"
+    CATEGORY = CATEGORY
 
     def save_audio(self, audio, filename, path, extension, enable_preview=False):
         full_output_folder = os.path.join(self.output_dir, path)
@@ -110,7 +112,7 @@ class VrchAudioRecorderNode:
 
     RETURN_TYPES = ("AUDIO",)
     RETURN_NAMES = ("AUDIO",)
-    CATEGORY = "vrch.io/audio"
+    CATEGORY = CATEGORY
     FUNCTION = "process_audio"
     
     def process_audio(self, base64_data, record_mode, record_duration_max, 
@@ -183,7 +185,7 @@ class VrchAudioGenresNode:
     RETURN_NAMES = ("audio", "genres",)
     OUTPUT_NODE = True
     FUNCTION = "analysis"
-    CATEGORY = "vrch.io/audio"
+    CATEGORY = CATEGORY
 
     def analysis(self, audio, threshold=0.015):  # Add threshold parameter with default value
         waveform = audio["waveform"]
