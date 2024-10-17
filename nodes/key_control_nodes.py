@@ -5,7 +5,6 @@ import hashlib
 # Define the category for organizational purposes
 CATEGORY = "vrch.ai/control/keyboard"
 
-
 class VrchIntKeyControlNode:
     """
     VrchIntKeyControlNode allows users to control an integer output value within
