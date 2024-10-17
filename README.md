@@ -1,8 +1,11 @@
 # ComfyUI Web Viewer
+ 
+A custom node collection for ComfyUI the [vrch.ai](https://vrch.ai) category, providing a Web Viewer utility and a framework for real-time AI-generated interactive art.
 
-This is a custom node collection for ComfyUI that provides a Web Viewer utility under the [vrch.ai](https://vrch.ai) category.
-
-It's a framework for real-time AI generated interactive experience. Turn your ComfyUI workflow into interactive media art.
+**Features:**  
+- Real-time interaction and AI generation.
+- Easily accessible on any device with a web browser.
+- Supports interactive input methods such as keyboard, OSC control, and sound input.
 
 ![](./assets/images/web_viewer_example_001.gif)
 
@@ -89,6 +92,9 @@ Created and maintained by the [vrch.io](https://vrch.io) team.
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+## Contact Us
+
+For any inquiries, you can contact us at [hi@vrch.io](mailto:hi@vrch.io).
 
 ## License
 
