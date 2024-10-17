@@ -1,0 +1,439 @@
+{
+  "last_node_id": 69,
+  "last_link_id": 54,
+  "nodes": [
+    {
+      "id": 63,
+      "type": "VrchBooleanKeyControlNode",
+      "pos": [
+        -3400,
+        -656
+      ],
+      "size": {
+        "0": 315,
+        "1": 124
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "BOOLEAN",
+          "type": "BOOLEAN",
+          "links": [
+            49
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchBooleanKeyControlNode"
+      },
+      "widgets_values": [
+        "F2",
+        false,
+        null
+      ]
+    },
+    {
+      "id": 69,
+      "type": "ShowText|pysssss",
+      "pos": [
+        -2653,
+        -1060
+      ],
+      "size": {
+        "0": 315,
+        "1": 76
+      },
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 53,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "",
+        "play-doh style  . sculpture, clay art, centered composition, Claymation"
+      ]
+    },
+    {
+      "id": 62,
+      "type": "VrchFloatKeyControlNode",
+      "pos": [
+        -3387,
+        -158
+      ],
+      "size": {
+        "0": 315,
+        "1": 172
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            48
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchFloatKeyControlNode"
+      },
+      "widgets_values": [
+        0.01,
+        "F1",
+        "Left/Right",
+        "0.51",
+        null
+      ]
+    },
+    {
+      "id": 61,
+      "type": "VrchIntKeyControlNode",
+      "pos": [
+        -3397,
+        -459
+      ],
+      "size": {
+        "0": 315,
+        "1": 240
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            47
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchIntKeyControlNode"
+      },
+      "widgets_values": [
+        1,
+        111,
+        5,
+        "F1",
+        "Down/Up",
+        16,
+        null
+      ]
+    },
+    {
+      "id": 46,
+      "type": "easy showAnything",
+      "pos": [
+        -2987,
+        -640
+      ],
+      "size": {
+        "0": 210,
+        "1": 80
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 49
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "true"
+      ]
+    },
+    {
+      "id": 68,
+      "type": "CR String To Combo",
+      "pos": [
+        -3011,
+        -1092
+      ],
+      "size": {
+        "0": 315,
+        "1": 78
+      },
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 54,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "links": [
+            52
+          ],
+          "shape": 3
+        },
+        {
+          "name": "show_help",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CR String To Combo"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 67,
+      "type": "SDXLPromptStyler",
+      "pos": [
+        -3009,
+        -957
+      ],
+      "size": {
+        "0": 315.8334655761719,
+        "1": 214
+      },
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "style",
+          "type": "COMBO",
+          "link": 52,
+          "widget": {
+            "name": "style"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive_prompt_text_g",
+          "type": "STRING",
+          "links": [
+            53
+          ],
+          "slot_index": 0,
+          "shape": 3
+        },
+        {
+          "name": "negative_prompt_text_g",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SDXLPromptStyler"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "base",
+        "No",
+        ""
+      ]
+    },
+    {
+      "id": 66,
+      "type": "VrchTextKeyControlNode",
+      "pos": [
+        -3412,
+        -1277
+      ],
+      "size": {
+        "0": 312.7351989746094,
+        "1": 548
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            54
+          ],
+          "slot_index": 0,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchTextKeyControlNode"
+      },
+      "widgets_values": [
+        "base",
+        "anime",
+        "craft clay",
+        "photographic",
+        "",
+        "",
+        "",
+        "",
+        true,
+        "F2",
+        "1",
+        null
+      ]
+    },
+    {
+      "id": 11,
+      "type": "easy showAnything",
+      "pos": [
+        -2980,
+        -158
+      ],
+      "size": {
+        "0": 210,
+        "1": 80
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 48
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "0.5"
+      ]
+    },
+    {
+      "id": 36,
+      "type": "easy showAnything",
+      "pos": [
+        -2989,
+        -458
+      ],
+      "size": {
+        "0": 210,
+        "1": 80
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 47
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "21"
+      ]
+    }
+  ],
+  "links": [
+    [
+      47,
+      61,
+      0,
+      36,
+      0,
+      "*"
+    ],
+    [
+      48,
+      62,
+      0,
+      11,
+      0,
+      "*"
+    ],
+    [
+      49,
+      63,
+      0,
+      46,
+      0,
+      "*"
+    ],
+    [
+      52,
+      68,
+      0,
+      67,
+      0,
+      "COMBO"
+    ],
+    [
+      53,
+      67,
+      0,
+      69,
+      0,
+      "STRING"
+    ],
+    [
+      54,
+      66,
+      0,
+      68,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.9646149645000006,
+      "offset": [
+        4138.774518489872,
+        1363.6572500286295
+      ]
+    }
+  },
+  "version": 0.4
+}
