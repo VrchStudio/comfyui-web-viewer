@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `VrchXYZOSCControlNode`
 - add a new Web Viewer node `VrchImageWebViewerNode`
 - add comfy-org registration configuration files (placeholder only)
+- add example workflows
+- add touchosc control panel file
 
 ### Updated
 - update `VrchWebViewerNode` to rename `page` to be `mode`
