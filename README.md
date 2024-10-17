@@ -1,6 +1,6 @@
 # ComfyUI Web Viewer
  
-A custom node collection for ComfyUI the [vrch.ai](https://vrch.ai) category, providing a Web Viewer utility and a framework for real-time AI-generated interactive art.
+A custom node collection for ComfyUI under the [vrch.ai](https://vrch.ai) category, providing a Web Viewer utility and a framework for real-time AI-generated interactive art.
 
 **Features:**  
 - Real-time interaction and AI generation.
