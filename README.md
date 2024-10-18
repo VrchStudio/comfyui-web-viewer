@@ -25,7 +25,7 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
    ```
    pip install -r requirements.txt
    ``` 
-   or if you use the portable install, run this in `ComfyUI_windows_portable` folder:
+   or if you use the `windows` portable install, run this in `ComfyUI_windows_portable` folder:
    ```
    python_embeded\python.exe -m pip install -r ComfyUI\custom_nodes\comfyui-web-viewer\requirements.txt
    ```
@@ -46,8 +46,8 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
   - [comfyui_osc_control.tosc](./assets/touchosc/comfyui_osc_control.tosc)
 - Example workflows:
   - [Workflow Example: OSC Control Nodes](./workflows/example_osc_control_001_basic.json)
-  - (TBA) [Workflow Example: Live Portrait]()
-  - (TBA) [Workflow Example: IC-Light]()
+  - [Workflow Example: Live Portrait + Gamepad](./workflows/example_osc_control_002_live_portrait_with_gamepad.json)
+  - [Workflow Example: IC-Light](./workflows/example_osc_control_003_ic-light.png)
 
 ### `Key Control Nodes`
 
