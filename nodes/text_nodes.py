@@ -1,6 +1,8 @@
 import json
 import requests
 
+CATEGORY="vrch.ai/text"
+
 class VrchJsonUrlLoaderNode:
     @classmethod
     def INPUT_TYPES(s):
@@ -14,7 +16,7 @@ class VrchJsonUrlLoaderNode:
         }
 
     RETURN_TYPES = ("JSON",)
-    CATEGORY = "vrch.io/text"
+    CATEGORY = CATEGORY
     FUNCTION = "load_json"
 
     def load_json(self, url: str, print_to_console=False):

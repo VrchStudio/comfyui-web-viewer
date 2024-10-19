@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.10 - 2024-10-19
+
+### Added
+- add OSC Cotnrol nodes, including
+  - `VrchAnyOSCControlNode`
+  - `VrchFloatOSCControlNode`
+  - `VrchImageSwitchOSCControlNode`
+  - `VrchIntOSCControlNode`
+  - `VrchSwitchOSCControlNode`
+  - `VrchTextConcatOSCControlNode`
+  - `VrchTextSwitchOSCControlNode`
+  - `VrchXYOSCControlNode`
+  - `VrchXYZOSCControlNode`
+- add a new Web Viewer node `VrchImageWebViewerNode`
+- add comfy-org registration configuration files (placeholder only)
+- add example workflows
+- add touchosc control panel file
+
+### Updated
+- update `VrchWebViewerNode` to rename `page` to be `mode`
+- rework on README.md
+
 ## 1.0.9 - 2024-09-30
 
 ### Updated

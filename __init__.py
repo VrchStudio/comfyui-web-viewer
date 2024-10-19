@@ -1,35 +1,60 @@
-from .nodes.web_viewer_node import VrchWebViewerNode
+from .nodes.web_viewer_nodes import *
 from .nodes.image_nodes import *
 from .nodes.audio_nodes import *
 from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
+from .nodes.osc_control_nodes import *
 
-__version__ = "1.0.9"
+__version__ = "1.0.10"
 
 NODE_CLASS_MAPPINGS = {
+    "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
     "VrchAudioGenresNode": VrchAudioGenresNode,
     "VrchAudioRecorderNode": VrchAudioRecorderNode,
     "VrchAudioSaverNode": VrchAudioSaverNode,
     "VrchBooleanKeyControlNode": VrchBooleanKeyControlNode,
+    "VrchChannelOSCControlNode": VrchChannelOSCControlNode,
+    "VrchChannelX4OSCControlNode": VrchChannelX4OSCControlNode,
     "VrchFloatKeyControlNode": VrchFloatKeyControlNode,
+    "VrchFloatOSCControlNode": VrchFloatOSCControlNode,
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
     "VrchImageSaverNode": VrchImageSaverNode,
+    "VrchImageSwitchOSCControlNode": VrchImageSwitchOSCControlNode,
+    "VrchImageWebViewerNode": VrchImageWebViewerNode,
     "VrchIntKeyControlNode": VrchIntKeyControlNode,
+    "VrchIntOSCControlNode": VrchIntOSCControlNode,
+    "VrchSwitchOSCControlNode": VrchSwitchOSCControlNode,
+    "VrchTextConcatOSCControlNode": VrchTextConcatOSCControlNode,
     "VrchTextKeyControlNode": VrchTextKeyControlNode,
+    "VrchTextSwitchOSCControlNode": VrchTextSwitchOSCControlNode,
     "VrchWebViewerNode": VrchWebViewerNode,
+    "VrchXYOSCControlNode": VrchXYOSCControlNode,
+    "VrchXYZOSCControlNode": VrchXYZOSCControlNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "VrchAudioGenresNode": "Get Audio Genres by vrch.io",
-    "VrchAudioRecorderNode": "Audio Recorder by vrch.io",
-    "VrchAudioSaverNode": "Audio Saver by vrch.io",
-    "VrchBooleanKeyControlNode": "BOOLEAN Key Control by vrch.io",
-    "VrchFloatKeyControlNode": "FLOAT Key Control by vrch.io",
-    "VrchJsonUrlLoaderNode": "JSON URL Loader by vrch.io",
-    "VrchImageSaverNode": "Image Saver by vrch.io",
-    "VrchIntKeyControlNode": "INT Key Control by vrch.io",
-    "VrchTextKeyControlNode": "TEXT Key Control by vrch.io",
-    "VrchWebViewerNode": "Web Viewer by vrch.io",
+    "VrchAnyOSCControlNode": "ANY Value OSC Control @ vrch.ai",
+    "VrchAudioGenresNode": "Get Audio Genres @ vrch.ai",
+    "VrchAudioRecorderNode": "Audio Recorder @ vrch.ai",
+    "VrchAudioSaverNode": "Audio Saver @ vrch.ai",
+    "VrchBooleanKeyControlNode": "BOOLEAN Key Control @ vrch.ai",
+    "VrchChannelOSCControlNode": "CHANNEL OSC Control @ vrch.ai",
+    "VrchChannelX4OSCControlNode": "CHANNEL x4 OSC Control @ vrch.ai",
+    "VrchFloatKeyControlNode": "FLOAT Key Control @ vrch.ai",
+    "VrchFloatOSCControlNode": "FLOAT OSC Control @ vrch.ai",
+    "VrchJsonUrlLoaderNode": "JSON URL Loader @ vrch.ai",
+    "VrchImageSaverNode": "IMAGE Saver @ vrch.ai",
+    "VrchImageSwitchOSCControlNode": "IMAGE Switch OSC Control @ vrch.ai",
+    "VrchImageWebViewerNode": "IMAGE Web Viewer @ vrch.ai",
+    "VrchIntKeyControlNode": "INT Key Control @ vrch.ai",
+    "VrchIntOSCControlNode": "INT OSC Control @ vrch.ai",
+    "VrchSwitchOSCControlNode": "SWITCH OSC Control @ vrch.ai",
+    "VrchTextConcatOSCControlNode": "TEXT Concat OSC Control @ vrch.ai",
+    "VrchTextKeyControlNode": "TEXT Key Control @ vrch.ai",
+    "VrchTextSwitchOSCControlNode": "TEXT Switch OSC Control @ vrch.ai",
+    "VrchWebViewerNode": "Web Viewer @ vrch.ai",
+    "VrchXYOSCControlNode": "XY OSC Control @ vrch.ai",
+    "VrchXYZOSCControlNode": "XYZ OSC Control @ vrch.ai",
 }
 
 # WEB_DIRECTORY is the comfyui nodes directory that ComfyUI will link and auto-load.
