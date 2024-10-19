@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-web-viewer"
 description = "A custom node collection for ComfyUI providing a Web Viewer utility and a framework for real-time AI-generated interactive art."
-version = "1.0.9"
+version = "1.0.10"
 license = {file = "LICENSE"}
 dependencies = ["aiohttp","ffmpeg-python","pydub","python-osc"]
 
@@ -11,5 +11,5 @@ Repository = "https://github.com/VrchStudio/comfyui-web-viewer"
 
 [tool.comfy]
 PublisherId = "vrchdev"
-DisplayName = "Vrch Studio"
+DisplayName = "ComfyUI Web Viewer"
 Icon = ""
