@@ -7,7 +7,7 @@ A custom node collection for ComfyUI under the [vrch.ai](https://vrch.ai) catego
 - Easily accessible on any device with a web browser.
 - Supports interactive input methods such as keyboard, OSC control, and sound input.
 
-![](./assets/images/web_viewer_example_001.gif)
+<video src="https://github.com/VrchStudio/comfyui-web-viewer/raw/refs/heads/main/assets/videos/intro.mp4" width="100%" controls autoplay loop></video>
 
 ## Changelog
 
@@ -34,6 +34,8 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 ## How to Use
 
 ### `Web Viewer Nodes`
+
+![](./assets/images/web_viewer_example_001.gif)
 
 - Documentation: [Usage of Web Viewer nodes](./docs/web_viewer_nodes.md)
 - Example workflows: 
