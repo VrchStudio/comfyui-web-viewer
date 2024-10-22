@@ -7,13 +7,8 @@ A custom node collection for ComfyUI under the [vrch.ai](https://vrch.ai) catego
 - Easily accessible on any device with a web browser.
 - Supports interactive input methods such as keyboard, OSC control, and sound input.
 
-<table border="0" style="width: 100%; text-align: left; margin-top: 20px;">
-  <tr>
-      <td>
-          <video src="https://github.com/VrchStudio/comfyui-web-viewer/raw/refs/heads/main/assets/videos/intro.mp4" width="100%" controls autoplay loop></video>
-      </td>
-  </tr>
-</table>
+<video src="https://github.com/user-attachments/assets/cdac0293-64ce-4b74-95a8-d4dcce2300d2" controls="controls" style="max-width: 100%;">
+</video>
 
 ## Changelog
 
