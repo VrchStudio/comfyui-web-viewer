@@ -13,7 +13,7 @@ With this setup, you can use your gamepad to control live portrait movements and
    - Method 2: install from github: [https://github.com/VrchStudio/comfyui-web-viewer](https://github.com/VrchStudio/comfyui-web-viewer)
 2. Install `Advanced Live Portrait` custome node: 
    - Method 1: search for `ComfyUI-AdvancedLivePortrait` in ComfyUI Manager
-   - Method 2: install from github: [https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait](https://github.com/VrchStudio/comfyui-web-viewer)
+   - Method 2: install from github: [https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait](https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait)
 3. Download `Workflow Example: Live Portrait + Gamepad` workflow:
    - Download it from here: [example_osc_control_002_live_portrait_with_gamepad.json](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_osc_control_002_live_portrait_with_gamepad.json)
 4. Install `TouchOSC` app
