@@ -50,6 +50,8 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
   - [Workflow Example: OSC Control Nodes](./workflows/example_osc_control_001_basic.json)
   - [Workflow Example: Live Portrait + Gamepad](./workflows/example_osc_control_002_live_portrait_with_gamepad.json)
   - [Workflow Example: IC-Light](./workflows/example_osc_control_003_ic-light.png)
+- Tutorials:
+  - [Live Portrait + Gamepad](./docs/tutorial_001_live_portrait_with_gamepad.md)
 
 ### `Key Control Nodes`
 
