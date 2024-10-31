@@ -50,6 +50,8 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
   - [Workflow Example: OSC Control Nodes](./workflows/example_osc_control_001_basic.json)
   - [Workflow Example: Live Portrait + Gamepad](./workflows/example_osc_control_002_live_portrait_with_gamepad.json)
   - [Workflow Example: IC-Light](./workflows/example_osc_control_003_ic-light.png)
+- Tutorials:
+  - [Live Portrait + Gamepad](./docs/tutorial_001_live_portrait_with_gamepad.md)
 
 ### `Key Control Nodes`
 
@@ -67,6 +69,15 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 
 - Documentation: [Usage of Image nodes](./docs/image_nodes.md)
 - Example workflows: n/a
+
+## Troubleshooting
+
+### Image Not Displayed in Popped-Up Image Viewer Window
+
+For Chrome, you may need to add the ComfyUI server's IP address manually in `chrome://flags/#unsafely-treat-insecure-origin-as-secure` to enable access to the content. For other browsers, an http-to-http setup should allow for seamless access without additional configuration.
+
+![](./assets/images/troubleshooting_001.png)
+
 
 ## Version Update
 
