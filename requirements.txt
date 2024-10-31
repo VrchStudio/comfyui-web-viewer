@@ -2,3 +2,5 @@ aiohttp
 ffmpeg-python
 pydub
 python-osc
+scikit-learn
+matplotlib
