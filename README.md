@@ -70,6 +70,15 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 - Documentation: [Usage of Image nodes](./docs/image_nodes.md)
 - Example workflows: n/a
 
+## Troubleshooting
+
+### Image Not Displayed in Popped-Up Image Viewer Window
+
+For Chrome, you may need to add the ComfyUI server's IP address manually in `chrome://flags/#unsafely-treat-insecure-origin-as-secure` to enable access to the content. For other browsers, an http-to-http setup should allow for seamless access without additional configuration.
+
+![](./assets/images/troubleshooting_001.png)
+
+
 ## Version Update
 
 This project uses `bump2version` for version management. To update the version:
