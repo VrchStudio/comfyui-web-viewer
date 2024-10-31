@@ -24,7 +24,9 @@ app.registerExtension({
                 let filename = filenameWidget ? filenameWidget.value : "web_viewer_image.jpeg";
                 let path = pathWidget ? pathWidget.value : "web_viewer";
                 let mode = modeWidget ? modeWidget.value : "image";
-                const newUrl = `https://vrch.ai/viewer?mode=${mode}&server=${server}&ssl=${ssl}&file=${filename}&path=${path}`;
+                let scheme = ssl ? "https" : "http";
+
+                const newUrl = `${scheme}://vrch.ai/viewer?mode=${mode}&server=${server}&ssl=${ssl}&file=${filename}&path=${path}`;
                 if (urlWidget) {
                     urlWidget.value = newUrl;
                 }
@@ -124,7 +126,8 @@ app.registerExtension({
                 let channel = channelWidget ? channelWidget.value : "1";
                 let sslStr = ssl ? "true" : "false";
                 let filename = `channel_${channel}.jpeg`;
-                let newUrl = `https://vrch.ai/viewer?mode=image&server=${server}&ssl=${sslStr}&file=${filename}&path=web_viewer`;
+                let scheme = ssl ? "https" : "http";
+                let newUrl = `${scheme}://vrch.ai/viewer?mode=image&server=${server}&ssl=${sslStr}&file=${filename}&path=web_viewer`;
                 if (urlWidget) {
                     urlWidget.value = newUrl;
                 }
