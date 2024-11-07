@@ -70,7 +70,7 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 - Documentation: [Usage of Image nodes](./docs/image_nodes.md)
 - Example workflows: n/a
 
-## Troubleshooting
+## Troubleshootings
 
 ### Image Not Displayed in Popped-Up Image Viewer Window
 
@@ -78,18 +78,35 @@ For Chrome, you may need to add the ComfyUI server's IP address manually in `chr
 
 ![](./assets/images/troubleshooting_001.png)
 
-### Image Not Displayed due to CORS Policy Error
+---
 
-If you encountered the CORS policy issue, with error message like this:
+### How can I resolve the CORS policy error when trying to display images?
 
-> `origin 'https:\\vrch.ai' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on this requested resource`
+If you’re encountering a CORS policy error with a message like this:
 
+> `"origin 'https://vrch.ai' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource"`
 
-Please use `--enable-cors-header` flag when lunching comfyui service, e.g.
+you can resolve this by launching the ComfyUI service with the `--enable-cors-header` flag. For example:
 
-```
+```bash
 python main.py --enable-cors-header
 ```
+
+For additional details, refer to [this discussion on GitHub](https://github.com/comfyanonymous/ComfyUI/pull/413#issuecomment-1499518110).
+
+---
+
+### Why can’t the ComfyUI service run at HTTPS/TLS/SSL on port 8189?
+
+`ComfyUI Web Viewer` provides a build-in, self-signed certificate (intended for development only, not production use). To launch the ComfyUI service with HTTPS enabled on port 8189, use the following command:
+
+```bash
+# Start ComfyUI with HTTPS using the built-in certificate and key
+python main.py --tls-keyfile ./custom_nodes/comfyui-web-viewer/https/key.pem --tls-certfile ./custom_nodes/comfyui-web-viewer/https/cert.pem --port 8189 --listen
+```
+
+For more details, refer to the [ComfyUI official instructions](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#how-to-use-tlsssl).
+
 
 ## Version Update
 
