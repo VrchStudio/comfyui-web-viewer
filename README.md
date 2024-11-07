@@ -78,6 +78,18 @@ For Chrome, you may need to add the ComfyUI server's IP address manually in `chr
 
 ![](./assets/images/troubleshooting_001.png)
 
+### Image Not Displayed due to CORS Policy Error
+
+If you encountered the CORS policy issue, with error message like this:
+
+> `origin 'https:\\vrch.ai' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on this requested resource`
+
+
+Please use `--enable-cors-header` flag when lunching comfyui service, e.g.
+
+```
+python main.py --enable-cors-header
+```
 
 ## Version Update
 
