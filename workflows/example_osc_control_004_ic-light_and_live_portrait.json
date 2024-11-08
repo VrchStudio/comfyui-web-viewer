@@ -1,20 +1,20 @@
 {
-  "last_node_id": 120,
-  "last_link_id": 302,
+  "last_node_id": 121,
+  "last_link_id": 320,
   "nodes": [
     {
       "id": 40,
       "type": "Reroute",
-      "pos": [
-        630.1084113361769,
-        791.4616081129246
-      ],
+      "pos": {
+        "0": 630.1083984375,
+        "1": 791.4616088867188
+      },
       "size": [
         75,
         26
       ],
       "flags": {},
-      "order": 26,
+      "order": 21,
       "mode": 0,
       "inputs": [
         {
@@ -43,16 +43,16 @@
     {
       "id": 4,
       "type": "CLIPTextEncode",
-      "pos": [
-        17.226234762828753,
-        872.2525119900224
-      ],
+      "pos": {
+        "0": 17.226234436035156,
+        "1": 872.2525024414062
+      },
       "size": {
         "0": 354.3748474121094,
         "1": 74.71156311035156
       },
       "flags": {},
-      "order": 37,
+      "order": 36,
       "mode": 0,
       "inputs": [
         {
@@ -92,16 +92,16 @@
     {
       "id": 5,
       "type": "CLIPTextEncode",
-      "pos": [
-        31.226234762828724,
-        1010.2525119900232
-      ],
+      "pos": {
+        "0": 31.226234436035156,
+        "1": 1010.2525024414062
+      },
       "size": {
         "0": 357.7424011230469,
         "1": 77.3104019165039
       },
       "flags": {},
-      "order": 32,
+      "order": 27,
       "mode": 0,
       "inputs": [
         {
@@ -133,16 +133,16 @@
     {
       "id": 42,
       "type": "GrowMaskWithBlur",
-      "pos": [
-        511.2262347628283,
-        1336.252511990023
-      ],
+      "pos": {
+        "0": 511.2262268066406,
+        "1": 1336.2525634765625
+      },
       "size": {
         "0": 315,
         "1": 246
       },
       "flags": {},
-      "order": 42,
+      "order": 41,
       "mode": 0,
       "inputs": [
         {
@@ -185,16 +185,16 @@
     {
       "id": 44,
       "type": "ICLightConditioning",
-      "pos": [
-        1025.2262347628302,
-        827.2525119900224
-      ],
+      "pos": {
+        "0": 1025.2261962890625,
+        "1": 827.2525024414062
+      },
       "size": {
         "0": 342.5999755859375,
         "1": 138
       },
       "flags": {},
-      "order": 40,
+      "order": 39,
       "mode": 0,
       "inputs": [
         {
@@ -221,7 +221,8 @@
         {
           "name": "opt_background",
           "type": "LATENT",
-          "link": null
+          "link": null,
+          "shape": 7
         }
       ],
       "outputs": [
@@ -260,16 +261,16 @@
     {
       "id": 20,
       "type": "VAEEncode",
-      "pos": [
-        1071.2262347628302,
-        1047.2525119900229
-      ],
+      "pos": {
+        "0": 1071.2261962890625,
+        "1": 1047.2525634765625
+      },
       "size": {
         "0": 210,
         "1": 46
       },
       "flags": {},
-      "order": 45,
+      "order": 44,
       "mode": 0,
       "inputs": [
         {
@@ -298,21 +299,22 @@
       ],
       "properties": {
         "Node name for S&R": "VAEEncode"
-      }
+      },
+      "widgets_values": []
     },
     {
       "id": 22,
       "type": "CreateShapeMask",
-      "pos": [
-        28.226234762828724,
-        1181.252511990023
-      ],
+      "pos": {
+        "0": 28.226234436035156,
+        "1": 1181.2525634765625
+      },
       "size": {
         "0": 315,
         "1": 270
       },
       "flags": {},
-      "order": 41,
+      "order": 40,
       "mode": 0,
       "inputs": [
         {
@@ -408,16 +410,16 @@
     {
       "id": 43,
       "type": "RemapMaskRange",
-      "pos": [
-        510.2262347628283,
-        1187.252511990023
-      ],
+      "pos": {
+        "0": 510.2262268066406,
+        "1": 1187.2525634765625
+      },
       "size": {
         "0": 315,
         "1": 82
       },
       "flags": {},
-      "order": 43,
+      "order": 42,
       "mode": 0,
       "inputs": [
         {
@@ -448,16 +450,16 @@
     {
       "id": 95,
       "type": "PreviewImage",
-      "pos": [
-        1107.4100886717724,
-        2058.621853403489
-      ],
+      "pos": {
+        "0": 1107.4100341796875,
+        "1": 2058.621826171875
+      },
       "size": {
         "0": 524.9093627929688,
         "1": 766.022216796875
       },
       "flags": {},
-      "order": 50,
+      "order": 49,
       "mode": 0,
       "inputs": [
         {
@@ -466,17 +468,19 @@
           "link": 241
         }
       ],
+      "outputs": [],
       "properties": {
         "Node name for S&R": "PreviewImage"
-      }
+      },
+      "widgets_values": []
     },
     {
       "id": 88,
       "type": "VrchXYOSCControlNode",
-      "pos": [
-        -2308.998185980507,
-        1950.0298183037366
-      ],
+      "pos": {
+        "0": -2308.998291015625,
+        "1": 1950.02978515625
+      },
       "size": {
         "0": 315,
         "1": 470
@@ -484,6 +488,7 @@
       "flags": {},
       "order": 0,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "X_INT",
@@ -552,10 +557,10 @@
     {
       "id": 92,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        -2300.83737401318,
-        2521.127940352351
-      ],
+      "pos": {
+        "0": -2300.83740234375,
+        "1": 2521.1279296875
+      },
       "size": {
         "0": 315,
         "1": 270
@@ -563,6 +568,7 @@
       "flags": {},
       "order": 1,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "VALUE",
@@ -599,10 +605,10 @@
     {
       "id": 87,
       "type": "VrchXYOSCControlNode",
-      "pos": [
-        -1953.8292986107188,
-        1958.0344615329027
-      ],
+      "pos": {
+        "0": -1953.829345703125,
+        "1": 1958.034423828125
+      },
       "size": {
         "0": 315,
         "1": 470
@@ -610,6 +616,7 @@
       "flags": {},
       "order": 2,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "X_INT",
@@ -678,10 +685,10 @@
     {
       "id": 91,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        -1942.837374013181,
-        2532.127940352351
-      ],
+      "pos": {
+        "0": -1942.83740234375,
+        "1": 2532.1279296875
+      },
       "size": {
         "0": 315,
         "1": 270
@@ -689,6 +696,7 @@
       "flags": {},
       "order": 3,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "VALUE",
@@ -725,10 +733,10 @@
     {
       "id": 89,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        -1573.8292986107197,
-        1943.0344615329027
-      ],
+      "pos": {
+        "0": -1573.829345703125,
+        "1": 1943.034423828125
+      },
       "size": {
         "0": 315,
         "1": 270
@@ -736,6 +744,7 @@
       "flags": {},
       "order": 4,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "VALUE",
@@ -772,10 +781,10 @@
     {
       "id": 90,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        -1569.8292986107197,
-        2211.0344615329036
-      ],
+      "pos": {
+        "0": -1569.829345703125,
+        "1": 2211.034423828125
+      },
       "size": {
         "0": 315,
         "1": 270
@@ -783,6 +792,7 @@
       "flags": {},
       "order": 5,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "VALUE",
@@ -819,10 +829,10 @@
     {
       "id": 93,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        -1573.8292986107197,
-        2469.0344615329036
-      ],
+      "pos": {
+        "0": -1573.829345703125,
+        "1": 2469.034423828125
+      },
       "size": {
         "0": 315,
         "1": 270
@@ -830,6 +840,7 @@
       "flags": {},
       "order": 6,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "VALUE",
@@ -866,10 +877,10 @@
     {
       "id": 94,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        -1210.8292986107201,
-        1947.0344615329027
-      ],
+      "pos": {
+        "0": -1210.829345703125,
+        "1": 1947.034423828125
+      },
       "size": {
         "0": 315,
         "1": 270
@@ -877,6 +888,7 @@
       "flags": {},
       "order": 7,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "VALUE",
@@ -913,10 +925,10 @@
     {
       "id": 97,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        -1204.6603532982201,
-        2211.0344615329036
-      ],
+      "pos": {
+        "0": -1204.660400390625,
+        "1": 2211.034423828125
+      },
       "size": {
         "0": 315,
         "1": 270
@@ -924,6 +936,7 @@
       "flags": {},
       "order": 8,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "VALUE",
@@ -960,10 +973,10 @@
     {
       "id": 98,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        -1199.8373740131824,
-        2477.127940352351
-      ],
+      "pos": {
+        "0": -1199.83740234375,
+        "1": 2477.1279296875
+      },
       "size": {
         "0": 315,
         "1": 270
@@ -971,6 +984,7 @@
       "flags": {},
       "order": 9,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "VALUE",
@@ -1007,16 +1021,16 @@
     {
       "id": 37,
       "type": "LoadAndApplyICLightUnet",
-      "pos": [
-        754.2262347628283,
-        692.2525119900221
-      ],
+      "pos": {
+        "0": 754.2262573242188,
+        "1": 692.2525024414062
+      },
       "size": {
         "0": 381.3333740234375,
         "1": 58
       },
       "flags": {},
-      "order": 31,
+      "order": 26,
       "mode": 0,
       "inputs": [
         {
@@ -1046,16 +1060,16 @@
     {
       "id": 19,
       "type": "KSampler",
-      "pos": [
-        1006.2262347628302,
-        1192.252511990023
-      ],
+      "pos": {
+        "0": 1006.2262573242188,
+        "1": 1192.2525634765625
+      },
       "size": {
         "0": 315,
         "1": 474
       },
       "flags": {},
-      "order": 47,
+      "order": 46,
       "mode": 0,
       "inputs": [
         {
@@ -1108,22 +1122,22 @@
     {
       "id": 76,
       "type": "VrchTextSwitchOSCControlNode",
-      "pos": [
-        -926.5584028493926,
-        359.6357271419286
-      ],
-      "size": [
-        320.4036865234375,
-        522.0000610351562
-      ],
+      "pos": {
+        "0": -926.5584106445312,
+        "1": 359.6357421875
+      },
+      "size": {
+        "0": 320.4036865234375,
+        "1": 522.0000610351562
+      },
       "flags": {},
-      "order": 24,
+      "order": 25,
       "mode": 0,
       "inputs": [
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 301,
+          "link": 311,
           "widget": {
             "name": "server_ip"
           }
@@ -1131,7 +1145,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 302,
+          "link": 320,
           "widget": {
             "name": "port"
           }
@@ -1169,16 +1183,16 @@
     {
       "id": 114,
       "type": "VrchChannelOSCControlNode",
-      "pos": [
-        -615.5584028493922,
-        1263.635727141929
-      ],
-      "size": [
-        330,
-        150
-      ],
+      "pos": {
+        "0": -615.5584106445312,
+        "1": 1263.6357421875
+      },
+      "size": {
+        "0": 330,
+        "1": 150
+      },
       "flags": {},
-      "order": 38,
+      "order": 37,
       "mode": 0,
       "inputs": [
         {
@@ -1194,7 +1208,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 297,
+          "link": 309,
           "widget": {
             "name": "server_ip"
           }
@@ -1202,7 +1216,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 298,
+          "link": 318,
           "widget": {
             "name": "port"
           }
@@ -1232,16 +1246,16 @@
     {
       "id": 113,
       "type": "VrchChannelOSCControlNode",
-      "pos": [
-        -611.5584028493923,
-        1469.635727141929
-      ],
-      "size": [
-        330,
-        150
-      ],
+      "pos": {
+        "0": -611.5584106445312,
+        "1": 1469.6357421875
+      },
+      "size": {
+        "0": 330,
+        "1": 150
+      },
       "flags": {},
-      "order": 39,
+      "order": 38,
       "mode": 0,
       "inputs": [
         {
@@ -1257,7 +1271,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 299,
+          "link": 310,
           "widget": {
             "name": "server_ip"
           }
@@ -1265,7 +1279,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 300,
+          "link": 319,
           "widget": {
             "name": "port"
           }
@@ -1295,16 +1309,16 @@
     {
       "id": 7,
       "type": "VAEDecode",
-      "pos": [
-        1359.2262347628302,
-        1096.252511990023
-      ],
+      "pos": {
+        "0": 1359.2261962890625,
+        "1": 1096.2525634765625
+      },
       "size": {
         "0": 210,
         "1": 46
       },
       "flags": {},
-      "order": 48,
+      "order": 47,
       "mode": 0,
       "inputs": [
         {
@@ -1332,42 +1346,47 @@
       ],
       "properties": {
         "Node name for S&R": "VAEDecode"
-      }
+      },
+      "widgets_values": []
     },
     {
       "id": 84,
       "type": "ExpressionEditor",
-      "pos": [
-        -718.6603532982207,
-        1978.0344615329027
-      ],
+      "pos": {
+        "0": -718.6603393554688,
+        "1": 1978.034423828125
+      },
       "size": {
         "0": 260.81048583984375,
         "1": 690
       },
       "flags": {},
-      "order": 49,
+      "order": 48,
       "mode": 0,
       "inputs": [
         {
           "name": "src_image",
           "type": "IMAGE",
-          "link": 226
+          "link": 226,
+          "shape": 7
         },
         {
           "name": "motion_link",
           "type": "EDITOR_LINK",
-          "link": null
+          "link": null,
+          "shape": 7
         },
         {
           "name": "sample_image",
           "type": "IMAGE",
-          "link": null
+          "link": null,
+          "shape": 7
         },
         {
           "name": "add_exp",
           "type": "EXP_DATA",
-          "link": null
+          "link": null,
+          "shape": 7
         },
         {
           "name": "pupil_x",
@@ -1515,16 +1534,16 @@
     {
       "id": 74,
       "type": "VrchIntOSCControlNode",
-      "pos": [
-        -1123.5584028493909,
-        941.6357271419291
-      ],
-      "size": [
-        315,
-        246
-      ],
+      "pos": {
+        "0": -1123.558349609375,
+        "1": 941.6357421875
+      },
+      "size": {
+        "0": 315,
+        "1": 246
+      },
       "flags": {},
-      "order": 35,
+      "order": 34,
       "mode": 0,
       "inputs": [
         {
@@ -1538,7 +1557,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 291,
+          "link": 306,
           "widget": {
             "name": "server_ip"
           }
@@ -1546,7 +1565,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 292,
+          "link": 315,
           "widget": {
             "name": "port"
           }
@@ -1589,16 +1608,16 @@
     {
       "id": 73,
       "type": "VrchIntOSCControlNode",
-      "pos": [
-        -1119.5584028493909,
-        1236.635727141929
-      ],
-      "size": [
-        315,
-        246
-      ],
+      "pos": {
+        "0": -1119.558349609375,
+        "1": 1236.6357421875
+      },
+      "size": {
+        "0": 315,
+        "1": 246
+      },
       "flags": {},
-      "order": 34,
+      "order": 33,
       "mode": 0,
       "inputs": [
         {
@@ -1612,7 +1631,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 293,
+          "link": 307,
           "widget": {
             "name": "server_ip"
           }
@@ -1620,7 +1639,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 294,
+          "link": 316,
           "widget": {
             "name": "port"
           }
@@ -1663,17 +1682,18 @@
     {
       "id": 111,
       "type": "LoadImage",
-      "pos": [
-        -2366.70556640625,
-        1143.226806640625
-      ],
+      "pos": {
+        "0": -2366.70556640625,
+        "1": 1143.226806640625
+      },
       "size": [
-        282.11087856426093,
-        306.7539668909001
+        282.1108703613281,
+        314
       ],
       "flags": {},
       "order": 10,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "IMAGE",
@@ -1703,17 +1723,18 @@
     {
       "id": 112,
       "type": "LoadImage",
-      "pos": [
-        -2368.852783203125,
-        1507.81787109375
-      ],
+      "pos": {
+        "0": -2368.852783203125,
+        "1": 1507.81787109375
+      },
       "size": [
-        296.0121670363742,
-        284.9775797612863
+        296.0121765136719,
+        314
       ],
       "flags": {},
       "order": 11,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "IMAGE",
@@ -1743,17 +1764,18 @@
     {
       "id": 9,
       "type": "LoadImage",
-      "pos": [
-        -2377.852783203125,
-        374.81787109375
-      ],
-      "size": [
-        318.92870093798774,
-        365.69361661538824
-      ],
+      "pos": {
+        "0": -2377.852783203125,
+        "1": 374.81787109375
+      },
+      "size": {
+        "0": 318.9287109375,
+        "1": 365.693603515625
+      },
       "flags": {},
       "order": 12,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "IMAGE",
@@ -1783,17 +1805,18 @@
     {
       "id": 108,
       "type": "LoadImage",
-      "pos": [
-        -2375.852783203125,
-        800.81787109375
-      ],
+      "pos": {
+        "0": -2375.852783203125,
+        "1": 800.81787109375
+      },
       "size": [
-        303.04960018384463,
-        285.00699086398504
+        303.0495910644531,
+        314
       ],
       "flags": {},
       "order": 13,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "IMAGE",
@@ -1823,17 +1846,19 @@
     {
       "id": 118,
       "type": "Note",
-      "pos": [
-        -3043,
-        135
-      ],
-      "size": [
-        455.9010679606831,
-        170.3511052574978
-      ],
+      "pos": {
+        "0": -3043,
+        "1": 135
+      },
+      "size": {
+        "0": 455.90106201171875,
+        "1": 170.35110473632812
+      },
       "flags": {},
       "order": 14,
       "mode": 0,
+      "inputs": [],
+      "outputs": [],
       "title": "Instructions",
       "properties": {
         "text": ""
@@ -1847,22 +1872,22 @@
     {
       "id": 103,
       "type": "VrchTextConcatOSCControlNode",
-      "pos": [
-        -1937.852783203125,
-        661.81787109375
-      ],
-      "size": [
-        400,
-        714
-      ],
+      "pos": {
+        "0": -1937.852783203125,
+        "1": 661.81787109375
+      },
+      "size": {
+        "0": 400,
+        "1": 714
+      },
       "flags": {},
-      "order": 22,
+      "order": 23,
       "mode": 0,
       "inputs": [
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 287,
+          "link": 304,
           "widget": {
             "name": "server_ip"
           }
@@ -1870,7 +1895,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 288,
+          "link": 313,
           "widget": {
             "name": "port"
           }
@@ -1915,42 +1940,46 @@
     {
       "id": 110,
       "type": "VrchImageSwitchOSCControlNode",
-      "pos": [
-        -1926.852783203125,
-        375.81787109375
-      ],
-      "size": [
-        315,
-        190
-      ],
+      "pos": {
+        "0": -1926.852783203125,
+        "1": 375.81787109375
+      },
+      "size": {
+        "0": 315,
+        "1": 190
+      },
       "flags": {},
-      "order": 21,
+      "order": 22,
       "mode": 0,
       "inputs": [
         {
           "name": "image0",
           "type": "IMAGE",
-          "link": 270
+          "link": 270,
+          "shape": 7
         },
         {
           "name": "image1",
           "type": "IMAGE",
-          "link": 271
+          "link": 271,
+          "shape": 7
         },
         {
           "name": "image2",
           "type": "IMAGE",
-          "link": 274
+          "link": 274,
+          "shape": 7
         },
         {
           "name": "image3",
           "type": "IMAGE",
-          "link": 275
+          "link": 275,
+          "shape": 7
         },
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 285,
+          "link": 303,
           "widget": {
             "name": "server_ip"
           }
@@ -1958,7 +1987,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 286,
+          "link": 312,
           "widget": {
             "name": "port"
           }
@@ -1989,16 +2018,16 @@
     {
       "id": 46,
       "type": "ImageResizeKJ",
-      "pos": [
-        -1539,
-        376
-      ],
+      "pos": {
+        "0": -1539,
+        "1": 376
+      },
       "size": {
         "0": 313.05291748046875,
         "1": 238
       },
       "flags": {},
-      "order": 27,
+      "order": 28,
       "mode": 0,
       "inputs": [
         {
@@ -2009,7 +2038,8 @@
         {
           "name": "get_image_size",
           "type": "IMAGE",
-          "link": null
+          "link": null,
+          "shape": 7
         },
         {
           "name": "width_input",
@@ -2076,16 +2106,16 @@
     {
       "id": 107,
       "type": "VrchXYOSCControlNode",
-      "pos": [
-        -1487,
-        739
-      ],
-      "size": [
-        315,
-        470
-      ],
+      "pos": {
+        "0": -1487,
+        "1": 739
+      },
+      "size": {
+        "0": 315,
+        "1": 470
+      },
       "flags": {},
-      "order": 36,
+      "order": 35,
       "mode": 0,
       "inputs": [
         {
@@ -2107,7 +2137,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 289,
+          "link": 305,
           "widget": {
             "name": "server_ip"
           }
@@ -2115,7 +2145,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 290,
+          "link": 314,
           "widget": {
             "name": "port"
           }
@@ -2188,22 +2218,22 @@
     {
       "id": 104,
       "type": "VrchIntOSCControlNode",
-      "pos": [
-        -1117,
-        1531
-      ],
-      "size": [
-        315,
-        270
-      ],
+      "pos": {
+        "0": -1117,
+        "1": 1531
+      },
+      "size": {
+        "0": 315,
+        "1": 270
+      },
       "flags": {},
-      "order": 23,
+      "order": 24,
       "mode": 0,
       "inputs": [
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 295,
+          "link": 308,
           "widget": {
             "name": "server_ip"
           }
@@ -2211,7 +2241,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 296,
+          "link": 317,
           "widget": {
             "name": "port"
           }
@@ -2252,100 +2282,18 @@
       ]
     },
     {
-      "id": 116,
-      "type": "String",
-      "pos": [
-        -2963,
-        464
-      ],
-      "size": {
-        "0": 315,
-        "1": 58
-      },
-      "flags": {},
-      "order": 15,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            285,
-            287,
-            289,
-            291,
-            293,
-            295,
-            297,
-            299,
-            301
-          ],
-          "slot_index": 0,
-          "shape": 3
-        }
-      ],
-      "title": "Server",
-      "properties": {
-        "Node name for S&R": "String"
-      },
-      "widgets_values": [
-        "192.168.123.104"
-      ]
-    },
-    {
-      "id": 117,
-      "type": "Int",
-      "pos": [
-        -2960,
-        588
-      ],
-      "size": {
-        "0": 315,
-        "1": 58
-      },
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "INT",
-          "type": "INT",
-          "links": [
-            286,
-            288,
-            290,
-            292,
-            294,
-            296,
-            298,
-            300,
-            302
-          ],
-          "slot_index": 0,
-          "shape": 3
-        }
-      ],
-      "title": "Port",
-      "properties": {
-        "Node name for S&R": "Int"
-      },
-      "widgets_values": [
-        8000
-      ]
-    },
-    {
       "id": 82,
       "type": "PreviewImage",
-      "pos": [
-        -130.9789951748547,
-        2057.6258984375127
-      ],
+      "pos": {
+        "0": -130.97898864746094,
+        "1": 2057.6259765625
+      },
       "size": {
         "0": 606.1448364257812,
         "1": 756.5897216796875
       },
       "flags": {},
-      "order": 28,
+      "order": 29,
       "mode": 0,
       "inputs": [
         {
@@ -2354,23 +2302,25 @@
           "link": 273
         }
       ],
+      "outputs": [],
       "properties": {
         "Node name for S&R": "PreviewImage"
-      }
+      },
+      "widgets_values": []
     },
     {
       "id": 41,
       "type": "PreviewImage",
-      "pos": [
-        522.0210048251447,
-        2062.625898437513
-      ],
+      "pos": {
+        "0": 522.02099609375,
+        "1": 2062.6259765625
+      },
       "size": {
         "0": 543.6597290039062,
         "1": 751.4212036132812
       },
       "flags": {},
-      "order": 46,
+      "order": 45,
       "mode": 0,
       "inputs": [
         {
@@ -2379,23 +2329,25 @@
           "link": 151
         }
       ],
+      "outputs": [],
       "properties": {
         "Node name for S&R": "PreviewImage"
-      }
+      },
+      "widgets_values": []
     },
     {
       "id": 115,
       "type": "VrchImageWebViewerNode",
-      "pos": [
-        1694.0210048251454,
-        2087.6258984375145
-      ],
+      "pos": {
+        "0": 1694.02099609375,
+        "1": 2087.6259765625
+      },
       "size": {
         "0": 400,
         "1": 270.00006103515625
       },
       "flags": {},
-      "order": 51,
+      "order": 50,
       "mode": 0,
       "inputs": [
         {
@@ -2404,6 +2356,7 @@
           "link": 284
         }
       ],
+      "outputs": [],
       "properties": {
         "Node name for S&R": "VrchImageWebViewerNode"
       },
@@ -2414,23 +2367,23 @@
         1280,
         960,
         false,
-        "https://vrch.ai/viewer?mode=image&server=192.168.123.104:8188&ssl=false&file=channel_1.jpeg&path=web_viewer",
+        "http://vrch.ai/viewer?mode=image&server=192.168.123.104:8188&ssl=false&file=channel_1.jpeg&path=web_viewer",
         null
       ]
     },
     {
       "id": 77,
       "type": "CR String To Combo",
-      "pos": [
-        -533,
-        610
-      ],
+      "pos": {
+        "0": -533,
+        "1": 610
+      },
       "size": {
         "0": 315,
         "1": 78
       },
       "flags": {},
-      "order": 30,
+      "order": 31,
       "mode": 0,
       "inputs": [
         {
@@ -2469,16 +2422,16 @@
     {
       "id": 81,
       "type": "ShowText|pysssss",
-      "pos": [
-        -540,
-        463
-      ],
+      "pos": {
+        "0": -540,
+        "1": 463
+      },
       "size": {
         "0": 320,
         "1": 80
       },
       "flags": {},
-      "order": 29,
+      "order": 30,
       "mode": 0,
       "inputs": [
         {
@@ -2505,24 +2458,24 @@
         "Node name for S&R": "ShowText|pysssss"
       },
       "widgets_values": [
-        "",
-        "red light,rainbow"
+        ""
       ]
     },
     {
       "id": 2,
       "type": "CheckpointLoaderSimple",
-      "pos": [
-        1.226234762828747,
-        691.2525119900221
-      ],
+      "pos": {
+        "0": 1.226234793663025,
+        "1": 691.2525024414062
+      },
       "size": {
         "0": 315,
         "1": 98
       },
       "flags": {},
-      "order": 17,
+      "order": 15,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "MODEL",
@@ -2563,17 +2516,19 @@
     {
       "id": 119,
       "type": "Note",
-      "pos": [
-        -5,
-        540
-      ],
-      "size": [
-        306.02057157755075,
-        83.91347097661549
-      ],
+      "pos": {
+        "0": -5,
+        "1": 540
+      },
+      "size": {
+        "0": 306.02056884765625,
+        "1": 83.91346740722656
+      },
       "flags": {},
-      "order": 18,
+      "order": 16,
       "mode": 0,
+      "inputs": [],
+      "outputs": [],
       "properties": {
         "text": ""
       },
@@ -2586,16 +2541,16 @@
     {
       "id": 57,
       "type": "LoraLoader",
-      "pos": [
-        387.2262347628288,
-        687.2525119900221
-      ],
+      "pos": {
+        "0": 387.2262268066406,
+        "1": 687.2525024414062
+      },
       "size": {
         "0": 315,
         "1": 126
       },
       "flags": {},
-      "order": 25,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
@@ -2642,17 +2597,19 @@
     {
       "id": 120,
       "type": "Note",
-      "pos": [
-        379,
-        546
-      ],
-      "size": [
-        361.4334984219836,
-        76.09417985874643
-      ],
+      "pos": {
+        "0": 379,
+        "1": 546
+      },
+      "size": {
+        "0": 361.4335021972656,
+        "1": 76.09417724609375
+      },
       "flags": {},
-      "order": 19,
+      "order": 17,
       "mode": 0,
+      "inputs": [],
+      "outputs": [],
       "properties": {
         "text": ""
       },
@@ -2665,16 +2622,16 @@
     {
       "id": 45,
       "type": "VAEEncode",
-      "pos": [
-        758,
-        908
-      ],
+      "pos": {
+        "0": 758,
+        "1": 908
+      },
       "size": {
         "0": 210,
         "1": 46
       },
       "flags": {},
-      "order": 33,
+      "order": 32,
       "mode": 0,
       "inputs": [
         {
@@ -2702,21 +2659,22 @@
       ],
       "properties": {
         "Node name for S&R": "VAEEncode"
-      }
+      },
+      "widgets_values": []
     },
     {
       "id": 35,
       "type": "MaskToImage",
-      "pos": [
-        761,
-        1046
-      ],
+      "pos": {
+        "0": 761,
+        "1": 1046
+      },
       "size": {
         "0": 210,
         "1": 26
       },
       "flags": {},
-      "order": 44,
+      "order": 43,
       "mode": 0,
       "inputs": [
         {
@@ -2739,29 +2697,22 @@
       ],
       "properties": {
         "Node name for S&R": "MaskToImage"
-      }
+      },
+      "widgets_values": []
     },
     {
       "id": 96,
       "type": "Fast Groups Bypasser (rgthree)",
       "pos": {
         "0": 1730.0208740234375,
-        "1": 2469.625244140625,
-        "2": 0,
-        "3": 0,
-        "4": 0,
-        "5": 0,
-        "6": 0,
-        "7": 0,
-        "8": 0,
-        "9": 0
+        "1": 2469.625244140625
       },
       "size": {
         "0": 328.900634765625,
         "1": 178
       },
       "flags": {},
-      "order": 20,
+      "order": 18,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2779,6 +2730,62 @@
         "customSortAlphabet": "",
         "toggleRestriction": "default"
       }
+    },
+    {
+      "id": 121,
+      "type": "VrchOSCControlSettingsNode",
+      "pos": {
+        "0": -2987,
+        "1": 472
+      },
+      "size": {
+        "0": 378,
+        "1": 126
+      },
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SERVER_IP",
+          "type": "STRING",
+          "links": [
+            303,
+            304,
+            305,
+            306,
+            307,
+            308,
+            309,
+            310,
+            311
+          ]
+        },
+        {
+          "name": "PORT",
+          "type": "INT",
+          "links": [
+            312,
+            313,
+            314,
+            315,
+            316,
+            317,
+            318,
+            319,
+            320
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchOSCControlSettingsNode"
+      },
+      "widgets_values": [
+        "192.168.123.36",
+        8000,
+        false
+      ]
     }
   ],
   "links": [
@@ -3287,145 +3294,145 @@
       "IMAGE"
     ],
     [
-      285,
-      116,
+      303,
+      121,
       0,
       110,
       4,
       "STRING"
     ],
     [
-      286,
-      117,
-      0,
-      110,
-      5,
-      "INT"
-    ],
-    [
-      287,
-      116,
+      304,
+      121,
       0,
       103,
       0,
       "STRING"
     ],
     [
-      288,
-      117,
-      0,
-      103,
-      1,
-      "INT"
-    ],
-    [
-      289,
-      116,
+      305,
+      121,
       0,
       107,
       2,
       "STRING"
     ],
     [
-      290,
-      117,
-      0,
-      107,
-      3,
-      "INT"
-    ],
-    [
-      291,
-      116,
+      306,
+      121,
       0,
       74,
       1,
       "STRING"
     ],
     [
-      292,
-      117,
-      0,
-      74,
-      2,
-      "INT"
-    ],
-    [
-      293,
-      116,
+      307,
+      121,
       0,
       73,
       1,
       "STRING"
     ],
     [
-      294,
-      117,
-      0,
-      73,
-      2,
-      "INT"
-    ],
-    [
-      295,
-      116,
+      308,
+      121,
       0,
       104,
       0,
       "STRING"
     ],
     [
-      296,
-      117,
-      0,
-      104,
-      1,
-      "INT"
-    ],
-    [
-      297,
-      116,
+      309,
+      121,
       0,
       114,
       2,
       "STRING"
     ],
     [
-      298,
-      117,
-      0,
-      114,
-      3,
-      "INT"
-    ],
-    [
-      299,
-      116,
+      310,
+      121,
       0,
       113,
       2,
       "STRING"
     ],
     [
-      300,
-      117,
-      0,
-      113,
-      3,
-      "INT"
-    ],
-    [
-      301,
-      116,
+      311,
+      121,
       0,
       76,
       0,
       "STRING"
     ],
     [
-      302,
-      117,
-      0,
+      312,
+      121,
+      1,
+      110,
+      5,
+      "INT"
+    ],
+    [
+      313,
+      121,
+      1,
+      103,
+      1,
+      "INT"
+    ],
+    [
+      314,
+      121,
+      1,
+      107,
+      3,
+      "INT"
+    ],
+    [
+      315,
+      121,
+      1,
+      74,
+      2,
+      "INT"
+    ],
+    [
+      316,
+      121,
+      1,
+      73,
+      2,
+      "INT"
+    ],
+    [
+      317,
+      121,
+      1,
+      104,
+      1,
+      "INT"
+    ],
+    [
+      318,
+      121,
+      1,
+      114,
+      3,
+      "INT"
+    ],
+    [
+      319,
+      121,
+      1,
+      113,
+      3,
+      "INT"
+    ],
+    [
+      320,
+      121,
+      1,
       76,
       1,
       "INT"
@@ -3442,7 +3449,7 @@
       ],
       "color": "#3f789e",
       "font_size": 24,
-      "locked": false
+      "flags": {}
     },
     {
       "title": "IC-Light Image Generation",
@@ -3454,7 +3461,7 @@
       ],
       "color": "#A88",
       "font_size": 24,
-      "locked": false
+      "flags": {}
     },
     {
       "title": "Output Panel",
@@ -3466,7 +3473,7 @@
       ],
       "color": "#3f789e",
       "font_size": 24,
-      "locked": false
+      "flags": {}
     },
     {
       "title": "OSC Control Panel - Portrait",
@@ -3478,7 +3485,7 @@
       ],
       "color": "#3f789e",
       "font_size": 24,
-      "locked": false
+      "flags": {}
     },
     {
       "title": "Server Settings",
@@ -3490,16 +3497,16 @@
       ],
       "color": "#3f789e",
       "font_size": 24,
-      "locked": false
+      "flags": {}
     }
   ],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.1908439282676209,
+      "scale": 0.7247295000000021,
       "offset": [
-        4057.6451743204852,
-        982.4762182364009
+        3302.3147658813405,
+        -173.78823319394917
       ]
     }
   },
