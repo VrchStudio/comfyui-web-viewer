@@ -10,10 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - add build-in self-signed https certs (not for production use)
+- add an image example workflow for rapid 8k image generation
 
 ### Updated
 
 - update README.md with more troubleshouting questions
+- update example workflows for osc control nodes
 
 ## 1.0.11 - 2024-10-31
 
