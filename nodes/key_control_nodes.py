@@ -5,6 +5,10 @@ import hashlib
 # Define the category for organizational purposes
 CATEGORY = "vrch.ai/control/keyboard"
 
+SHORTCUT_KEYS = [
+    "F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12",
+]
+
 class VrchIntKeyControlNode:
     """
     VrchIntKeyControlNode allows users to control an integer output value within
@@ -20,20 +24,7 @@ class VrchIntKeyControlNode:
                 "max_value": ("INT", {"default": 100, "min": -9999, "max": 9999}),
                 "step_size": ("INT", {"default": 1, "min": 1, "max": 1000}),
                 "shortcut_key1": (
-                    [
-                        "F1",
-                        "F2",
-                        "F3",
-                        "F4",
-                        "F5",
-                        "F6",
-                        "F7",
-                        "F8",
-                        "F9",
-                        "F10",
-                        "F11",
-                        "F12",
-                    ],
+                    SHORTCUT_KEYS,
                     {"default": "F2"},  # Updated default from "F1" to "F2"
                 ),
                 "shortcut_key2": (
@@ -109,20 +100,7 @@ class VrchFloatKeyControlNode:
             "required": {
                 "step_size": ("FLOAT", {"default": 0.01, "min": 0.01, "max": 0.10, "step": 0.01}),
                 "shortcut_key1": (
-                    [
-                        "F1",
-                        "F2",
-                        "F3",
-                        "F4",
-                        "F5",
-                        "F6",
-                        "F7",
-                        "F8",
-                        "F9",
-                        "F10",
-                        "F11",
-                        "F12",
-                    ],
+                    SHORTCUT_KEYS,
                     {"default": "F2"},
                 ),
                 "shortcut_key2": (
@@ -188,20 +166,7 @@ class VrchBooleanKeyControlNode:
         return {
             "required": {
                 "shortcut_key": (
-                    [
-                        "F1",
-                        "F2",
-                        "F3",
-                        "F4",
-                        "F5",
-                        "F6",
-                        "F7",
-                        "F8",
-                        "F9",
-                        "F10",
-                        "F11",
-                        "F12",
-                    ],
+                    SHORTCUT_KEYS,
                     {"default": "F2"},
                 ),
                 "current_value": ("BOOLEAN", {"default": False}),
@@ -265,20 +230,7 @@ class VrchTextKeyControlNode:
                 "text8": ("STRING", {"default": "", "multiline": True}),
                 "skip_empty_option": ("BOOLEAN", {"default": True}),
                 "shortcut_key": (
-                    [
-                        "F1",
-                        "F2",
-                        "F3",
-                        "F4",
-                        "F5",
-                        "F6",
-                        "F7",
-                        "F8",
-                        "F9",
-                        "F10",
-                        "F11",
-                        "F12",
-                    ],
+                    SHORTCUT_KEYS,
                     {"default": "F2"},
                 ),
                 "current_value": (
@@ -370,3 +322,27 @@ class VrchTextKeyControlNode:
         m.update(current_value.encode())
         return m.hexdigest()
     
+    
+class VrchInstantQueueKeyControlNode:
+    """
+    VrchInstantQueueKeyControlNode allows users to enable Queue Instant option using keyboard shortcuts. 
+    """
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "enable_queue_instant": ("BOOLEAN", {"default": False}),
+                "shortcut_key": (
+                    SHORTCUT_KEYS,
+                    {"default": "F2"},
+                ),
+            }
+        }
+
+    RETURN_TYPES = ()
+    FUNCTION = "get_current_value"
+    CATEGORY = CATEGORY
+
+    def get_current_value(self, enable_queue_instant, shortcut_key):
+        return ()
