@@ -102,3 +102,24 @@
 Ensure the ComfyUI window/tab is focused when using the shortcut key to prevent conflicts with browser shortcuts.
 
 ----
+
+### Node: `Instant Queue Key Control @ vrch.ai` (vrch.ai/control/keyboard)
+
+![](../assets/images/example_002_instant_queue_key_control.gif)
+
+1. **Add the `Instant Queue Key Control @ vrch.ai` to your ComfyUI workflow.**
+2. **Configure the Node:**
+   - **Enable Queue Instant (`enable_queue_instant`):** Set the initial state of the instant queue toggle. Default is `False`.
+   - **Shortcut Key (`shortcut_key`):** Select a function key (`F1` to `F12`) as the shortcut key to toggle the instant queue functionality on or off. Default is `F2`.
+3. **Toggle Instant Queue:**
+   - **Using Shortcut Key:**
+     - Pressing the chosen `shortcut_key` (e.g., `F2`) will toggle the `enable_queue_instant` state between **Enabled** and **Disabled**.
+     - Each press of the shortcut key will switch the state, allowing for easy control over the instant queue function without needing to manually adjust the `enable_queue_instant` setting.
+4. **Display and Output:**
+   - The node displays the current status of the instant queue as either **Enabled** or **Disabled** within its UI.
+   - No additional outputs are provided, as this node functions as a control toggle within the workflow.
+
+**Note:**  
+Ensure the ComfyUI window/tab is focused when using the shortcut key to avoid conflicts with browser-specific shortcuts or system key bindings.
+
+--- 
