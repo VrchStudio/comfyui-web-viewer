@@ -39,7 +39,7 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 - Documentation: [Usage of Web Viewer nodes](./docs/web_viewer_nodes.md)
 - Example workflows: 
   - [Workflow Example: Image Web Viewer node](./workflows/example_web_viewer_001_image_web_viewer)
-    ![](./assets/images/web_viewer_example_001.gif)
+    ![](./assets/images/example_001_web_viewer.gif)
 
 ### `OSC Control Nodes`
 
@@ -70,13 +70,46 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 - Documentation: [Usage of Image nodes](./docs/image_nodes.md)
 - Example workflows: n/a
 
-## Troubleshooting
+### `Other Example Workflows`
+
+- [Rapid Text to Image (8K)](./workflows/example_others_001_text_to_image_8k.json)
+
+## Troubleshootings
 
 ### Image Not Displayed in Popped-Up Image Viewer Window
 
 For Chrome, you may need to add the ComfyUI server's IP address manually in `chrome://flags/#unsafely-treat-insecure-origin-as-secure` to enable access to the content. For other browsers, an http-to-http setup should allow for seamless access without additional configuration.
 
 ![](./assets/images/troubleshooting_001.png)
+
+---
+
+### How can I resolve the CORS policy error when trying to display images?
+
+If you’re encountering a CORS policy error with a message like this:
+
+> `"origin 'https://vrch.ai' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource"`
+
+you can resolve this by launching the ComfyUI service with the `--enable-cors-header` flag. For example:
+
+```bash
+python main.py --enable-cors-header
+```
+
+For additional details, refer to [this discussion on GitHub](https://github.com/comfyanonymous/ComfyUI/pull/413#issuecomment-1499518110).
+
+---
+
+### Why can’t the ComfyUI service run at HTTPS/TLS/SSL on port 8189?
+
+`ComfyUI Web Viewer` provides a build-in, self-signed certificate (intended for development only, not production use). To launch the ComfyUI service with HTTPS enabled on port 8189, use the following command:
+
+```bash
+# Start ComfyUI with HTTPS using the built-in certificate and key
+python main.py --tls-keyfile ./custom_nodes/comfyui-web-viewer/https/key.pem --tls-certfile ./custom_nodes/comfyui-web-viewer/https/cert.pem --port 8189 --listen
+```
+
+For more details, refer to the [ComfyUI official instructions](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#how-to-use-tlsssl).
 
 
 ## Version Update

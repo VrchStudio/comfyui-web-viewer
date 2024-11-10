@@ -1,18 +1,18 @@
 {
-  "last_node_id": 83,
-  "last_link_id": 195,
+  "last_node_id": 84,
+  "last_link_id": 221,
   "nodes": [
     {
       "id": 40,
       "type": "VrchXYOSCControlNode",
-      "pos": [
-        1170,
-        1030
-      ],
-      "size": [
-        315,
-        470
-      ],
+      "pos": {
+        "0": 1170,
+        "1": 1030
+      },
+      "size": {
+        "0": 315,
+        "1": 470
+      },
       "flags": {},
       "order": 8,
       "mode": 0,
@@ -20,7 +20,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 172,
+          "link": 210,
           "widget": {
             "name": "server_ip"
           }
@@ -28,7 +28,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 173,
+          "link": 197,
           "widget": {
             "name": "port"
           }
@@ -102,14 +102,14 @@
     {
       "id": 42,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        1560,
-        1010
-      ],
-      "size": [
-        315,
-        270
-      ],
+      "pos": {
+        "0": 1560,
+        "1": 1010
+      },
+      "size": {
+        "0": 315,
+        "1": 270
+      },
       "flags": {},
       "order": 11,
       "mode": 0,
@@ -117,7 +117,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 178,
+          "link": 213,
           "widget": {
             "name": "server_ip"
           }
@@ -125,7 +125,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 179,
+          "link": 200,
           "widget": {
             "name": "port"
           }
@@ -167,14 +167,14 @@
     {
       "id": 47,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        1930,
-        1020
-      ],
-      "size": [
-        315,
-        270
-      ],
+      "pos": {
+        "0": 1930,
+        "1": 1020
+      },
+      "size": {
+        "0": 315,
+        "1": 270
+      },
       "flags": {},
       "order": 14,
       "mode": 0,
@@ -182,7 +182,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 184,
+          "link": 216,
           "widget": {
             "name": "server_ip"
           }
@@ -190,7 +190,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 185,
+          "link": 203,
           "widget": {
             "name": "port"
           }
@@ -232,14 +232,14 @@
     {
       "id": 48,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        1960,
-        1370
-      ],
-      "size": [
-        315,
-        270
-      ],
+      "pos": {
+        "0": 1960,
+        "1": 1370
+      },
+      "size": {
+        "0": 315,
+        "1": 270
+      },
       "flags": {},
       "order": 15,
       "mode": 0,
@@ -247,7 +247,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 186,
+          "link": 217,
           "widget": {
             "name": "server_ip"
           }
@@ -255,7 +255,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 187,
+          "link": 204,
           "widget": {
             "name": "port"
           }
@@ -297,16 +297,16 @@
     {
       "id": 73,
       "type": "VrchChannelX4OSCControlNode",
-      "pos": [
-        2740,
-        1020
-      ],
-      "size": [
-        380.4000244140625,
-        342
-      ],
+      "pos": {
+        "0": 2740,
+        "1": 1020
+      },
+      "size": {
+        "0": 380.4000244140625,
+        "1": 342
+      },
       "flags": {},
-      "order": 18,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
@@ -352,7 +352,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 190,
+          "link": 219,
           "widget": {
             "name": "server_ip"
           }
@@ -360,7 +360,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 191,
+          "link": 206,
           "widget": {
             "name": "port"
           }
@@ -415,16 +415,16 @@
     {
       "id": 70,
       "type": "VrchChannelX4OSCControlNode",
-      "pos": [
-        2750,
-        1420
-      ],
-      "size": [
-        380.4000244140625,
-        342
-      ],
+      "pos": {
+        "0": 2750,
+        "1": 1420
+      },
+      "size": {
+        "0": 380.4000244140625,
+        "1": 342
+      },
       "flags": {},
-      "order": 19,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
@@ -470,7 +470,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 192,
+          "link": 220,
           "widget": {
             "name": "server_ip"
           }
@@ -478,7 +478,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 193,
+          "link": 207,
           "widget": {
             "name": "port"
           }
@@ -536,14 +536,14 @@
     {
       "id": 43,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        1560,
-        1340
-      ],
-      "size": [
-        315,
-        270
-      ],
+      "pos": {
+        "0": 1560,
+        "1": 1340
+      },
+      "size": {
+        "0": 315,
+        "1": 270
+      },
       "flags": {},
       "order": 12,
       "mode": 0,
@@ -551,7 +551,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 180,
+          "link": 214,
           "widget": {
             "name": "server_ip"
           }
@@ -559,7 +559,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 181,
+          "link": 201,
           "widget": {
             "name": "port"
           }
@@ -601,14 +601,14 @@
     {
       "id": 41,
       "type": "VrchXYOSCControlNode",
-      "pos": [
-        820,
-        1020
-      ],
-      "size": [
-        315,
-        470
-      ],
+      "pos": {
+        "0": 820,
+        "1": 1020
+      },
+      "size": {
+        "0": 315,
+        "1": 470
+      },
       "flags": {},
       "order": 7,
       "mode": 0,
@@ -616,7 +616,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 170,
+          "link": 209,
           "widget": {
             "name": "server_ip"
           }
@@ -624,7 +624,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 171,
+          "link": 196,
           "widget": {
             "name": "port"
           }
@@ -698,16 +698,16 @@
     {
       "id": 72,
       "type": "VrchChannelX4OSCControlNode",
-      "pos": [
-        2750,
-        1830
-      ],
-      "size": [
-        380.4000244140625,
-        342
-      ],
+      "pos": {
+        "0": 2750,
+        "1": 1830
+      },
+      "size": {
+        "0": 380.4000244140625,
+        "1": 342
+      },
       "flags": {},
-      "order": 20,
+      "order": 19,
       "mode": 0,
       "inputs": [
         {
@@ -753,7 +753,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 194,
+          "link": 221,
           "widget": {
             "name": "server_ip"
           }
@@ -761,7 +761,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 195,
+          "link": 208,
           "widget": {
             "name": "port"
           }
@@ -820,10 +820,10 @@
     {
       "id": 52,
       "type": "Float",
-      "pos": [
-        2329,
-        960
-      ],
+      "pos": {
+        "0": 2329,
+        "1": 960
+      },
       "size": {
         "0": 282.6849670410156,
         "1": 58
@@ -831,6 +831,7 @@
       "flags": {},
       "order": 0,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "FLOAT",
@@ -860,10 +861,10 @@
     {
       "id": 76,
       "type": "String",
-      "pos": [
-        2332,
-        1081
-      ],
+      "pos": {
+        "0": 2332,
+        "1": 1081
+      },
       "size": {
         "0": 275.770751953125,
         "1": 58
@@ -871,6 +872,7 @@
       "flags": {},
       "order": 1,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "STRING",
@@ -898,14 +900,14 @@
     {
       "id": 45,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        827,
-        1624
-      ],
-      "size": [
-        315,
-        270
-      ],
+      "pos": {
+        "0": 827,
+        "1": 1624
+      },
+      "size": {
+        "0": 315,
+        "1": 270
+      },
       "flags": {},
       "order": 9,
       "mode": 0,
@@ -913,7 +915,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 174,
+          "link": 211,
           "widget": {
             "name": "server_ip"
           }
@@ -921,7 +923,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 175,
+          "link": 198,
           "widget": {
             "name": "port"
           }
@@ -963,14 +965,14 @@
     {
       "id": 49,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        1969,
-        1755
-      ],
-      "size": [
-        315,
-        270
-      ],
+      "pos": {
+        "0": 1969,
+        "1": 1755
+      },
+      "size": {
+        "0": 315,
+        "1": 270
+      },
       "flags": {},
       "order": 16,
       "mode": 0,
@@ -978,7 +980,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 188,
+          "link": 218,
           "widget": {
             "name": "server_ip"
           }
@@ -986,7 +988,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 189,
+          "link": 205,
           "widget": {
             "name": "port"
           }
@@ -1026,108 +1028,18 @@
       ]
     },
     {
-      "id": 82,
-      "type": "Int",
-      "pos": [
-        289.1799373444248,
-        1106.4478590313804
-      ],
-      "size": {
-        "0": 315,
-        "1": 58
-      },
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "INT",
-          "type": "INT",
-          "links": [
-            171,
-            173,
-            175,
-            177,
-            179,
-            181,
-            183,
-            185,
-            187,
-            189,
-            191,
-            193,
-            195
-          ],
-          "slot_index": 0,
-          "shape": 3
-        }
-      ],
-      "title": "Port",
-      "properties": {
-        "Node name for S&R": "Int"
-      },
-      "widgets_values": [
-        8000
-      ]
-    },
-    {
-      "id": 81,
-      "type": "String",
-      "pos": [
-        283.1799373444248,
-        962.447859031379
-      ],
-      "size": {
-        "0": 315,
-        "1": 58
-      },
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            170,
-            172,
-            174,
-            176,
-            178,
-            180,
-            182,
-            184,
-            186,
-            188,
-            190,
-            192,
-            194
-          ],
-          "slot_index": 0,
-          "shape": 3
-        }
-      ],
-      "title": "Server",
-      "properties": {
-        "Node name for S&R": "String"
-      },
-      "widgets_values": [
-        "192.168.123.104"
-      ]
-    },
-    {
       "id": 50,
       "type": "ImageResizeKJ",
-      "pos": [
-        3172,
-        521
-      ],
+      "pos": {
+        "0": 3172,
+        "1": 521
+      },
       "size": {
         "0": 315,
         "1": 242
       },
       "flags": {},
-      "order": 17,
+      "order": 6,
       "mode": 0,
       "inputs": [
         {
@@ -1138,7 +1050,8 @@
         {
           "name": "get_image_size",
           "type": "IMAGE",
-          "link": null
+          "link": null,
+          "shape": 7
         },
         {
           "name": "width_input",
@@ -1196,17 +1109,18 @@
     {
       "id": 15,
       "type": "LoadImage",
-      "pos": [
-        2829,
-        506
-      ],
+      "pos": {
+        "0": 2829,
+        "1": 506
+      },
       "size": {
         "0": 210,
         "1": 314
       },
       "flags": {},
-      "order": 4,
+      "order": 2,
       "mode": 0,
+      "inputs": [],
       "outputs": [
         {
           "name": "IMAGE",
@@ -1235,16 +1149,16 @@
     {
       "id": 71,
       "type": "VrchImageWebViewerNode",
-      "pos": [
-        3648,
-        1165
-      ],
+      "pos": {
+        "0": 3648,
+        "1": 1165
+      },
       "size": {
         "0": 230,
         "1": 270
       },
       "flags": {},
-      "order": 22,
+      "order": 21,
       "mode": 0,
       "inputs": [
         {
@@ -1253,6 +1167,7 @@
           "link": 124
         }
       ],
+      "outputs": [],
       "properties": {
         "Node name for S&R": "VrchImageWebViewerNode"
       },
@@ -1263,24 +1178,26 @@
         600,
         600,
         false,
-        "https://vrch.ai/viewer?mode=image&server=192.168.123.104:8188&ssl=false&file=channel_1.jpeg&path=web_viewer",
+        "http://vrch.ai/viewer?mode=image&server=192.168.123.104:8188&ssl=false&file=channel_1.jpeg&path=web_viewer",
         null
       ]
     },
     {
       "id": 74,
       "type": "Note",
-      "pos": [
-        3207,
-        1857
-      ],
-      "size": [
-        365.7131321809816,
-        260.54083408559836
-      ],
+      "pos": {
+        "0": 3207,
+        "1": 1857
+      },
+      "size": {
+        "0": 365.713134765625,
+        "1": 260.54083251953125
+      },
       "flags": {},
-      "order": 5,
+      "order": 3,
       "mode": 0,
+      "inputs": [],
+      "outputs": [],
       "title": "Live-Portrait <-> GamePad Mapping:",
       "properties": {
         "text": ""
@@ -1294,14 +1211,14 @@
     {
       "id": 46,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        1582,
-        1756
-      ],
-      "size": [
-        315,
-        270
-      ],
+      "pos": {
+        "0": 1582,
+        "1": 1756
+      },
+      "size": {
+        "0": 315,
+        "1": 270
+      },
       "flags": {},
       "order": 13,
       "mode": 0,
@@ -1309,7 +1226,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 182,
+          "link": 215,
           "widget": {
             "name": "server_ip"
           }
@@ -1317,7 +1234,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 183,
+          "link": 202,
           "widget": {
             "name": "port"
           }
@@ -1359,14 +1276,14 @@
     {
       "id": 44,
       "type": "VrchFloatOSCControlNode",
-      "pos": [
-        1199,
-        1755
-      ],
-      "size": [
-        315,
-        270
-      ],
+      "pos": {
+        "0": 1199,
+        "1": 1755
+      },
+      "size": {
+        "0": 315,
+        "1": 270
+      },
       "flags": {},
       "order": 10,
       "mode": 0,
@@ -1374,7 +1291,7 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 176,
+          "link": 212,
           "widget": {
             "name": "server_ip"
           }
@@ -1382,7 +1299,7 @@
         {
           "name": "port",
           "type": "INT",
-          "link": 177,
+          "link": 199,
           "widget": {
             "name": "port"
           }
@@ -1424,37 +1341,41 @@
     {
       "id": 39,
       "type": "ExpressionEditor",
-      "pos": [
-        3253,
-        1079
-      ],
+      "pos": {
+        "0": 3253,
+        "1": 1079
+      },
       "size": {
         "0": 270.6428527832031,
         "1": 646
       },
       "flags": {},
-      "order": 21,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
           "name": "src_image",
           "type": "IMAGE",
-          "link": 62
+          "link": 62,
+          "shape": 7
         },
         {
           "name": "motion_link",
           "type": "EDITOR_LINK",
-          "link": null
+          "link": null,
+          "shape": 7
         },
         {
           "name": "sample_image",
           "type": "IMAGE",
-          "link": null
+          "link": null,
+          "shape": 7
         },
         {
           "name": "add_exp",
           "type": "EXP_DATA",
-          "link": null
+          "link": null,
+          "shape": 7
         },
         {
           "name": "pupil_x",
@@ -1601,17 +1522,19 @@
     {
       "id": 83,
       "type": "Note",
-      "pos": [
-        216,
-        646
-      ],
-      "size": [
-        543.9141428045411,
-        168.5306783079609
-      ],
+      "pos": {
+        "0": 216,
+        "1": 646
+      },
+      "size": {
+        "0": 543.9141235351562,
+        "1": 168.5306854248047
+      },
       "flags": {},
-      "order": 6,
+      "order": 4,
       "mode": 0,
+      "inputs": [],
+      "outputs": [],
       "title": "Instructions",
       "properties": {
         "text": ""
@@ -1621,6 +1544,70 @@
       ],
       "color": "#432",
       "bgcolor": "#653"
+    },
+    {
+      "id": 84,
+      "type": "VrchOSCControlSettingsNode",
+      "pos": {
+        "0": 247,
+        "1": 957
+      },
+      "size": {
+        "0": 378,
+        "1": 126
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SERVER_IP",
+          "type": "STRING",
+          "links": [
+            209,
+            210,
+            211,
+            212,
+            213,
+            214,
+            215,
+            216,
+            217,
+            218,
+            219,
+            220,
+            221
+          ]
+        },
+        {
+          "name": "PORT",
+          "type": "INT",
+          "links": [
+            196,
+            197,
+            198,
+            199,
+            200,
+            201,
+            202,
+            203,
+            204,
+            205,
+            206,
+            207,
+            208
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchOSCControlSettingsNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        false
+      ]
     }
   ],
   "links": [
@@ -1937,227 +1924,215 @@
       "*"
     ],
     [
-      170,
-      81,
+      196,
+      84,
+      1,
+      41,
+      1,
+      "INT"
+    ],
+    [
+      197,
+      84,
+      1,
+      40,
+      1,
+      "INT"
+    ],
+    [
+      198,
+      84,
+      1,
+      45,
+      1,
+      "INT"
+    ],
+    [
+      199,
+      84,
+      1,
+      44,
+      1,
+      "INT"
+    ],
+    [
+      200,
+      84,
+      1,
+      42,
+      1,
+      "INT"
+    ],
+    [
+      201,
+      84,
+      1,
+      43,
+      1,
+      "INT"
+    ],
+    [
+      202,
+      84,
+      1,
+      46,
+      1,
+      "INT"
+    ],
+    [
+      203,
+      84,
+      1,
+      47,
+      1,
+      "INT"
+    ],
+    [
+      204,
+      84,
+      1,
+      48,
+      1,
+      "INT"
+    ],
+    [
+      205,
+      84,
+      1,
+      49,
+      1,
+      "INT"
+    ],
+    [
+      206,
+      84,
+      1,
+      73,
+      9,
+      "INT"
+    ],
+    [
+      207,
+      84,
+      1,
+      70,
+      9,
+      "INT"
+    ],
+    [
+      208,
+      84,
+      1,
+      72,
+      9,
+      "INT"
+    ],
+    [
+      209,
+      84,
       0,
       41,
       0,
       "STRING"
     ],
     [
-      171,
-      82,
-      0,
-      41,
-      1,
-      "INT"
-    ],
-    [
-      172,
-      81,
+      210,
+      84,
       0,
       40,
       0,
       "STRING"
     ],
     [
-      173,
-      82,
-      0,
-      40,
-      1,
-      "INT"
-    ],
-    [
-      174,
-      81,
+      211,
+      84,
       0,
       45,
       0,
       "STRING"
     ],
     [
-      175,
-      82,
-      0,
-      45,
-      1,
-      "INT"
-    ],
-    [
-      176,
-      81,
+      212,
+      84,
       0,
       44,
       0,
       "STRING"
     ],
     [
-      177,
-      82,
-      0,
-      44,
-      1,
-      "INT"
-    ],
-    [
-      178,
-      81,
+      213,
+      84,
       0,
       42,
       0,
       "STRING"
     ],
     [
-      179,
-      82,
-      0,
-      42,
-      1,
-      "INT"
-    ],
-    [
-      180,
-      81,
+      214,
+      84,
       0,
       43,
       0,
       "STRING"
     ],
     [
-      181,
-      82,
-      0,
-      43,
-      1,
-      "INT"
-    ],
-    [
-      182,
-      81,
+      215,
+      84,
       0,
       46,
       0,
       "STRING"
     ],
     [
-      183,
-      82,
-      0,
-      46,
-      1,
-      "INT"
-    ],
-    [
-      184,
-      81,
+      216,
+      84,
       0,
       47,
       0,
       "STRING"
     ],
     [
-      185,
-      82,
-      0,
-      47,
-      1,
-      "INT"
-    ],
-    [
-      186,
-      81,
+      217,
+      84,
       0,
       48,
       0,
       "STRING"
     ],
     [
-      187,
-      82,
-      0,
-      48,
-      1,
-      "INT"
-    ],
-    [
-      188,
-      81,
+      218,
+      84,
       0,
       49,
       0,
       "STRING"
     ],
     [
-      189,
-      82,
-      0,
-      49,
-      1,
-      "INT"
-    ],
-    [
-      190,
-      81,
+      219,
+      84,
       0,
       73,
       8,
       "STRING"
     ],
     [
-      191,
-      82,
-      0,
-      73,
-      9,
-      "INT"
-    ],
-    [
-      192,
-      81,
+      220,
+      84,
       0,
       70,
       8,
       "STRING"
     ],
     [
-      193,
-      82,
-      0,
-      70,
-      9,
-      "INT"
-    ],
-    [
-      194,
-      81,
+      221,
+      84,
       0,
       72,
       8,
       "STRING"
-    ],
-    [
-      195,
-      82,
-      0,
-      72,
-      9,
-      "INT"
     ]
   ],
   "groups": [
-    {
-      "title": "Simple facial expression editing",
-      "bounding": [
-        770,
-        840,
-        2837,
-        1398
-      ],
-      "color": "#88A",
-      "font_size": 30,
-      "locked": false
-    },
     {
       "title": "Server Settings",
       "bounding": [
@@ -2168,16 +2143,28 @@
       ],
       "color": "#3f789e",
       "font_size": 24,
-      "locked": false
+      "flags": {}
+    },
+    {
+      "title": "Simple facial expression editing",
+      "bounding": [
+        770,
+        840,
+        2837,
+        1398
+      ],
+      "color": "#88A",
+      "font_size": 30,
+      "flags": {}
     }
   ],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.8390545288824041,
+      "scale": 0.9646149645000034,
       "offset": [
-        -1191.4502980098066,
-        -17.8218617370277
+        201.75782954514005,
+        -438.4841490467852
       ]
     }
   },

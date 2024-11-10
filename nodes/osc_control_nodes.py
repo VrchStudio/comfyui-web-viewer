@@ -1299,3 +1299,38 @@ class VrchChannelX4OSCControlNode:
             if self.debug:
                 print(f"[VrchChannelX4OSCControlNode] Channel {index+1} is {'ON' if self.channel_states[index] else 'OFF'}")
         return handler
+
+
+class VrchOSCControlSettingsNode:
+
+    def __init__(self):
+        self.server_manager = None
+        self.debug = False
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {
+            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+            "debug": ("BOOLEAN", {"default": False}),
+        }}
+
+    RETURN_TYPES = ("STRING", "INT")
+    RETURN_NAMES = ("SERVER_IP", "PORT")
+    FUNCTION = "load_osc_server_settings"
+    CATEGORY = CATEGORY
+
+    def load_osc_server_settings(self, server_ip, port, debug=False):
+        
+        # Get or create the server manager
+        self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
+        self.debug = debug
+        
+        if self.debug:
+            print(f"[VrchOSCControlServerNode] server: {server_ip}, port: {port}")
+        
+        return server_ip, port
+    
+    @classmethod
+    def IS_CHANGED(s, **kwargs):
+        return False

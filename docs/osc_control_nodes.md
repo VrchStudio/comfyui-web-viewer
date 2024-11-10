@@ -281,3 +281,30 @@
 - This node is useful when you need to receive dynamic values of varying types over OSC without knowing the exact type in advance.
 
 ---
+
+### Node: `OSC Control Settings @ vrch.ai` (vrch.ai/control/osc)
+
+1. **Add the `OSC Control Settings @ vrch.ai` node to your ComfyUI workflow.**
+   
+2. **Configure the Node:**
+   - **Server IP (`server_ip`):** Specify the IP address of the OSC server. By default, this is set to the local IP address of your machine.
+   - **Port (`port`):** Set the port number on which the OSC server is listening. The default value is `8000`, but you can specify any valid port number between `0` and `65535`.
+   - **Debug (`debug`):** Enable this option to activate debug mode, which will print detailed logs to help with troubleshooting. The default is `False`.
+
+3. **Use the Node:**
+   - This node initializes and configures the OSC server settings in your workflow. It does not actively send or receive OSC messages but serves as a central configuration point for OSC communication.
+   - If `debug` is enabled, the node outputs debug information, including the server IP and port details, to the console for verification and troubleshooting.
+
+4. **Outputs:**
+   - **`SERVER_IP`**: Outputs the configured IP address for the OSC server as a string.
+   - **`PORT`**: Outputs the configured port number for the OSC server as an integer.
+
+5. **Connect Outputs:**
+   - Use the `SERVER_IP` and `PORT` outputs to link this configuration to other OSC nodes in your workflow, ensuring that all nodes are using the same IP and port settings.
+
+**Note:**  
+- Ensure that the OSC client is configured to communicate with the specified `server_ip` and `port`.
+- This node is useful for setting up a consistent OSC configuration across multiple nodes within a ComfyUI workflow, centralizing the IP and port details for easy management.
+- When `debug` mode is active, it helps you monitor OSC activity by outputting server connection details to the console.
+
+--- 
