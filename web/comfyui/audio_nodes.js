@@ -53,34 +53,6 @@ app.registerExtension({
     }
 });
 
-function get_position_style(ctx, widget_width, y, node_height) {
-    const MARGIN = 4; // the margin around the html element
-
-    /* Create a transform that deals with all the scrolling and zooming */
-    const elRect = ctx.canvas.getBoundingClientRect();
-    const transform = new DOMMatrix()
-        .scaleSelf(
-            elRect.width / ctx.canvas.width,
-            elRect.height / ctx.canvas.height
-        )
-        .multiplySelf(ctx.getTransform())
-        .translateSelf(MARGIN, MARGIN + y);
-
-    return {
-        transformOrigin: '0 0',
-        transform: transform,
-        left: `0`,
-        top: `0`,
-        cursor: 'pointer',
-        position: 'absolute',
-        maxWidth: `${widget_width - MARGIN * 2}px`,
-        width: `${widget_width - MARGIN * 2}px`,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-around'
-    };
-}
-
 app.registerExtension({
     name: 'vrch.AudioRecorderNode',
     async getCustomWidgets(app) {
@@ -124,27 +96,10 @@ app.registerExtension({
                     base64Widget.hidden = true;
                 }
 
-                // Create a container div for the button and countdown
-                const widget = {
-                    type: 'div',
-                    name: 'audioRecorderDiv',
-                    draw(ctx, node, widget_width, y, widget_height) {
-                        Object.assign(
-                            this.div.style,
-                            get_position_style(ctx, widget_width, 250, node.size[1])
-                        );
-                    }
-                };
-
-                widget.div = document.createElement('div');
-
-                const startBtn = document.createElement('button');
-                startBtn.className = "comfy-btn";
-                startBtn.style = `
-                    font-size: 18px;
-                    padding: 15px 10px;
-                    width: 100%;
-                `;
+                // Create a custom button element
+                const startBtn = document.createElement("button");
+                startBtn.textContent = "";
+                startBtn.classList.add("comfy-big-button");
 
                 const countdownDisplay = document.createElement('div');
                 countdownDisplay.style = `
@@ -153,10 +108,9 @@ app.registerExtension({
                     text-align: center;
                 `;
 
-                widget.div.appendChild(startBtn);
-                widget.div.appendChild(countdownDisplay);
-                document.body.appendChild(widget.div);
-                this.addCustomWidget(widget);
+                // Add the button and tag to the node using addDOMWidget
+                this.addDOMWidget("button_widget", "Press and Hold to Record", startBtn);
+                this.addDOMWidget("text_widget", "Countdown Display", countdownDisplay);
 
                 // Default shortcut settings
                 let enableShortcut = false;
@@ -387,10 +341,6 @@ app.registerExtension({
                     }
                 };
 
-                document.body.appendChild(widget.div);
-
-                this.addCustomWidget(widget);
-
                 // Initialize button mode based on the record mode
                 // Load settings from localStorage if available
                 const savedRecordMode = localStorage.getItem('vrch_audio_recorder_record_mode');
@@ -401,8 +351,6 @@ app.registerExtension({
 
                 const onRemoved = this.onRemoved;
                 this.onRemoved = function () {
-                    // Clean up when node is removed
-                    widget.div.remove();
                     if (recordingTimer) {
                         clearInterval(recordingTimer);
                     }
@@ -420,3 +368,29 @@ app.registerExtension({
     }
 });
 
+// Add custom styles for the button
+const style = document.createElement("style");
+style.textContent = `
+    .comfy-big-button {
+        background-color: #4CAF50;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .comfy-big-button:hover {
+        background-color: #45a049;
+        transform: scale(1.05); 
+    }
+
+    .comfy-big-button:active {
+        background-color: #3e8e41;
+        transform: scale(1);
+    }
+`;
+document.head.appendChild(style);
