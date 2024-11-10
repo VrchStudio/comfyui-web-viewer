@@ -70,6 +70,10 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 - Documentation: [Usage of Image nodes](./docs/image_nodes.md)
 - Example workflows: n/a
 
+### `Other Example Workflows`
+
+- [Rapid Text to Image (8K)](./workflows/example_others_001_text_to_image_8k.json)
+
 ## Troubleshootings
 
 ### Image Not Displayed in Popped-Up Image Viewer Window
