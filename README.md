@@ -39,7 +39,7 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 - Documentation: [Usage of Web Viewer nodes](./docs/web_viewer_nodes.md)
 - Example workflows: 
   - [Workflow Example: Image Web Viewer node](./workflows/example_web_viewer_001_image_web_viewer)
-    ![](./assets/images/web_viewer_example_001.gif)
+    ![](./assets/images/example_001_web_viewer.gif)
 
 ### `OSC Control Nodes`
 
