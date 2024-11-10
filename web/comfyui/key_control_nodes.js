@@ -6,6 +6,8 @@ import { api } from "../../scripts/api.js";
 // Debug flag to control log outputs
 const ENABLE_DEBUG = false;
 
+const fxKeys = ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"];
+
 /**
  * VrchIntKeyControlNode allows users to control an integer output value within
  * a customizable range using keyboard shortcuts. Users can adjust the step size,
@@ -179,7 +181,7 @@ app.registerExtension({
 
             // Handler for keydown events
             const handleKeyDown = (event) => {
-                const fxKeys = ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"];
+                
                 const directionKeysMap = {
                     "Down/Up": ["ArrowDown", "ArrowUp"],
                     "Left/Right": ["ArrowLeft", "ArrowRight"]
@@ -323,7 +325,6 @@ app.registerExtension({
 
             // Handler for keydown events
             const handleKeyDown = (event) => {
-                const fxKeys = ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"];
                 const directionOptions = ["Down/Up", "Left/Right"];
                 const directionKeysMap = {
                     "Down/Up": ["ArrowDown", "ArrowUp"],
@@ -467,7 +468,6 @@ app.registerExtension({
 
             // Handler for keydown events
             const handleKeyDown = (event) => {
-                const fxKeys = ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"];
 
                 // Add the key to the pressedKeys Set
                 pressedKeys.add(event.key);
@@ -661,7 +661,6 @@ app.registerExtension({
 
             // Handler for keydown events
             const handleKeyDown = (event) => {
-                const fxKeys = ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12"];
 
                 // Add the key to the pressedKeys Set
                 pressedKeys.add(event.key.toUpperCase());
@@ -724,6 +723,166 @@ app.registerExtension({
                     console.log("[VrchTextKeyControlNode] Keydown and Keyup event listeners removed.");
                 }
             };
+        }
+    }
+});
+
+app.registerExtension({
+    name: "vrch.InstantQueueKeyControlNode",
+    async beforeRegisterNodeDef(nodeType, nodeData) {
+        if (nodeType.comfyClass === "VrchInstantQueueKeyControlNode") {
+        }
+    },
+    getCustomWidgets() {
+        return {};
+    },
+    async nodeCreated(node) {
+        if (node.comfyClass === "VrchInstantQueueKeyControlNode") {
+            // Initialize node state from inputs
+            let currentValueWidget = node.widgets.find(w => w.name === "enable_queue_instant");
+            let currentValue = currentValueWidget ? (currentValueWidget.value === "True" || currentValueWidget.value === true) : false; // Default value
+
+            // Create a display element for the current value
+            const valueDisplay = document.createElement("div");
+            valueDisplay.classList.add("comfy-value-display");
+            valueDisplay.textContent = ``;
+            node.addDOMWidget("boolean_value_display", "boolean_value_display", valueDisplay);
+
+            if (ENABLE_DEBUG) {
+                console.log("[VrchInstantQueueKeyControlNode] Initialized with value:", currentValue);
+            }
+
+            function updateNode(currentValue) {
+                if (currentValueWidget) {
+                    currentValueWidget.value = currentValue;
+                }
+                valueDisplay.textContent = `Instant Queue: ${currentValue?"Enabled":"Disabled"}`;
+                selectQueueOption(currentValue);
+            }
+
+            function selectQueueOption(isInstant) {
+                // Locate the div container that holds the activation button
+                const buttonContainer = document.querySelector('div[data-testid="queue-button"]');
+                
+                if (buttonContainer) {
+                    // Find the activation button using the data-pc-name attribute
+                    const activateButton = buttonContainer.querySelector('button[data-pc-name="pcdropdown"]');
+                    
+                    if (activateButton) {
+                        // Click the activation button to display the menu
+                        activateButton.click();
+                    } else {
+                        console.warn("Activate button with data-pc-name='pcdropdown' not found inside queue-button container");
+                        return;
+                    }
+                } else {
+                    console.warn("Queue button container not found");
+                    return;
+                }
+            
+                // Set a delay to ensure the menu is fully displayed before proceeding
+                setTimeout(() => {
+                    // Select the two option buttons within the menu list items (li elements)
+                    const queueButton = document.querySelector('li[aria-label="Queue"] button');
+                    const queueInstantButton = document.querySelector('li[aria-label="Queue (Instant)"] button');
+                    
+                    // Check if 'isInstant' is true; if so, click Queue (Instant), otherwise click Queue
+                    if (isInstant) {
+                        if (queueInstantButton) {
+                            // Click the Queue (Instant) button
+                            queueInstantButton.click();
+                        } else {
+                            console.warn("Queue (Instant) button not found");
+                        }
+                    } else {
+                        if (queueButton) {
+                            // Click the Queue button
+                            queueButton.click();
+                        } else {
+                            console.warn("Queue button not found");
+                        }
+                    }
+                }, 300); // Delay of 300 milliseconds, adjust as needed
+            }
+
+            // Add callback to update values when inputs change
+            if (currentValueWidget) {
+                currentValueWidget.callback = (value) => {
+                    currentValue = value;
+                    updateNode(currentValue);
+                };
+            }
+
+            // Set to keep track of pressed keys
+            const pressedKeys = new Set();
+
+            // Handler for keydown events
+            const handleKeyDown = (event) => {
+
+                // Add the key to the pressedKeys Set
+                pressedKeys.add(event.key);
+
+                // Get the currently selected shortcut_key
+                const shortcutKeyWidget = node.widgets.find(w => w.name === "shortcut_key");
+                const shortcutKey = shortcutKeyWidget ? shortcutKeyWidget.value : "F2";
+
+                // Check if the pressed key matches shortcut_key
+                if (event.key.toUpperCase() === shortcutKey.toUpperCase() && fxKeys.includes(event.key.toUpperCase())) {
+                    // Toggle the current_value
+                    currentValue = !currentValue;
+                    updateNode(currentValue);
+
+                    if (ENABLE_DEBUG) {
+                        console.log(`[VrchInstantQueueKeyControlNode] Value toggled to: ${currentValue}`);
+                    }
+
+                    // Prevent default behavior (if any)
+                    event.preventDefault();
+                }
+            };
+
+            // Handler for keyup events
+            const handleKeyUp = (event) => {
+                // Remove the key from the pressedKeys Set
+                pressedKeys.delete(event.key);
+            };
+
+            // Add the keydown and keyup listeners
+            window.addEventListener("keydown", handleKeyDown);
+            window.addEventListener("keyup", handleKeyUp);
+            if (ENABLE_DEBUG) {
+                console.log("[VrchInstantQueueKeyControlNode] Keydown and Keyup event listeners added.");
+            }
+
+            // Cleanup when the node is removed
+            node.onRemoved = function () {
+                window.removeEventListener("keydown", handleKeyDown);
+                window.removeEventListener("keyup", handleKeyUp);
+                // Remove the valueDisplay widget
+                if (valueDisplay.parentNode) {
+                    valueDisplay.parentNode.removeChild(valueDisplay);
+                }
+                if (ENABLE_DEBUG) {
+                    console.log("[VrchInstantQueueKeyControlNode] Keydown and Keyup event listeners removed.");
+                }
+            };
+
+            function init() {
+                // update urlWidget visibility
+                if (currentValueWidget) {
+                    currentValue = currentValueWidget.value;
+                }
+                updateNode(currentValue);
+                if (ENABLE_DEBUG) {
+                    console.log("[VrchInstantQueueKeyControlNode] init() done.");
+                }
+            }
+
+            // Initialize display after ensuring all widgets are loaded
+            function delayedInit() {
+                init();
+            }
+            setTimeout(delayedInit, 1000);
         }
     }
 });
