@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Updated
+
+- update `VrchInstantQueueKeyControlNode` with two new options:
+  - `enable_queue_autorun`
+  - `autorun_delay`
+- update `key_control_nodes.md`
+
 ## 1.0.12 - 2024-11-10
 
 ### Added
