@@ -761,11 +761,12 @@ app.registerExtension({
             }
 
             function updateNode(enableQueueInstant, enableQueueAutorun, autorunDelay) {
-                if (enableQueueInstantWidget) {
+                if (enableQueueInstantWidget && enableQueueInstantWidget.value != enableQueueInstant) {
                     enableQueueInstantWidget.value = enableQueueInstant;
                 }
-                valueDisplay.textContent = `Instant Queue: ${enableQueueInstant?"Enabled":"Disabled"}`;
+
                 selectQueueOption(enableQueueInstant);
+                valueDisplay.textContent = `Instant Queue: ${enableQueueInstant?"Enabled":"Disabled"}`;
 
                 runQueue(enableQueueAutorun, autorunDelay);
             }
