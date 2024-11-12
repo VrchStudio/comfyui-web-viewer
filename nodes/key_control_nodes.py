@@ -337,6 +337,8 @@ class VrchInstantQueueKeyControlNode:
                     SHORTCUT_KEYS,
                     {"default": "F2"},
                 ),
+                "enable_queue_autorun": ("BOOLEAN", {"default": False}),
+                "autorun_delay": ("INT", {"default": 5, "min": 1, "max": 60}),
             }
         }
 
@@ -344,5 +346,5 @@ class VrchInstantQueueKeyControlNode:
     FUNCTION = "get_current_value"
     CATEGORY = CATEGORY
 
-    def get_current_value(self, enable_queue_instant, shortcut_key):
+    def get_current_value(self, enable_queue_instant, shortcut_key, enable_queue_autorun, autorun_delay):
         return ()
