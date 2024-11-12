@@ -739,25 +739,91 @@ app.registerExtension({
     async nodeCreated(node) {
         if (node.comfyClass === "VrchInstantQueueKeyControlNode") {
             // Initialize node state from inputs
-            let currentValueWidget = node.widgets.find(w => w.name === "enable_queue_instant");
-            let currentValue = currentValueWidget ? (currentValueWidget.value === "True" || currentValueWidget.value === true) : false; // Default value
-
+            let enableQueueInstantWidget = node.widgets.find(w => w.name === "enable_queue_instant");
+            let enableQueueAutorunWidget = node.widgets.find(w => w.name === "enable_queue_autorun");
+            let autorunDelayWidget = node.widgets.find(w => w.name === "autorun_delay");
+            let enableQueueInstant = enableQueueInstantWidget ? enableQueueInstantWidget.value : false;
+            let enableQueueAutorun = enableQueueAutorunWidget ? enableQueueAutorunWidget.value : false;
+            let autorunDelay = autorunDelayWidget ? autorunDelayWidget.value : 10;
+            let countdownInterval = null;
+            
             // Create a display element for the current value
             const valueDisplay = document.createElement("div");
             valueDisplay.classList.add("comfy-value-display");
-            valueDisplay.textContent = ``;
+            const countdownDisplay = document.createElement('div');
+            countdownDisplay.classList.add("comfy-value-small-display");
+
             node.addDOMWidget("boolean_value_display", "boolean_value_display", valueDisplay);
+            node.addDOMWidget("countdown_display", "countdown_display", countdownDisplay);
 
             if (ENABLE_DEBUG) {
-                console.log("[VrchInstantQueueKeyControlNode] Initialized with value:", currentValue);
+                console.log("[VrchInstantQueueKeyControlNode] Initialized with value:", enableQueueInstant);
             }
 
-            function updateNode(currentValue) {
-                if (currentValueWidget) {
-                    currentValueWidget.value = currentValue;
+            function updateNode(enableQueueInstant, enableQueueAutorun, autorunDelay) {
+                if (enableQueueInstantWidget && enableQueueInstantWidget.value != enableQueueInstant) {
+                    enableQueueInstantWidget.value = enableQueueInstant;
                 }
-                valueDisplay.textContent = `Instant Queue: ${currentValue?"Enabled":"Disabled"}`;
-                selectQueueOption(currentValue);
+
+                selectQueueOption(enableQueueInstant);
+                valueDisplay.textContent = `Instant Queue: ${enableQueueInstant?"Enabled":"Disabled"}`;
+
+                runQueue(enableQueueAutorun, autorunDelay);
+            }
+
+            function runQueue(enableQueueAutorun, autorunDelay) {
+
+                if (enableQueueAutorun) {
+                    // Locate the div container that holds the activation button
+                    const buttonContainer = document.querySelector('div[data-testid="queue-button"]');
+                
+                    if (buttonContainer) {
+                        // Find the queue button using the data-pc-name attribute
+                        const queueButton = buttonContainer.querySelector('button[data-pc-name="pcbutton"]');
+                        
+                        if (queueButton) {
+                            // Clear any existing countdown to prevent multiple intervals from running simultaneously
+                            if (countdownInterval) {
+                                clearInterval(countdownInterval);
+                                countdownInterval = null;
+                            }
+                
+                            // Initialize the countdown
+                            let remainingTime = autorunDelay;
+                            console.log(remainingTime);
+                
+                            // Start a new countdown interval
+                            countdownInterval = setInterval(() => {
+                                // Update display with countdown info
+                                if (countdownDisplay) {
+                                    countdownDisplay.textContent = `Run Queue in ${remainingTime} ${remainingTime==1? "second" : "seconds"} ...`;
+                                }
+                                
+                                // Decrease remaining time
+                                remainingTime--;
+                
+                                // When the countdown reaches 0, click the button and clear the interval
+                                if (remainingTime < 0) {
+                                    clearInterval(countdownInterval);
+                                    countdownInterval = null; // Reset countdownInterval after clearing
+                                    queueButton.click();
+                                    countdownDisplay.textContent = `Queue Execution Triggered`
+                                }
+                            }, 1000); // Update every second
+                        } else {
+                            console.warn("Queue button with data-pc-name='pcbutton' not found inside queue-button container");
+                            return;
+                        }
+                    } else {
+                        console.warn("Queue button container not found");
+                        return;
+                    }
+                } else {
+                    // cancel autorun
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    countdownDisplay.textContent = ``;
+                }
             }
 
             function selectQueueOption(isInstant) {
@@ -806,11 +872,18 @@ app.registerExtension({
             }
 
             // Add callback to update values when inputs change
-            if (currentValueWidget) {
-                currentValueWidget.callback = (value) => {
-                    currentValue = value;
-                    updateNode(currentValue);
+            if (enableQueueInstantWidget) {
+                enableQueueInstantWidget.callback = (value) => {
+                    enableQueueInstant = value;
+                    updateNode(enableQueueInstant, enableQueueAutorun, autorunDelay);
                 };
+            }
+
+            if (enableQueueAutorunWidget) {
+                enableQueueAutorunWidget.callback = (value) => {
+                    enableQueueAutorun = value;
+                    updateNode(enableQueueInstant, enableQueueAutorun, autorunDelay);
+                }
             }
 
             // Set to keep track of pressed keys
@@ -829,11 +902,11 @@ app.registerExtension({
                 // Check if the pressed key matches shortcut_key
                 if (event.key.toUpperCase() === shortcutKey.toUpperCase() && fxKeys.includes(event.key.toUpperCase())) {
                     // Toggle the current_value
-                    currentValue = !currentValue;
-                    updateNode(currentValue);
+                    enableQueueInstant = !enableQueueInstant;
+                    updateNode(enableQueueInstant, enableQueueAutorun, autorunDelay);
 
                     if (ENABLE_DEBUG) {
-                        console.log(`[VrchInstantQueueKeyControlNode] Value toggled to: ${currentValue}`);
+                        console.log(`[VrchInstantQueueKeyControlNode] Value toggled to: ${enableQueueInstant}`);
                     }
 
                     // Prevent default behavior (if any)
@@ -869,10 +942,16 @@ app.registerExtension({
 
             function init() {
                 // update urlWidget visibility
-                if (currentValueWidget) {
-                    currentValue = currentValueWidget.value;
+                if (enableQueueInstantWidget) {
+                    enableQueueInstant = enableQueueInstantWidget.value;
                 }
-                updateNode(currentValue);
+                if (enableQueueAutorunWidget) {
+                    enableQueueAutorun = enableQueueAutorunWidget.value;
+                }
+                if (autorunDelayWidget) {
+                    autorunDelay = autorunDelayWidget.value;
+                }
+                updateNode(enableQueueInstant, enableQueueAutorun, autorunDelay);
                 if (ENABLE_DEBUG) {
                     console.log("[VrchInstantQueueKeyControlNode] init() done.");
                 }
@@ -894,6 +973,11 @@ style.textContent = `
         margin-top: 10px;
         font-size: 16px;
         font-weight: bold;
+        text-align: center;
+    }
+    .comfy-value-small-display {
+        margin-top: 0px;
+        font-size: 14px;
         text-align: center;
     }
 `;
