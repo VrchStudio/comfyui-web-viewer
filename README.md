@@ -73,6 +73,7 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 ### `Other Example Workflows`
 
 - [Rapid Text to Image (8K)](./workflows/example_others_001_text_to_image_8k.json)
+- [Auto Switch to Instant Queue and Run Workflow](./workflows/example_others_002_autorun_instant_queue.json)
 
 ## Troubleshootings
 
