@@ -74,6 +74,7 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 
 - [Rapid Text to Image (8K)](./workflows/example_others_001_text_to_image_8k.json)
 - [Auto Switch to Instant Queue and Run Workflow](./workflows/example_others_002_autorun_instant_queue.json)
+- [Apple Vision Pro Ultrawide Wallpaper (5K)](./workflows/example_others_003_text_to_image_5k_avp_ultra_wide.png)
 
 ## Troubleshootings
 
