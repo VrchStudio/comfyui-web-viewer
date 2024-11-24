@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- add a new Web Viewer node `VrchImageFlipBookWebViewerNode`
+- add a new example workflow
+
+### Updated
+
+- update `VrchWebViewerNode` to support `flipbook` mode
+- update `VrchInstantQueueKeyControlNode` to support `change` queue option
+- update workflow and screenshot for `VrchInstantQueueKeyControlNode`
+- update `web_viewer_nodes.md` and `key_control_nodes.md` documentations
+- update `README.md`
+
 ## 1.0.13 - 2024-11-12
 
 ### Updated
