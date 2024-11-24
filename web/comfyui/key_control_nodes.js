@@ -739,13 +739,15 @@ app.registerExtension({
     async nodeCreated(node) {
         if (node.comfyClass === "VrchInstantQueueKeyControlNode") {
             // Initialize node state from inputs
-            let enableQueueInstantWidget = node.widgets.find(w => w.name === "enable_queue_instant");
+            let queueOptionWidget = node.widgets.find(w => w.name === "queue_option");
             let enableQueueAutorunWidget = node.widgets.find(w => w.name === "enable_queue_autorun");
             let autorunDelayWidget = node.widgets.find(w => w.name === "autorun_delay");
-            let enableQueueInstant = enableQueueInstantWidget ? enableQueueInstantWidget.value : false;
+            const QUEUE_OPTIONS = ["once", "instant", "change"];
+            let currentQueueIndex = 0;
+            let currentQueueOption = queueOptionWidget ? queueOptionWidget.value : "instant";
             let enableQueueAutorun = enableQueueAutorunWidget ? enableQueueAutorunWidget.value : false;
             let autorunDelay = autorunDelayWidget ? autorunDelayWidget.value : 10;
-            let countdownInterval = null;
+            let countdownInterval = null;      
             
             // Create a display element for the current value
             const valueDisplay = document.createElement("div");
@@ -757,17 +759,17 @@ app.registerExtension({
             node.addDOMWidget("countdown_display", "countdown_display", countdownDisplay);
 
             if (ENABLE_DEBUG) {
-                console.log("[VrchInstantQueueKeyControlNode] Initialized with value:", enableQueueInstant);
+                console.log("[VrchInstantQueueKeyControlNode] Initialized with value:", currentQueueOption);
             }
 
-            function updateNode(enableQueueInstant, enableQueueAutorun, autorunDelay) {
-                if (enableQueueInstantWidget && enableQueueInstantWidget.value != enableQueueInstant) {
-                    enableQueueInstantWidget.value = enableQueueInstant;
+            function updateNode(queueOption, enableQueueAutorun, autorunDelay) {
+
+                if (queueOptionWidget && queueOptionWidget.value != queueOption) {
+                    queueOptionWidget.value = queueOption;
                 }
 
-                selectQueueOption(enableQueueInstant);
-                valueDisplay.textContent = `Instant Queue: ${enableQueueInstant?"Enabled":"Disabled"}`;
-
+                selectQueueOption(queueOption);
+                valueDisplay.textContent = `Queue Mode: ${queueOption}`;
                 runQueue(enableQueueAutorun, autorunDelay);
             }
 
@@ -826,7 +828,7 @@ app.registerExtension({
                 }
             }
 
-            function selectQueueOption(isInstant) {
+            function selectQueueOption(queueOption) {
                 // Locate the div container that holds the activation button
                 const buttonContainer = document.querySelector('div[data-testid="queue-button"]');
                 
@@ -845,44 +847,59 @@ app.registerExtension({
                     console.warn("Queue button container not found");
                     return;
                 }
-            
+
                 // Set a delay to ensure the menu is fully displayed before proceeding
                 setTimeout(() => {
+                    const menuContainer = document.querySelector('div[data-pc-name="pcmenu"]');
                     // Select the two option buttons within the menu list items (li elements)
-                    const queueButton = document.querySelector('li[aria-label="Queue"] button');
-                    const queueInstantButton = document.querySelector('li[aria-label="Queue (Instant)"] button');
+                    const queueButton = menuContainer.querySelector('li[aria-label="Queue"] button');
+                    const queueInstantButton = menuContainer.querySelector('li[aria-label="Queue (Instant)"] button');
+                    const queueChangeButton = menuContainer.querySelector('li[aria-label="Queue (Change)"] button');
                     
                     // Check if 'isInstant' is true; if so, click Queue (Instant), otherwise click Queue
-                    if (isInstant) {
-                        if (queueInstantButton) {
-                            // Click the Queue (Instant) button
-                            queueInstantButton.click();
-                        } else {
-                            console.warn("Queue (Instant) button not found");
-                        }
-                    } else {
-                        if (queueButton) {
-                            // Click the Queue button
-                            queueButton.click();
-                        } else {
-                            console.warn("Queue button not found");
-                        }
+                    switch (queueOption) {
+                        case "once":
+                            if (queueButton) {
+                                // Click the Queue button
+                                queueButton.click();
+                            } else {
+                                console.warn("Queue button not found");
+                            }
+                            break;
+                        case "instant":
+                            if (queueInstantButton) {
+                                // Click the Queue (Instant) button
+                                queueInstantButton.click();
+                            } else {
+                                console.warn("Queue (Instant) button not found");
+                            }
+                            break;
+                        case "change":
+                            if (queueChangeButton) {
+                                // Click the Queue (Instant) button
+                                queueChangeButton.click();
+                            } else {
+                                console.warn("Queue (Queue) button not found");
+                            }
+                            break;
+                        default:
+                            console.error(`Invalide Queue Option: ${queueOption}`);
+                            break;
                     }
                 }, 300); // Delay of 300 milliseconds, adjust as needed
             }
 
-            // Add callback to update values when inputs change
-            if (enableQueueInstantWidget) {
-                enableQueueInstantWidget.callback = (value) => {
-                    enableQueueInstant = value;
-                    updateNode(enableQueueInstant, enableQueueAutorun, autorunDelay);
-                };
+            if (queueOptionWidget) {
+                queueOptionWidget.callback = (value) => {
+                    currentQueueOption = value;
+                    updateNode(currentQueueOption, enableQueueAutorun, autorunDelay);
+                }
             }
 
             if (enableQueueAutorunWidget) {
                 enableQueueAutorunWidget.callback = (value) => {
                     enableQueueAutorun = value;
-                    updateNode(enableQueueInstant, enableQueueAutorun, autorunDelay);
+                    updateNode(currentQueueOption, enableQueueAutorun, autorunDelay);
                 }
             }
 
@@ -901,12 +918,14 @@ app.registerExtension({
 
                 // Check if the pressed key matches shortcut_key
                 if (event.key.toUpperCase() === shortcutKey.toUpperCase() && fxKeys.includes(event.key.toUpperCase())) {
-                    // Toggle the current_value
-                    enableQueueInstant = !enableQueueInstant;
-                    updateNode(enableQueueInstant, enableQueueAutorun, autorunDelay);
-
+                    
+                    // Increment the index and loop back to 0 if it exceeds the length
+                    currentQueueIndex = (currentQueueIndex + 1) % QUEUE_OPTIONS.length;
+                    currentQueueOption = QUEUE_OPTIONS[currentQueueIndex]
+                    updateNode(currentQueueOption, enableQueueAutorun, autorunDelay);
+                    
                     if (ENABLE_DEBUG) {
-                        console.log(`[VrchInstantQueueKeyControlNode] Value toggled to: ${enableQueueInstant}`);
+                        console.log(`[VrchInstantQueueKeyControlNode] Value toggled to: ${currentQueueOption}`);
                     }
 
                     // Prevent default behavior (if any)
@@ -941,9 +960,8 @@ app.registerExtension({
             };
 
             function init() {
-                // update urlWidget visibility
-                if (enableQueueInstantWidget) {
-                    enableQueueInstant = enableQueueInstantWidget.value;
+                if (queueOptionWidget) {
+                    currentQueueOption = queueOptionWidget.value;
                 }
                 if (enableQueueAutorunWidget) {
                     enableQueueAutorun = enableQueueAutorunWidget.value;
@@ -951,7 +969,8 @@ app.registerExtension({
                 if (autorunDelayWidget) {
                     autorunDelay = autorunDelayWidget.value;
                 }
-                updateNode(enableQueueInstant, enableQueueAutorun, autorunDelay);
+                updateNode(currentQueueOption, enableQueueAutorun, autorunDelay);
+
                 if (ENABLE_DEBUG) {
                     console.log("[VrchInstantQueueKeyControlNode] init() done.");
                 }

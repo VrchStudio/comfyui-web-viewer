@@ -5,7 +5,7 @@ from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
 
-__version__ = "1.0.13"
+__version__ = "1.0.14"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -18,6 +18,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchFloatKeyControlNode": VrchFloatKeyControlNode,
     "VrchFloatOSCControlNode": VrchFloatOSCControlNode,
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
+    "VrchImageFlipBookWebViewerNode": VrchImageFlipBookWebViewerNode,
     "VrchImageSaverNode": VrchImageSaverNode,
     "VrchImageSwitchOSCControlNode": VrchImageSwitchOSCControlNode,
     "VrchImageWebViewerNode": VrchImageWebViewerNode,
@@ -45,6 +46,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchFloatKeyControlNode": "FLOAT Key Control @ vrch.ai",
     "VrchFloatOSCControlNode": "FLOAT OSC Control @ vrch.ai",
     "VrchJsonUrlLoaderNode": "JSON URL Loader @ vrch.ai",
+    "VrchImageFlipBookWebViewerNode": "IMAGE Flipbook Web Viewer @vrch.ai",
     "VrchImageSaverNode": "IMAGE Saver @ vrch.ai",
     "VrchImageSwitchOSCControlNode": "IMAGE Switch OSC Control @ vrch.ai",
     "VrchImageWebViewerNode": "IMAGE Web Viewer @ vrch.ai",

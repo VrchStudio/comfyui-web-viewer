@@ -332,7 +332,7 @@ class VrchInstantQueueKeyControlNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "enable_queue_instant": ("BOOLEAN", {"default": False}),
+                "queue_option":(["once", "instant", "change"], {"default": "instant"}),
                 "shortcut_key": (
                     SHORTCUT_KEYS,
                     {"default": "F2"},
@@ -346,5 +346,5 @@ class VrchInstantQueueKeyControlNode:
     FUNCTION = "get_current_value"
     CATEGORY = CATEGORY
 
-    def get_current_value(self, enable_queue_instant, shortcut_key, enable_queue_autorun, autorun_delay):
+    def get_current_value(self, queue_option, shortcut_key, enable_queue_autorun, autorun_delay):
         return ()
