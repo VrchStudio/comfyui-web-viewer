@@ -110,15 +110,15 @@ Ensure the ComfyUI window/tab is focused when using the shortcut key to prevent 
 1. **Add the `Instant Queue Key Control @ vrch.ai` to your ComfyUI workflow.**
 
 2. **Configure the Node:**
-   - **Enable Queue Instant (`enable_queue_instant`):** Sets the initial state of the instant queue toggle. Default is `False`.
-   - **Shortcut Key (`shortcut_key`):** Select a function key (`F1` to `F12`) as the shortcut key to toggle the instant queue functionality on or off. Default is `F2`.
+   - **Queue Option (`queue_option`):** Options of the initial state of the queue status, including `once`, `instant` and `change`. Default is `instant`.
+   - **Shortcut Key (`shortcut_key`):** Select a function key (`F1` to `F12`) as the shortcut key to switch the queue option from one to another. Default is `F2`.
    - **Enable Queue Autorun (`enable_queue_autorun`):** Toggle whether the queue will automatically run after a delay when activated. Default is `False`.
    - **Autorun Delay (`autorun_delay`):** Sets the delay (in seconds) before the queue automatically triggers when `enable_queue_autorun` is enabled. The value ranges from 1 to 60 seconds, with a default of 5 seconds.
 
-3. **Toggle Instant Queue:**
+3. **Toggle Queue Option:**
    - **Using Shortcut Key:**
-     - Pressing the chosen `shortcut_key` (e.g., `F2`) toggles the `enable_queue_instant` state between **Enabled** and **Disabled**.
-     - Each press of the shortcut key switches the state, allowing for easy control over the instant queue function without manually adjusting the `enable_queue_instant` setting.
+     - Pressing the chosen `shortcut_key` (e.g., `F2`) toggles the `queue_option` option between `once`, `instant` and `change`.
+     - Each press of the shortcut key switches the state, allowing for easy control over the instant queue function without manually adjusting the `queue_option` setting.
 
 4. **Display and Output:**
    - The node displays the current status of the instant queue (either **Enabled** or **Disabled**) within its UI.
