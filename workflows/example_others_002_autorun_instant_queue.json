@@ -1,5 +1,5 @@
 {
-  "last_node_id": 11,
+  "last_node_id": 12,
   "last_link_id": 9,
   "nodes": [
     {
@@ -160,10 +160,10 @@
         "0": 1451,
         "1": 189
       },
-      "size": [
-        210,
-        270
-      ],
+      "size": {
+        "0": 210,
+        "1": 270
+      },
       "flags": {},
       "order": 7,
       "mode": 0,
@@ -281,7 +281,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        77087225084311,
+        54020863898625,
         "randomize",
         6,
         2,
@@ -291,7 +291,7 @@
       ]
     },
     {
-      "id": 11,
+      "id": 12,
       "type": "VrchInstantQueueKeyControlNode",
       "pos": {
         "0": 891,
@@ -310,7 +310,7 @@
         "Node name for S&R": "VrchInstantQueueKeyControlNode"
       },
       "widgets_values": [
-        true,
+        "instant",
         "F2",
         true,
         5,
@@ -399,8 +399,8 @@
     "ds": {
       "scale": 1,
       "offset": [
-        -607.3613343306934,
-        67.9461182035202
+        73.89999999999998,
+        -86
       ]
     }
   },
