@@ -206,6 +206,109 @@ app.registerExtension({
     }
 });
 
+app.registerExtension({
+    name: "vrch.ImageFlipbookWebViewer",
+    async nodeCreated(node) {
+        if (node.comfyClass === "VrchImageFlipBookWebViewerNode") {
+            // Find the existing widgets
+            const serverWidget = node.widgets.find(w => w.name === "server");
+            const sslWidget = node.widgets.find(w => w.name === "ssl");
+            const channelWidget = node.widgets.find(w => w.name === "channel");
+            const numberOfImagesWidget = node.widgets.find(w => w.name === "number_of_images");
+            const widthWidget = node.widgets.find(w => w.name === "window_width");
+            const heightWidget = node.widgets.find(w => w.name === "window_height");
+            const urlWidget = node.widgets.find(w => w.name === "url");
+            const showUrlWidget = node.widgets.find(w => w.name === "show_url");
+
+            // Function to update the URL based on stored values
+            function updateUrl() {
+                // Store the current values in variables
+                let server = serverWidget ? serverWidget.value : "127.0.0.1:8188";
+                let ssl = sslWidget ? sslWidget.value : false;
+                let channel = channelWidget ? channelWidget.value : "1";
+                let numberOfImages = numberOfImagesWidget ? numberOfImagesWidget.value : "4";
+                let sslStr = ssl ? "true" : "false";
+                let filename = `channel_${channel}.jpeg`;
+                let scheme = ssl ? "https" : "http";
+                let newUrl = `${scheme}://vrch.ai/viewer?mode=flipbook&server=${server}&ssl=${sslStr}&file=${filename}&path=web_viewer&numberOfImages=${numberOfImages}`;
+                if (urlWidget) {
+                    urlWidget.value = newUrl;
+                }
+            }
+
+            // List of widgets that trigger URL update
+            const widgets = [serverWidget, sslWidget, channelWidget, numberOfImagesWidget];
+
+            // Add callback listeners to update values and the URL when inputs change
+            widgets.forEach(widget => {
+                if (widget) {
+                    widget.callback = () => {
+                        updateUrl();
+                    };
+                }
+            });
+
+            function hideWidget(node, widget) {
+                if (widget.type === "hidden")
+                    return;
+                widget.origType = widget.type;
+                widget.origComputeSize = widget.computeSize;
+                widget.type = "hidden";
+            }
+
+            function showWidget(node, widget) {
+                widget.type = widget.origType;
+                widget.computeSize = widget.origComputeSize;
+            }
+
+            if (showUrlWidget) {
+                showUrlWidget.callback = (value) => {
+                    if (value) {
+                        showWidget(node, urlWidget);
+                    } else {
+                        hideWidget(node, urlWidget);
+                    }
+                };
+            }
+
+            // Create a custom button element
+            const button = document.createElement("button");
+            button.textContent = "Open Web Viewer";
+            button.classList.add("comfy-big-button");
+            button.onclick = () => {
+                if (urlWidget && urlWidget.value) {
+                    const width = widthWidget ? widthWidget.value : 1280;
+                    const height = heightWidget ? heightWidget.value : 960;
+                    window.open(urlWidget.value, "_blank", `width=${width},height=${height}`);
+                } else {
+                    console.error("URL widget not found or empty");
+                }
+            };
+
+            // Add the button to the node using addDOMWidget
+            node.addDOMWidget("button_widget", "Open Web Viewer", button);
+
+            // Hide urlWidget initially
+            hideWidget(node, urlWidget);
+
+            function init() {
+                // update urlWidget visibility
+                if (showUrlWidget) {
+                    showUrlWidget.value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
+                }
+                // update url
+                updateUrl();
+            }
+
+            // Initialize display after ensuring all widgets are loaded
+            function delayedInit() {
+                init();
+            }
+            setTimeout(delayedInit, 1000);
+        }
+    }
+});
+
 
 // Add custom styles for the button
 const style = document.createElement("style");
