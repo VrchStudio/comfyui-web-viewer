@@ -1,9 +1,17 @@
+import hashlib
+import time
 from pythonosc import dispatcher, osc_server
 import threading
 import socket
 
 # Define the category for organizational purposes
 CATEGORY = "vrch.ai/control/osc"
+
+# Global dictionaries to store output states and previous hashes
+node_output_states = {}
+previous_hashes = {}
+# Lock for thread-safe access to global dictionaries
+state_lock = threading.Lock()
 
 class AlwaysEqualProxy(str):
         def __eq__(self, _):
@@ -1034,9 +1042,44 @@ class VrchAnyOSCControlNode:
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
-        return float("NaN")
+        """
+        Determines if the outputs have changed by comparing the current hash with the previous hash.
+        Returns the hash digest if changed, otherwise returns False.
+        """
+        path = kwargs.get('path')
+        debug = kwargs.get('debug', False)
+        if not path:
+            if debug:
+                print("[VrchAnyOSCControlNode] No path provided to IS_CHANGED.")
+            return False  # No path provided, no change detected
+        
+        with state_lock:
+            state = node_output_states.get(path, {
+                'INT': 0,
+                'FLOAT': 0.0,
+                'TEXT': '',
+                'BOOL': False
+            })
+            combined = f"{state['INT']}_{state['FLOAT']}_{state['TEXT']}_{state['BOOL']}"
+            m = hashlib.sha256()
+            m.update(combined.encode())
+            hash_digest = m.hexdigest()
+
+            previous_hash = previous_hashes.get(path)
+            if previous_hash != hash_digest:
+                previous_hashes[path] = hash_digest
+                if debug:
+                    print(f"[VrchAnyOSCControlNode] Change detected for path '{path}': {combined} -> {hash_digest}")
+                return hash_digest  # Change detected
+            if debug:
+                print(f"[VrchAnyOSCControlNode] No change detected for path '{path}'.")
+            return False  # No change detected
 
     def load_any_osc(self, server_ip, port, path, debug):
+        """
+        Initializes or updates the OSC server handler based on the provided parameters.
+        Returns the current output values for IS_CHANGED to detect changes.
+        """
         # Check if server parameters have changed
         server_params_changed = (
             self.server_manager is None
@@ -1047,11 +1090,11 @@ class VrchAnyOSCControlNode:
         )
 
         if server_params_changed:
-            # Unregister previous handler if it exists
+            # Unregister previous handler if exists
             if self.server_manager and self.path:
                 self.server_manager.unregister_handler(self.path, self.handle_osc_message)
                 if debug:
-                    print(f"[VrchAnyOSCControlNode] Unregistered handler at path {self.path}")
+                    print(f"[VrchAnyOSCControlNode] Unregistered handler at path '{self.path}'")
             # Get or create the server manager
             self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
             self.debug = debug
@@ -1059,18 +1102,21 @@ class VrchAnyOSCControlNode:
             self.path = path
             self.server_manager.register_handler(self.path, self.handle_osc_message)
             if debug:
-                print(f"[VrchAnyOSCControlNode] Registered handler at path {self.path}")
+                print(f"[VrchAnyOSCControlNode] Registered handler at path '{self.path}'")
 
-        # Return the current values
+        # Return the current values along with path and debug for IS_CHANGED
         return self.int_value, self.float_value, self.text_value, self.bool_value
 
     def handle_osc_message(self, address, *args):
+        """
+        Handles incoming OSC messages and updates the node's output values based on the message type.
+        """
         if self.debug:
-            print(f"[VrchAnyOSCControlNode] Received OSC message: addr={address}, args={args}")
+            print(f"[VrchAnyOSCControlNode] Received OSC message: addr='{address}', args={args}")
 
         if not args:
             if self.debug:
-                print(f"[VrchAnyOSCControlNode] No arguments received.")
+                print("[VrchAnyOSCControlNode] No arguments received.")
             return
 
         value = args[0]
@@ -1081,7 +1127,7 @@ class VrchAnyOSCControlNode:
         self.text_value = ""
         self.bool_value = False
 
-        # Determine the type of the value
+        # Determine the type of the value and update the corresponding output
         if isinstance(value, bool):
             self.bool_value = value
             if self.debug:
@@ -1102,6 +1148,18 @@ class VrchAnyOSCControlNode:
             # Handle other types if necessary
             if self.debug:
                 print(f"[VrchAnyOSCControlNode] Received unsupported value type: {type(value)}")
+            return  # Unsupported type, do not update state
+
+        # Update the global state with the current outputs using path
+        with state_lock:
+            node_output_states[self.path] = {
+                'INT': self.int_value,
+                'FLOAT': self.float_value,
+                'TEXT': self.text_value,
+                'BOOL': self.bool_value
+            }
+            if self.debug:
+                print(f"[VrchAnyOSCControlNode] Updated state for path '{self.path}': {node_output_states[self.path]}")
 
 
 class VrchChannelOSCControlNode:
@@ -1300,6 +1358,110 @@ class VrchChannelX4OSCControlNode:
                 print(f"[VrchChannelX4OSCControlNode] Channel {index+1} is {'ON' if self.channel_states[index] else 'OFF'}")
         return handler
 
+class VrchDelayOscControlNode:
+
+    def __init__(self):
+        self.delay_period = 0  # Delay in milliseconds
+        self.raw_value = 0.0    # Original OSC message value
+        self.server_manager = None
+        self.path = None
+        self.debug = False
+        self.any_output = None  # To store the delayed output
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {"required": {
+            "any_input": (AlwaysEqualProxy("*"), {}),
+            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
+            "path": ("STRING", {"default": "/path"}),
+            "input_min": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 9999.0, "step": 0.01}),
+            "input_max": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 9999.0, "step": 0.01}),
+            "output_min": ("INT", {"default": 0, "min": 0, "max": 9999}),
+            "output_max": ("INT", {"default": 1000, "min": 0, "max": 9999}),
+            "output_invert": ("BOOLEAN", {"default": False}),
+            "debug": ("BOOLEAN", {"default": False}),
+        }}
+
+    RETURN_TYPES = (AlwaysEqualProxy("*"), "INT", "FLOAT")
+    RETURN_NAMES = ("ANY_OUTPUT", "DELAY_PERIOD", "RAW_VALUE")
+    FUNCTION = "load_delay_osc"
+    CATEGORY = CATEGORY
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("NaN")
+
+    def load_delay_osc(self, any_input, server_ip, port, path,
+                       input_min, input_max, output_min, output_max, output_invert, debug):
+
+        if output_min > output_max:
+            raise ValueError("[VrchDelayOscControlNode] Output min value cannot be greater than max value.")
+        if input_min > input_max:
+            raise ValueError("[VrchDelayOscControlNode] Input min value cannot be greater than max value.")
+
+        # Check if server parameters have changed
+        server_params_changed = (
+            self.server_manager is None or
+            self.server_manager.ip != server_ip or
+            self.server_manager.port != port or
+            self.debug != debug
+        )
+
+        if server_params_changed:
+            # Unregister previous handler if exists
+            if self.server_manager and self.path:
+                self.server_manager.unregister_handler(f"{self.path}*", self.handle_osc_message)
+            # Get or create the server manager
+            self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
+            self.debug = debug
+            # Register new handler
+            self.path = path
+            self.server_manager.register_handler(f"{self.path}*", self.handle_osc_message)
+            if debug:
+                print(f"[VrchDelayOscControlNode] Registered handler at path {self.path}*")
+
+        # Select remap function based on invert option
+        remap_func = VrchNodeUtils.select_remap_func(output_invert)
+
+        # Remap the raw OSC value to delay_period in milliseconds
+        mapped_delay = remap_func(
+            float(self.raw_value),
+            float(input_min),
+            float(input_max),
+            float(output_min),
+            float(output_max),
+        )
+        self.delay_period = int(mapped_delay)
+
+        # Process the any_input with the specified delay
+        if any_input is not None:
+            if self.debug:
+                print(f"[VrchDelayOscControlNode] Delaying input for {self.delay_period} ms")
+            time.sleep(self.delay_period / 1000.0)  # Convert ms to seconds
+            self.any_output = any_input
+            if self.debug:
+                print(f"[VrchDelayOscControlNode] Output set after delay: {self.any_output}")
+
+        return (self.any_output, self.delay_period, self.raw_value)
+
+    def handle_osc_message(self, address, *args):
+        if self.debug:
+            print(f"[VrchDelayOscControlNode] Received OSC message: addr={address}, args={args}")
+
+        if len(args) == 1:
+            try:
+                value = float(args[0])
+                # Update raw_value based on the received value
+                self.raw_value = value
+                if self.debug:
+                    print(f"[VrchDelayOscControlNode] Updated raw_value to: {self.raw_value}")
+            except (ValueError, TypeError):
+                if self.debug:
+                    print(f"[VrchDelayOscControlNode] Received non-float value: {args[0]}")
+        else:
+            if self.debug:
+                print(f"[VrchDelayOscControlNode] handle_osc_message() call with invalid args: {args}")
 
 class VrchOSCControlSettingsNode:
 
@@ -1334,3 +1496,4 @@ class VrchOSCControlSettingsNode:
     @classmethod
     def IS_CHANGED(s, **kwargs):
         return False
+

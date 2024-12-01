@@ -308,3 +308,41 @@
 - When `debug` mode is active, it helps you monitor OSC activity by outputting server connection details to the console.
 
 --- 
+
+### Node: `Delay OSC Control @ vrch.ai` (vrch.ai/control/osc)
+
+1. **Add the `Delay OSC Control @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Any Input (`any_input`):** Connect the input you want to delay.
+   - **Server IP (`server_ip`):** Enter the IP address of the OSC server (default is your local IP address).
+   - **Port (`port`):** Specify the port number on which the OSC server is listening (default is `8000`).
+   - **Path (`path`):** Set the OSC address path to listen for messages (default is `"/path"`).
+   - **Input Range:**
+     - **`input_min`:** Minimum expected OSC message value (default is `0.0`).
+     - **`input_max`:** Maximum expected OSC message value (default is `1.0`).
+   - **Output Range:**
+     - **`output_min`:** Minimum delay period in milliseconds (integer, default is `0`).
+     - **`output_max`:** Maximum delay period in milliseconds (integer, default is `1000`).
+     - **`output_invert`:** Invert the delay mapping if checked (default is `False`).
+   - **Debug (`debug`):** Enable debug mode to print detailed logs (default is `False`).
+
+3. **Use the Node:**
+   - **Send OSC Messages:**
+     - Send OSC messages to the specified `path` with a single float value representing the desired delay factor.
+   - **Data Mapping:**
+     - The node maps the incoming OSC value from `[input_min, input_max]` to `[output_min, output_max]` milliseconds, optionally inverting the mapping.
+   - **Functionality:**
+     - Upon receiving an OSC message, the node pauses the workflow for the mapped delay period and then outputs the `any_input` value.
+
+4. **Outputs:**
+   - **`ANY_OUTPUT`**: The delayed output value (same as `any_input`).
+   - **`DELAY_PERIOD`**: The delay period in milliseconds.
+   - **`RAW_VALUE`**: The raw OSC message value received, useful for debugging.
+
+**Note:**
+- **Blocking Behavior:** The node uses `time.sleep` to synchronously pause the workflow. Use reasonable delay periods to avoid making the interface unresponsive.
+- **Debugging:** Enable `debug` to view detailed logs of OSC message reception and delay processing.
+- **OSC Configuration:** Ensure your OSC client sends messages to the correct `server_ip`, `port`, and `path`.
+
+---
