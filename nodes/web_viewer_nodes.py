@@ -1,4 +1,5 @@
 import os
+import shutil
 import torch
 import hashlib
 import numpy as np
@@ -161,3 +162,54 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
                 image_bytes = bytes()
             m.update(image_bytes)
         return m.hexdigest()
+    
+class VrchVideoWebViewerNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "filename": ("STRING", {"forceInput": True}),
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": "127.0.0.1:8188", "multiline": False}),
+                "ssl": ("BOOLEAN", {"default": False}),
+                "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
+                "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
+                "show_url": ("BOOLEAN", {"default": False}),
+                "url": ("STRING", {"default": "", "multiline": True}),
+            },
+        }
+
+    RETURN_TYPES = ()
+    FUNCTION = "save_and_view_video"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def __init__(self):
+        self.output_dir = folder_paths.output_directory
+        self.allowed_extensions = ["mp4"]
+
+    def validate(self, filename):
+        if not filename or not os.path.isfile(filename):
+            raise FileNotFoundError(f"File '{filename}' not found.")
+
+        ext = os.path.splitext(filename)[1].lower()
+        if ext.lstrip('.') not in self.allowed_extensions:
+            raise ValueError(f"Unsupported file extension '{ext}'. Allowed extensions: {self.allowed_extensions}")
+
+    def save_and_view_video(self, channel, server, ssl, window_width, window_height, show_url, url, filename=None):
+        self.validate(filename)
+        output_path = os.path.join(self.output_dir, "web_viewer")
+        os.makedirs(output_path, exist_ok=True)
+        dst_file = os.path.join(output_path, f"channel_{channel}.mp4")
+        shutil.copyfile(filename, dst_file)
+        return ()
+
+    @classmethod
+    def IS_CHANGED(cls, channel, server, ssl, window_width, window_height, show_url, url, filename=None):
+        if not filename or not os.path.isfile(filename):
+            return False
+        m = hashlib.sha256()
+        with open(filename, 'rb') as f:
+            m.update(f.read())
+        return m.hexdigest()
+    
