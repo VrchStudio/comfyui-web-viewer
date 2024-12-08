@@ -75,3 +75,31 @@
 - The "Show URL" option allows you to see the dynamically constructed URL if you want to inspect or copy it.
 
 ----
+
+### Node: `Video Web Viewer @ vrch.ai` (vrch.ai/viewer)
+
+1. **Add the `Video Web Viewer @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Video Input:**
+     - **`filename`**: Provide the full path of the video file (currently only `.mp4` format is supported).
+       - If the file does not exist or the extension is not allowed, the node will raise an error.
+   - **Channel:** Select a channel number from **"1"** to **"8"** (default is **"1"**).
+   - **Server:** Enter the server's domain name or IP address (default is **`127.0.0.1:8188`**).
+   - **SSL:** Choose whether the connection should use SSL. If checked (`True`), it will use `https`; otherwise, it will use `http`.
+   - **Window Dimensions:**
+     - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
+     - **`window_height`**: Set the height of the web viewer window (default is **`960`**).
+   - **Show URL:** Toggle whether to display the constructed URL in the interface. Enabling this will make the **`url`** field visible.
+   - **URL Input:** This field automatically updates with the constructed URL based on your inputs (`server`, `ssl`, `channel`, etc.). You can toggle its visibility using the **`show_url`** option.
+
+3. **Open Web Viewer:**
+   - After providing a valid video file and configuring the node, a **"Play Video"** or **"Open Web Viewer"** button (as implemented in your UI) can be used to launch the specified URL in a new browser window, playing your video based on the input parameters.
+
+**Note**:
+- Ensure that the server address and settings are correct and that the server is accessible.
+- The video is copied and saved in the `web_viewer` directory under the ComfyUI output folder with the filename `channel_{channel}.mp4` (e.g., `channel_1.mp4`).
+- Only `.mp4` format is currently supported.
+- The "Show URL" option allows you to view and copy the dynamically constructed URL if needed.
+
+-----
