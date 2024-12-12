@@ -8,14 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+
 - add a new Viewer Control node `VrchVideoWebViewerNode`
+- add workflow for Video Web Viewer node
+- add tutorial for Video Web Viewer node
 
 ### Updated
+
 - update `web_viewer_nodes.md` documentation
+- update README.md
 
 ## 1.0.15 - 2024-12-01
 
 ### Added
+
 - add a new OSC Control node `VrchDelayOscControlNode`
 
 ### Updated
