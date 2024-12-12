@@ -1,0 +1,2769 @@
+{
+  "last_node_id": 214,
+  "last_link_id": 446,
+  "nodes": [
+    {
+      "id": 116,
+      "type": "Florence2Run",
+      "pos": [
+        -2244.18896484375,
+        -818.3560180664062
+      ],
+      "size": [
+        340.4589538574219,
+        352
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 277
+        },
+        {
+          "name": "florence2_model",
+          "type": "FL2MODEL",
+          "link": 276
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": null
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "name": "caption",
+          "type": "STRING",
+          "links": [
+            315
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "data",
+          "type": "JSON",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Florence2Run"
+      },
+      "widgets_values": [
+        "",
+        "more_detailed_caption",
+        true,
+        false,
+        1024,
+        3,
+        true,
+        "",
+        195844480889180,
+        "randomize"
+      ]
+    },
+    {
+      "id": 140,
+      "type": "easy cleanGpuUsed",
+      "pos": [
+        1297.1256103515625,
+        -95.02953338623047
+      ],
+      "size": [
+        210,
+        26
+      ],
+      "flags": {},
+      "order": 44,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 434
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "easy cleanGpuUsed"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 130,
+      "type": "ImageResize",
+      "pos": [
+        -1484.2923583984375,
+        -242.09860229492188
+      ],
+      "size": [
+        315,
+        246
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 308
+        },
+        {
+          "name": "mask_optional",
+          "type": "MASK",
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "larger_side",
+          "type": "INT",
+          "link": 345,
+          "widget": {
+            "name": "larger_side"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            404
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageResize"
+      },
+      "widgets_values": [
+        "resize only",
+        0,
+        768,
+        0,
+        "any",
+        "3:2",
+        0.5,
+        20
+      ]
+    },
+    {
+      "id": 120,
+      "type": "VHS_SelectFilename",
+      "pos": [
+        -1114.332275390625,
+        17.021759033203125
+      ],
+      "size": [
+        315,
+        58
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "filenames",
+          "type": "VHS_FILENAMES",
+          "link": 284
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filename",
+          "type": "STRING",
+          "links": [
+            285
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_SelectFilename"
+      },
+      "widgets_values": {
+        "index": -1
+      }
+    },
+    {
+      "id": 121,
+      "type": "VHS_LoadVideoPath",
+      "pos": [
+        -1133.41796875,
+        154.42776489257812
+      ],
+      "size": [
+        327.5999755859375,
+        238
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "meta_batch",
+          "type": "VHS_BatchManager",
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "video",
+          "type": "STRING",
+          "link": 285,
+          "widget": {
+            "name": "video"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            386
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "frame_count",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": null
+        },
+        {
+          "name": "video_info",
+          "type": "VHS_VIDEOINFO",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_LoadVideoPath"
+      },
+      "widgets_values": {
+        "video": "",
+        "force_rate": 0,
+        "force_size": "Disabled",
+        "custom_width": 512,
+        "custom_height": 512,
+        "frame_load_cap": 0,
+        "skip_first_frames": 0,
+        "select_every_nth": 1,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "frame_load_cap": 0,
+            "skip_first_frames": 0,
+            "force_rate": 0,
+            "filename": "",
+            "type": "path",
+            "format": "video/",
+            "select_every_nth": 1
+          }
+        }
+      }
+    },
+    {
+      "id": 152,
+      "type": "VHS_PruneOutputs",
+      "pos": [
+        -1121.427734375,
+        445.5180969238281
+      ],
+      "size": [
+        214.1650390625,
+        58
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "filenames",
+          "type": "VHS_FILENAMES",
+          "link": 344
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "VHS_PruneOutputs"
+      },
+      "widgets_values": {
+        "options": "Intermediate and Utility"
+      }
+    },
+    {
+      "id": 119,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        -1477.2120361328125,
+        59.66645812988281
+      ],
+      "size": [
+        315,
+        446.9166564941406
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 406
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "meta_batch",
+          "type": "VHS_BatchManager",
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": null,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": [
+            284,
+            344
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 1,
+        "loop_count": 0,
+        "filename_prefix": "temp",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 30,
+        "save_metadata": false,
+        "pingpong": false,
+        "save_output": false,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "temp_00013.mp4",
+            "subfolder": "",
+            "type": "temp",
+            "format": "video/h264-mp4",
+            "frame_rate": 1
+          }
+        }
+      }
+    },
+    {
+      "id": 191,
+      "type": "VAEEncode",
+      "pos": [
+        -274.9034118652344,
+        -20.742223739624023
+      ],
+      "size": [
+        210,
+        46
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 386
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 387
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            401,
+            429
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEEncode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 190,
+      "type": "EmptyLTXVLatentVideo",
+      "pos": [
+        -275.43695068359375,
+        74.29977416992188
+      ],
+      "size": [
+        221.59730529785156,
+        98
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 384,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 385,
+          "widget": {
+            "name": "height"
+          }
+        },
+        {
+          "name": "length",
+          "type": "INT",
+          "link": 394,
+          "widget": {
+            "name": "length"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            400,
+            415
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmptyLTXVLatentVideo",
+        "ttNbgOverride": {
+          "color": "#432",
+          "bgcolor": "#653",
+          "groupcolor": "#b58b2a"
+        }
+      },
+      "widgets_values": [
+        768,
+        512,
+        97,
+        1
+      ]
+    },
+    {
+      "id": 182,
+      "type": "ModifyLTXModel",
+      "pos": [
+        -327.9700927734375,
+        -209.73382568359375
+      ],
+      "size": [
+        210,
+        26
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 369
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            399
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ModifyLTXModel"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 193,
+      "type": "VAEDecode",
+      "pos": [
+        950,
+        200
+      ],
+      "size": [
+        210,
+        46
+      ],
+      "flags": {},
+      "order": 43,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 390
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 398,
+          "slot_index": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            391
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 187,
+      "type": "LTXVScheduler",
+      "pos": [
+        490,
+        200
+      ],
+      "size": [
+        282.28857421875,
+        151.23635864257812
+      ],
+      "flags": {},
+      "order": 41,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "link": 413,
+          "shape": 7
+        },
+        {
+          "name": "steps",
+          "type": "INT",
+          "link": 381,
+          "widget": {
+            "name": "steps"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SIGMAS",
+          "type": "SIGMAS",
+          "links": [
+            374
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LTXVScheduler"
+      },
+      "widgets_values": [
+        20,
+        2.05,
+        0.95,
+        true,
+        0.1
+      ]
+    },
+    {
+      "id": 180,
+      "type": "LTXPerturbedAttention",
+      "pos": [
+        500,
+        -80
+      ],
+      "size": [
+        280.9585876464844,
+        126
+      ],
+      "flags": {},
+      "order": 40,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 412
+        },
+        {
+          "name": "attn_override",
+          "type": "ATTN_OVERRIDE",
+          "link": 366,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            372
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LTXPerturbedAttention"
+      },
+      "widgets_values": [
+        1,
+        0.25,
+        3
+      ]
+    },
+    {
+      "id": 189,
+      "type": "KSamplerSelect",
+      "pos": [
+        500,
+        100
+      ],
+      "size": [
+        275.8462219238281,
+        58
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SAMPLER",
+          "type": "SAMPLER",
+          "links": [
+            382
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSamplerSelect"
+      },
+      "widgets_values": [
+        "euler"
+      ]
+    },
+    {
+      "id": 149,
+      "type": "VHS_SelectFilename",
+      "pos": [
+        546.6237182617188,
+        600.8234252929688
+      ],
+      "size": [
+        224.2685546875,
+        58
+      ],
+      "flags": {},
+      "order": 46,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "filenames",
+          "type": "VHS_FILENAMES",
+          "link": 437
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filename",
+          "type": "STRING",
+          "links": [
+            446
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_SelectFilename"
+      },
+      "widgets_values": {
+        "index": -1
+      }
+    },
+    {
+      "id": 151,
+      "type": "VHS_PruneOutputs",
+      "pos": [
+        542.2614135742188,
+        719.4683837890625
+      ],
+      "size": [
+        223.3826904296875,
+        58
+      ],
+      "flags": {},
+      "order": 47,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "filenames",
+          "type": "VHS_FILENAMES",
+          "link": 438
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "VHS_PruneOutputs"
+      },
+      "widgets_values": {
+        "options": "Intermediate and Utility"
+      }
+    },
+    {
+      "id": 183,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        -673.1685180664062,
+        -209.03692626953125
+      ],
+      "size": [
+        273.22979736328125,
+        99.1696548461914
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            369
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [],
+          "slot_index": 1
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            387,
+            398
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "video/ltx-video-2b-v0.9.safetensors"
+      ]
+    },
+    {
+      "id": 210,
+      "type": "CLIPLoader",
+      "pos": [
+        -686.3709716796875,
+        -53.380706787109375
+      ],
+      "size": [
+        315,
+        82
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            441,
+            442
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPLoader"
+      },
+      "widgets_values": [
+        "t5xxl_fp8_e4m3fn.safetensors",
+        "ltxv"
+      ]
+    },
+    {
+      "id": 208,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -674.09814453125,
+        176.89271545410156
+      ],
+      "size": [
+        290.3044128417969,
+        60.59393310546875
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 441
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 433,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            430
+          ],
+          "slot_index": 0,
+          "shape": 3
+        }
+      ],
+      "title": "Positive Prompt",
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "A group of colorful hot air balloons take off at dawn in Cappadocia, Turkey.\nDozens of balloons in various bright colors and patterns slowly rise into the pink and orange sky. Below them, the unique landscape of Cappadocia unfolds, with its distinctive \"fairy chimneys\" - tall, cone-shaped rock formations scattered across the valley. The rising sun casts long shadows across the terrain, highlighting the otherworldly topography."
+      ]
+    },
+    {
+      "id": 194,
+      "type": "AddLatentGuide",
+      "pos": [
+        -30.187519073486328,
+        -184.36483764648438
+      ],
+      "size": [
+        210,
+        122
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 399
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "link": 400
+        },
+        {
+          "name": "image_latent",
+          "type": "LATENT",
+          "link": 401
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            410
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            411
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AddLatentGuide"
+      },
+      "widgets_values": [
+        0,
+        false
+      ]
+    },
+    {
+      "id": 181,
+      "type": "LTXAttnOverride",
+      "pos": [
+        500,
+        -220
+      ],
+      "size": [
+        283.35858154296875,
+        76
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "ATTN_OVERRIDE",
+          "type": "ATTN_OVERRIDE",
+          "links": [
+            366
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LTXAttnOverride"
+      },
+      "widgets_values": [
+        "14"
+      ]
+    },
+    {
+      "id": 209,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -670.9631958007812,
+        290.2335510253906
+      ],
+      "size": [
+        284.2690734863281,
+        94.26139068603516
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 442
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            431
+          ],
+          "slot_index": 0,
+          "shape": 3
+        }
+      ],
+      "title": "Negative Prompt",
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "worst quality, inconsistent motion, blurry, jittery, distorted, watermarks"
+      ]
+    },
+    {
+      "id": 188,
+      "type": "LTXVConditioning",
+      "pos": [
+        -273.7143859863281,
+        224.5381317138672
+      ],
+      "size": [
+        222.53562927246094,
+        78
+      ],
+      "flags": {},
+      "order": 39,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 430
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 431
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            443
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "links": [
+            444
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LTXVConditioning"
+      },
+      "widgets_values": [
+        24
+      ]
+    },
+    {
+      "id": 185,
+      "type": "SamplerCustom",
+      "pos": [
+        940,
+        -100
+      ],
+      "size": [
+        280.16015625,
+        236.75421142578125
+      ],
+      "flags": {},
+      "order": 42,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 372
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 443
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 444
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 382
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 374
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 415
+        },
+        {
+          "name": "noise_seed",
+          "type": "INT",
+          "link": 445,
+          "widget": {
+            "name": "noise_seed"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": [
+            390,
+            434
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SamplerCustom"
+      },
+      "widgets_values": [
+        true,
+        768107050114160,
+        "randomize",
+        3
+      ]
+    },
+    {
+      "id": 156,
+      "type": "Seed (rgthree)",
+      "pos": [
+        -1897.64697265625,
+        387.3328552246094
+      ],
+      "size": [
+        304.8508605957031,
+        130
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SEED",
+          "type": "INT",
+          "links": [
+            445
+          ],
+          "slot_index": 0,
+          "shape": 3,
+          "dir": 4
+        }
+      ],
+      "properties": {},
+      "widgets_values": [
+        -1,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 195,
+      "type": "ComfyUI_Image_Round__ImageRound",
+      "pos": [
+        -1126.632080078125,
+        -229.50686645507812
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 404
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            405,
+            406
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ComfyUI_Image_Round__ImageRound"
+      },
+      "widgets_values": [
+        "Crop",
+        64,
+        64,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 155,
+      "type": "Int",
+      "pos": [
+        -1903.8394775390625,
+        156.2545623779297
+      ],
+      "size": [
+        315,
+        58
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            345
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Frame Max Size (384/512/640/768)",
+      "properties": {
+        "Node name for S&R": "Int"
+      },
+      "widgets_values": [
+        768
+      ]
+    },
+    {
+      "id": 163,
+      "type": "Int",
+      "pos": [
+        -1902.1668701171875,
+        573.0792236328125
+      ],
+      "size": [
+        315,
+        58
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            381
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Steps",
+      "properties": {
+        "Node name for S&R": "Int"
+      },
+      "widgets_values": [
+        25
+      ]
+    },
+    {
+      "id": 162,
+      "type": "Fast Groups Bypasser (rgthree)",
+      "pos": [
+        -2298.923583984375,
+        420.5407409667969
+      ],
+      "size": [
+        377.5057678222656,
+        202
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "OPT_CONNECTION",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "matchColors": "",
+        "matchTitle": "",
+        "showNav": true,
+        "sort": "position",
+        "customSortAlphabet": "",
+        "toggleRestriction": "default"
+      }
+    },
+    {
+      "id": 158,
+      "type": "Textbox",
+      "pos": [
+        -2266.667236328125,
+        -230.10662841796875
+      ],
+      "size": [
+        309.1988220214844,
+        141.8330535888672
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "passthrough",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "passthrough"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            348
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "User Input",
+      "properties": {
+        "Node name for S&R": "Textbox"
+      },
+      "widgets_values": [
+        " ",
+        ""
+      ]
+    },
+    {
+      "id": 106,
+      "type": "LoadImage",
+      "pos": [
+        -1907.2913818359375,
+        -222.75074768066406
+      ],
+      "size": [
+        315,
+        314
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            277,
+            308
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "CleanShot 2024-12-12 at 00.20.29@2x.png",
+        "image"
+      ]
+    },
+    {
+      "id": 211,
+      "type": "Note",
+      "pos": [
+        -1357.6099853515625,
+        -1485.2574462890625
+      ],
+      "size": [
+        497.501708984375,
+        195.2947540283203
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "ollama - llama3.2:latest\n- downlaod: https://ollama.com/library/llama3.2\n\nflorence-2-large-ft\n- download: automatically downloaded by the node when first time running\n\n\nComfyUI Ollama custom node:\nhttps://github.com/stavsap/comfyui-ollama\n\nComfyUI-Florence2 custom node:\nhttps://github.com/kijai/ComfyUI-Florence2\n\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 157,
+      "type": "Int",
+      "pos": [
+        -1902.2315673828125,
+        271.3531188964844
+      ],
+      "size": [
+        315,
+        58
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            394
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Frames (49/65/97/121)",
+      "properties": {
+        "Node name for S&R": "Int"
+      },
+      "widgets_values": [
+        121
+      ]
+    },
+    {
+      "id": 178,
+      "type": "Textbox",
+      "pos": [
+        -2275.7314453125,
+        -37.75055694580078
+      ],
+      "size": [
+        325.8247375488281,
+        198.2014617919922
+      ],
+      "flags": {},
+      "order": 35,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "passthrough",
+          "type": "STRING",
+          "link": 364,
+          "widget": {
+            "name": "passthrough"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            433
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Positive Prompt",
+      "properties": {
+        "Node name for S&R": "Textbox"
+      },
+      "widgets_values": [
+        "The man stands before an imposing cityscape, clad in a sleek black robe and dramatic black cape that billows behind him. His figure is silhouetted against a backdrop of numerous buildings, each with its own unique architectural style. A colossal dome dominates the central structure, its grandeur accentuated by the surrounding edifices. The man's pose conveys an air of confidence and authority, as if he is surveying his domain from this prominent vantage point.",
+        ""
+      ]
+    },
+    {
+      "id": 113,
+      "type": "OllamaGenerateAdvance",
+      "pos": [
+        -1366.715576171875,
+        -1078.3612060546875
+      ],
+      "size": [
+        386.7123107910156,
+        374
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "context",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "context"
+          },
+          "shape": 7
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 273,
+          "widget": {
+            "name": "prompt"
+          }
+        },
+        {
+          "name": "system",
+          "type": "STRING",
+          "link": 272,
+          "widget": {
+            "name": "system"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "response",
+          "type": "STRING",
+          "links": [
+            349
+          ],
+          "slot_index": 0,
+          "shape": 3
+        },
+        {
+          "name": "context",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "OllamaGenerateAdvance"
+      },
+      "widgets_values": [
+        "What is Art?",
+        false,
+        "http://127.0.0.1:11434",
+        "llama3.2:latest",
+        "You are an art expert, gracefully describing your knowledge in art domain.",
+        632461624,
+        "fixed",
+        40,
+        0.9,
+        0.8,
+        -1,
+        1,
+        5,
+        false,
+        ""
+      ]
+    },
+    {
+      "id": 196,
+      "type": "AddLatentGuide",
+      "pos": [
+        219.19711303710938,
+        -484.8691711425781
+      ],
+      "size": [
+        210,
+        122
+      ],
+      "flags": {},
+      "order": 38,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 410
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "link": 411
+        },
+        {
+          "name": "image_latent",
+          "type": "LATENT",
+          "link": 429
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            412
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            413
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AddLatentGuide"
+      },
+      "widgets_values": [
+        -1,
+        false
+      ]
+    },
+    {
+      "id": 161,
+      "type": "Note",
+      "pos": [
+        1269.1812744140625,
+        -376.82086181640625
+      ],
+      "size": [
+        361.20001220703125,
+        59.028564453125
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Enable this node if you encounter OOM issue",
+      "properties": {},
+      "widgets_values": [
+        "As said above"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 159,
+      "type": "Note",
+      "pos": [
+        -719.3115844726562,
+        -578.2477416992188
+      ],
+      "size": [
+        695.27099609375,
+        250.2269287109375
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "ltx-video-2b-v0.9.safetensors\n\n- location: ComfyUI/models/checkpoints\n- downlaod: https://huggingface.co/Lightricks/LTX-Video/blob/main/ltx-video-2b-v0.9.safetensors\n\nt5xxl_fp8_e4m3fn.safetensors\n\n- location: ComfyUI/models/clip\n- download: https://huggingface.co/comfyanonymous/flux_text_encoders/blob/main/t5xxl_fp8_e4m3fn.safetensors\n\n\nComfyUI-LTXVideo custom node:\nhttps://github.com/Lightricks/ComfyUI-LTXVideo\n\nComfyUI-LTXTricks custom node:\nhttps://github.com/logtd/ComfyUI-LTXTricks\n\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 131,
+      "type": "GetImageSize+",
+      "pos": [
+        -1119.4354248046875,
+        558.300048828125
+      ],
+      "size": [
+        214.20001220703125,
+        66
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 405
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            384
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            385
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "count",
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize+"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 117,
+      "type": "Textbox",
+      "pos": [
+        -1368.7486572265625,
+        -607.2823486328125
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "passthrough",
+          "type": "STRING",
+          "link": 349,
+          "widget": {
+            "name": "passthrough"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            364
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Response",
+      "properties": {
+        "Node name for S&R": "Textbox"
+      },
+      "widgets_values": [
+        "The man stands before an imposing cityscape, clad in a sleek black robe and dramatic black cape that billows behind him. His figure is silhouetted against a backdrop of numerous buildings, each with its own unique architectural style. A colossal dome dominates the central structure, its grandeur accentuated by the surrounding edifices. The man's pose conveys an air of confidence and authority, as if he is surveying his domain from this prominent vantage point.",
+        ""
+      ]
+    },
+    {
+      "id": 112,
+      "type": "Textbox",
+      "pos": [
+        -1833.8302001953125,
+        -611.3163452148438
+      ],
+      "size": [
+        418.0925598144531,
+        234.79005432128906
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "passthrough",
+          "type": "STRING",
+          "link": 317,
+          "slot_index": 0,
+          "widget": {
+            "name": "passthrough"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            273
+          ],
+          "slot_index": 0,
+          "shape": 3
+        }
+      ],
+      "title": "User Prompt",
+      "properties": {
+        "Node name for S&R": "Textbox"
+      },
+      "widgets_values": [
+        "{\n  \"instruction\":\" \",\n  \"description\":\"A man dressed in a black robe and a black cape is standing in front of a city. There is a large building with a large dome on top of it. There are many buildings around the man. \"\n}",
+        ""
+      ]
+    },
+    {
+      "id": 135,
+      "type": "Textbox",
+      "pos": [
+        -2290.689453125,
+        -1226.9044189453125
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "passthrough",
+          "type": "STRING",
+          "link": 348,
+          "widget": {
+            "name": "passthrough"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            316
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "User Instruction",
+      "properties": {
+        "Node name for S&R": "Textbox"
+      },
+      "widgets_values": [
+        " ",
+        ""
+      ]
+    },
+    {
+      "id": 115,
+      "type": "Florence2ModelLoader",
+      "pos": [
+        -2227.409423828125,
+        -979.4362182617188
+      ],
+      "size": [
+        315,
+        106
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "lora",
+          "type": "PEFTLORA",
+          "link": null,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "florence2_model",
+          "type": "FL2MODEL",
+          "links": [
+            276
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Florence2ModelLoader"
+      },
+      "widgets_values": [
+        "Florence-2-large-ft",
+        "fp16",
+        "sdpa"
+      ]
+    },
+    {
+      "id": 134,
+      "type": "easy promptReplace",
+      "pos": [
+        -1834.20458984375,
+        -884.154541015625
+      ],
+      "size": [
+        400,
+        202
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 314,
+          "widget": {
+            "name": "prompt"
+          }
+        },
+        {
+          "name": "replace1",
+          "type": "STRING",
+          "link": 315,
+          "widget": {
+            "name": "replace1"
+          },
+          "shape": 7
+        },
+        {
+          "name": "replace2",
+          "type": "STRING",
+          "link": 316,
+          "widget": {
+            "name": "replace2"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            317
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy promptReplace"
+      },
+      "widgets_values": [
+        "",
+        "{image_description}",
+        "",
+        "{user_instruct}",
+        "",
+        "",
+        ""
+      ],
+      "color": "#233",
+      "bgcolor": "#355"
+    },
+    {
+      "id": 111,
+      "type": "Textbox",
+      "pos": [
+        -1838.6700439453125,
+        -1487.363037109375
+      ],
+      "size": [
+        402.96905517578125,
+        491.4605407714844
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "passthrough",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "passthrough"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            272
+          ],
+          "slot_index": 0,
+          "shape": 3
+        }
+      ],
+      "title": "System Prompt",
+      "properties": {
+        "Node name for S&R": "Textbox"
+      },
+      "widgets_values": [
+        "You are transforming user inputs into descriptive prompts for generating AI Videos. Follow these steps to produce the final description:\n1. English Only: The entire output must be written in English with 80-150 words.\n2. Concise, Single Paragraph: Begin with a single paragraph that describes the scene, focusing on key actions in sequence.\n3. Detailed Actions and Appearance: Clearly detail the movements of characters, objects, and relevant elements in the scene. Include brief, essential visual details that highlight distinctive features.\n4. Contextual Setting: Provide minimal yet effective background details that establish time, place, and atmosphere. Keep it relevant to the scene without unnecessary elaboration.\n5. Camera Angles and Movements: Mention camera perspectives or movements that shape the viewer’s experience, but keep it succinct.\n6. Lighting and Color: Incorporate lighting conditions and color tones that set the scene’s mood and complement the actions.\n7. Source Type: Reflect the nature of the footage (e.g., real-life, animation) naturally in the description.\n8. No Additional Commentary: Do not include instructions, reasoning steps, or any extra text outside the described scene. Do not provide explanations or justifications—only the final prompt description.\n\nExample Style:\n• A group of colorful hot air balloons take off at dawn in Cappadocia, Turkey. Dozens of balloons in various bright colors and patterns slowly rise into the pink and orange sky. Below them, the unique landscape of Cappadocia unfolds, with its distinctive “fairy chimneys” - tall, cone-shaped rock formations scattered across the valley. The rising sun casts long shadows across the terrain, highlighting the otherworldly topography.",
+        ""
+      ]
+    },
+    {
+      "id": 133,
+      "type": "Textbox",
+      "pos": [
+        -2288.079345703125,
+        -1482.974365234375
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "passthrough",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "passthrough"
+          },
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            314
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Textbox"
+      },
+      "widgets_values": [
+        "{\n  \"instruction\":\"{user_instruct}\",\n  \"description\":\"{image_description}\"\n}",
+        ""
+      ]
+    },
+    {
+      "id": 192,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        200.09532165527344,
+        543.3768310546875
+      ],
+      "size": [
+        315,
+        446.9166564941406
+      ],
+      "flags": {},
+      "order": 45,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 391
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "meta_batch",
+          "type": "VHS_BatchManager",
+          "link": null,
+          "shape": 7
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": null,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": [
+            437,
+            438
+          ],
+          "slot_index": 0,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 16,
+        "loop_count": 0,
+        "filename_prefix": "LTXVideo",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 19,
+        "save_metadata": false,
+        "pingpong": false,
+        "save_output": false,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "LTXVideo_00039.mp4",
+            "subfolder": "",
+            "type": "temp",
+            "format": "video/h264-mp4",
+            "frame_rate": 16
+          }
+        }
+      }
+    },
+    {
+      "id": 214,
+      "type": "VrchVideoWebViewerNode",
+      "pos": [
+        813.6781005859375,
+        559.1693725585938
+      ],
+      "size": [
+        400,
+        226
+      ],
+      "flags": {},
+      "order": 48,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "filename",
+          "type": "STRING",
+          "link": 446,
+          "widget": {
+            "name": "filename"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "VrchVideoWebViewerNode"
+      },
+      "widgets_values": [
+        "",
+        "1",
+        "127.0.0.1:8188",
+        false,
+        1280,
+        960,
+        false,
+        "http://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=false&file=channel_1.mp4&path=web_viewer",
+        null
+      ]
+    },
+    {
+      "id": 213,
+      "type": "Note",
+      "pos": [
+        824.3380737304688,
+        881.1611938476562
+      ],
+      "size": [
+        386.6794738769531,
+        152.2682647705078
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "The value of server address should be your ComfyUI server ip anddress and port number, e.g. 127.0.0.1:8188.\n\nComfyUI Web Viewer custom node\nhttps://github.com/VrchStudio/comfyui-web-viewer\n\n\nComfyUI-VideoHelperSuite\nhttps://github.com/Kosinkadink/ComfyUI-VideoHelperSuite"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      272,
+      111,
+      0,
+      113,
+      2,
+      "STRING"
+    ],
+    [
+      273,
+      112,
+      0,
+      113,
+      1,
+      "STRING"
+    ],
+    [
+      276,
+      115,
+      0,
+      116,
+      1,
+      "FL2MODEL"
+    ],
+    [
+      277,
+      106,
+      0,
+      116,
+      0,
+      "IMAGE"
+    ],
+    [
+      284,
+      119,
+      0,
+      120,
+      0,
+      "VHS_FILENAMES"
+    ],
+    [
+      285,
+      120,
+      0,
+      121,
+      2,
+      "STRING"
+    ],
+    [
+      308,
+      106,
+      0,
+      130,
+      0,
+      "IMAGE"
+    ],
+    [
+      314,
+      133,
+      0,
+      134,
+      0,
+      "STRING"
+    ],
+    [
+      315,
+      116,
+      2,
+      134,
+      1,
+      "STRING"
+    ],
+    [
+      316,
+      135,
+      0,
+      134,
+      2,
+      "STRING"
+    ],
+    [
+      317,
+      134,
+      0,
+      112,
+      0,
+      "STRING"
+    ],
+    [
+      344,
+      119,
+      0,
+      152,
+      0,
+      "VHS_FILENAMES"
+    ],
+    [
+      345,
+      155,
+      0,
+      130,
+      2,
+      "INT"
+    ],
+    [
+      348,
+      158,
+      0,
+      135,
+      0,
+      "STRING"
+    ],
+    [
+      349,
+      113,
+      0,
+      117,
+      0,
+      "STRING"
+    ],
+    [
+      364,
+      117,
+      0,
+      178,
+      0,
+      "STRING"
+    ],
+    [
+      366,
+      181,
+      0,
+      180,
+      1,
+      "ATTN_OVERRIDE"
+    ],
+    [
+      369,
+      183,
+      0,
+      182,
+      0,
+      "MODEL"
+    ],
+    [
+      372,
+      180,
+      0,
+      185,
+      0,
+      "MODEL"
+    ],
+    [
+      374,
+      187,
+      0,
+      185,
+      4,
+      "SIGMAS"
+    ],
+    [
+      381,
+      163,
+      0,
+      187,
+      1,
+      "INT"
+    ],
+    [
+      382,
+      189,
+      0,
+      185,
+      3,
+      "SAMPLER"
+    ],
+    [
+      384,
+      131,
+      0,
+      190,
+      0,
+      "INT"
+    ],
+    [
+      385,
+      131,
+      1,
+      190,
+      1,
+      "INT"
+    ],
+    [
+      386,
+      121,
+      0,
+      191,
+      0,
+      "IMAGE"
+    ],
+    [
+      387,
+      183,
+      2,
+      191,
+      1,
+      "VAE"
+    ],
+    [
+      390,
+      185,
+      0,
+      193,
+      0,
+      "LATENT"
+    ],
+    [
+      391,
+      193,
+      0,
+      192,
+      0,
+      "IMAGE"
+    ],
+    [
+      394,
+      157,
+      0,
+      190,
+      2,
+      "INT"
+    ],
+    [
+      398,
+      183,
+      2,
+      193,
+      1,
+      "VAE"
+    ],
+    [
+      399,
+      182,
+      0,
+      194,
+      0,
+      "MODEL"
+    ],
+    [
+      400,
+      190,
+      0,
+      194,
+      1,
+      "LATENT"
+    ],
+    [
+      401,
+      191,
+      0,
+      194,
+      2,
+      "LATENT"
+    ],
+    [
+      404,
+      130,
+      0,
+      195,
+      0,
+      "IMAGE"
+    ],
+    [
+      405,
+      195,
+      0,
+      131,
+      0,
+      "IMAGE"
+    ],
+    [
+      406,
+      195,
+      0,
+      119,
+      0,
+      "IMAGE"
+    ],
+    [
+      410,
+      194,
+      0,
+      196,
+      0,
+      "MODEL"
+    ],
+    [
+      411,
+      194,
+      1,
+      196,
+      1,
+      "LATENT"
+    ],
+    [
+      412,
+      196,
+      0,
+      180,
+      0,
+      "MODEL"
+    ],
+    [
+      413,
+      196,
+      1,
+      187,
+      0,
+      "LATENT"
+    ],
+    [
+      415,
+      190,
+      0,
+      185,
+      5,
+      "LATENT"
+    ],
+    [
+      429,
+      191,
+      0,
+      196,
+      2,
+      "LATENT"
+    ],
+    [
+      430,
+      208,
+      0,
+      188,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      431,
+      209,
+      0,
+      188,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      433,
+      178,
+      0,
+      208,
+      1,
+      "STRING"
+    ],
+    [
+      434,
+      185,
+      0,
+      140,
+      0,
+      "*"
+    ],
+    [
+      437,
+      192,
+      0,
+      149,
+      0,
+      "VHS_FILENAMES"
+    ],
+    [
+      438,
+      192,
+      0,
+      151,
+      0,
+      "VHS_FILENAMES"
+    ],
+    [
+      441,
+      210,
+      0,
+      208,
+      0,
+      "CLIP"
+    ],
+    [
+      442,
+      210,
+      0,
+      209,
+      0,
+      "CLIP"
+    ],
+    [
+      443,
+      188,
+      0,
+      185,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      444,
+      188,
+      1,
+      185,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      445,
+      156,
+      0,
+      185,
+      6,
+      "INT"
+    ],
+    [
+      446,
+      149,
+      0,
+      214,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "Ollama Video Prompt Generator",
+      "bounding": [
+        -2320.239501953125,
+        -1587.278076171875,
+        1532.0146484375,
+        1233.4739990234375
+      ],
+      "color": "#8AA",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "Control Panel",
+      "bounding": [
+        -2321.566650390625,
+        -313.5894775390625,
+        787.7662353515625,
+        1024.0284423828125
+      ],
+      "color": "#b06634",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "Image Pre-process",
+      "bounding": [
+        -1494.2923583984375,
+        -315.6987609863281,
+        710.7576293945312,
+        1022.7901611328125
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "Video Post-process",
+      "bounding": [
+        173.0813751220703,
+        454.0921630859375,
+        1071.2965087890625,
+        649.622314453125
+      ],
+      "color": "#b58b2a",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 6,
+      "title": "Free GPU Memory",
+      "bounding": [
+        1274.181640625,
+        -299.4554443359375,
+        354.646728515625,
+        333.7626953125
+      ],
+      "color": "#A88",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 7,
+      "title": "Same First / Last Frame (Experimental)",
+      "bounding": [
+        185.5482940673828,
+        -571.0375366210938,
+        444.5510559082031,
+        234.18370056152344
+      ],
+      "color": "#8A8",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 8,
+      "title": "LTX Video Generator (STG Enhanced))",
+      "bounding": [
+        -722.9910278320312,
+        -305.24078369140625,
+        1972.7574462890625,
+        719.913330078125
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.3558410273837759,
+      "offset": [
+        2645.6813906622524,
+        1813.7676907509574
+      ]
+    }
+  },
+  "version": 0.4
+}
