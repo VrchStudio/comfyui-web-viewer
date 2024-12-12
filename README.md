@@ -3,6 +3,7 @@
 The ComfyUI Web Viewer by [vrch.ai](https://vrch.ai) is a custom node collection offering a real-time AI-generated interactive art framework. This utility integrates realtime streaming into ComfyUI workflows, supporting keyboard control nodes, OSC control nodes, sound input nodes, and more. Accessible from any device with a web browser, it enables real time interaction with AI-generated content, making it ideal for interactive visual projects and enhancing ComfyUI workflows with efficient content management and display.
 
 **Features:**  
+
 - Real-time interaction and AI generation  
 - Keyboard control nodes, OSC control nodes, and sound input nodes  
 - Web accessibility from any device
@@ -36,11 +37,15 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 
 ### `Web Viewer Nodes`
 
+![](./assets/images/example_001_web_viewer.gif)
+
 - Documentation: [Usage of Web Viewer nodes](./docs/web_viewer_nodes.md)
 - Example workflows: 
   - [Workflow Example: Image Web Viewer node](./workflows/example_web_viewer_001_image_web_viewer.json)
-    ![](./assets/images/example_001_web_viewer.gif)
   - [Workflow Example: Image Flipbook Viewer node](./workflows/example_web_viewer_002_image_flipbook_web_viewer.json)
+  - [Workflow Example: Video Web Viewer node](./workflows/example_web_viewer_003_video_web_viewer.json)
+- Tutorials:
+  - [Fast Image to Video by LTX Videos and Ollama](./docs/tutorial_002_fast_image_to_video_by_ltx_video_and_ollama.md)
 
 ### `OSC Control Nodes`
 
