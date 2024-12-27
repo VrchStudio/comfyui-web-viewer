@@ -97,16 +97,12 @@ app.registerExtension({
                 }
 
                 // Create a custom button element
-                const startBtn = document.createElement("button");
+                const startBtn = document.createElement("div");
                 startBtn.textContent = "";
-                startBtn.classList.add("comfy-big-button");
+                startBtn.classList.add("comfy-vrch-big-button");
 
                 const countdownDisplay = document.createElement('div');
-                countdownDisplay.style = `
-                    font-size: 14px;
-                    margin-top: 5px;
-                    text-align: center;
-                `;
+                countdownDisplay.classList.add("comfy-value-small-display");
 
                 // Add the button and tag to the node using addDOMWidget
                 this.addDOMWidget("button_widget", "Press and Hold to Record", startBtn);
@@ -120,6 +116,7 @@ app.registerExtension({
                 const enableShortcutWidget = currentNode.widgets.find(w => w.name === 'shortcut');
                 const shortcutOptionWidget = currentNode.widgets.find(w => w.name === 'shortcut_key');
                 const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
+                const newGenerationWidget = currentNode.widgets.find(w => w.name === 'new_generation_after_recording');
 
                 if (enableShortcutWidget) {
                     enableShortcut = enableShortcutWidget.value;
@@ -254,6 +251,26 @@ app.registerExtension({
                                     }
 
                                     console.log('Audio recording saved.');
+
+                                    // Trigger a new queue job if `new_generation_after_recording` is enabled
+                                    if (newGenerationWidget && newGenerationWidget.value === true) {
+                                        // Locate the div container that holds the activation button
+                                        const buttonContainer = document.querySelector('div[data-testid="queue-button"]');
+
+                                        if (buttonContainer) {
+                                            
+                                            const queueButton = buttonContainer.querySelector('button[data-pc-name="pcbutton"]');
+                                            if (queueButton) {
+                                                queueButton.click();
+                                                console.log('New queue generation triggered.');
+                                            } else {
+                                                console.warn("Queue button not found inside container.");
+                                            }
+                                        } else {
+                                            console.warn("Queue button container not found.");
+                                        }
+                                    }
+
                                 };
                                 reader.readAsDataURL(audioBlob);
                             };
@@ -371,7 +388,12 @@ app.registerExtension({
 // Add custom styles for the button
 const style = document.createElement("style");
 style.textContent = `
-    .comfy-big-button {
+    .comfy-vrch-big-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        height: 40px !important;
         background-color: #4CAF50;
         color: white;
         font-size: 16px;
@@ -383,14 +405,25 @@ style.textContent = `
         transition: background-color 0.3s, transform 0.2s;
     }
 
-    .comfy-big-button:hover {
+    .comfy-vrch-big-button:hover {
         background-color: #45a049;
-        transform: scale(1.05); 
     }
 
-    .comfy-big-button:active {
+    .comfy-vrch-big-button:active {
         background-color: #3e8e41;
-        transform: scale(1);
+    }
+
+    .comfy-value-display {
+        margin-top: 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+    }
+    
+    .comfy-value-small-display {
+        margin-top: 60px;
+        font-size: 14px;
+        text-align: center;
     }
 `;
 document.head.appendChild(style);
