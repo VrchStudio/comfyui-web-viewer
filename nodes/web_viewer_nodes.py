@@ -62,7 +62,8 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
             }
         }
 
-    RETURN_TYPES = ()
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("IMAGES",)
     FUNCTION = "save_and_view_images"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
@@ -85,8 +86,7 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
             quality_jpeg_or_webp=85
         )
 
-        # No need to return anything; UI handling is done via JavaScript
-        return ()
+        return (images,)
 
     @classmethod
     def IS_CHANGED(cls, images, **kwargs):
@@ -122,7 +122,8 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
             }
         }
 
-    RETURN_TYPES = ()
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("IMAGES",)
     FUNCTION = "save_and_view_images"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
@@ -146,7 +147,7 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
         )
 
         # No need to return anything; UI handling is done via JavaScript
-        return ()
+        return (images,)
 
     @classmethod
     def IS_CHANGED(cls, images, **kwargs):
