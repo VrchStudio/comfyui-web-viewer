@@ -43,9 +43,11 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 - Example workflows: 
   - [Workflow Example: Image Web Viewer node](./workflows/example_web_viewer_001_image_web_viewer.json)
   - [Workflow Example: Image Flipbook Viewer node](./workflows/example_web_viewer_002_image_flipbook_web_viewer.json)
-  - [Workflow Example: Video Web Viewer node](./workflows/example_web_viewer_003_video_web_viewer.json)
+  - [Workflow Example: Video Web Viewer node (video only)](./workflows/example_web_viewer_003_video_web_viewer.json)
+  - [Workflow Example: Video Web Viewer node (video + sound)](./workflows/example_web_viewer_004_video_web_viewer_video_with_sfx.json)
 - Tutorials:
   - [Fast Image to Video by LTX Videos and Ollama](./docs/tutorial_002_fast_image_to_video_by_ltx_video_and_ollama.md)
+  - [Fast Iamge to Video by LTX Vidoes, MMAudio and Ollama](./docs/tutorial_003_fast_image_to_video_by_ltx_video_and_mmaudio_and_ollama.md)
 
 ### `OSC Control Nodes`
 
