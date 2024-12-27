@@ -89,6 +89,7 @@ class VrchAudioRecorderNode:
                     "max": 60.0,     
                     "step": 0.1,
                 }),
+                "new_generation_after_recording": ("BOOLEAN", {"default": False}),
                 "shortcut": ("BOOLEAN", {"default": True}),
                 "shortcut_key":(
                     [
@@ -116,7 +117,8 @@ class VrchAudioRecorderNode:
     FUNCTION = "process_audio"
     
     def process_audio(self, base64_data, record_mode, record_duration_max, 
-                      loop, loop_interval, shortcut, shortcut_key):
+                      loop, loop_interval, shortcut, shortcut_key, 
+                      new_generation_after_recording):
         
         audio_data = base64.b64decode(base64_data)
         input_buffer = io.BytesIO(audio_data)
@@ -145,7 +147,8 @@ class VrchAudioRecorderNode:
     
     @classmethod
     def IS_CHANGED(s, base64_data, record_mode, record_duration_max, 
-                   loop, loop_interval, shortcut, shortcut_key):
+                   loop, loop_interval, shortcut, shortcut_key, 
+                   new_generation_after_recording):
         
         # Create a new SHA-256 hash object
         m = hashlib.sha256()
