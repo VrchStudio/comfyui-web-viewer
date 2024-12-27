@@ -13,6 +13,7 @@
      - `record_duration_max`: Set the maximum recording duration (1-60 seconds).
      - `loop`: Enable or disable loop recording.
      - `loop_interval`: Set the interval between loop recordings (if loop is enabled).
+     - `new_generation_after_recording`: Enable to automatically trigger a queue generation after recording.
    - **Shortcut Configuration:**
      - `shortcut`: Enable or disable the keyboard shortcut for controlling recording.
      - `shortcut_key`: Select the desired shortcut key (e.g., F1, F2, ..., F12) for controlling the recording.

@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.17 - 2024-12-27
+
+### Added
+
+- add a new workflow for Video Web Viewer node
+- add a new tutorial for Video Web Viewer node
+
+### Updated
+
+- update `VrchImageWebViewerNode` and `VrchImageFlipBookWebViewerNode` to have `IMAGES` as output
+- update `VrchAudioRecorderNode` to introduce `new_generation_after_recording` option
+- update README.md
+- update `audio_nodes.md`
+
 ## 1.0.16 - 2024-12-12
 
 ### Added
