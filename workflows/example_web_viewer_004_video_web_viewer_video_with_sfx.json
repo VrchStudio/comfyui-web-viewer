@@ -413,7 +413,7 @@
         200
       ],
       "flags": {},
-      "order": 33,
+      "order": 32,
       "mode": 0,
       "inputs": [
         {
@@ -1620,7 +1620,7 @@
         200
       ],
       "flags": {},
-      "order": 32,
+      "order": 31,
       "mode": 0,
       "inputs": [
         {
@@ -2032,7 +2032,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 31,
+      "order": 33,
       "mode": 0,
       "inputs": [
         {
@@ -2122,47 +2122,6 @@
       },
       "widgets_values": [
         24
-      ]
-    },
-    {
-      "id": 244,
-      "type": "DF_Int_to_Float",
-      "pos": [
-        -2282.004638671875,
-        1027.4296875
-      ],
-      "size": [
-        315,
-        58
-      ],
-      "flags": {},
-      "order": 27,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "Value",
-          "type": "INT",
-          "link": 496,
-          "widget": {
-            "name": "Value"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "FLOAT",
-          "type": "FLOAT",
-          "links": [
-            499
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "DF_Int_to_Float"
-      },
-      "widgets_values": [
-        1
       ]
     },
     {
@@ -2537,52 +2496,6 @@
       ]
     },
     {
-      "id": 159,
-      "type": "Note",
-      "pos": [
-        -723.5014038085938,
-        -569.2667236328125
-      ],
-      "size": [
-        695.27099609375,
-        250.2269287109375
-      ],
-      "flags": {},
-      "order": 17,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {},
-      "widgets_values": [
-        "ltx-video-2b-v0.9.safetensors & ltx-video-2b-v0.9.1.safetensors \n\n- location: ComfyUI/models/checkpoints/video\n- downlaod: \n  - https://huggingface.co/Lightricks/LTX-Video/blob/main/ltx-video-2b-v0.9.safetensors\n  - https://huggingface.co/Lightricks/LTX-Video/resolve/main/ltx-video-2b-v0.9.1.safetensors\n\nt5xxl_fp8_e4m3fn.safetensors\n\n- location: ComfyUI/models/clip\n- download: https://huggingface.co/comfyanonymous/flux_text_encoders/blob/main/t5xxl_fp8_e4m3fn.safetensors\n\nComfyUI-LTXVideo custom node:\nhttps://github.com/Lightricks/ComfyUI-LTXVideo\n\nComfyUI-LTXTricks custom node:\nhttps://github.com/logtd/ComfyUI-LTXTricks\n\n"
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
-    },
-    {
-      "id": 226,
-      "type": "Note",
-      "pos": [
-        -687.9517822265625,
-        560.5237426757812
-      ],
-      "size": [
-        458.1549072265625,
-        207.94631958007812
-      ],
-      "flags": {},
-      "order": 18,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {},
-      "widgets_values": [
-        "Install `ComfyUI-MMAudio` custome node:\n\n- ComfyUI Manager -> Install via Git URL\n- url: https://github.com/kijai/ComfyUI-MMAudio\n\nDownload MMAudio used model files\n\n- location: ComfyUI/models/mmaudio\n- models:\n  - `apple_DFN5B-CLIP-ViT-H-14-384_fp16.safetensors`\n  - `mmaudio_large_44k_v2_fp16.safetensors`\n  - `mmaudio_synchformer_fp16.safetensors`\n  - `mmaudio_vae_44k_fp16.safetensors`\n- url: https://huggingface.co/Kijai/MMAudio_safetensors/tree/main"
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
-    },
-    {
       "id": 210,
       "type": "CLIPLoader",
       "pos": [
@@ -2594,7 +2507,7 @@
         82
       ],
       "flags": {},
-      "order": 19,
+      "order": 17,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2830,7 +2743,7 @@
         267.42938232421875
       ],
       "flags": {},
-      "order": 20,
+      "order": 18,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2861,7 +2774,7 @@
         314
       ],
       "flags": {},
-      "order": 21,
+      "order": 19,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2889,52 +2802,6 @@
       ]
     },
     {
-      "id": 218,
-      "type": "CheckpointLoaderSimple",
-      "pos": [
-        -692.4743041992188,
-        -193.74220275878906
-      ],
-      "size": [
-        315,
-        98
-      ],
-      "flags": {},
-      "order": 22,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            467
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "CLIP",
-          "type": "CLIP",
-          "links": null
-        },
-        {
-          "name": "VAE",
-          "type": "VAE",
-          "links": [
-            458,
-            464
-          ],
-          "slot_index": 2
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "CheckpointLoaderSimple"
-      },
-      "widgets_values": [
-        "video/ltx-video-2b-v0.9.1.safetensors"
-      ]
-    },
-    {
       "id": 233,
       "type": "Float",
       "pos": [
@@ -2946,7 +2813,7 @@
         58
       ],
       "flags": {},
-      "order": 23,
+      "order": 20,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2980,7 +2847,7 @@
         113.08045196533203
       ],
       "flags": {},
-      "order": 24,
+      "order": 21,
       "mode": 0,
       "inputs": [
         {
@@ -3024,7 +2891,7 @@
         58
       ],
       "flags": {},
-      "order": 25,
+      "order": 22,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -3183,7 +3050,7 @@
         113.08045196533203
       ],
       "flags": {},
-      "order": 26,
+      "order": 23,
       "mode": 0,
       "inputs": [
         {
@@ -3213,6 +3080,139 @@
       "widgets_values": [
         " ",
         ""
+      ]
+    },
+    {
+      "id": 159,
+      "type": "Note",
+      "pos": [
+        -723.5014038085938,
+        -569.2667236328125
+      ],
+      "size": [
+        695.27099609375,
+        250.2269287109375
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "ltx-video-2b-v0.9.safetensors & ltx-video-2b-v0.9.1.safetensors \n\n- location: ComfyUI/models/checkpoints/video\n- downlaod: \n  - https://huggingface.co/Lightricks/LTX-Video/blob/main/ltx-video-2b-v0.9.safetensors\n  - https://huggingface.co/Lightricks/LTX-Video/resolve/main/ltx-video-2b-v0.9.1.safetensors\n\nt5xxl_fp8_e4m3fn.safetensors\n\n- location: ComfyUI/models/clip\n- download: https://huggingface.co/comfyanonymous/flux_text_encoders/blob/main/t5xxl_fp8_e4m3fn.safetensors\n\nComfyUI-LTXVideo custom node:\nhttps://github.com/Lightricks/ComfyUI-LTXVideo\n\nComfyUI-LTXTricks custom node:\nhttps://github.com/logtd/ComfyUI-LTXTricks\n\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 226,
+      "type": "Note",
+      "pos": [
+        -687.9517822265625,
+        560.5237426757812
+      ],
+      "size": [
+        458.1549072265625,
+        207.94631958007812
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "Install `ComfyUI-MMAudio` custome node:\n\n- ComfyUI Manager -> Install via Git URL\n- url: https://github.com/kijai/ComfyUI-MMAudio\n\nDownload MMAudio used model files\n\n- location: ComfyUI/models/mmaudio\n- models:\n  - `apple_DFN5B-CLIP-ViT-H-14-384_fp16.safetensors`\n  - `mmaudio_large_44k_v2_fp16.safetensors`\n  - `mmaudio_synchformer_fp16.safetensors`\n  - `mmaudio_vae_44k_fp16.safetensors`\n- url: https://huggingface.co/Kijai/MMAudio_safetensors/tree/main"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 244,
+      "type": "DF_Int_to_Float",
+      "pos": [
+        -2282.412841796875,
+        1013.2115478515625
+      ],
+      "size": [
+        315,
+        58
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "Value",
+          "type": "INT",
+          "link": 496,
+          "widget": {
+            "name": "Value"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            499
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "DF_Int_to_Float"
+      },
+      "widgets_values": [
+        1
+      ]
+    },
+    {
+      "id": 218,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        -692.4743041992188,
+        -193.74220275878906
+      ],
+      "size": [
+        315,
+        98
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            467
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": null
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            458,
+            464
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "video/ltx-video-2b-v0.9.safetensors"
       ]
     }
   ],
@@ -3980,10 +3980,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.459497298635806,
+      "scale": 0.6115909044842609,
       "offset": [
-        2616.0974920990952,
-        726.025244876085
+        2111.183078869296,
+        705.2604284522513
       ]
     }
   },
