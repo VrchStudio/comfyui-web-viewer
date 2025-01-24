@@ -1,11 +1,14 @@
 import hashlib
 import time
 from pythonosc import dispatcher, osc_server
+from .node_utils import VrchNodeUtils
 import threading
-import socket
+
 
 # Define the category for organizational purposes
 CATEGORY = "vrch.ai/control/osc"
+# The default server IP address
+DEFAULT_SERVER_IP = VrchNodeUtils.get_default_ip_address()
 
 # Global dictionaries to store output states and previous hashes
 node_output_states = {}
@@ -19,48 +22,6 @@ class AlwaysEqualProxy(str):
 
         def __ne__(self, _):
             return False
-class VrchNodeUtils:
-    
-    @staticmethod
-    def get_default_ip_address():
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect(("8.8.8.8", 80))
-            local_ip = s.getsockname()[0]
-            s.close()
-            return local_ip
-        except Exception:
-            return "127.0.0.1"
-
-    @staticmethod
-    def remap(value, in_min=0.0, in_max=1.0, out_min=0.0, out_max=1.0):
-        """
-        Remap a scalar value from the range [in_min, in_max] to [out_min, out_max].
-        """
-        if in_max == in_min:
-            return out_min
-        # Clamp the value within the input range
-        value = max(min(value, in_max), in_min)
-        # Perform the remapping
-        return out_min + ((value - in_min) / (in_max - in_min)) * (out_max - out_min)
-
-    @staticmethod
-    def remap_invert(value, in_min=0.0, in_max=1.0, out_min=0.0, out_max=1.0):
-        """
-        Invert and remap a scalar value from the range [in_min, in_max] to [out_min, out_max].
-        """
-        if in_max == in_min:
-            return out_max
-        # Clamp the value within the input range
-        value = max(min(value, in_max), in_min)
-        # Perform the inverted remapping
-        return out_max - ((value - in_min) / (in_max - in_min)) * (out_max - out_min)
-
-    @staticmethod
-    def select_remap_func(invert: bool):
-        return VrchNodeUtils.remap_invert if invert else VrchNodeUtils.remap
-
-
 
 class VrchOSCServerManager:
     _instances = {}
@@ -133,7 +94,7 @@ class VrchXYOSCControlNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "server_ip": ("STRING", {"multiline": False, "default": DEFAULT_SERVER_IP}),
             "port": ("INT", {"default": 8000}),
             "path": ("STRING", {"default": "/xy"}),
             "x_input_min": ("FLOAT", {"default": 0.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
@@ -247,7 +208,7 @@ class VrchXYZOSCControlNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "server_ip": ("STRING", {"multiline": False, "default": DEFAULT_SERVER_IP}),
             "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
             "path": ("STRING", {"default": "/xyz"}),
             "x_input_min": ("FLOAT", {"default": 0.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
@@ -392,7 +353,7 @@ class VrchIntOSCControlNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "server_ip": ("STRING", {"multiline": False, "default": DEFAULT_SERVER_IP}),
             "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
             "path": ("STRING", {"default": "/path"}),
             "input_min": ("FLOAT", {"default": 0.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
@@ -489,7 +450,7 @@ class VrchFloatOSCControlNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "server_ip": ("STRING", {"multiline": False, "default": DEFAULT_SERVER_IP}),
             "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
             "path": ("STRING", {"default": "/path"}),
             "input_min": ("FLOAT", {"default": 0.0, "min": -9999.00, "max": 9999.00, "step": 0.01}),
@@ -580,7 +541,7 @@ class VrchSwitchOSCControlNode:
             "required": {
                 "server_ip": (
                     "STRING",
-                    {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()},
+                    {"multiline": False, "default": DEFAULT_SERVER_IP},
                 ),
                 "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
                 "path1": ("STRING", {"default": "/toggle1"}),
@@ -693,7 +654,7 @@ class VrchTextConcatOSCControlNode:
                 "text8": ("STRING", {"multiline": True, "default": ""}),
                 "server_ip": (
                     "STRING",
-                    {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()},
+                    {"multiline": False, "default": DEFAULT_SERVER_IP},
                 ),
                 "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
                 "path1": ("STRING", {"default": "/toggle1"}),
@@ -816,7 +777,7 @@ class VrchTextSwitchOSCControlNode:
                 "text8": ("STRING", {"multiline": True, "default": ""}),
                 "server_ip": (
                     "STRING",
-                    {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()},
+                    {"multiline": False, "default": DEFAULT_SERVER_IP},
                 ),
                 "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
                 "path": ("STRING", {"default": "/radio1"}),
@@ -917,7 +878,7 @@ class VrchImageSwitchOSCControlNode:
             "required": {
                 "server_ip": (
                     "STRING",
-                    {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()},
+                    {"multiline": False, "default": DEFAULT_SERVER_IP},
                 ),
                 "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
                 "path": ("STRING", {"default": "/radio1"}),
@@ -1029,7 +990,7 @@ class VrchAnyOSCControlNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "server_ip": ("STRING", {"multiline": False, "default": DEFAULT_SERVER_IP}),
             "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
             "path": ("STRING", {"default": "/path"}),
             "debug": ("BOOLEAN", {"default": False}),
@@ -1178,7 +1139,7 @@ class VrchChannelOSCControlNode:
         return {"required": {
             "any_channel_on": (AlwaysEqualProxy("*"), {}),
             "any_channel_off": (AlwaysEqualProxy("*"), {}),
-            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "server_ip": ("STRING", {"multiline": False, "default": DEFAULT_SERVER_IP}),
             "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
             "path": ("STRING", {"default": "/channel"}),
             "debug": ("BOOLEAN", {"default": False}),
@@ -1265,7 +1226,7 @@ class VrchChannelX4OSCControlNode:
             "any_channel_3_off": (AlwaysEqualProxy("*"), {}),
             "any_channel_4_on": (AlwaysEqualProxy("*"), {}),
             "any_channel_4_off": (AlwaysEqualProxy("*"), {}),
-            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "server_ip": ("STRING", {"multiline": False, "default": DEFAULT_SERVER_IP}),
             "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
             "path1": ("STRING", {"default": "/channel1"}),
             "path2": ("STRING", {"default": "/channel2"}),
@@ -1372,7 +1333,7 @@ class VrchDelayOscControlNode:
     def INPUT_TYPES(cls):
         return {"required": {
             "any_input": (AlwaysEqualProxy("*"), {}),
-            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "server_ip": ("STRING", {"multiline": False, "default": DEFAULT_SERVER_IP}),
             "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
             "path": ("STRING", {"default": "/path"}),
             "input_min": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 9999.0, "step": 0.01}),
@@ -1472,7 +1433,7 @@ class VrchOSCControlSettingsNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {"required": {
-            "server_ip": ("STRING", {"multiline": False, "default": VrchNodeUtils.get_default_ip_address()}),
+            "server_ip": ("STRING", {"multiline": False, "default": DEFAULT_SERVER_IP}),
             "port": ("INT", {"default": 8000, "min": 0, "max": 65535}),
             "debug": ("BOOLEAN", {"default": False}),
         }}
