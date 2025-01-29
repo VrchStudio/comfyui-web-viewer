@@ -5,7 +5,7 @@ from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
 
-__version__ = "1.0.17"
+__version__ = "1.0.18"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
