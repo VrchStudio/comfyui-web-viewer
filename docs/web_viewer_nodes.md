@@ -103,3 +103,32 @@
 - The "Show URL" option allows you to view and copy the dynamically constructed URL if needed.
 
 -----
+
+### Node: `Audio Web Viewer @ vrch.ai` (vrch.ai/viewer)
+
+1. **Add the `Audio Web Viewer @ vrch.ai` node** to your ComfyUI workflow.  
+   This node enables you to save and preview audio in a web viewer interface.
+
+2. **Configure the Node:**
+   - **Audio Input:**
+     - **`audio`**: Connect the audio tensor (`AUDIO` type) that you want to save and preview.
+   - **Channel:** Select a channel number from **"1"** to **"8"** (default is **"1"**).  
+     This channel number is appended to the saved filename, e.g., `channel_1.mp3`.
+   - **Server:** Enter the server's domain name or IP address (default is **`127.0.0.1:8188`**).
+   - **SSL:** Choose whether the connection should use SSL. If checked (`True`), it will use `https`; otherwise, it will use `http`.
+   - **Window Dimensions:**
+     - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
+     - **`window_height`**: Set the height of the web viewer window (default is **`960`**).
+   - **Show URL:** Toggle whether to display the constructed URL in the interface. If enabled, the **`url`** field will become visible and show the constructed URL based on your input parameters (`server`, `ssl`, `channel`, etc.).
+   - **URL Input:** This field is automatically updated with the constructed URL if **`show_url`** is enabled. You can copy and open this URL manually if desired.
+
+3. **Open Web Viewer:**
+   - After connecting your audio and configuring the node, you can open the web viewer (often via a button or link in your ComfyUI interface) to listen to the audio in a new browser window.
+   - The audio is saved in the `web_viewer` directory under the ComfyUI output folder with the filename `channel_{channel}.mp3` (e.g., `channel_1.mp3`).
+
+**Notes**:
+- Only `.mp3` format is currently used when saving the audio file.
+- Make sure the **`server`** address and **`ssl`** settings are correct so that the web viewer can access the generated audio file.
+- The **"Show URL"** option allows you to inspect, copy, or manually open the dynamic URL created for your audio content.
+
+-----
