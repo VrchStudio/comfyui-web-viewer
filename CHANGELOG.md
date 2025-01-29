@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.18 - 2025-01-29
+
+### Added
+
+- add a new Web Viewer node `VrchAudioWebViewerNode`
+- add a new workflow for Audio Web Viewer node
+- add a new tutorial for Audio web Viewer node
+- separate `VrchNodeUtils` into `node_utils.py`
+
+### Updated
+
+- update OSC Control nodes with `DEFAUTL_ADDRESS_IP`
+- update Web Viwer nodes with `DEFAULT_ADDRESS`
+- update README.md
+- update `web_viewer_nodes.md` documentation
+
 ## 1.0.17 - 2024-12-27
 
 ### Added

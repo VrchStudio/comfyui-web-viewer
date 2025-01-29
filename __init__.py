@@ -5,13 +5,14 @@ from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
 
-__version__ = "1.0.17"
+__version__ = "1.0.18"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
     "VrchAudioGenresNode": VrchAudioGenresNode,
     "VrchAudioRecorderNode": VrchAudioRecorderNode,
     "VrchAudioSaverNode": VrchAudioSaverNode,
+    "VrchAudioWebViewerNode": VrchAudioWebViewerNode,
     "VrchBooleanKeyControlNode": VrchBooleanKeyControlNode,
     "VrchChannelOSCControlNode": VrchChannelOSCControlNode,
     "VrchChannelX4OSCControlNode": VrchChannelX4OSCControlNode,
@@ -42,6 +43,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchAudioGenresNode": "Get Audio Genres @ vrch.ai",
     "VrchAudioRecorderNode": "Audio Recorder @ vrch.ai",
     "VrchAudioSaverNode": "Audio Saver @ vrch.ai",
+    "VrchAudioWebViewerNode": "AUDIO Web Viewer @ vrch.ai",
     "VrchBooleanKeyControlNode": "BOOLEAN Key Control @ vrch.ai",
     "VrchChannelOSCControlNode": "CHANNEL OSC Control @ vrch.ai",
     "VrchChannelX4OSCControlNode": "CHANNEL x4 OSC Control @ vrch.ai",

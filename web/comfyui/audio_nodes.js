@@ -101,8 +101,8 @@ app.registerExtension({
                 startBtn.textContent = "";
                 startBtn.classList.add("comfy-vrch-big-button");
 
-                const countdownDisplay = document.createElement('div');
-                countdownDisplay.classList.add("comfy-value-small-display");
+                const countdownDisplay = document.createElement("div");
+                countdownDisplay.classList.add("comfy-vrch-value-small-display");
 
                 // Add the button and tag to the node using addDOMWidget
                 this.addDOMWidget("button_widget", "Press and Hold to Record", startBtn);
@@ -312,10 +312,12 @@ app.registerExtension({
                         .catch(error => console.error('Error accessing audio devices.', error));
                 };
 
-                const stopRecording = (isManualStop = false) => {
+                const stopRecording = (isManualStop = false, delay = 300) => {
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
-                        mediaRecorder.stop();
-                        mediaRecorder = null;
+                        setTimeout(() => {
+                            mediaRecorder.stop();
+                            mediaRecorder = null;
+                        }, delay);
                         isRecording = false;
 
                         if (recordingTimer) {
@@ -413,15 +415,15 @@ style.textContent = `
         background-color: #3e8e41;
     }
 
-    .comfy-value-display {
+    .comfy-vrch-value-display {
         margin-top: 20px;
         font-size: 16px;
         font-weight: bold;
         text-align: center;
     }
     
-    .comfy-value-small-display {
-        margin-top: 60px;
+    .comfy-vrch-value-small-display {
+        margin-top: 50px;
         font-size: 14px;
         text-align: center;
     }
