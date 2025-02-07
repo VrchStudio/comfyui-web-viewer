@@ -19,7 +19,7 @@ class VrchWebViewerNode:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "mode": (["image", "flipbook", "audio", "depthmap"], {"default": "image"}),
+                "mode": (["image", "flipbook", "audio", "depthmap", "3dmodel"], {"default": "image"}),
                 "server": ("STRING", {"default": DEFAULT_SERVER, "multiline": False, "dynamicPrompts": False}),
                 "ssl": ("BOOLEAN", {"default": False}),
                 "filename": ("STRING", {"default": "web_viewer_image.jpeg", "multiline": False, "dynamicPrompts": False}),
