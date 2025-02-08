@@ -163,11 +163,8 @@ app.registerExtension({
                     if (enableShortcut && event.key === selectedShortcut && recordModeWidget.value === 'press_and_hold') {
                         console.log("shortcut key released");
                         if (shortcutKeyPressed) {
-                            // Delay stopRecording to ensure startRecording has enough time
-                            setTimeout(() => {
-                                stopRecording(true); // Manual stop on key release
-                                shortcutKeyPressed = false; // Reset flag
-                            }, 100); // Adjust the delay if necessary
+                            stopRecording(true); // Manual stop on key release
+                            shortcutKeyPressed = false; // Reset flag
                         }
                     }
                 };
