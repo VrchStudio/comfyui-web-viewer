@@ -225,6 +225,77 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
         m.update(audio_bytes)
         return m.hexdigest()
     
+class VrchModelWebViewerNode():
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "model_file": ("STRING", {"forceInput": True}),
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": DEFAULT_SERVER, "multiline": False}),
+                "ssl": ("BOOLEAN", {"default": False}),
+                "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
+                "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
+                "show_url": ("BOOLEAN", {"default": False}),
+                "url": ("STRING", {"default": "", "multiline": True}),
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("MODEL_FILE",)
+    FUNCTION = "save_and_view_3d_model"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def __init__(self):
+        # The output directory where audio will be saved
+        self.output_dir = folder_paths.output_directory
+
+    def save_and_view_3d_model(self, model_file, channel, server, ssl, window_width, window_height, show_url, url):
+        # Save the 3d model into "web_viewer" directory with filename "channel_{channel}.glb"
+        output_path = self.output_dir
+        web_viewer_folder = "web_viewer"
+        os.makedirs(os.path.join(output_path, web_viewer_folder), exist_ok=True)
+        
+        # Construct the source file path (assumed to be in output_path directory)
+        src_file = os.path.join(output_path, model_file)
+        if not os.path.isfile(src_file):
+            raise FileNotFoundError(f"File '{src_file}' not found.")
+        
+        # Check if the file extension is .glb
+        _, ext = os.path.splitext(src_file)
+        if ext.lower() != ".glb":
+            raise ValueError(f"Unsupported file extension '{ext}'. Expected '.glb'.")
+        
+        # Define the new file name and destination path
+        new_filename = f"channel_{channel}.glb"
+        dst_file = os.path.join(output_path, web_viewer_folder, new_filename)
+        
+        # Overwrite the destination file if it exists
+        if os.path.exists(dst_file):
+            os.remove(dst_file)
+        
+        # Move the file to the new destination
+        shutil.move(src_file, dst_file)
+        
+        # Return the new path relative to the output directory
+        return (os.path.join(web_viewer_folder, new_filename),)
+
+    @classmethod
+    def IS_CHANGED(cls, model_file, **kwargs):
+        m = hashlib.sha256()
+        output_path = folder_paths.output_directory
+        file_path = os.path.join(output_path, model_file)
+        
+        if not os.path.isfile(file_path):
+            return False
+        
+        with open(file_path, 'rb') as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                m.update(chunk)
+        return m.hexdigest()
+    
 class VrchVideoWebViewerNode:
     @classmethod
     def INPUT_TYPES(cls):
