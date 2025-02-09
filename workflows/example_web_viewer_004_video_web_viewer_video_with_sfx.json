@@ -797,7 +797,7 @@
       ],
       "size": [
         386.7123107910156,
-        374
+        386
       ],
       "flags": {},
       "order": 45,
@@ -864,6 +864,7 @@
         1,
         0,
         false,
+        "",
         ""
       ]
     },
@@ -966,7 +967,7 @@
       ],
       "size": [
         315,
-        446.9166564941406
+        310
       ],
       "flags": {},
       "order": 39,
@@ -1425,7 +1426,7 @@
       ],
       "size": [
         386.7123107910156,
-        374
+        386
       ],
       "flags": {},
       "order": 59,
@@ -1492,6 +1493,7 @@
         1,
         0,
         false,
+        "",
         ""
       ]
     },
@@ -2383,7 +2385,7 @@
       ],
       "size": [
         315,
-        442.9166564941406
+        306
       ],
       "flags": {},
       "order": 66,
@@ -2526,7 +2528,8 @@
       },
       "widgets_values": [
         "t5xxl_fp8_e4m3fn.safetensors",
-        "ltxv"
+        "ltxv",
+        "default"
       ]
     },
     {
@@ -2607,7 +2610,8 @@
       "widgets_values": [
         true,
         true
-      ]
+      ],
+      "color": "rgba(38, 73, 116, 0.7)"
     },
     {
       "id": 185,
@@ -2999,46 +3003,6 @@
       ]
     },
     {
-      "id": 214,
-      "type": "VrchVideoWebViewerNode",
-      "pos": [
-        948.026611328125,
-        554.452392578125
-      ],
-      "size": [
-        400,
-        270
-      ],
-      "flags": {},
-      "order": 69,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "filename",
-          "type": "STRING",
-          "link": 446,
-          "widget": {
-            "name": "filename"
-          }
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "Node name for S&R": "VrchVideoWebViewerNode"
-      },
-      "widgets_values": [
-        "",
-        "1",
-        "127.0.0.1:8188",
-        true,
-        1280,
-        960,
-        false,
-        "https://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=true&file=channel_1.mp4&path=web_viewer",
-        null
-      ]
-    },
-    {
       "id": 158,
       "type": "Textbox",
       "pos": [
@@ -3213,6 +3177,47 @@
       },
       "widgets_values": [
         "video/ltx-video-2b-v0.9.safetensors"
+      ]
+    },
+    {
+      "id": 214,
+      "type": "VrchVideoWebViewerNode",
+      "pos": [
+        948.026611328125,
+        554.452392578125
+      ],
+      "size": [
+        400,
+        320
+      ],
+      "flags": {},
+      "order": 69,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "filename",
+          "type": "STRING",
+          "link": 446,
+          "widget": {
+            "name": "filename"
+          }
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "VrchVideoWebViewerNode"
+      },
+      "widgets_values": [
+        "",
+        "1",
+        "127.0.0.1:8188",
+        true,
+        1280,
+        960,
+        false,
+        "",
+        "https://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=true&file=channel_1.mp4&path=web_viewer&https://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=true&file=channel_1.mp4&path=web_viewer",
+        null
       ]
     }
   ],
@@ -3980,11 +3985,29 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.6115909044842609,
+      "scale": 0.30735605491428225,
       "offset": [
-        2111.183078869296,
-        705.2604284522513
+        2780.7083279393737,
+        1686.7671299938593
       ]
+    },
+    "node_versions": {
+      "image-resize-comfyui": "ae5888637742ff1668b6cd32954ba48d81dbd39d",
+      "comfy-core": "0.3.13",
+      "ComfyUI-VideoHelperSuite": "b0f9796ea3d716997aa2c5e1e5e5000cac8365d9",
+      "ComfyUI_essentials": "8727258f04be6647d7b9013993d1d335acf84169",
+      "ComfyUI-Chibi-Nodes": "290ccef2a8c1bc3917e1c00dbe5c206b66fb8ded",
+      "ComfyUI-Easy-Use": "db14b955a59ef8568ed2511b73373d5437449341",
+      "ComfyUI-LTXTricks": "06fed1c7974de7198840209b3b7eb7a84742d460",
+      "comfyui-florence2": "1.0.1",
+      "comfyui-ollama": "cfa314d36efbb2344ba22a76256200016ad9570a",
+      "comfyui-image-round": "de5090763b6f33e5e4850ad929e2ac6dee66c054",
+      "ComfyUI-MMAudio": "d77f511c6593bcbd4e65ef6e1f7bed4741801e47",
+      "ComfyUI-Logic": "fb8897351f715ea75eebf52e74515b6d07c693b8",
+      "rgthree-comfy": "2613da28c639b90b310e35c6ffde9ee0a3d60bfe",
+      "ComfyUI_LayerStyle": "e06df57bd0cd45e60586f4c3626d1bf2519216b5",
+      "Derfuu_ComfyUI_ModdedNodes": "d0905bed31249f2bd0814c67585cf4fe3c77c015",
+      "comfyui-web-viewer": "93daa27bd76f869eb88bafda6e621abe460c8d59"
     }
   },
   "version": 0.4

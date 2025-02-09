@@ -5,14 +5,14 @@
     {
       "id": 7,
       "type": "CLIPTextEncode",
-      "pos": {
-        "0": 413,
-        "1": 389
-      },
-      "size": {
-        "0": 425.27801513671875,
-        "1": 180.6060791015625
-      },
+      "pos": [
+        413,
+        389
+      ],
+      "size": [
+        425.27801513671875,
+        180.6060791015625
+      ],
       "flags": {},
       "order": 3,
       "mode": 0,
@@ -43,14 +43,14 @@
     {
       "id": 6,
       "type": "CLIPTextEncode",
-      "pos": {
-        "0": 415,
-        "1": 186
-      },
-      "size": {
-        "0": 422.84503173828125,
-        "1": 164.31304931640625
-      },
+      "pos": [
+        415,
+        186
+      ],
+      "size": [
+        422.84503173828125,
+        164.31304931640625
+      ],
       "flags": {},
       "order": 2,
       "mode": 0,
@@ -81,14 +81,14 @@
     {
       "id": 4,
       "type": "CheckpointLoaderSimple",
-      "pos": {
-        "0": 26,
-        "1": 474
-      },
-      "size": {
-        "0": 315,
-        "1": 98
-      },
+      "pos": [
+        26,
+        474
+      ],
+      "size": [
+        315,
+        98
+      ],
       "flags": {},
       "order": 0,
       "mode": 0,
@@ -130,14 +130,14 @@
     {
       "id": 3,
       "type": "KSampler",
-      "pos": {
-        "0": 863,
-        "1": 186
-      },
-      "size": {
-        "0": 315,
-        "1": 262
-      },
+      "pos": [
+        863,
+        186
+      ],
+      "size": [
+        315,
+        262
+      ],
       "flags": {},
       "order": 4,
       "mode": 0,
@@ -177,7 +177,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        416944569153838,
+        639560808131120,
         "randomize",
         6,
         2,
@@ -189,14 +189,14 @@
     {
       "id": 8,
       "type": "VAEDecode",
-      "pos": {
-        "0": 1209,
-        "1": 188
-      },
-      "size": {
-        "0": 210,
-        "1": 46
-      },
+      "pos": [
+        1209,
+        188
+      ],
+      "size": [
+        210,
+        46
+      ],
       "flags": {},
       "order": 5,
       "mode": 0,
@@ -230,14 +230,14 @@
     {
       "id": 5,
       "type": "EmptyLatentImage",
-      "pos": {
-        "0": 473,
-        "1": 609
-      },
-      "size": {
-        "0": 315,
-        "1": 106
-      },
+      "pos": [
+        473,
+        609
+      ],
+      "size": [
+        315,
+        106
+      ],
       "flags": {},
       "order": 1,
       "mode": 0,
@@ -264,14 +264,14 @@
     {
       "id": 13,
       "type": "VrchImageFlipBookWebViewerNode",
-      "pos": {
-        "0": 1211,
-        "1": 412
-      },
-      "size": {
-        "0": 428.4000244140625,
-        "1": 294
-      },
+      "pos": [
+        1211,
+        412
+      ],
+      "size": [
+        428.4000244140625,
+        344
+      ],
       "flags": {},
       "order": 6,
       "mode": 0,
@@ -282,19 +282,26 @@
           "link": 10
         }
       ],
-      "outputs": [],
+      "outputs": [
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
       "properties": {
         "Node name for S&R": "VrchImageFlipBookWebViewerNode"
       },
       "widgets_values": [
         "1",
         4,
-        "192.168.123.104:8188",
+        "127.0.0.1:8188",
         false,
         1280,
         960,
         false,
-        "http://vrch.ai/viewer?mode=flipbook&server=192.168.123.104:8188&ssl=false&file=channel_1.jpeg&path=web_viewer&numberOfImages=4",
+        "",
+        "http://vrch.ai/viewer?mode=flipbook&server=127.0.0.1:8188&ssl=false&file=channel_1.jpeg&path=web_viewer&numberOfImages=4",
         null
       ]
     }
@@ -377,11 +384,15 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1,
+      "scale": 0.7972024500000007,
       "offset": [
-        3.8340517338935456,
-        100.27451899951797
+        -24.132361175842064,
+        45.193188172566956
       ]
+    },
+    "node_versions": {
+      "comfy-core": "0.3.13",
+      "comfyui-web-viewer": "93daa27bd76f869eb88bafda6e621abe460c8d59"
     }
   },
   "version": 0.4
