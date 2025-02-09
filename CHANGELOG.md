@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - adjust Audio Recorder recording behaviour
 - update `web_viewer_nodes.md` documentation
+- introduce `extra_params` option for all Web Viewer nodes
+- refactor Web Viewer nodes js code
 
 ## 1.0.18 - 2025-01-29
 
