@@ -222,8 +222,8 @@
         -408.033447265625
       ],
       "size": [
-        400,
-        270
+        403.46722412109375,
+        353.8019714355469
       ],
       "flags": {},
       "order": 5,
@@ -252,6 +252,7 @@
         500,
         600,
         false,
+        "",
         "http://vrch.ai/viewer?mode=audio&server=127.0.0.1:8188&ssl=false&file=channel_1.mp3&path=web_viewer",
         null
       ]
@@ -295,16 +296,16 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.8390545288824054,
+      "scale": 1.061076460950001,
       "offset": [
-        1216.6609091217738,
-        548.5177720644192
+        1003.8349404785547,
+        562.4945593358352
       ]
     },
     "node_versions": {
       "ComfyUI-F5-TTS": "39981dafa1bdff3d0021f0a68b1330071989f775",
       "ComfyUI-Chibi-Nodes": "290ccef2a8c1bc3917e1c00dbe5c206b66fb8ded",
-      "comfyui-web-viewer": "9810dcf991c8d0c93ad10752ae62aee656f311ae"
+      "comfyui-web-viewer": "93daa27bd76f869eb88bafda6e621abe460c8d59"
     }
   },
   "version": 0.4

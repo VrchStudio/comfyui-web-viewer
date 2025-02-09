@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.19 - 2025-02-09
+
+### Added
+
+- add a new Web Viewer node `VrchVideoWebViewerNode`
+- add `web_viewer_nodes_extra_params.md` documentation
+
+### Updated
+
+- adjust Audio Recorder recording behaviour
+- introduce `extra_params` option for all Web Viewer nodes
+- refactor Web Viewer nodes js code
+- update `web_viewer_nodes.md` documentation
+- update example workflows for all Web Viewer nodes
+
 ## 1.0.18 - 2025-01-29
 
 ### Added
