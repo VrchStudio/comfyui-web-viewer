@@ -12,6 +12,7 @@
      - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
      - **`window_height`**: Set the height of the web viewer window (default is **`960`**).
    - **Show URL:** Toggle whether to display the constructed URL in the interface. Enabling this will make the **`url`** field visible.
+   - **Extra Params**: The extra parameters for Image Web Viewer, see [web_viewer_nodes_extra_params.md](./web_viewer_nodes_extra_params.md)
    - **URL Input:** This field automatically updates with the constructed URL based on your inputs (`server`, `ssl`, `channel`, etc.). You can toggle its visibility using the **`show_url`** option.
 
 3. **Open Web Viewer:**
@@ -40,6 +41,7 @@
      - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
      - **`window_height`**: Set the height of the web viewer window (default is **`960`**).
    - **Show URL:** Toggle whether to display the constructed URL in the interface. Enabling this will make the **`url`** field visible.
+   - **Extra Params**: The extra parameters for Image Flipbook Web Viewer, see [web_viewer_nodes_extra_params.md](./web_viewer_nodes_extra_params.md)
    - **URL Input:** This field automatically updates with the constructed URL based on your inputs (`server`, `ssl`, `channel`, `number_of_images` etc.). You can toggle its visibility using the **`show_url`** option.
 
 3. **Open Web Viewer:**
@@ -68,6 +70,7 @@
      - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
      - **`window_height`**: Set the height of the web viewer window (default is **`960`**).
    - **Show URL:** Toggle whether to display the constructed URL in the interface. Enabling this will make the **`url`** field visible.
+   - **Extra Params**: The extra parameters for Video Web Viewer, see [web_viewer_nodes_extra_params.md](./web_viewer_nodes_extra_params.md)
    - **URL Input:** This field automatically updates with the constructed URL based on your inputs (`server`, `ssl`, `channel`, etc.). You can toggle its visibility using the **`show_url`** option.
 
 3. **Open Web Viewer:**
@@ -97,6 +100,7 @@
      - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
      - **`window_height`**: Set the height of the web viewer window (default is **`960`**).
    - **Show URL:** Toggle whether to display the constructed URL in the interface. If enabled, the **`url`** field will become visible and show the constructed URL based on your input parameters (`server`, `ssl`, `channel`, etc.).
+   - **Extra Params**: The extra parameters for Audio Web Viewer, see [web_viewer_nodes_extra_params.md](./web_viewer_nodes_extra_params.md)
    - **URL Input:** This field is automatically updated with the constructed URL if **`show_url`** is enabled. You can copy and open this URL manually if desired.
 
 3. **Open Web Viewer:**
@@ -126,6 +130,7 @@
      - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
      - **`window_height`**: Set the height of the web viewer window (default is **`960`**).
    - **Show URL:** Toggle whether to display the constructed URL in the interface.
+   - **Extra Params**: The extra parameters for 3D Model Web Viewer, see [web_viewer_nodes_extra_params.md](./web_viewer_nodes_extra_params.md)
    - **URL Input:** This field is automatically updated with the constructed URL if **`show_url`** is enabled.
 
 3. **Open Web Viewer:**
@@ -153,6 +158,7 @@
      - `window_height`: Set the height of the web viewer window.
    - **Show URL:** Toggle whether to display the constructed URL in the interface. If enabled, the `url` input field will become visible and show the constructed URL based on the input parameters.
    - **URL Input:** This field is automatically updated with the constructed URL based on the inputs provided (`page`, `server`, `ssl`, `file`, and `path`). You can toggle its visibility using the `show_url` input.
+   - **Extra Params**: The extra parameters for Web Viewer pages, see [web_viewer_nodes_extra_params.md](./web_viewer_nodes_extra_params.md)
 3. **Open Web Viewer:**
    - Click the "Open Web Viewer" button to launch the specified URL in a new browser window based on the input parameters.
 
