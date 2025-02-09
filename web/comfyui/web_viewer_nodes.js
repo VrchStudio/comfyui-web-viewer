@@ -66,6 +66,79 @@ function buildUrl(config) {
     return `${scheme}://vrch.ai/viewer?mode=${mode}&server=${server}&ssl=${sslStr}&file=${filename}&path=${path}${additionalQuery}${extraParams}`;
 }
 
+/**
+ * Helper function to initialize the URL and widget visibility after a delay.
+ *
+ * @param {Object} node - The current node.
+ * @param {Object} showUrlWidget - The widget controlling URL visibility.
+ * @param {Object} urlWidget - The URL widget.
+ * @param {Function} updateUrl - The updateUrl callback.
+ */
+function delayInit(node, showUrlWidget, urlWidget, updateUrl) {
+    setTimeout(() => {
+        if (showUrlWidget) {
+            showUrlWidget.value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
+        }
+        updateUrl();
+    }, 1000);
+}
+
+/**
+ * Helper function to create the "Open Web Viewer" button.
+ *
+ * @param {Object} node - The current node.
+ * @param {Object} urlWidget - The widget containing the URL.
+ * @param {Object} widthWidget - The widget for window width.
+ * @param {Object} heightWidget - The widget for window height.
+ */
+function createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget) {
+    const button = document.createElement("button");
+    button.textContent = "Open Web Viewer";
+    button.classList.add("comfy-big-button");
+    button.onclick = () => {
+        if (urlWidget && urlWidget.value) {
+            const width = widthWidget ? widthWidget.value : 1280;
+            const height = heightWidget ? heightWidget.value : 960;
+            window.open(urlWidget.value, "_blank", `width=${width},height=${height}`);
+        } else {
+            console.error("URL widget not found or empty");
+        }
+    };
+    node.addDOMWidget("button_widget", "Open Web Viewer", button);
+}
+
+/**
+ * Helper function to set up widget callbacks for updating the URL and toggling visibility.
+ *
+ * @param {Object} node - The current node.
+ * @param {Function} updateUrl - The updateUrl function to be called on widget change.
+ * @param {Object} urlWidget - The URL widget to be toggled.
+ * @param {Object} showUrlWidget - The widget controlling URL visibility.
+ * @param {Array} widgets - An array of widgets whose callbacks will trigger updateUrl.
+ * @param {string} [logPrefix] - (Optional) A prefix to log for debugging.
+ */
+function setupWidgetCallback(node, updateUrl, urlWidget, showUrlWidget, widgets, logPrefix) {
+    widgets.forEach(widget => {
+        if (widget) {
+            widget.callback = () => {
+                if (logPrefix) {
+                    console.log(`${logPrefix}:::${widget.name}`);
+                }
+                updateUrl();
+            };
+        }
+    });
+    if (showUrlWidget) {
+        showUrlWidget.callback = (value) => {
+            if (value) {
+                showWidget(node, urlWidget);
+            } else {
+                hideWidget(node, urlWidget);
+            }
+        };
+    }
+}
+
 // =====================================================================
 // Extension: vrch.WebViewer
 // =====================================================================
@@ -81,7 +154,6 @@ app.registerExtension({
             const modeWidget = node.widgets.find(w => w.name === "mode");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
             const heightWidget = node.widgets.find(w => w.name === "window_height");
-            // Note: extraParamsWidget is obtained from node.widget as in the original code
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
@@ -93,67 +165,30 @@ app.registerExtension({
                         serverWidget: serverWidget,
                         sslWidget: sslWidget,
                         extraParamsWidget: extraParamsWidget,
-                        // Mode comes from modeWidget (default to "image")
                         mode: modeWidget ? modeWidget.value : "image",
-                        // Path comes from pathWidget (default to "web_viewer")
                         path: pathWidget ? pathWidget.value : "web_viewer",
-                        // Generate filename based on filenameWidget (default value if missing)
                         fileGenerator: (cfg) =>
                             filenameWidget ? filenameWidget.value : "web_viewer_image.jpeg"
                     });
                 }
             }
 
-            // Attach updateUrl callback to relevant widgets
-            const widgets = [serverWidget, sslWidget, filenameWidget, pathWidget, modeWidget, extraParamsWidget];
-            widgets.forEach(widget => {
-                if (widget) {
-                    widget.callback = () => {
-                        console.log(`VrchWebViewerNode:::${widget.name}`);
-                        updateUrl();
-                    };
-                }
-            });
-
-            // Toggle URL widget visibility based on showUrlWidget's value
-            if (showUrlWidget) {
-                showUrlWidget.callback = (value) => {
-                    if (value) {
-                        showWidget(node, urlWidget);
-                    } else {
-                        hideWidget(node, urlWidget);
-                    }
-                };
-            }
-
-            // Create a custom button to open the web viewer URL in a new window
-            const button = document.createElement("button");
-            button.textContent = "Open Web Viewer";
-            button.classList.add("comfy-big-button");
-            button.onclick = () => {
-                if (urlWidget && urlWidget.value) {
-                    const width = widthWidget ? widthWidget.value : 1280;
-                    const height = heightWidget ? heightWidget.value : 960;
-                    window.open(urlWidget.value, "_blank", `width=${width},height=${height}`);
-                } else {
-                    console.error("URL widget not found or empty");
-                }
-            };
-
-            // Add the button as a DOM widget
-            node.addDOMWidget("button_widget", "Open Web Viewer", button);
+            // Use setupWidgetCallback() to attach callbacks
+            setupWidgetCallback(
+                node,
+                updateUrl,
+                urlWidget,
+                showUrlWidget,
+                [serverWidget, sslWidget, filenameWidget, pathWidget, modeWidget, extraParamsWidget],
+                "VrchWebViewerNode"
+            );
 
             // Initially hide the URL widget
             hideWidget(node, urlWidget);
 
-            // Initialize the URL and visibility after widgets are loaded
-            function init() {
-                if (showUrlWidget) {
-                    showUrlWidget.value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
-                }
-                updateUrl();
-            }
-            setTimeout(init, 1000);
+            // Create the button and initialize after a delay
+            createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
@@ -175,7 +210,6 @@ app.registerExtension({
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
 
-            // Function to update the URL using buildUrl
             function updateUrl() {
                 if (urlWidget) {
                     urlWidget.value = buildUrl({
@@ -192,51 +226,19 @@ app.registerExtension({
                 }
             }
 
-            // Attach updateUrl callback to relevant widgets
-            const widgets = [serverWidget, sslWidget, channelWidget, extraParamsWidget];
-            widgets.forEach(widget => {
-                if (widget) {
-                    widget.callback = () => {
-                        updateUrl();
-                    };
-                }
-            });
+            // Use setupWidgetCallback() with a custom log prefix if desired
+            setupWidgetCallback(
+                node,
+                updateUrl,
+                urlWidget,
+                showUrlWidget,
+                [serverWidget, sslWidget, channelWidget, extraParamsWidget],
+                "VrchImageWebViewerNode"
+            );
 
-            // Toggle URL widget visibility based on showUrlWidget's value
-            if (showUrlWidget) {
-                showUrlWidget.callback = (value) => {
-                    value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
-                };
-            }
-
-            // Create a custom button to open the URL
-            const button = document.createElement("button");
-            button.textContent = "Open Web Viewer";
-            button.classList.add("comfy-big-button");
-            button.onclick = () => {
-                if (urlWidget && urlWidget.value) {
-                    const width = widthWidget ? widthWidget.value : 1280;
-                    const height = heightWidget ? heightWidget.value : 960;
-                    window.open(urlWidget.value, "_blank", `width=${width},height=${height}`);
-                } else {
-                    console.error("URL widget not found or empty");
-                }
-            };
-
-            // Add the button as a DOM widget
-            node.addDOMWidget("button_widget", "Open Web Viewer", button);
-
-            // Initially hide the URL widget
             hideWidget(node, urlWidget);
-
-            // Initialize after a delay
-            function init() {
-                if (showUrlWidget) {
-                    showUrlWidget.value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
-                }
-                updateUrl();
-            }
-            setTimeout(init, 1000);
+            createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
@@ -259,7 +261,6 @@ app.registerExtension({
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
 
-            // Function to update the URL using buildUrl
             function updateUrl() {
                 if (urlWidget) {
                     urlWidget.value = buildUrl({
@@ -272,57 +273,23 @@ app.registerExtension({
                             const channel = channelWidget ? channelWidget.value : "1";
                             return `channel_${channel}.jpeg`;
                         },
-                        // Pass additional parameter for the number of images
                         additionalParams: { numberOfImages: numberOfImagesWidget }
                     });
                 }
             }
 
-            // Attach updateUrl callback to relevant widgets
-            const widgets = [serverWidget, sslWidget, channelWidget, numberOfImagesWidget, extraParamsWidget];
-            widgets.forEach(widget => {
-                if (widget) {
-                    widget.callback = () => {
-                        updateUrl();
-                    };
-                }
-            });
+            setupWidgetCallback(
+                node,
+                updateUrl,
+                urlWidget,
+                showUrlWidget,
+                [serverWidget, sslWidget, channelWidget, numberOfImagesWidget, extraParamsWidget],
+                "VrchImageFlipbookWebViewerNode"
+            );
 
-            // Toggle URL widget visibility
-            if (showUrlWidget) {
-                showUrlWidget.callback = (value) => {
-                    value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
-                };
-            }
-
-            // Create the custom button
-            const button = document.createElement("button");
-            button.textContent = "Open Web Viewer";
-            button.classList.add("comfy-big-button");
-            button.onclick = () => {
-                if (urlWidget && urlWidget.value) {
-                    const width = widthWidget ? widthWidget.value : 1280;
-                    const height = heightWidget ? heightWidget.value : 960;
-                    window.open(urlWidget.value, "_blank", `width=${width},height=${height}`);
-                } else {
-                    console.error("URL widget not found or empty");
-                }
-            };
-
-            // Add the button to the node
-            node.addDOMWidget("button_widget", "Open Web Viewer", button);
-
-            // Initially hide the URL widget
             hideWidget(node, urlWidget);
-
-            // Initialize after a delay
-            function init() {
-                if (showUrlWidget) {
-                    showUrlWidget.value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
-                }
-                updateUrl();
-            }
-            setTimeout(init, 1000);
+            createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
@@ -344,7 +311,6 @@ app.registerExtension({
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
 
-            // Function to update the URL using buildUrl
             function updateUrl() {
                 if (urlWidget) {
                     urlWidget.value = buildUrl({
@@ -361,51 +327,18 @@ app.registerExtension({
                 }
             }
 
-            // Attach updateUrl callback to relevant widgets
-            const widgets = [serverWidget, sslWidget, channelWidget];
-            widgets.forEach(widget => {
-                if (widget) {
-                    widget.callback = () => {
-                        updateUrl();
-                    };
-                }
-            });
+            setupWidgetCallback(
+                node,
+                updateUrl,
+                urlWidget,
+                showUrlWidget,
+                [serverWidget, sslWidget, channelWidget],
+                "VrchVideoWebViewerNode"
+            );
 
-            // Toggle URL widget visibility
-            if (showUrlWidget) {
-                showUrlWidget.callback = (value) => {
-                    value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
-                };
-            }
-
-            // Create the custom button
-            const button = document.createElement("button");
-            button.textContent = "Open Web Viewer";
-            button.classList.add("comfy-big-button");
-            button.onclick = () => {
-                if (urlWidget && urlWidget.value) {
-                    const width = widthWidget ? widthWidget.value : 1280;
-                    const height = heightWidget ? heightWidget.value : 960;
-                    window.open(urlWidget.value, "_blank", `width=${width},height=${height}`);
-                } else {
-                    console.error("URL widget not found or empty");
-                }
-            };
-
-            // Add the button to the node
-            node.addDOMWidget("button_widget", "Open Web Viewer", button);
-
-            // Initially hide the URL widget
             hideWidget(node, urlWidget);
-
-            // Initialize after a delay
-            function init() {
-                if (showUrlWidget) {
-                    showUrlWidget.value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
-                }
-                updateUrl();
-            }
-            setTimeout(init, 1000);
+            createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
@@ -427,7 +360,6 @@ app.registerExtension({
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
 
-            // Function to update the URL using buildUrl
             function updateUrl() {
                 if (urlWidget) {
                     urlWidget.value = buildUrl({
@@ -444,51 +376,18 @@ app.registerExtension({
                 }
             }
 
-            // Attach updateUrl callback to relevant widgets
-            const widgets = [serverWidget, sslWidget, channelWidget, extraParamsWidget];
-            widgets.forEach(widget => {
-                if (widget) {
-                    widget.callback = () => {
-                        updateUrl();
-                    };
-                }
-            });
+            setupWidgetCallback(
+                node,
+                updateUrl,
+                urlWidget,
+                showUrlWidget,
+                [serverWidget, sslWidget, channelWidget, extraParamsWidget],
+                "VrchAudioWebViewerNode"
+            );
 
-            // Toggle URL widget visibility
-            if (showUrlWidget) {
-                showUrlWidget.callback = (value) => {
-                    value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
-                };
-            }
-
-            // Create the custom button
-            const button = document.createElement("button");
-            button.textContent = "Open Web Viewer";
-            button.classList.add("comfy-big-button");
-            button.onclick = () => {
-                if (urlWidget && urlWidget.value) {
-                    const width = widthWidget ? widthWidget.value : 1280;
-                    const height = heightWidget ? heightWidget.value : 960;
-                    window.open(urlWidget.value, "_blank", `width=${width},height=${height}`);
-                } else {
-                    console.error("URL widget not found or empty");
-                }
-            };
-
-            // Add the button to the node
-            node.addDOMWidget("button_widget", "Open Web Viewer", button);
-
-            // Initially hide the URL widget
             hideWidget(node, urlWidget);
-
-            // Initialize after a delay
-            function init() {
-                if (showUrlWidget) {
-                    showUrlWidget.value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
-                }
-                updateUrl();
-            }
-            setTimeout(init, 1000);
+            createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
@@ -510,7 +409,6 @@ app.registerExtension({
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
 
-            // Function to update the URL using buildUrl
             function updateUrl() {
                 if (urlWidget) {
                     urlWidget.value = buildUrl({
@@ -527,55 +425,21 @@ app.registerExtension({
                 }
             }
 
-            // Attach updateUrl callback to relevant widgets
-            const widgets = [serverWidget, sslWidget, channelWidget, extraParamsWidget];
-            widgets.forEach(widget => {
-                if (widget) {
-                    widget.callback = () => {
-                        updateUrl();
-                    };
-                }
-            });
+            setupWidgetCallback(
+                node,
+                updateUrl,
+                urlWidget,
+                showUrlWidget,
+                [serverWidget, sslWidget, channelWidget, extraParamsWidget],
+                "VrchModelWebViewerNode"
+            );
 
-            // Toggle URL widget visibility
-            if (showUrlWidget) {
-                showUrlWidget.callback = (value) => {
-                    value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
-                };
-            }
-
-            // Create the custom button
-            const button = document.createElement("button");
-            button.textContent = "Open Web Viewer";
-            button.classList.add("comfy-big-button");
-            button.onclick = () => {
-                if (urlWidget && urlWidget.value) {
-                    const width = widthWidget ? widthWidget.value : 1280;
-                    const height = heightWidget ? heightWidget.value : 960;
-                    window.open(urlWidget.value, "_blank", `width=${width},height=${height}`);
-                } else {
-                    console.error("URL widget not found or empty");
-                }
-            };
-
-            // Add the button to the node
-            node.addDOMWidget("button_widget", "Open Web Viewer", button);
-
-            // Initially hide the URL widget
             hideWidget(node, urlWidget);
-
-            // Initialize after a delay
-            function init() {
-                if (showUrlWidget) {
-                    showUrlWidget.value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
-                }
-                updateUrl();
-            }
-            setTimeout(init, 1000);
+            createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
-
 
 // Add custom styles for the button
 const style = document.createElement("style");
