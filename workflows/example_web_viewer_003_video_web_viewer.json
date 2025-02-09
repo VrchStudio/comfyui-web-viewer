@@ -90,7 +90,13 @@
           "link": 434
         }
       ],
-      "outputs": [],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
       "properties": {
         "Node name for S&R": "easy cleanGpuUsed"
       },
@@ -324,7 +330,7 @@
       ],
       "size": [
         315,
-        446.9166564941406
+        310
       ],
       "flags": {},
       "order": 26,
@@ -853,7 +859,8 @@
       },
       "widgets_values": [
         "t5xxl_fp8_e4m3fn.safetensors",
-        "ltxv"
+        "ltxv",
+        "default"
       ]
     },
     {
@@ -1534,7 +1541,7 @@
       ],
       "size": [
         386.7123107910156,
-        374
+        386
       ],
       "flags": {},
       "order": 31,
@@ -1601,6 +1608,7 @@
         1,
         5,
         false,
+        "",
         ""
       ]
     },
@@ -2096,7 +2104,7 @@
       ],
       "size": [
         315,
-        446.9166564941406
+        310
       ],
       "flags": {},
       "order": 45,
@@ -2165,6 +2173,29 @@
       }
     },
     {
+      "id": 213,
+      "type": "Note",
+      "pos": [
+        824.3380737304688,
+        881.1611938476562
+      ],
+      "size": [
+        386.6794738769531,
+        152.2682647705078
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "The value of server address should be your ComfyUI server ip anddress and port number, e.g. 127.0.0.1:8188.\n\nComfyUI Web Viewer custom node\nhttps://github.com/VrchStudio/comfyui-web-viewer\n\n\nComfyUI-VideoHelperSuite\nhttps://github.com/Kosinkadink/ComfyUI-VideoHelperSuite"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
       "id": 214,
       "type": "VrchVideoWebViewerNode",
       "pos": [
@@ -2173,7 +2204,7 @@
       ],
       "size": [
         400,
-        226
+        320
       ],
       "flags": {},
       "order": 48,
@@ -2200,32 +2231,10 @@
         1280,
         960,
         false,
-        "http://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=false&file=channel_1.mp4&path=web_viewer",
+        "",
+        "http://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=false&file=channel_1.mp4&path=web_viewer&http://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=false&file=channel_1.mp4&path=web_viewer",
         null
       ]
-    },
-    {
-      "id": 213,
-      "type": "Note",
-      "pos": [
-        824.3380737304688,
-        881.1611938476562
-      ],
-      "size": [
-        386.6794738769531,
-        152.2682647705078
-      ],
-      "flags": {},
-      "order": 17,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {},
-      "widgets_values": [
-        "The value of server address should be your ComfyUI server ip anddress and port number, e.g. 127.0.0.1:8188.\n\nComfyUI Web Viewer custom node\nhttps://github.com/VrchStudio/comfyui-web-viewer\n\n\nComfyUI-VideoHelperSuite\nhttps://github.com/Kosinkadink/ComfyUI-VideoHelperSuite"
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
     }
   ],
   "links": [
@@ -2758,11 +2767,26 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.3558410273837759,
+      "scale": 0.6588450000000005,
       "offset": [
-        2645.6813906622524,
-        1813.7676907509574
+        612.3617239882029,
+        128.9858169749382
       ]
+    },
+    "node_versions": {
+      "comfyui-florence2": "1.0.1",
+      "ComfyUI-Easy-Use": "db14b955a59ef8568ed2511b73373d5437449341",
+      "image-resize-comfyui": "ae5888637742ff1668b6cd32954ba48d81dbd39d",
+      "ComfyUI-VideoHelperSuite": "b0f9796ea3d716997aa2c5e1e5e5000cac8365d9",
+      "comfy-core": "0.3.13",
+      "ComfyUI-LTXTricks": "06fed1c7974de7198840209b3b7eb7a84742d460",
+      "rgthree-comfy": "2613da28c639b90b310e35c6ffde9ee0a3d60bfe",
+      "comfyui-image-round": "de5090763b6f33e5e4850ad929e2ac6dee66c054",
+      "ComfyUI-Logic": "fb8897351f715ea75eebf52e74515b6d07c693b8",
+      "ComfyUI-Chibi-Nodes": "290ccef2a8c1bc3917e1c00dbe5c206b66fb8ded",
+      "comfyui-ollama": "cfa314d36efbb2344ba22a76256200016ad9570a",
+      "ComfyUI_essentials": "8727258f04be6647d7b9013993d1d335acf84169",
+      "comfyui-web-viewer": "93daa27bd76f869eb88bafda6e621abe460c8d59"
     }
   },
   "version": 0.4
