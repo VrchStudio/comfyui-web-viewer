@@ -8,7 +8,7 @@ app.registerExtension({
         // Only process nodes of type "VrchImageTDBackgroundNode"
         if (node.comfyClass === "VrchImageTDBackgroundNode") {
             // Get the relevant widgets
-            const enableWidget = node.widgets.find(w => w.name === "enable_background_display");
+            const enableWidget = node.widgets.find(w => w.name === "background_display");
             const colorWidget = node.widgets.find(w => w.name === "transparent_colour");
             const intervalWidget = node.widgets.find(w => w.name === "refresh_interval_ms");
 
@@ -22,7 +22,7 @@ app.registerExtension({
                         reinitBackground();
                         updateBackground();
                         if (app.graph && app.graph.canvas) {
-                            app.graph.canvas.setDirty(true, true);
+                            app.graph.canvas.draw(true, true);
                         }
                     };
                 }
@@ -31,9 +31,8 @@ app.registerExtension({
             // Function that returns the final image path
             function getImagePath() {
                 const folder = "td_background";
-                const filename = "background.png";
+                const filename = "background.jpg";
                 const basePath = window.location.href;
-                console.log("basePath:", basePath);
                 return `${basePath}view?filename=${filename}&subfolder=${folder}&type=output&rand=${Math.random()}`;
             }
 
@@ -55,6 +54,9 @@ app.registerExtension({
                 let ms = parseInt(intervalWidget.value || 300, 10);
                 pollTimer = setInterval(() => {
                     updateBackground();
+                    if (app.graph && app.graph.canvas) {
+                        app.graph.canvas.draw(true, true);
+                    }
                 }, ms);
             }
 
@@ -64,7 +66,7 @@ app.registerExtension({
                 window._td_bg_img.onload = () => {
                     // Trigger canvas redraw when image is loaded
                     if (app.graph && app.graph.canvas) {
-                        app.graph.canvas.setDirty(true, true);
+                        app.graph.canvas.draw(true, true);
                     }
                 };
             }
@@ -77,7 +79,7 @@ app.registerExtension({
                         window._td_bg_img.src = "";
                         lastLoadedPath = null;
                         if (app.graph && app.graph.canvas) {
-                            app.graph.canvas.setDirty(true, true);
+                            app.graph.canvas.draw(true, true);
                         }
                     }
                     return;
@@ -91,11 +93,14 @@ app.registerExtension({
                     imgObj.onload = () => {
                         // Set the global image source once loaded
                         window._td_bg_img.src = imgObj.src;
+                        if (app.graph && app.graph.canvas) {
+                            app.graph.canvas.draw(true, true);
+                        }
                     };
                     imgObj.onerror = err => {
                         console.warn("Background image not found or load error:", path);
                     };
-                    console.log("Loading background image:", path);
+                    console.log("Loading background image aaaa:", path);
                     imgObj.src = path; // Prevent cache
                 }
             }
@@ -124,7 +129,7 @@ app.registerExtension({
                 if (tdNodes.length) {
                     const n = tdNodes[0];
                     const cWidget = n.widgets.find(w => w.name === "transparent_colour");
-                    const eWidget = n.widgets.find(w => w.name === "enable_background_display");
+                    const eWidget = n.widgets.find(w => w.name === "background_display");
                     enableVal = eWidget ? eWidget.value : false;
                     colorVal = cWidget ? cWidget.value : "#000000";
                 }
