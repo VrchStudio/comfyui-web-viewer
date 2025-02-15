@@ -3,22 +3,21 @@ import { api } from "../../scripts/api.js";
 
 
 function imgToCanvasBase64 (img) {
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    canvas.width = img.width
-    canvas.height = img.height
-    ctx.drawImage(img, 0, 0)
-    const base64 = canvas.toDataURL('image/png')
-
-    return base64
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    const base64 = canvas.toDataURL('image/png');
+    return base64;
 }
 
 function convertImageToBase64 (img) {
     try {
-        const base64 = imgToCanvasBase64(img)
-        return base64
+        const base64 = imgToCanvasBase64(img);
+        return base64;
     } catch (error) {
-        console.error(error)
+        console.error(error);
     }
 }
 
@@ -202,7 +201,6 @@ app.registerExtension({
                     }
                     ctx.putImageData(imgData, 0, 0);
                 }
-
                 ctx.restore();
             }
         };
