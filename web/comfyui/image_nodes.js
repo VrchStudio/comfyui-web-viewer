@@ -21,6 +21,19 @@ function convertImageToBase64 (img) {
     }
 }
 
+// Helper function to compute SHA-256 hash of a string and return it as hex
+async function computeHash(str) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+// Global flag to enable/disable debug logging
+const ENABLE_DEBUG = false;
+
 app.registerExtension({
     name: "vrch.ImageTDBackground",
 
@@ -87,6 +100,9 @@ app.registerExtension({
                 };
             }
 
+            // Variable to store the last image hash
+            let lastImageHash = null;
+
             // Main function to update the background image
             function updateBackground() {
                 if (!enableWidget.value) {
@@ -94,6 +110,7 @@ app.registerExtension({
                     if (window._td_bg_img.src) {
                         window._td_bg_img.src = "";
                         lastLoadedPath = null;
+                        lastImageHash = null;
                     }
                     return;
                 }
@@ -103,16 +120,22 @@ app.registerExtension({
                     lastLoadedPath = path;
                     // Create a new image object to load the image
                     let imgObj = new Image();
-                    imgObj.onload = () => {
-                        // TODO: check if the base64 -> hashcode (md5?) is the same as the last one
-                        // If the image is the same, don't update the background
+                    imgObj.onload = async () => {
                         let base64 = convertImageToBase64(imgObj);
+                        let newHash = await computeHash(base64);
+                        // If the hash is unchanged from the last one, do not update the background
+                        if (newHash === lastImageHash) {
+                            return;
+                        }
+                        lastImageHash = newHash;
                         window._td_bg_img.src = base64;
                     };
                     imgObj.onerror = err => {
                         console.warn("Background image not found or load error:", path);
                     };
-                    console.log("Loading background image:", path);
+                    if (ENABLE_DEBUG) {
+                        console.log("Loading background image:", path);
+                    }
                     imgObj.src = path; // Prevent cache
                 }
             }
@@ -172,6 +195,8 @@ app.registerExtension({
                 // Calculate offsets to center the image in the canvas
                 const offsetX = (canvasWidth - drawWidth) / 2;
                 const offsetY = (canvasHeight - drawHeight) / 2;
+
+                // FIXME: it should calculate the transparency color first and then draw the image
 
                 // Draw the image with computed dimensions and position
                 ctx.drawImage(window._td_bg_img, offsetX, offsetY, drawWidth, drawHeight);
