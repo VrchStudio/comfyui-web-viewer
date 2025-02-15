@@ -69,7 +69,6 @@ class VrchImageTDBackgroundNode(VrchImageSaverNode):
                 "image": ("IMAGE",),
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "background_display": ("BOOLEAN", {"default": True}),
-                "transparent_colour": ("STRING", {"default": "#000000"}),
                 "refresh_interval_ms": ("INT", {"default": 300, "min": 50, "max": 10000})
             }
         }
@@ -89,7 +88,6 @@ class VrchImageTDBackgroundNode(VrchImageSaverNode):
                                     image, 
                                     channel,
                                     background_display, 
-                                    transparent_colour, 
                                     refresh_interval_ms):
         
         filename = f"channel_{channel}"
