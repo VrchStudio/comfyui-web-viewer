@@ -67,7 +67,7 @@ class VrchImageTDBackgroundNode(VrchImageSaverNode):
         return {
             "required": {
                 "images": ("IMAGE",),
-                "enable_background_display": ("BOOLEAN", {"default": True}),
+                "background_display": ("BOOLEAN", {"default": True}),
                 "transparent_colour": ("STRING", {"default": "#000000"}),
                 "refresh_interval_ms": ("INT", {"default": 300, "min": 50, "max": 10000})
             }
@@ -86,7 +86,7 @@ class VrchImageTDBackgroundNode(VrchImageSaverNode):
 
     def save_image_to_td_background(self, 
                                     images, 
-                                    enable_background_display, 
+                                    background_display, 
                                     transparent_colour, 
                                     refresh_interval_ms):
         
@@ -100,7 +100,7 @@ class VrchImageTDBackgroundNode(VrchImageSaverNode):
             images=images,
             filename=filename,
             path=path,
-            extension="png",
+            extension="jpg",
             quality_jpeg_or_webp=85,
         )
 
