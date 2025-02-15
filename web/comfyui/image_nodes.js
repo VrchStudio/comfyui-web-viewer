@@ -1,6 +1,27 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
+
+function imgToCanvasBase64 (img) {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    canvas.width = img.width
+    canvas.height = img.height
+    ctx.drawImage(img, 0, 0)
+    const base64 = canvas.toDataURL('image/png')
+
+    return base64
+}
+
+function convertImageToBase64 (img) {
+    try {
+        const base64 = imgToCanvasBase64(img)
+        return base64
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 app.registerExtension({
     name: "vrch.ImageTDBackground",
 
@@ -8,11 +29,12 @@ app.registerExtension({
         // Only process nodes of type "VrchImageTDBackgroundNode"
         if (node.comfyClass === "VrchImageTDBackgroundNode") {
             // Get the relevant widgets
+            const channelWidget = node.widgets.find(w => w.name === "channel");
             const enableWidget = node.widgets.find(w => w.name === "background_display");
             const colorWidget = node.widgets.find(w => w.name === "transparent_colour");
             const intervalWidget = node.widgets.find(w => w.name === "refresh_interval_ms");
 
-            const widgets = [enableWidget, colorWidget, intervalWidget];
+            const widgets = [channelWidget, enableWidget, colorWidget, intervalWidget];
 
             // Set callbacks for widget changes to update the background immediately
             widgets.forEach(widget => {
@@ -20,18 +42,16 @@ app.registerExtension({
                     widget.callback = () => {
                         console.log(`callback:::${widget.name}:::${widget.value}`);
                         reinitBackground();
-                        updateBackground();
-                        if (app.graph && app.graph.canvas) {
-                            app.graph.canvas.draw(true, true);
-                        }
+                        updateBackground()
                     };
                 }
             });
 
             // Function that returns the final image path
             function getImagePath() {
+                const channel = channelWidget.value || "1";
                 const folder = "td_background";
-                const filename = "background.jpg";
+                const filename = `channel_${channel}.jpg`;
                 const basePath = window.location.href;
                 return `${basePath}view?filename=${filename}&subfolder=${folder}&type=output&rand=${Math.random()}`;
             }
@@ -54,9 +74,6 @@ app.registerExtension({
                 let ms = parseInt(intervalWidget.value || 300, 10);
                 pollTimer = setInterval(() => {
                     updateBackground();
-                    if (app.graph && app.graph.canvas) {
-                        app.graph.canvas.draw(true, true);
-                    }
                 }, ms);
             }
 
@@ -65,8 +82,8 @@ app.registerExtension({
                 window._td_bg_img = new Image();
                 window._td_bg_img.onload = () => {
                     // Trigger canvas redraw when image is loaded
-                    if (app.graph && app.graph.canvas) {
-                        app.graph.canvas.draw(true, true);
+                    if (app.canvas) {
+                        app.canvas.draw(true, true);
                     }
                 };
             }
@@ -78,9 +95,6 @@ app.registerExtension({
                     if (window._td_bg_img.src) {
                         window._td_bg_img.src = "";
                         lastLoadedPath = null;
-                        if (app.graph && app.graph.canvas) {
-                            app.graph.canvas.draw(true, true);
-                        }
                     }
                     return;
                 }
@@ -91,16 +105,15 @@ app.registerExtension({
                     // Create a new image object to load the image
                     let imgObj = new Image();
                     imgObj.onload = () => {
-                        // Set the global image source once loaded
-                        window._td_bg_img.src = imgObj.src;
-                        if (app.graph && app.graph.canvas) {
-                            app.graph.canvas.draw(true, true);
-                        }
+                        // TODO: check if the base64 -> hashcode (md5?) is the same as the last one
+                        // If the image is the same, don't update the background
+                        let base64 = convertImageToBase64(imgObj);
+                        window._td_bg_img.src = base64;
                     };
                     imgObj.onerror = err => {
                         console.warn("Background image not found or load error:", path);
                     };
-                    console.log("Loading background image aaaa:", path);
+                    console.log("Loading background image:", path);
                     imgObj.src = path; // Prevent cache
                 }
             }
