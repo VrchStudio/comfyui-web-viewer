@@ -66,7 +66,8 @@ class VrchImageTDBackgroundNode(VrchImageSaverNode):
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "images": ("IMAGE",),
+                "image": ("IMAGE",),
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "background_display": ("BOOLEAN", {"default": True}),
                 "transparent_colour": ("STRING", {"default": "#000000"}),
                 "refresh_interval_ms": ("INT", {"default": 300, "min": 50, "max": 10000})
@@ -85,23 +86,24 @@ class VrchImageTDBackgroundNode(VrchImageSaverNode):
         self.output_dir = folder_paths.output_directory
 
     def save_image_to_td_background(self, 
-                                    images, 
+                                    image, 
+                                    channel,
                                     background_display, 
                                     transparent_colour, 
                                     refresh_interval_ms):
         
-        filename = f"background"
+        filename = f"channel_{channel}"
         path = f"td_background"
 
         output_path = os.path.join(self.output_dir, path)
         os.makedirs(output_path, exist_ok=True)
         
         self.save_images(
-            images=images,
+            images=image,
             filename=filename,
             path=path,
             extension="jpg",
             quality_jpeg_or_webp=85,
         )
 
-        return (images,)
+        return (image,)
