@@ -69,7 +69,8 @@ class VrchImageTDBackgroundNode(VrchImageSaverNode):
                 "image": ("IMAGE",),
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "background_display": ("BOOLEAN", {"default": True}),
-                "refresh_interval_ms": ("INT", {"default": 300, "min": 50, "max": 10000})
+                "refresh_interval_ms": ("INT", {"default": 300, "min": 50, "max": 10000}),
+                "display_option": (["original", "fit", "stretch", "crop"], {"default": "fit"}),
             }
         }
 
@@ -88,7 +89,8 @@ class VrchImageTDBackgroundNode(VrchImageSaverNode):
                                     image, 
                                     channel,
                                     background_display, 
-                                    refresh_interval_ms):
+                                    refresh_interval_ms,
+                                    display_option):
         
         filename = f"channel_{channel}"
         path = f"td_background"
