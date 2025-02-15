@@ -32,7 +32,7 @@ async function computeHash(str) {
 }
 
 // Global flag to enable/disable debug logging
-const ENABLE_DEBUG = false;
+const ENABLE_DEBUG = true;
 
 app.registerExtension({
     name: "vrch.ImageTDBackground",
@@ -43,10 +43,9 @@ app.registerExtension({
             // Get the relevant widgets
             const channelWidget = node.widgets.find(w => w.name === "channel");
             const enableWidget = node.widgets.find(w => w.name === "background_display");
-            const colorWidget = node.widgets.find(w => w.name === "transparent_colour");
             const intervalWidget = node.widgets.find(w => w.name === "refresh_interval_ms");
 
-            const widgets = [channelWidget, enableWidget, colorWidget, intervalWidget];
+            const widgets = [channelWidget, enableWidget, intervalWidget];
 
             // Set callbacks for widget changes to update the background immediately
             widgets.forEach(widget => {
@@ -54,7 +53,7 @@ app.registerExtension({
                     widget.callback = () => {
                         console.log(`callback:::${widget.name}:::${widget.value}`);
                         reinitBackground();
-                        updateBackground()
+                        updateBackground();
                     };
                 }
             });
@@ -62,8 +61,9 @@ app.registerExtension({
             // Function that returns the final image path
             function getImagePath() {
                 const channel = channelWidget.value || "1";
+                const extension = "jpg";
                 const folder = "td_background";
-                const filename = `channel_${channel}.jpg`;
+                const filename = `channel_${channel}.${extension}`;
                 const basePath = window.location.href;
                 return `${basePath}view?filename=${filename}&subfolder=${folder}&type=output&rand=${Math.random()}`;
             }
@@ -159,14 +159,11 @@ app.registerExtension({
             if (window._td_bg_img && window._td_bg_img.width) {
                 // Retrieve the node to read widget values
                 const tdNodes = app.graph._nodes.filter(n => n?.comfyClass === "VrchImageTDBackgroundNode");
-                let colorVal = "#000000";
                 let enableVal = false;
                 if (tdNodes.length) {
                     const n = tdNodes[0];
-                    const cWidget = n.widgets.find(w => w.name === "transparent_colour");
                     const eWidget = n.widgets.find(w => w.name === "background_display");
                     enableVal = eWidget ? eWidget.value : false;
-                    colorVal = cWidget ? cWidget.value : "#000000";
                 }
                 // If background display is not enabled, do nothing
                 if (!enableVal) return;
@@ -196,36 +193,10 @@ app.registerExtension({
                 const offsetX = (canvasWidth - drawWidth) / 2;
                 const offsetY = (canvasHeight - drawHeight) / 2;
 
-                // FIXME: it should calculate the transparency color first and then draw the image
-
                 // Draw the image with computed dimensions and position
                 ctx.drawImage(window._td_bg_img, offsetX, offsetY, drawWidth, drawHeight);
-
-                // Process the transparent color: set alpha to 0 for matching pixels
-                if (colorVal && colorVal.startsWith("#")) {
-                    const imgData = ctx.getImageData(0, 0, this.bgcanvas.width, this.bgcanvas.height);
-                    const data = imgData.data;
-
-                    // Normalize hex code (convert #abc to #aabbcc)
-                    function normalizeHex(hex) {
-                        if (hex.length === 4) {
-                            return "#" + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
-                        }
-                        return hex;
-                    }
-                    const hex = normalizeHex(colorVal);
-                    const rT = parseInt(hex.substr(1, 2), 16),
-                          gT = parseInt(hex.substr(3, 2), 16),
-                          bT = parseInt(hex.substr(5, 2), 16);
-
-                    // Loop through image data and set matching pixel alpha to 0
-                    for (let i = 0; i < data.length; i += 4) {
-                        if (data[i] === rT && data[i + 1] === gT && data[i + 2] === bT) {
-                            data[i + 3] = 0;
-                        }
-                    }
-                    ctx.putImageData(imgData, 0, 0);
-                }
+                
+                // Restore context state
                 ctx.restore();
             }
         };
