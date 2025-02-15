@@ -44,8 +44,9 @@ app.registerExtension({
             const channelWidget = node.widgets.find(w => w.name === "channel");
             const enableWidget = node.widgets.find(w => w.name === "background_display");
             const intervalWidget = node.widgets.find(w => w.name === "refresh_interval_ms");
+            const displayOptionWidget = node.widgets.find(w => w.name === "display_option");
 
-            const widgets = [channelWidget, enableWidget, intervalWidget];
+            const widgets = [channelWidget, enableWidget, intervalWidget, displayOptionWidget];
 
             // Set callbacks for widget changes to update the background immediately
             widgets.forEach(widget => {
@@ -160,11 +161,15 @@ app.registerExtension({
                 // Retrieve the node to read widget values
                 const tdNodes = app.graph._nodes.filter(n => n?.comfyClass === "VrchImageTDBackgroundNode");
                 let enableVal = false;
+                let displayOptionVal = "fit";
                 if (tdNodes.length) {
                     const n = tdNodes[0];
                     const eWidget = n.widgets.find(w => w.name === "background_display");
+                    const displayOptionWidget = n.widgets.find(w => w.name === "display_option");
                     enableVal = eWidget ? eWidget.value : false;
+                    displayOptionVal = displayOptionWidget ? displayOptionWidget.value : "fit";
                 }
+
                 // If background display is not enabled, do nothing
                 if (!enableVal) return;
 
@@ -176,27 +181,51 @@ app.registerExtension({
                     ctx.setTransform(1, 0, 0, 1, 0, 0);
                 }
 
-                // Calculate dimensions for "fit" scaling (preserving aspect ratio)
+                let offsetX, offsetY, drawWidth, drawHeight;
                 const canvasWidth = this.bgcanvas.width;
                 const canvasHeight = this.bgcanvas.height;
                 const imageWidth = window._td_bg_img.width;
                 const imageHeight = window._td_bg_img.height;
-
-                // Calculate scale ratio using the smaller ratio (fit inside canvas)
-                const scaleRatio = Math.min(canvasWidth / imageWidth, canvasHeight / imageHeight);
-
-                // Calculate drawing dimensions
-                const drawWidth = imageWidth * scaleRatio;
-                const drawHeight = imageHeight * scaleRatio;
-
-                // Calculate offsets to center the image in the canvas
-                const offsetX = (canvasWidth - drawWidth) / 2;
-                const offsetY = (canvasHeight - drawHeight) / 2;
-
-                // Draw the image with computed dimensions and position
-                ctx.drawImage(window._td_bg_img, offsetX, offsetY, drawWidth, drawHeight);
                 
-                // Restore context state
+                switch (displayOptionVal) {
+                    case "original":
+                        drawWidth = imageWidth;
+                        drawHeight = imageHeight;
+                        offsetX = (canvasWidth - imageWidth) / 2;
+                        offsetY = (canvasHeight - imageHeight) / 2;
+                        break;
+                    case "fit": {
+                        const scaleRatio = Math.min(canvasWidth / imageWidth, canvasHeight / imageHeight);
+                        drawWidth = imageWidth * scaleRatio;
+                        drawHeight = imageHeight * scaleRatio;
+                        offsetX = (canvasWidth - drawWidth) / 2;
+                        offsetY = (canvasHeight - drawHeight) / 2;
+                        break;
+                    }
+                    case "stretch":
+                        offsetX = 0;
+                        offsetY = 0;
+                        drawWidth = canvasWidth;
+                        drawHeight = canvasHeight;
+                        break;
+                    case "crop": {
+                        const scaleRatio = Math.max(canvasWidth / imageWidth, canvasHeight / imageHeight);
+                        drawWidth = imageWidth * scaleRatio;
+                        drawHeight = imageHeight * scaleRatio;
+                        offsetX = (canvasWidth - drawWidth) / 2;
+                        offsetY = (canvasHeight - drawHeight) / 2;
+                        break;
+                    }
+                    default: {
+                        const scaleRatio = Math.min(canvasWidth / imageWidth, canvasHeight / imageHeight);
+                        drawWidth = imageWidth * scaleRatio;
+                        drawHeight = imageHeight * scaleRatio;
+                        offsetX = (canvasWidth - drawWidth) / 2;
+                        offsetY = (canvasHeight - drawHeight) / 2;
+                    }
+                }
+                
+                ctx.drawImage(window._td_bg_img, offsetX, offsetY, drawWidth, drawHeight);
                 ctx.restore();
             }
         };
