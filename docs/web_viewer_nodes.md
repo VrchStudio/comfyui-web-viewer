@@ -166,4 +166,25 @@
 - Ensure that the URL entered or constructed is valid and accessible. The web viewer window will open based on the specified dimensions.
 - The "Show URL" option allows you to see the dynamically constructed URL if you want to inspect or copy it.
   
----
+----
+
+### Node: `IMAGE Web Viewer Channel Loader @ vrch.ai` (vrch.ai/viewer)
+
+1. **Add the `IMAGE Web Viewer Channel Loader @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Channel:**
+     - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**). The node loads the corresponding image file from the `web_viewer` subfolder in the output directory (e.g., `channel_1.jpeg`).
+
+3. **Load Image:**
+   - The node attempts to load the specified image file.
+   - If the file exists, it is opened, and loaded.
+   - If the file does not exist or an error occurs during loading, a 512x512 black placeholder image is returned.
+
+4. **Caching Behavior:**
+   - The node's `IS_CHANGED` method always returns `NaN`, ensuring that the node is always considered changed and forces reloading of the image.
+
+**Note:**
+- Ensure that the `web_viewer` directory under the ComfyUI output folder contains the expected image files named in the format `channel_[channel].jpeg`.
+
+----
