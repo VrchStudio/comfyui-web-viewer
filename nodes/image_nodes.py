@@ -61,7 +61,7 @@ class VrchImageSaverNode:
             return {}
         
 
-class VrchImageTDBackgroundNode(VrchImageSaverNode):
+class VrchImagePreviewBackgroundNode(VrchImageSaverNode):
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -93,7 +93,7 @@ class VrchImageTDBackgroundNode(VrchImageSaverNode):
                                     display_option):
         
         filename = f"channel_{channel}"
-        path = f"td_background"
+        path = f"preview_background"
 
         output_path = os.path.join(self.output_dir, path)
         os.makedirs(output_path, exist_ok=True)
@@ -102,7 +102,7 @@ class VrchImageTDBackgroundNode(VrchImageSaverNode):
             images=image,
             filename=filename,
             path=path,
-            extension="jpg",
+            extension="jpeg",
             quality_jpeg_or_webp=85,
         )
 

@@ -38,8 +38,8 @@ app.registerExtension({
     name: "vrch.ImageTDBackground",
 
     async nodeCreated(node) {
-        // Only process nodes of type "VrchImageTDBackgroundNode"
-        if (node.comfyClass === "VrchImageTDBackgroundNode") {
+        // Only process nodes of type "VrchImagePreviewBackgroundNode"
+        if (node.comfyClass === "VrchImagePreviewBackgroundNode") {
             // Get the relevant widgets
             const channelWidget = node.widgets.find(w => w.name === "channel");
             const enableWidget = node.widgets.find(w => w.name === "background_display");
@@ -62,8 +62,8 @@ app.registerExtension({
             // Function that returns the final image path
             function getImagePath() {
                 const channel = channelWidget.value || "1";
-                const extension = "jpg";
-                const folder = "td_background";
+                const extension = "jpeg";
+                const folder = "preview_background";
                 const filename = `channel_${channel}.${extension}`;
                 const basePath = window.location.href;
                 return `${basePath}view?filename=${filename}&subfolder=${folder}&type=output&rand=${Math.random()}`;
@@ -159,7 +159,7 @@ app.registerExtension({
             // 2) If a background image is loaded, draw it with "fit" scaling
             if (window._td_bg_img && window._td_bg_img.width) {
                 // Retrieve the node to read widget values
-                const tdNodes = app.graph._nodes.filter(n => n?.comfyClass === "VrchImageTDBackgroundNode");
+                const tdNodes = app.graph._nodes.filter(n => n?.comfyClass === "VrchImagePreviewBackgroundNode");
                 let enableVal = false;
                 let displayOptionVal = "fit";
                 if (tdNodes.length) {
