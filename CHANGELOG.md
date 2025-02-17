@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.20 - 2025-02-17
+
+### Added
+
+- add a new Web Viewer node `VrchImageChannelLoaderNode`
+- add a new Image node `VrchImagePreviewBackgroundNode`
+
+### Updated
+
+- add `Star History` section in `README.md`
+- update `web_viewer_nodes.md` documentation
+- update `image_nodes.md` documentation
+
 ## 1.0.19 - 2025-02-09
 
 ### Added

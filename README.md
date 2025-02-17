@@ -158,6 +158,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 For any inquiries, you can contact us at [hi@vrch.io](mailto:hi@vrch.io).
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=comfyui-web-viewer/comfyui-web-viewer,VrchStudio/comfyui-web-viewer&type=Date)](https://star-history.com/#comfyui-web-viewer/comfyui-web-viewer&VrchStudio/comfyui-web-viewer&Date)
+
 ## License
 
 [MIT License](LICENSE)

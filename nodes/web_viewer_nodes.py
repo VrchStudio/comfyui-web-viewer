@@ -46,6 +46,50 @@ class VrchWebViewerNode:
     @classmethod
     def IS_CHANGED(s, **kwargs):
         return False
+    
+class VrchImageChannelLoaderNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"})
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("IMAGE",)
+    FUNCTION = "load_image"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def __init__(self):
+        # Get the output directory (assuming folder_paths.output_directory is defined)
+        self.output_dir = folder_paths.output_directory
+
+    def load_image(self, channel):
+        # Construct the full path of the target file with .jpg extension
+        file_path = os.path.join(self.output_dir, "web_viewer", f"channel_{channel}.jpeg")
+        
+        if os.path.exists(file_path):
+            try:
+                # Attempt to open and read the image
+                image = Image.open(file_path)
+                image = image.convert("RGB")
+                image_np = np.array(image).astype(np.float32) / 255.0
+            except Exception as e:
+                # If any error occurs during loading, return a black placeholder image
+                image_np = np.zeros((512, 512, 3), dtype=np.uint8)
+        else:
+            # If the specified file does not exist, return a black placeholder image
+            image_np = np.zeros((512, 512, 3), dtype=np.uint8)
+            
+        image = torch.from_numpy(image_np)[None,]
+        return (image,)
+    
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        # Always changed by default
+        return float("NaN")
 
 class VrchImageWebViewerNode(VrchImageSaverNode):
 
@@ -105,7 +149,6 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
                 image_bytes = bytes()
             m.update(image_bytes)
         return m.hexdigest()
-
 
 class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
 

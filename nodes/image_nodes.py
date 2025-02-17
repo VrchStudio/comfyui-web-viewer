@@ -1,3 +1,4 @@
+import hashlib
 import os
 import torch
 import numpy as np
@@ -58,3 +59,51 @@ class VrchImageSaverNode:
             return {"ui": {"images": results}}
         else:
             return {}
+        
+
+class VrchImagePreviewBackgroundNode(VrchImageSaverNode):
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image": ("IMAGE",),
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "background_display": ("BOOLEAN", {"default": True}),
+                "refresh_interval_ms": ("INT", {"default": 300, "min": 50, "max": 10000}),
+                "display_option": (["original", "fit", "stretch", "crop"], {"default": "fit"}),
+            }
+        }
+
+    RETURN_TYPES = ()
+    RETURN_NAMES = ()
+    FUNCTION = "save_image_to_td_background"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def __init__(self):
+        super().__init__()
+        # By default, images are saved into ComfyUI's output directory
+        self.output_dir = folder_paths.output_directory
+
+    def save_image_to_td_background(self, 
+                                    image, 
+                                    channel,
+                                    background_display, 
+                                    refresh_interval_ms,
+                                    display_option):
+        
+        filename = f"channel_{channel}"
+        path = f"preview_background"
+
+        output_path = os.path.join(self.output_dir, path)
+        os.makedirs(output_path, exist_ok=True)
+        
+        self.save_images(
+            images=image,
+            filename=filename,
+            path=path,
+            extension="jpeg",
+            quality_jpeg_or_webp=85,
+        )
+
+        return (image,)
