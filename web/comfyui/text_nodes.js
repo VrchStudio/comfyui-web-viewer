@@ -79,7 +79,12 @@ app.registerExtension({
                 }
             }
 
-            // Timer tick function: updates playback time and current selection periodically
+            // Updates the small display text to show current playback time
+            function updateTimeDisplay() {
+                timeDisplay.textContent = "Current time: " + playbackTime.toFixed(2) + " sec";
+            }
+
+            // Timer tick function: updates playback time, current selection, and small display periodically
             function tick() {
                 if (!isPlaying) return;
                 const now = Date.now();
@@ -88,6 +93,7 @@ app.registerExtension({
                 lastResumeTimestamp = now;
                 debugLog("Playback time: " + playbackTime.toFixed(2) + " sec");
                 updateCurrentSelection();
+                updateTimeDisplay();
 
                 // Check if playback has reached the end of the last entry
                 if (srtEntries.length > 0 && playbackTime >= srtEntries[srtEntries.length - 1].end) {
@@ -95,6 +101,8 @@ app.registerExtension({
                         debugLog("Loop mode active, restarting playback.");
                         playbackTime = 0;
                         lastResumeTimestamp = Date.now();
+                        pausePlayback();
+                        startPlayback();
                     } else {
                         debugLog("Playback finished, stopping.");
                         pausePlayback();
@@ -123,7 +131,7 @@ app.registerExtension({
                     clearInterval(timerId);
                     timerId = null;
                 }
-                playPauseButton.textContent = "Play";
+                playPauseButton.textContent = "Play SRT File";
                 debugLog("Playback paused at " + playbackTime.toFixed(2) + " sec.");
             }
 
@@ -132,13 +140,29 @@ app.registerExtension({
                 pausePlayback();
                 playbackTime = 0;
                 updateCurrentSelection();
+                updateTimeDisplay();
                 debugLog("Playback reset.");
             }
 
+            // Create a container div for the widget with explicit height
+            const widgetContainer = document.createElement("div");
+            widgetContainer.style.setProperty("height", "80px", "important");
+            widgetContainer.style.display = "flex";
+            widgetContainer.style.flexDirection = "column";
+            widgetContainer.style.justifyContent = "center";
+            widgetContainer.style.alignItems = "center";
+
+            // Create a div for buttons; arrange them in a vertical stack and center them
+            const buttonsContainer = document.createElement("div");
+            buttonsContainer.style.display = "flex";
+            buttonsContainer.style.flexDirection = "column";
+            buttonsContainer.style.alignItems = "center";
+            buttonsContainer.style.gap = "10px";
+
             // Create the Play/Pause button; initial state is "Play"
             const playPauseButton = document.createElement("button");
-            playPauseButton.textContent = "Play";
-            playPauseButton.classList.add("comfy-big-button");
+            playPauseButton.textContent = "Play SRT File";
+            playPauseButton.classList.add("vrch-srt-big-button");
             playPauseButton.onclick = () => {
                 if (isPlaying) {
                     pausePlayback();
@@ -146,16 +170,30 @@ app.registerExtension({
                     startPlayback();
                 }
             };
-            node.addDOMWidget("play_pause_button", "Play / Pause", playPauseButton);
 
-            // Create the Reset button
+            // Create the Reset button with distinct style
             const resetButton = document.createElement("button");
             resetButton.textContent = "Reset";
-            resetButton.classList.add("comfy-big-button");
+            resetButton.classList.add("vrch-srt-big-button", "vrch-srt-reset-button");
             resetButton.onclick = () => {
                 resetPlayback();
             };
-            node.addDOMWidget("reset_button", "Reset", resetButton);
+
+            // Append buttons to the buttons container (vertical stack)
+            buttonsContainer.appendChild(playPauseButton);
+            buttonsContainer.appendChild(resetButton);
+
+            // Create a small display div for showing playback time
+            const timeDisplay = document.createElement("div");
+            timeDisplay.classList.add("vrch-srt-small-display");
+            timeDisplay.textContent = "Current time: 0.00 sec";
+
+            // Append the buttons container and time display to the main container
+            widgetContainer.appendChild(buttonsContainer);
+            widgetContainer.appendChild(timeDisplay);
+
+            // Add the widget container to the node as a single widget component
+            node.addDOMWidget("srt_control_widget", "SRT Control", widgetContainer);
 
             // Monitor changes to the loop widget
             if (loopWidget) {
@@ -166,12 +204,67 @@ app.registerExtension({
             }
 
             // Cleanup timer when the node is removed
-            node.onRemoved = function () {
+            const onRemoved = this.onRemoved;
+            this.onRemoved = function () {
                 if (timerId) {
                     clearInterval(timerId);
                     timerId = null;
                 }
+                return onRemoved?.();
             };
         }
     }
 });
+
+// Insert custom CSS for the Play/Pause and Reset buttons and small display
+const srtButtonStyle = document.createElement("style");
+srtButtonStyle.textContent = `
+    .vrch-srt-big-button {
+        background-color: #4CAF50;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        width: 100%;
+        height: 60px;
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s, transform 0.2s;
+        margin-top: 20px;
+        padding: 8px 16px;
+    }
+    
+    .vrch-srt-big-button:hover {
+        background-color: #45a049;
+    }
+    
+    .vrch-srt-big-button:active {
+        background-color: #3e8e41;
+    }
+    
+    /* Reset button with a grey colour scheme */
+    .vrch-srt-reset-button {
+        height: 40px;
+        margin-top: 10px;
+        background-color: #757575;
+    }
+    
+    .vrch-srt-reset-button:hover {
+        background-color: #616161;
+    }
+    
+    .vrch-srt-reset-button:active {
+        background-color: #424242;
+    }
+    
+    /* Small display style with brighter text color */
+    .vrch-srt-small-display {
+        font-size: 14px;
+        color: #666;
+        margin-top: 10px;
+        width: 100%;
+        text-align: center;
+    }
+`;
+document.head.appendChild(srtButtonStyle);
