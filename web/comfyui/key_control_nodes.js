@@ -542,7 +542,7 @@ app.registerExtension({
     },
     async nodeCreated(node) {
         if (node.comfyClass === "VrchTextKeyControlNode") {
-            // Initialize node state from inputs
+            // Initialize widgets
             let text1Widget = node.widgets.find(w => w.name === "text1");
             let text2Widget = node.widgets.find(w => w.name === "text2");
             let text3Widget = node.widgets.find(w => w.name === "text3");
@@ -554,6 +554,8 @@ app.registerExtension({
             let skipEmptyOptionWidget = node.widgets.find(w => w.name === "skip_empty_option");
             let shortcutKeyWidget = node.widgets.find(w => w.name === "shortcut_key");
             let currentValueWidget = node.widgets.find(w => w.name === "current_value");
+            let enableAutoSwitchWidget = node.widgets.find(w => w.name === "enable_auto_switch");
+            let autoSwitchDelayWidget = node.widgets.find(w => w.name === "auto_switch_delay_ms");
 
             // Retrieve initial values
             let currentValue = parseInt(currentValueWidget ? currentValueWidget.value : "1", 10);
@@ -591,13 +593,13 @@ app.registerExtension({
                 }
             };
 
-            // Update display based on currentValue
+            // Function to update display based on currentValue
             const updateDisplay = () => {
                 const validKeys = getValidKeys();
                 if (validKeys.length === 0) {
                     valueDisplay.textContent = `Value: None`;
                     if (currentValueWidget) {
-                        currentValueWidget.value = "";
+                        currentValueWidget.value = "1";
                     }
                     return;
                 }
@@ -616,7 +618,29 @@ app.registerExtension({
                 }
             };
 
-            // Handle changes to current_value
+            // Helper function to switch to the next valid option
+            const switchToNextOption = () => {
+                const validKeys = getValidKeys();
+                if (validKeys.length === 0) {
+                    if (ENABLE_DEBUG) {
+                        console.log("[VrchTextKeyControlNode] No valid texts to switch.");
+                    }
+                    updateDisplay();
+                    return;
+                }
+                const currentIndex = validKeys.indexOf(currentValue.toString());
+                const nextIndex = (currentIndex + 1) % validKeys.length;
+                currentValue = parseInt(validKeys[nextIndex], 10);
+                if (currentValueWidget) {
+                    currentValueWidget.value = currentValue.toString();
+                }
+                updateDisplay();
+                if (ENABLE_DEBUG) {
+                    console.log(`[VrchTextKeyControlNode] Switched current_value to: ${currentValue}`);
+                }
+            };
+
+            // Function to handle changes to current_value
             const handleCurrentValueChange = (value) => {
                 let val = parseInt(value, 10);
                 if (![1, 2, 3, 4, 5, 6, 7, 8].includes(val)) {
@@ -632,7 +656,7 @@ app.registerExtension({
                 };
             }
 
-            // Handle changes to skip_empty_option
+            // Function to handle changes to skip_empty_option
             const handleSkipEmptyOptionChange = (value) => {
                 skipEmptyOption = value;
                 updateDisplay();
@@ -647,7 +671,63 @@ app.registerExtension({
                 };
             }
 
-            // Initialize display after ensuring all widgets are loaded
+            // Auto-switch functionality
+            let autoSwitchTimerId = null;
+
+            // Function to start the auto-switch timer
+            const startAutoSwitchTimer = () => {
+                // Clear any existing timer
+                if (autoSwitchTimerId !== null) clearInterval(autoSwitchTimerId);
+                // If auto-switch is enabled, start the timer
+                if (enableAutoSwitchWidget && enableAutoSwitchWidget.value) {
+                    let delay = parseInt(autoSwitchDelayWidget ? autoSwitchDelayWidget.value : "1000", 10);
+                    autoSwitchTimerId = setInterval(() => {
+                        switchToNextOption();
+                    }, delay);
+                }
+            };
+
+            // Function to stop the auto-switch timer
+            const stopAutoSwitchTimer = () => {
+                if (autoSwitchTimerId !== null) {
+                    clearInterval(autoSwitchTimerId);
+                    autoSwitchTimerId = null;
+                }
+            };
+
+            // Listen to changes for enable_auto_switch
+            if (enableAutoSwitchWidget) {
+                enableAutoSwitchWidget.callback = (value) => {
+                    if (ENABLE_DEBUG) {
+                        console.log(`[VrchTextKeyControlNode] enable_auto_switch set to: ${value}`);
+                    }
+                    if (value) {
+                        startAutoSwitchTimer();
+                    } else {
+                        stopAutoSwitchTimer();
+                    }
+                };
+            }
+
+            // Listen to changes for auto_switch_delay_ms
+            if (autoSwitchDelayWidget) {
+                autoSwitchDelayWidget.callback = (value) => {
+                    if (ENABLE_DEBUG) {
+                        console.log(`[VrchTextKeyControlNode] auto_switch_delay_ms set to: ${value}`);
+                    }
+                    // If auto-switch is enabled, restart the timer with new delay
+                    if (enableAutoSwitchWidget && enableAutoSwitchWidget.value) {
+                        startAutoSwitchTimer();
+                    }
+                };
+            }
+
+            // Start auto-switch timer if enabled on initialization
+            if (enableAutoSwitchWidget && enableAutoSwitchWidget.value) {
+                startAutoSwitchTimer();
+            }
+
+            // Delayed initialization to ensure all widgets are loaded
             function delayedInit() {
                 if (ENABLE_DEBUG) {
                     console.log("[VrchTextKeyControlNode] delayedInit called");
@@ -661,38 +741,13 @@ app.registerExtension({
 
             // Handler for keydown events
             const handleKeyDown = (event) => {
-
                 // Add the key to the pressedKeys Set
                 pressedKeys.add(event.key.toUpperCase());
-
                 // Get the currently selected shortcut_key
                 const shortcutKey = shortcutKeyWidget ? shortcutKeyWidget.value.toUpperCase() : "F2";
-
                 // Check if the pressed key matches the shortcut key
                 if (event.key.toUpperCase() === shortcutKey && fxKeys.includes(event.key.toUpperCase())) {
-                    const validKeys = getValidKeys();
-                    if (validKeys.length === 0) {
-                        if (ENABLE_DEBUG) {
-                            console.log("[VrchTextKeyControlNode] No valid texts to select.");
-                        }
-                        return;
-                    }
-
-                    // Find the current index in validKeys
-                    const currentIndex = validKeys.indexOf(currentValue.toString());
-                    // Calculate the next index
-                    const nextIndex = (currentIndex + 1) % validKeys.length;
-                    // Update currentValue
-                    currentValue = parseInt(validKeys[nextIndex], 10);
-                    if (currentValueWidget) {
-                        currentValueWidget.value = currentValue.toString();
-                    }
-                    updateDisplay();
-
-                    if (ENABLE_DEBUG) {
-                        console.log(`[VrchTextKeyControlNode] current_value toggled to: ${currentValue}`);
-                    }
-
+                    switchToNextOption();
                     // Prevent default behavior
                     event.preventDefault();
                 }
@@ -704,7 +759,7 @@ app.registerExtension({
                 pressedKeys.delete(event.key.toUpperCase());
             };
 
-            // Add the keydown and keyup listeners
+            // Add keydown and keyup event listeners
             window.addEventListener("keydown", handleKeyDown);
             window.addEventListener("keyup", handleKeyUp);
             if (ENABLE_DEBUG) {
@@ -715,12 +770,12 @@ app.registerExtension({
             node.onRemoved = function () {
                 window.removeEventListener("keydown", handleKeyDown);
                 window.removeEventListener("keyup", handleKeyUp);
-                // Remove the valueDisplay widget
+                stopAutoSwitchTimer();
                 if (valueDisplay.parentNode) {
                     valueDisplay.parentNode.removeChild(valueDisplay);
                 }
                 if (ENABLE_DEBUG) {
-                    console.log("[VrchTextKeyControlNode] Keydown and Keyup event listeners removed.");
+                    console.log("[VrchTextKeyControlNode] Cleaned up event listeners and auto-switch timer.");
                 }
             };
         }
