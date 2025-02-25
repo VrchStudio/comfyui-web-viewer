@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- introduce a new Text node `VrchTextSrtPlayerNode`
+- add test_nodes.md
+
 ### Updated
 
-- fix Audio Record node button disappear issue
+- fix Audio Record node button disappear issue #8
+- fix `VrchImageWebViewerNode` and `VrchImageFlipBookWebViewerNode` nodes IS_CHANGED() call issue
 - update `VrchTextKeyControlNode` with auto switch feature
 - update key_control_nodes.md
 
