@@ -93,7 +93,7 @@ app.registerExtension({
                 // Hide the base64_data widget
                 const base64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
                 if (base64Widget) {
-                    base64Widget.hidden = true;
+                    base64Widget.type = "hidden";
                 }
 
                 // Create a custom button element
@@ -312,7 +312,9 @@ app.registerExtension({
                 const stopRecording = (isManualStop = false, delay = 300) => {
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
                         setTimeout(() => {
-                            mediaRecorder.stop();
+                            if (mediaRecorder) {
+                                mediaRecorder.stop();
+                            }
                             mediaRecorder = null;
                         }, delay);
                         isRecording = false;

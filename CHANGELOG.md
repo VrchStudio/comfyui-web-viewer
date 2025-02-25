@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.21 - 2025-02-25
+
+### Added
+
+- introduce a new Text node `VrchTextSrtPlayerNode`
+- add test_nodes.md
+
+### Updated
+
+- fix Audio Record node button disappear issue #8
+- fix `VrchImageWebViewerNode` and `VrchImageFlipBookWebViewerNode` nodes IS_CHANGED() call issue
+- update `VrchTextKeyControlNode` with auto switch feature
+- update key_control_nodes.md
+
 ## 1.0.20 - 2025-02-17
 
 ### Added

@@ -5,7 +5,7 @@ from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
 
-__version__ = "1.0.20"
+__version__ = "1.0.21"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -34,6 +34,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchSwitchOSCControlNode": VrchSwitchOSCControlNode,
     "VrchTextConcatOSCControlNode": VrchTextConcatOSCControlNode,
     "VrchTextKeyControlNode": VrchTextKeyControlNode,
+    "VrchTextSrtPlayerNode": VrchTextSrtPlayerNode,
     "VrchTextSwitchOSCControlNode": VrchTextSwitchOSCControlNode,
     "VrchVideoWebViewerNode": VrchVideoWebViewerNode,
     "VrchWebViewerNode": VrchWebViewerNode,
@@ -68,6 +69,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchSwitchOSCControlNode": "SWITCH OSC Control @ vrch.ai",
     "VrchTextConcatOSCControlNode": "TEXT Concat OSC Control @ vrch.ai",
     "VrchTextKeyControlNode": "TEXT Key Control @ vrch.ai",
+    "VrchTextSrtPlayerNode": "TEXT SRT Player @ vrch.ai",
     "VrchTextSwitchOSCControlNode": "TEXT Switch OSC Control @ vrch.ai",
     "VrchVideoWebViewerNode": "VIDEO Web Viewer @ vrch.ai",
     "VrchWebViewerNode": "Web Viewer @ vrch.ai",
