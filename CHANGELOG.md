@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 
 - fix Audio Record node button disappear issue
+- update `VrchTextKeyControlNode` with auto switch feature
+- update key_control_nodes.md
 
 ## 1.0.20 - 2025-02-17
 
