@@ -84,6 +84,8 @@
    - **Jump Empty Option (`skip_empty_option`):** Enable or disable skipping empty text options when cycling. Default is `True`.
    - **Shortcut Key (`shortcut_key`):** Select a function key (`F1` to `F12`) to cycle through texts. Default is `F2`.
    - **Current Value (`current_value`):** Set the initial selection (`1` to `8`). Default is `1`.
+   - **Auto Switch (`enable_auto_switch`):** Enable or disable auto switch. Default is `False`.
+   - **Auto Switch Delay (ms) (`auto_switch_delay_ms`):** Delay in milliseconds for auto-switching.
 3. **Cycle Through Text Options:**
    - **Using Shortcut Key:**
      - Press the selected `shortcut_key` (e.g., `F2`) to cycle through the text options.
