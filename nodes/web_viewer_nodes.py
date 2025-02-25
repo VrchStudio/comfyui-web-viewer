@@ -138,6 +138,10 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
     @classmethod
     def IS_CHANGED(cls, images, **kwargs):
         m = hashlib.sha256()
+        
+        if not isinstance(images, list):
+            return False
+        
         for image in images:
             # Convert image to bytes and update the hash
             if isinstance(image, torch.Tensor):
@@ -199,6 +203,10 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
     @classmethod
     def IS_CHANGED(cls, images, **kwargs):
         m = hashlib.sha256()
+        
+        if not isinstance(images, list):
+            return False
+        
         for image in images:
             # Convert image to bytes and update the hash
             if isinstance(image, torch.Tensor):
