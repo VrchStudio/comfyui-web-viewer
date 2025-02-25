@@ -1,6 +1,9 @@
 import { app } from "../../scripts/app.js";
 import { ComfyWidgets } from "../../scripts/widgets.js";
 
+// Enable debug logging
+const ENABLE_DEBUG = false;
+
 // Helper functions to hide and show widgets
 function hideWidget(node, widget) {
     // If widget is already hidden, do nothing
@@ -121,7 +124,7 @@ function setupWidgetCallback(node, updateUrl, urlWidget, showUrlWidget, widgets,
     widgets.forEach(widget => {
         if (widget) {
             widget.callback = () => {
-                if (logPrefix) {
+                if (logPrefix && ENABLE_DEBUG) {
                     console.log(`${logPrefix}:::${widget.name}`);
                 }
                 updateUrl();
