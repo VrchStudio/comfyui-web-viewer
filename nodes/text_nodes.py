@@ -1,3 +1,4 @@
+import hashlib
 import json
 import requests
 import srt
@@ -51,6 +52,7 @@ class VrchTextSrtPlayerNode:
         return {
             "required": {
                 "srt_text": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
+                "placeholder_text": ("STRING", {"default": "", "multiline": False, "dynamicPrompts": False}),
                 "loop": ("BOOLEAN", {"default": False}),
                 "current_selection": ("INT", {"default": 1}),
                 "debug": ("BOOLEAN", {"default": False}),
@@ -64,6 +66,7 @@ class VrchTextSrtPlayerNode:
 
     def play_srt_text(self, 
                       srt_text: str, 
+                      placeholder_text: str="",
                       loop: bool=False, 
                       current_selection: int=0, 
                       debug: bool=False):
@@ -73,7 +76,7 @@ class VrchTextSrtPlayerNode:
                 
             # use -1 as a flag for no selection output
             if current_selection == -1:
-                return ("",)
+                return (placeholder_text,)
                 
             # Use srt python lib to parse srt text
             srt_entries = list(srt.parse(srt_text))
@@ -90,3 +93,4 @@ class VrchTextSrtPlayerNode:
             error_message = f"[VrchTextSrtPlayerNode] An error occurred when calling play_srt_text(): {str(e)} at {callsite.filename.split('/')[-1]}:{callsite.lineno}"
             print(error_message)
             raise ValueError(error_message)
+    
