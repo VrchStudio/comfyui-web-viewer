@@ -4,3 +4,4 @@ pydub
 python-osc
 scikit-learn
 matplotlib
+srt
