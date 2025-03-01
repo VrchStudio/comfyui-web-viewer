@@ -26,6 +26,8 @@
 
 ### Node: `IMAGE Preview in Background @ vrch.ai` (vrch.ai/image)
 
+![](../assets/images/example_003_preview_image_in_background.png)
+
 1. **Add the `IMAGE Preview in Background @ vrch.ai` node to your ComfyUI workflow.**
 
 2. **Configure the Node:**
