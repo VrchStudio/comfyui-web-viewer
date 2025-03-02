@@ -237,6 +237,8 @@ class VrchTextKeyControlNode:
                     ["1", "2", "3", "4", "5", "6", "7", "8"],
                     {"default": "1"},
                 ),
+                "enable_auto_switch": ("BOOLEAN", {"default": False}),
+                "auto_switch_delay_ms": ("INT", {"default": 1000, "min": 50, "max": 10000}),
             }
         }
 
@@ -244,7 +246,20 @@ class VrchTextKeyControlNode:
     FUNCTION = "get_current_value"
     CATEGORY = CATEGORY
 
-    def get_current_value(self, text1="", text2="", text3="", text4="", text5="", text6="", text7="", text8="", skip_empty_option=True, shortcut_key="F2", current_value="1"):
+    def get_current_value(self, 
+                          text1="", 
+                          text2="", 
+                          text3="", 
+                          text4="", 
+                          text5="", 
+                          text6="", 
+                          text7="", 
+                          text8="", 
+                          skip_empty_option=True, 
+                          shortcut_key="F2", 
+                          current_value="1",
+                          enable_auto_switch=False,
+                          auto_switch_delay_ms=300):
         """
         Returns the currently selected text based on current_value.
         If skip_empty_option is True, it skips any empty texts.
@@ -261,6 +276,8 @@ class VrchTextKeyControlNode:
             skip_empty_option (bool): Whether to skip empty texts when cycling.
             shortcut_key (str): The selected shortcut key (F1-F12).
             current_value (str): The current selected value ("1" to "8").
+            enable_auto_switch (bool): Whether to enable auto-switching.
+            auto_switch_delay_ms (int): Delay in milliseconds for auto-switching.
 
         Returns:
             tuple: A tuple containing the selected text.
@@ -288,7 +305,20 @@ class VrchTextKeyControlNode:
         return (texts.get(selected_key, ""),)
 
     @classmethod
-    def IS_CHANGED(cls, text1, text2, text3, text4, text5, text6, text7, text8, skip_empty_option, shortcut_key, current_value):
+    def IS_CHANGED(cls, 
+                   text1, 
+                   text2, 
+                   text3, 
+                   text4, 
+                   text5, 
+                   text6, 
+                   text7, 
+                   text8, 
+                   skip_empty_option, 
+                   shortcut_key, 
+                   current_value,
+                   enable_auto_switch,
+                   auto_switch_delay_ms):
         """
         Determines if the node's state has changed based on inputs.
 
@@ -304,6 +334,8 @@ class VrchTextKeyControlNode:
             skip_empty_option (bool): Whether to skip empty texts.
             shortcut_key (str): The selected shortcut key.
             current_value (str): The current selected value.
+            enable_auto_switch (bool): Whether to enable auto-switching.
+            auto_switch_delay_ms (int): Delay in milliseconds for auto-switching.
 
         Returns:
             str: A hash representing the current state.

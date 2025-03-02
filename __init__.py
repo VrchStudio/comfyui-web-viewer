@@ -5,7 +5,7 @@ from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
 
-__version__ = "1.0.19"
+__version__ = "1.0.21"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -20,9 +20,11 @@ NODE_CLASS_MAPPINGS = {
     "VrchFloatKeyControlNode": VrchFloatKeyControlNode,
     "VrchFloatOSCControlNode": VrchFloatOSCControlNode,
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
+    "VrchImageChannelLoaderNode": VrchImageChannelLoaderNode,
     "VrchImageFlipBookWebViewerNode": VrchImageFlipBookWebViewerNode,
     "VrchImageSaverNode": VrchImageSaverNode,
     "VrchImageSwitchOSCControlNode": VrchImageSwitchOSCControlNode,
+    "VrchImagePreviewBackgroundNode": VrchImagePreviewBackgroundNode,
     "VrchImageWebViewerNode": VrchImageWebViewerNode,
     "VrchIntKeyControlNode": VrchIntKeyControlNode,
     "VrchIntOSCControlNode": VrchIntOSCControlNode,
@@ -32,6 +34,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchSwitchOSCControlNode": VrchSwitchOSCControlNode,
     "VrchTextConcatOSCControlNode": VrchTextConcatOSCControlNode,
     "VrchTextKeyControlNode": VrchTextKeyControlNode,
+    "VrchTextSrtPlayerNode": VrchTextSrtPlayerNode,
     "VrchTextSwitchOSCControlNode": VrchTextSwitchOSCControlNode,
     "VrchVideoWebViewerNode": VrchVideoWebViewerNode,
     "VrchWebViewerNode": VrchWebViewerNode,
@@ -55,7 +58,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchImageFlipBookWebViewerNode": "IMAGE Flipbook Web Viewer @vrch.ai",
     "VrchImageSaverNode": "IMAGE Saver @ vrch.ai",
     "VrchImageSwitchOSCControlNode": "IMAGE Switch OSC Control @ vrch.ai",
+    "VrchImagePreviewBackgroundNode": "IMAGE Preview in Background @ vrch.ai",
     "VrchImageWebViewerNode": "IMAGE Web Viewer @ vrch.ai",
+    "VrchImageChannelLoaderNode": "IMAGE Web Viewer Channel Loader @ vrch.ai",
     "VrchIntKeyControlNode": "INT Key Control @ vrch.ai",
     "VrchIntOSCControlNode": "INT OSC Control @ vrch.ai",
     "VrchInstantQueueKeyControlNode": "Instant Queue Key Control @ vrch.ai",
@@ -64,6 +69,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchSwitchOSCControlNode": "SWITCH OSC Control @ vrch.ai",
     "VrchTextConcatOSCControlNode": "TEXT Concat OSC Control @ vrch.ai",
     "VrchTextKeyControlNode": "TEXT Key Control @ vrch.ai",
+    "VrchTextSrtPlayerNode": "TEXT SRT Player @ vrch.ai",
     "VrchTextSwitchOSCControlNode": "TEXT Switch OSC Control @ vrch.ai",
     "VrchVideoWebViewerNode": "VIDEO Web Viewer @ vrch.ai",
     "VrchWebViewerNode": "Web Viewer @ vrch.ai",

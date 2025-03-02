@@ -74,7 +74,7 @@ The **`Audio Web Viewer @ vrch.ai`** node from the [**ComfyUI Web Viewer**](http
    - The `.mp3` file is stored in your ComfyUI `output` folder, within the `web_viewer` subfolder (e.g., `web_viewer/channel_1.mp3`).
    - Share this file or open the generated URL from any device on your network (if your server is accessible externally).
 
-> **Tip:** Make sure your **Server** address and **SSL** settings in `Audio Web Viewer` are correct for your network environment. If you want to access the audio from another device or over the internet, ensure that the server IP/domain is reachable and ports are open.
+> **Tips:** Make sure your **Server** address and **SSL** settings in `Audio Web Viewer` are correct for your network environment. If you want to access the audio from another device or over the internet, ensure that the server IP/domain is reachable and ports are open.
 
 ---
 

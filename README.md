@@ -78,7 +78,16 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 ### `Image Nodes`
 
 - Documentation: [Usage of Image nodes](./docs/image_nodes.md)
-- Example workflows: n/a
+- Example workflows:
+  - [Workflow Example: Preview Image in Background](./workflows/example_image_nodes_001_preview_in_background.json)
+
+### `Test Nodes`
+
+- Documentation: [Usage of Text nodes](./docs/text_nodes.md)
+- Example workflows:
+    - [Workflow Example: Text SRT Player Node](./workflows/example_text_nodes_001_text_srt_player.json)
+- Tutorials:
+  - [Storytelling with Text SRT Player](./docs/tutorial_005_storytelling_with_text_srt_player.md)
 
 ### `Other Example Workflows`
 
@@ -157,6 +166,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Contact Us
 
 For any inquiries, you can contact us at [hi@vrch.io](mailto:hi@vrch.io).
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=comfyui-web-viewer/comfyui-web-viewer,VrchStudio/comfyui-web-viewer&type=Date)](https://star-history.com/#comfyui-web-viewer/comfyui-web-viewer&VrchStudio/comfyui-web-viewer&Date)
 
 ## License
 
