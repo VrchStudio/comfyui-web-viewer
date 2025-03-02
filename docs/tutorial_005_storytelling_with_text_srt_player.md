@@ -4,7 +4,12 @@
 
 ## TL;DR
 
-TBA
+This tutorial guides you on how to use the **TEXT SRT Playe @ vrch.air** node from [**ComfyUI Web Viewer**](https://github.com/VrchStudio/comfyui-web-viewer), leveraging SRT subtitle files with timestamps to dynamically control storytelling images generation. Combined with the **IMAGE Preview in Background** node, you can create a fully automated, timestamp-based storytelling experience with real-time AI-generated visuals in ComfyUI.
+
+**Practical Use Cases**:
+- Interactive storytelling for exhibitions or live performances.
+- Dynamic AI-generated visual experiences for streaming or live events.
+- Real-time creative sessions with precise narrative control.
 
 ## Preparations
 
@@ -71,19 +76,28 @@ TBA
         00:00:45,000 --> 00:00:50,000
         The adventurer happily returns to the welcoming village at sunset; villagers cheerfully celebrate with lanterns, music, and treats; gentle golden sunset casting warm lights; joyful mood, storybook fantasy illustration, cozy atmosphere, soft colors, highly detailed, 8K resolution.
      ```
+   - Edit and past the SRT Format text into `TEXT SRT Player @ vrch.ai` node
 
 3. **Enable and Start Queue (Instant) Mode**
-
+   - Activate **Queue (Instant)** mode in ComfyUI for real-time prompt processing.
 4. **Click [Play SRT File] Button to Start SRT Text Switch**
+   - Click the **[Play SRT File]** button in the `TEXT SRT Player @ vrch.ai` node to initiate playback. 
+   - The node automatically sends prompts to the workflow according to timestamps.
 
-5. **Enjoy the Result!**
-   - The generated images will be displayed in ComfyUI page directly (via `IMAGE Preview in Background @ vrch.ai` node) and switched based on the time interval defined in SRT Text 
+5. **Enjoy Real-time Visual Storytelling!**
+   - Generated images appear dynamically in your ComfyUI interface via the **`IMAGE Preview in Background @ vrch.ai`** node.
+   - Images will switch automatically based on SRT timestamps, delivering a smooth storytelling experience.
 
-### 2. Use Your Artwork Outside of ComfyUI
 
-You may simply replace the `IMAGE Preview in Background @ vrch.ai` node with the `IMAGE Web Viewer @ vrch.ai` node from the [**ComfyUI Web Viewer**](https://github.com/VrchStudio/comfyui-web-viewer) plugin, then click at **[Open Web Viewer]** button and then a new browser window (or tab) will open to play your artworks in it.
+### 2. Using Your Artworks Outside of ComfyUI
 
-#### Tips
+To showcase your real-time AI-generated visuals externally:
+
+- Replace the node **`IMAGE Preview in Background @ vrch.ai`** with the **`IMAGE Web Viewer @ vrch.ai`** node.
+- After replacement, click the **[Open Web Viewer]** button.
+- A new browser window/tab will open, displaying your real-time storytelling images.
+
+#### Tips for External Viewing:
 1. Make sure your **Server** address and **SSL** settings in `IMAGE Web Viewer @ vrch.ai` are correct for your network environment. If you want to access the audio from another device or over the internet, ensure that the server IP/domain is reachable and ports are open.
 2. If you’re encountering a CORS policy error with a message like this:
    > `WARNING: request with non matching host and origin 127.0.0.1 != vrch.ai, returning 403`
@@ -98,3 +112,7 @@ You may simply replace the `IMAGE Preview in Background @ vrch.ai` node with the
   [example_text_nodes_001_text_srt_player](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_text_nodes_001_text_srt_player.json)
 - **ComfyUI Web Viewer GitHub Repo**:
   [https://github.com/VrchStudio/comfyui-web-viewer](https://github.com/VrchStudio/comfyui-web-viewer)
+
+---
+
+Enjoy your journey into dynamic storytelling with ComfyUI!
