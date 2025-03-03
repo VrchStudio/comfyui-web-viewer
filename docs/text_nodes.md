@@ -32,20 +32,29 @@
    - **Loop:**
      - **`loop`**: Toggle this option to enable or disable looping playback of the SRT file.
    - **Current Selection:**
-     - **`current_selection`**: This integer value is automatically updated during playback to indicate the currently active subtitle. When the playback time is outside any subtitle interval, the value is set to `-1` so that the placeholder text is output.
+     - **`current_selection`**: This integer value is automatically updated during playback to indicate the currently active subtitle. When the playback time is outside any subtitle interval, the value is set to `-1`, causing the placeholder text to be output instead.
    - **Debug:**
-     - **`debug`**: Enable debug mode to print detailed parsing and playback logs to the console.
+     - **`debug`**: Enable debug mode to print detailed parsing and playback logs to the console (useful for troubleshooting or verifying SRT parsing).
 
-3. **Play SRT Text:**
-   - The node uses an SRT parsing library to convert the provided SRT text into subtitle entries.
-   - It then plays the subtitles by continuously updating the `current_selection` based on the current playback time.
-   - The node provides interactive controls:
-     - **Play/Pause:** A button that toggles between playing and pausing the subtitle playback. The button text updates to reflect the current state.
-     - **Reset:** A button that resets the playback time to the beginning.
-   - A small display shows the current playback time in seconds.
-   - When looping is enabled, playback automatically restarts from the beginning upon reaching the end of the last subtitle entry.
+3. **Play SRT Text & Interactive Controls:**
+   - **Subtitle Parsing & Playback:**
+     - The node uses an SRT parsing library to convert the provided SRT text into a list of subtitle entries.
+     - As the node “plays” the subtitles, it continuously updates `current_selection` based on the current playback time.
+   - **Play/Pause Button:**
+     - Toggles between playing and pausing the subtitle playback. The button text updates to reflect the current state.
+   - **Reset Button:**
+     - Resets the playback time to the beginning (0 seconds).
+   - **Playback Time Display:**
+     - Shows the current playback time (in seconds) and updates in real time while subtitles are playing.
+   - **Progress Slider:**
+     - An interactive timeline bar for jumping to a specific time within the SRT file.  
+     - Dragging the slider updates the playback time accordingly, and the displayed subtitle changes if a new subtitle range is entered.
+   - **Looping:**
+     - If `loop` is enabled, playback automatically restarts at 0 seconds after the last subtitle entry ends.
+
+4. **Node Output:**
+   - The node outputs the text of the currently active subtitle entry. If the playback time is not within any subtitle range, the node outputs the `placeholder_text`.
+   - You can chain this output into subsequent nodes in your ComfyUI workflow for further processing or display.
 
 **Note:**
-- Ensure that the SRT text follows the correct SRT formatting standard.
-- The node outputs the content of the selected subtitle (or the placeholder text when no subtitle is active) to subsequent nodes in your workflow.
-
+- Ensure that your SRT text is correctly formatted (with sequential numbering, time range lines, and subtitle text).
