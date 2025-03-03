@@ -1,5 +1,3 @@
-// text_nodes.js
-
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
@@ -7,7 +5,7 @@ app.registerExtension({
     name: "vrch.TextSrtPlayerNode",
     async nodeCreated(node) {
         if (node.comfyClass === "VrchTextSrtPlayerNode") {
-            // Get required widgets
+            // Obtain required widgets
             const srtTextWidget = node.widgets.find(w => w.name === "srt_text");
             const loopWidget = node.widgets.find(w => w.name === "loop");
             const currentSelectionWidget = node.widgets.find(w => w.name === "current_selection");
@@ -16,19 +14,19 @@ app.registerExtension({
             // Player state variables
             let isPlaying = false;
             let timerId = null;
-            let playbackTime = 0; // current playback time in seconds
-            let lastResumeTimestamp = 0; // timestamp when playback last resumed
-            let srtEntries = []; // parsed SRT entries array
+            let playbackTime = 0; // Current playback time in seconds
+            let lastResumeTimestamp = 0; // Timestamp when playback last resumed
+            let srtEntries = []; // Parsed SRT entries array
             let shouldLoop = loopWidget ? loopWidget.value : false;
 
-            // Debug logging function: logs messages if debug widget is enabled
+            // Debug logging function: logs messages when debug is enabled
             const debugLog = (msg) => {
                 if (debugWidget && debugWidget.value) {
                     console.log("[VrchTextSrtPlayerNode]", msg);
                 }
             };
 
-            // Converts a time string "HH:MM:SS,mmm" to seconds (as a float)
+            // Convert time string "HH:MM:SS,mmm" to seconds (as a float)
             function timeToSeconds(timeStr) {
                 const parts = timeStr.split(/[:,]/);
                 const hours = parseInt(parts[0], 10);
@@ -38,8 +36,7 @@ app.registerExtension({
                 return hours * 3600 + minutes * 60 + seconds + milliseconds / 1000;
             }
 
-            // Function to parse SRT text and return an array of entries.
-            // Each entry contains: index, start (in seconds), end (in seconds), and content.
+            // Parse SRT text, return an array of objects containing index, start (in seconds), end (in seconds) and content
             function parseSRTText(srtText) {
                 const entries = [];
                 const blocks = srtText.split(/\r?\n\r?\n/);
@@ -47,7 +44,7 @@ app.registerExtension({
                     block = block.trim();
                     if (!block) return;
                     const lines = block.split(/\r?\n/);
-                    if (lines.length < 2) return; // must have at least index and time line
+                    if (lines.length < 2) return; // At least index and time line are required
                     const index = parseInt(lines[0], 10);
                     const timeLine = lines[1];
                     const timeMatch = timeLine.match(/(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})/);
@@ -61,8 +58,7 @@ app.registerExtension({
                 return entries;
             }
 
-            // Updates the current selection widget based on the current playback time.
-            // If playback time is outside any subtitle interval, set current_selection to -1.
+            // Update current subtitle selection based on playback time (1-based index, set to -1 if not within any subtitle interval)
             function updateCurrentSelection() {
                 if (!srtEntries || srtEntries.length === 0) return;
                 let selectedIndex = -1;
@@ -79,12 +75,12 @@ app.registerExtension({
                 }
             }
 
-            // Updates the small display text to show current playback time
+            // Update the text in the time display area
             function updateTimeDisplay() {
                 timeDisplay.textContent = "Current time: " + playbackTime.toFixed(2) + " sec";
             }
 
-            // Timer tick function: updates playback time, current selection, and small display periodically
+            // Timer tick function: update playback time, subtitle selection, time display, and slider
             function tick() {
                 if (!isPlaying) return;
                 const now = Date.now();
@@ -94,8 +90,10 @@ app.registerExtension({
                 debugLog("Playback time: " + playbackTime.toFixed(2) + " sec");
                 updateCurrentSelection();
                 updateTimeDisplay();
+                // Update the slider value
+                slider.value = playbackTime;
 
-                // Check if playback has reached the end of the last entry
+                // Check if playback has reached the end time of the last subtitle
                 if (srtEntries.length > 0 && playbackTime >= srtEntries[srtEntries.length - 1].end) {
                     if (shouldLoop) {
                         debugLog("Loop mode active, restarting playback.");
@@ -110,11 +108,16 @@ app.registerExtension({
                 }
             }
 
-            // Starts or resumes playback: parses SRT text and starts the timer
+            // Start or resume playback: parse SRT text and start the timer, also update slider max value
             function startPlayback() {
                 if (isPlaying) return;
                 if (srtTextWidget) {
                     srtEntries = parseSRTText(srtTextWidget.value);
+                    if (srtEntries.length > 0) {
+                        slider.max = srtEntries[srtEntries.length - 1].end;
+                    } else {
+                        slider.max = 0;
+                    }
                 }
                 isPlaying = true;
                 lastResumeTimestamp = Date.now();
@@ -123,7 +126,7 @@ app.registerExtension({
                 debugLog("Playback started.");
             }
 
-            // Pauses playback: stops the timer and retains current playback time
+            // Pause playback: stop the timer but keep current playback time
             function pausePlayback() {
                 if (!isPlaying) return;
                 isPlaying = false;
@@ -135,16 +138,17 @@ app.registerExtension({
                 debugLog("Playback paused at " + playbackTime.toFixed(2) + " sec.");
             }
 
-            // Resets playback: pauses playback and resets time to the beginning
+            // Reset playback: pause and reset time to start, also update slider display
             function resetPlayback() {
                 pausePlayback();
                 playbackTime = 0;
                 updateCurrentSelection();
                 updateTimeDisplay();
+                slider.value = playbackTime;
                 debugLog("Playback reset.");
             }
 
-            // Create a container div for the widget with explicit height
+            // Create a container for widgets, with a fixed height
             const widgetContainer = document.createElement("div");
             widgetContainer.style.setProperty("height", "80px", "important");
             widgetContainer.style.display = "flex";
@@ -152,14 +156,14 @@ app.registerExtension({
             widgetContainer.style.justifyContent = "center";
             widgetContainer.style.alignItems = "center";
 
-            // Create a div for buttons; arrange them in a vertical stack and center them
+            // Create a container for buttons, arranged vertically and centered
             const buttonsContainer = document.createElement("div");
             buttonsContainer.style.display = "flex";
             buttonsContainer.style.flexDirection = "column";
             buttonsContainer.style.alignItems = "center";
             buttonsContainer.style.gap = "10px";
 
-            // Create the Play/Pause button; initial state is "Play"
+            // Create the Play/Pause button, initial state "Play SRT File"
             const playPauseButton = document.createElement("button");
             playPauseButton.textContent = "Play SRT File";
             playPauseButton.classList.add("vrch-srt-big-button");
@@ -171,7 +175,7 @@ app.registerExtension({
                 }
             };
 
-            // Create the Reset button with distinct style
+            // Create the Reset button
             const resetButton = document.createElement("button");
             resetButton.textContent = "Reset";
             resetButton.classList.add("vrch-srt-big-button", "vrch-srt-reset-button");
@@ -179,23 +183,40 @@ app.registerExtension({
                 resetPlayback();
             };
 
-            // Append buttons to the buttons container (vertical stack)
+            // Append buttons to the buttons container
             buttonsContainer.appendChild(playPauseButton);
             buttonsContainer.appendChild(resetButton);
 
-            // Create a small display div for showing playback time
+            // Create the progress slider
+            const slider = document.createElement("input");
+            slider.type = "range";
+            slider.min = 0;
+            slider.step = 0.01; // Allow adjustment in fractions of a second
+            slider.value = playbackTime;
+            slider.style.width = "100%";
+            // When the user drags the slider, update playback time and related displays
+            slider.addEventListener("input", (e) => {
+                playbackTime = parseFloat(slider.value);
+                lastResumeTimestamp = Date.now();
+                updateCurrentSelection();
+                updateTimeDisplay();
+                debugLog("Slider adjusted to: " + playbackTime.toFixed(2) + " sec.");
+            });
+
+            // Create a small display area to show playback time
             const timeDisplay = document.createElement("div");
             timeDisplay.classList.add("vrch-srt-small-display");
             timeDisplay.textContent = "Current time: 0.00 sec";
 
-            // Append the buttons container and time display to the main container
+            // Append the buttons container, slider, and time display to the main container in order
             widgetContainer.appendChild(buttonsContainer);
+            widgetContainer.appendChild(slider);
             widgetContainer.appendChild(timeDisplay);
 
-            // Add the widget container to the node as a single widget component
+            // Add the main container as a component to the node
             node.addDOMWidget("srt_control_widget", "SRT Control", widgetContainer);
 
-            // Monitor changes to the loop widget
+            // Listen for changes to the loop widget
             if (loopWidget) {
                 loopWidget.callback = (value) => {
                     shouldLoop = value;
@@ -203,7 +224,20 @@ app.registerExtension({
                 };
             }
 
-            // Cleanup timer when the node is removed
+            // If the srt_text widget value changes, re-parse and update the slider's max value (reflecting new timeline)
+            if (srtTextWidget) {
+                srtTextWidget.callback = (value) => {
+                    srtEntries = parseSRTText(value);
+                    if (srtEntries.length > 0) {
+                        slider.max = srtEntries[srtEntries.length - 1].end;
+                    } else {
+                        slider.max = 0;
+                    }
+                    debugLog("srt_text updated, slider max set to: " + slider.max);
+                };
+            }
+
+            // Clear the timer when the node is removed
             const onRemoved = this.onRemoved;
             this.onRemoved = function () {
                 if (timerId) {
@@ -216,7 +250,7 @@ app.registerExtension({
     }
 });
 
-// Insert custom CSS for the Play/Pause and Reset buttons and small display
+// Insert custom CSS styles
 const srtButtonStyle = document.createElement("style");
 srtButtonStyle.textContent = `
     .vrch-srt-big-button {
@@ -243,7 +277,7 @@ srtButtonStyle.textContent = `
         background-color: #3e8e41;
     }
     
-    /* Reset button with a grey colour scheme */
+    /* Grey style for the Reset button */
     .vrch-srt-reset-button {
         height: 40px;
         margin-top: 10px;
@@ -258,7 +292,7 @@ srtButtonStyle.textContent = `
         background-color: #424242;
     }
     
-    /* Small display style with brighter text color */
+    /* Style for the small display area */
     .vrch-srt-small-display {
         font-size: 14px;
         color: #666;
