@@ -1,12 +1,20 @@
 # ComfyUI Web Viewer
- 
-The ComfyUI Web Viewer by [vrch.ai](https://vrch.ai) is a custom node collection offering a real-time AI-generated interactive art framework. This utility integrates realtime streaming into ComfyUI workflows, supporting keyboard control nodes, OSC control nodes, sound input nodes, and more. Accessible from any device with a web browser, it enables real time interaction with AI-generated content, making it ideal for interactive visual projects and enhancing ComfyUI workflows with efficient content management and display.
 
-**Features:**  
+The **ComfyUI Web Viewer** by [vrch.ai](https://vrch.ai) is a custom node collection offering a real-time AI-generated interactive art framework. This utility integrates realtime streaming into ComfyUI workflows, supporting keyboard control nodes, OSC control nodes, sound input nodes, and more. Accessible from any device with a web browser, it enables real time interaction with AI-generated content, making it ideal for interactive visual projects and enhancing ComfyUI workflows with efficient content management and display.
 
-- Real-time interaction and AI generation  
-- Keyboard control nodes, OSC control nodes, and sound input nodes  
-- Web accessibility from any device
+**✨ Features:**
+
+- **Real-Time AI Generation & Interaction**: Immediate response for interactive creativity.
+- **Multi-Input Support**: Easily integrates keyboard, OSC, and audio input for versatile interactivity.
+- **Universal Web Accessibility**: Compatible with any device equipped with a web browser.
+
+**🚀 Support Us:**
+
+If you find the **ComfyUI Web Viewer** useful or inspiring, consider supporting us:
+
+- 💖 **Sponsor**: Help us maintain and enhance the project through [GitHub Sponsors](https://github.com/sponsors/VrchStudio).
+- ⭐ **Star the Project**: A star on GitHub greatly motivates us and helps increase visibility!
+- 📩 **Business Inquiries**: For commercial collaborations, reach us at [hi@vrch.io](mailto:hi@vrch.io).
 
 <video src="https://github.com/user-attachments/assets/cdac0293-64ce-4b74-95a8-d4dcce2300d2" controls="controls" style="max-width: 100%;">
 </video>
@@ -22,7 +30,11 @@ see [CHANGELOG](CHANGELOG.md)
 Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directly.
 
 ### Method 2: Manual Installation
+
 1. Clone this repo into the `custom_nodes` directory of ComfyUI
+   ```
+   git clone git@github.com:VrchStudio/comfyui-web-viewer.git
+   ```
 2. Install dependencies: 
    ```
    pip install -r requirements.txt
