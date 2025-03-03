@@ -36,7 +36,14 @@ app.registerExtension({
                 return hours * 3600 + minutes * 60 + seconds + milliseconds / 1000;
             }
 
-            // Parse SRT text, return an array of objects containing index, start (in seconds), end (in seconds) and content
+            // Format seconds as "M:SS" (e.g. 65 -> "1:05")
+            function formatTime(sec) {
+                const m = Math.floor(sec / 60);
+                const s = Math.floor(sec % 60);
+                return m + ":" + (s < 10 ? "0" + s : s);
+            }
+
+            // Parse SRT text, return an array of objects containing index, start (in seconds), end (in seconds), and content
             function parseSRTText(srtText) {
                 const entries = [];
                 const blocks = srtText.split(/\r?\n\r?\n/);
@@ -65,7 +72,7 @@ app.registerExtension({
                 for (let i = 0; i < srtEntries.length; i++) {
                     const entry = srtEntries[i];
                     if (playbackTime >= entry.start && playbackTime < entry.end) {
-                        selectedIndex = i + 1; // 1-based index
+                        selectedIndex = i + 1;
                         break;
                     }
                 }
@@ -78,6 +85,39 @@ app.registerExtension({
             // Update the text in the time display area
             function updateTimeDisplay() {
                 timeDisplay.textContent = "Current time: " + playbackTime.toFixed(2) + " sec";
+            }
+
+            // Create or update tick labels at 0%, 25%, 50%, 75%, and 100% of the total duration,
+            // each with a small vertical marker above the label.
+            function createTickLabels(duration) {
+                tickLabelsContainer.innerHTML = "";
+                if (duration <= 0) return;
+
+                // We want 5 tick positions: 0%, 25%, 50%, 75%, 100%
+                const fractions = [0, 0.25, 0.5, 0.75, 1.0];
+                fractions.forEach(frac => {
+                    const labelTime = frac * duration;
+
+                    // Container for marker + label
+                    const labelDiv = document.createElement("div");
+                    labelDiv.style.display = "flex";
+                    labelDiv.style.flexDirection = "column";
+                    labelDiv.style.alignItems = "center";
+
+                    // The small vertical bar (marker) above the label
+                    const marker = document.createElement("div");
+                    marker.classList.add("vrch-srt-tick-marker");
+                    // For example, you could also use marker.textContent = "|" if you want a direct symbol
+
+                    // The time label below the marker
+                    const label = document.createElement("div");
+                    label.classList.add("vrch-srt-tick-label");
+                    label.textContent = formatTime(labelTime);
+
+                    labelDiv.appendChild(marker);
+                    labelDiv.appendChild(label);
+                    tickLabelsContainer.appendChild(labelDiv);
+                });
             }
 
             // Timer tick function: update playback time, subtitle selection, time display, and slider
@@ -108,15 +148,17 @@ app.registerExtension({
                 }
             }
 
-            // Start or resume playback: parse SRT text and start the timer, also update slider max value
+            // Start or resume playback: parse SRT text and start the timer, also update slider max value and tick labels
             function startPlayback() {
                 if (isPlaying) return;
                 if (srtTextWidget) {
                     srtEntries = parseSRTText(srtTextWidget.value);
                     if (srtEntries.length > 0) {
                         slider.max = srtEntries[srtEntries.length - 1].end;
+                        createTickLabels(srtEntries[srtEntries.length - 1].end);
                     } else {
                         slider.max = 0;
+                        createTickLabels(0);
                     }
                 }
                 isPlaying = true;
@@ -150,7 +192,7 @@ app.registerExtension({
 
             // Create a container for widgets, with a fixed height
             const widgetContainer = document.createElement("div");
-            widgetContainer.style.setProperty("height", "80px", "important");
+            widgetContainer.style.setProperty("height", "120px", "important");
             widgetContainer.style.display = "flex";
             widgetContainer.style.flexDirection = "column";
             widgetContainer.style.justifyContent = "center";
@@ -193,7 +235,8 @@ app.registerExtension({
             slider.min = 0;
             slider.step = 0.01; // Allow adjustment in fractions of a second
             slider.value = playbackTime;
-            slider.style.width = "100%";
+            slider.classList.add("vrch-srt-slider");
+
             // When the user drags the slider, update playback time and related displays
             slider.addEventListener("input", (e) => {
                 playbackTime = parseFloat(slider.value);
@@ -203,14 +246,22 @@ app.registerExtension({
                 debugLog("Slider adjusted to: " + playbackTime.toFixed(2) + " sec.");
             });
 
+            // Create a container for the tick labels below the slider
+            const tickLabelsContainer = document.createElement("div");
+            tickLabelsContainer.style.display = "flex";
+            tickLabelsContainer.style.justifyContent = "space-between";
+            tickLabelsContainer.style.width = "100%";
+            tickLabelsContainer.style.marginTop = "5px";
+
             // Create a small display area to show playback time
             const timeDisplay = document.createElement("div");
             timeDisplay.classList.add("vrch-srt-small-display");
             timeDisplay.textContent = "Current time: 0.00 sec";
 
-            // Append the buttons container, slider, and time display to the main container in order
+            // Append the buttons container, slider, tick labels, and time display to the main container in order
             widgetContainer.appendChild(buttonsContainer);
             widgetContainer.appendChild(slider);
+            widgetContainer.appendChild(tickLabelsContainer);
             widgetContainer.appendChild(timeDisplay);
 
             // Add the main container as a component to the node
@@ -224,14 +275,16 @@ app.registerExtension({
                 };
             }
 
-            // If the srt_text widget value changes, re-parse and update the slider's max value (reflecting new timeline)
+            // If the srt_text widget value changes, re-parse and update the slider's max value and tick labels
             if (srtTextWidget) {
                 srtTextWidget.callback = (value) => {
                     srtEntries = parseSRTText(value);
                     if (srtEntries.length > 0) {
                         slider.max = srtEntries[srtEntries.length - 1].end;
+                        createTickLabels(srtEntries[srtEntries.length - 1].end);
                     } else {
                         slider.max = 0;
+                        createTickLabels(0);
                     }
                     debugLog("srt_text updated, slider max set to: " + slider.max);
                 };
@@ -292,13 +345,88 @@ srtButtonStyle.textContent = `
         background-color: #424242;
     }
     
-    /* Style for the small display area */
+    /* Style for the slider */
+    .vrch-srt-slider {
+        width: 100%;
+        margin-top: 30px; /* Additional space from the buttons */
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+    }
+
+    /* Slider track (default gray) */
+    .vrch-srt-slider::-webkit-slider-runnable-track {
+        height: 6px;
+        background: #ddd;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .vrch-srt-slider::-moz-range-track {
+        height: 6px;
+        background: #ddd;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    /* Slider thumb (solid theme color), with basic hover/active animation */
+    .vrch-srt-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 24px;
+        height: 24px;
+        background: #4CAF50;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-top: -9px; /* center on the track (half thumb size + half track height) */
+        transition: transform 0.2s, background 0.2s;
+    }
+    .vrch-srt-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+        background: #45a049;
+    }
+    .vrch-srt-slider::-webkit-slider-thumb:active {
+        transform: scale(1.2);
+        background: #3e8e41;
+    }
+
+    .vrch-srt-slider::-moz-range-thumb {
+        width: 24px;
+        height: 24px;
+        background: #4CAF50;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.2s, background 0.2s;
+    }
+    .vrch-srt-slider::-moz-range-thumb:hover {
+        transform: scale(1.1);
+        background: #45a049;
+    }
+    .vrch-srt-slider::-moz-range-thumb:active {
+        transform: scale(1.2);
+        background: #3e8e41;
+    }
+
+    /* Small display area for the current time */
     .vrch-srt-small-display {
         font-size: 14px;
         color: #666;
-        margin-top: 10px;
+        margin-top: 20px;
         width: 100%;
         text-align: center;
+    }
+
+    /* Tick marker and label styles */
+    .vrch-srt-tick-marker {
+        width: 2px;
+        height: 8px;
+        background-color: #333;
+        margin-bottom: 2px; /* small gap between marker and label */
+    }
+    .vrch-srt-tick-label {
+        font-size: 12px;
+        color: #666;
     }
 `;
 document.head.appendChild(srtButtonStyle);
