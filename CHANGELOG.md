@@ -12,10 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add workflow example for `IMAGE Preview in Background @ vrch.ai` node
 - add workflow example for `TEXT SRT Player @ vrch.ai` node
 - add tutorial for `TEXT SRT Player @ vrch.ai` node
+- add FUNDING.yml file
 
 ### Updated
 
+- update `TEXT SRT Play @ vrch.ai` node to add interactive slider bar
 - update README.md
+- update text_nodes.md
 
 ## 1.0.21 - 2025-02-25
 
