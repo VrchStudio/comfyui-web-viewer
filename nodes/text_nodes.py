@@ -72,7 +72,7 @@ class VrchTextSrtPlayerNode:
                       debug: bool=False):
         try:
             if debug:
-                print("Playing SRT Text:", srt_text)
+                print("[VrchTextSrtPlayerNode] Playing SRT Text:", srt_text)
                 
             # use -1 as a flag for no selection output
             if current_selection == -1:
@@ -86,6 +86,9 @@ class VrchTextSrtPlayerNode:
             
             selected_text = srt_entries[current_selection-1].content
             
+            if debug:
+                print(f"[VrchTextSrtPlayerNode] Selected SRT Entry [{current_selection}]: {selected_text}")
+            
             return (selected_text,)
         
         except Exception as e:
@@ -93,4 +96,17 @@ class VrchTextSrtPlayerNode:
             error_message = f"[VrchTextSrtPlayerNode] An error occurred when calling play_srt_text(): {str(e)} at {callsite.filename.split('/')[-1]}:{callsite.lineno}"
             print(error_message)
             raise ValueError(error_message)
-    
+        
+    @classmethod
+    def IS_CHANGED(cls, 
+                   srt_text: str, 
+                   placeholder_text: str, 
+                   loop: bool, 
+                   current_selection: int, 
+                   debug: bool):
+        m = hashlib.sha256()
+        m.update(srt_text.encode('utf-8'))
+        m.update(placeholder_text.encode('utf-8'))
+        m.update(str(loop).encode('utf-8'))
+        m.update(str(current_selection).encode('utf-8'))
+        return m.hexdigest()
