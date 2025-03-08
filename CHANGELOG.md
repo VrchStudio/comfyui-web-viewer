@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- add workflow for audio picture book
+- add tutorial for audio picture book
+
+### Updated
+
+- update `TEXT SRT Player @ vrch.ai` node to add `IS_CHANGED` check
+- update README.md
+
 ## 1.0.22 - 2025-03-03
 
 ### Added
