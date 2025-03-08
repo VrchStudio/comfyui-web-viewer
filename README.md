@@ -62,6 +62,7 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
   - [Fast Image to Video by LTX Videos and Ollama](./docs/tutorial_002_fast_image_to_video_by_ltx_video_and_ollama.md)
   - [Fast Image to Video by LTX Vidoes, MMAudio and Ollama](./docs/tutorial_003_fast_image_to_video_by_ltx_video_and_mmaudio_and_ollama.md)
   - [Real Time Voice Clone](./docs/tutorial_004_real_time_voice_clone_by_f5_tts.md)
+  - [Audio Picture Book with Your Own Voice](./docs/tutorial_006_srt_to_audio_picture_book.md)
 
 ### `OSC Control Nodes`
 
@@ -105,7 +106,8 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 
 - [Rapid Text to Image (8K)](./workflows/example_others_001_text_to_image_8k.json)
 - [Auto Switch to Instant Queue and Run Workflow](./workflows/example_others_002_autorun_instant_queue.json)
-- [Apple Vision Pro Ultrawide Wallpaper (5K)](./workflows/example_others_003_text_to_image_5k_avp_ultra_wide.png)
+- [Apple Vision Pro Ultrawide Wallpaper (5K)](./workflows/example_others_003_text_to_image_5k_avp_ultra_wide.json)
+- [Audio Picture Book with Your Own Voice](./workflows/example_others_004_srt_to_audio_picture_book.json)
 
 ## Troubleshootings
 
