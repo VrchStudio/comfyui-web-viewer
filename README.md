@@ -183,7 +183,7 @@ For any inquiries, you can contact us at [hi@vrch.io](mailto:hi@vrch.io).
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=comfyui-web-viewer/comfyui-web-viewer,VrchStudio/comfyui-web-viewer&type=Date)](https://star-history.com/#comfyui-web-viewer/comfyui-web-viewer&VrchStudio/comfyui-web-viewer&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=VrchStudio/comfyui-web-viewer&type=Date)](https://www.star-history.com/#VrchStudio/comfyui-web-viewer&Date)
 
 ## License
 
