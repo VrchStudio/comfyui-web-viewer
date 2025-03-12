@@ -422,7 +422,7 @@ style.textContent = `
     }
     
     .comfy-vrch-value-small-display {
-        margin-top: 50px;
+        margin-top: 20px;
         font-size: 14px;
         text-align: center;
     }

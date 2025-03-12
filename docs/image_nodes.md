@@ -28,27 +28,38 @@
 
 ![](../assets/images/example_003_preview_image_in_background.png)
 
-1. **Add the `IMAGE Preview in Background @ vrch.ai` node to your ComfyUI workflow.**
+#### 1. Adding the Node
+Add the `IMAGE Preview in Background @ vrch.ai` node to your ComfyUI workflow.
 
-2. **Configure the Node:**
-   - **Image Input:**
-     - **`image`**: Provide a single image that you wish to use for the background preview.
-   - **Channel:**
-     - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**). This determines the filename (e.g., `channel_1.jpeg`).
-   - **Background Display:**
-     - **`background_display`**: Toggle to enable or disable the display of the image as a background in ComfyUI.
-   - **Refresh Interval:**
-     - **`refresh_interval_ms`**: Set the refresh interval in milliseconds for updating the background preview (default is **300ms**).
-   - **Display Option:**
-     - **`display_option`**: Choose how the image should be displayed in the background. Options include **`original`**, **`fit`**, **`stretch`**, and **`crop`** (default is **`fit`**).
+#### 2. Node Configuration
+- **Image Input:**
+  - **`images`**: Provide a single image to be used for the background preview.
+- **Channel:**
+  - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**). This determines the filename prefix (e.g., `channel_1.jpeg` or in batch mode `channel_1_00.jpeg`).
+- **Background Display:**
+  - **`background_display`**: Toggle to enable or disable displaying the image as a background in ComfyUI.
+- **Refresh Interval:**
+  - **`refresh_interval_ms`**: Set the interval (in milliseconds) for refreshing the background preview (default is **300ms**).
+- **Display Option:**
+  - **`display_option`**: Choose how the image is displayed in the background. Options include **`original`**, **`fit`**, **`stretch`**, and **`crop`** (default is **`fit`**).
+- **Batch Display:**
+  - **`batch_display`**: Toggle to enable batch display mode. When enabled, the node will cycle through multiple images within a batch.
+- **Batch Display Interval:**
+  - **`batch_display_interval_ms`**: Set the interval (in milliseconds) for switching between images in batch mode (default is **200ms**).
+- **Batch Images Size:**
+  - **`batch_images_size`**: Define the total number of images in the batch, which determines the range for the index used in the filename (default is **4**).
 
-3. **Preview in Background:**
-   - The node saves the input image in the `preview_background` subfolder of the ComfyUI output directory using a filename based on the selected channel (e.g., `channel_1.jpeg`).
-   - The saved image is intended to be used as a dynamic background inside the ComfyUI frontend.
-   - The refresh interval controls how frequently the background preview is updated.
+#### 3. Background Preview
+- When **`background_display`** is enabled, the node saves the input image to the `preview_background` subfolder within the ComfyUI output directory.
+- **File Naming Rules**:
+  - If **`batch_display`** is **false**, the saved filename format is:  
+    `channel_{channel}.jpeg`
+  - If **`batch_display`** is **true**, the saved filename format is:  
+    `channel_{channel}_{index:02d}.jpeg`  
+    where **`{index}`** is updated cyclically based on **`batch_display_interval_ms`** and within the range defined by **`batch_images_size`** (for example: `channel_1_00.jpeg`, `channel_1_01.jpeg`, `channel_1_02.jpeg`, `channel_1_03.jpeg`).
 
-**Note**:
-- Ensure that the output directory is correctly configured.
-- This node is useful for continuously updating a background display with image previews.
+#### 4. Notes
+- Ensure that the output directory is correctly configured, as the node saves images into the `preview_background` folder within that directory.
+- The node dynamically updates the background preview by refreshing the saved image at the set interval. Adjust the refresh interval and batch display parameters as needed for optimal preview performance.
 
 ---
