@@ -66,11 +66,14 @@ class VrchImagePreviewBackgroundNode(VrchImageSaverNode):
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "image": ("IMAGE",),
+                "images": ("IMAGE",),
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "background_display": ("BOOLEAN", {"default": True}),
                 "refresh_interval_ms": ("INT", {"default": 300, "min": 50, "max": 10000}),
                 "display_option": (["original", "fit", "stretch", "crop"], {"default": "fit"}),
+                "batch_display": ("BOOLEAN", {"default": False}),
+                "batch_display_interval_ms": ("INT", {"default": 200, "min": 50, "max": 10000}),
+                "batch_images_size": ("INT", {"default": 4, "min": 1, "max": 100}),
             }
         }
 
@@ -86,12 +89,16 @@ class VrchImagePreviewBackgroundNode(VrchImageSaverNode):
         self.output_dir = folder_paths.output_directory
 
     def save_image_to_td_background(self, 
-                                    image, 
+                                    images, 
                                     channel,
                                     background_display, 
                                     refresh_interval_ms,
-                                    display_option):
+                                    display_option,
+                                    batch_display,
+                                    batch_display_interval_ms,
+                                    batch_images_size):
         
+        # Save the images into "preview_background" directory with filename "{channel}_{index:%02d}.jpeg"
         filename = f"channel_{channel}"
         path = f"preview_background"
 
@@ -99,11 +106,11 @@ class VrchImagePreviewBackgroundNode(VrchImageSaverNode):
         os.makedirs(output_path, exist_ok=True)
         
         self.save_images(
-            images=image,
+            images=images,
             filename=filename,
             path=path,
             extension="jpeg",
             quality_jpeg_or_webp=85,
         )
 
-        return (image,)
+        return ()
