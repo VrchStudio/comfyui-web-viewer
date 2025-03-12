@@ -183,12 +183,10 @@ app.registerExtension({
                 }
             }
 
-            // Initialize polling and update with a short delay
-            setTimeout(() => {
-                setupInterval();
-                setupBatchInterval();
-                updateBackground();
-            }, 1000);
+            // Initialize polling and update
+            setupInterval();
+            setupBatchInterval();
+            updateBackground();
         }
     },
 
