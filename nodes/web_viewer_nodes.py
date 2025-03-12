@@ -183,8 +183,18 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
         # The output directory where images will be saved
         self.output_dir = folder_paths.output_directory
 
-    def save_and_view_images(self, images, channel, number_of_images, server, ssl, window_width, window_height, extra_params, show_url, url):
-        # Save the images into "web_viewer" directory with filename "{channel}_{index:%02d}.jpeg"
+    def save_and_view_images(self, 
+                             images, 
+                             channel, 
+                             number_of_images, 
+                             server, 
+                             ssl, 
+                             window_width, 
+                             window_height, 
+                             extra_params, 
+                             show_url, 
+                             url):
+        # Save the images into "web_viewer" directory with filename "channel_{channel}_{index:%02d}.jpeg"
         output_path = os.path.join(self.output_dir, "web_viewer")
         os.makedirs(output_path, exist_ok=True)
 
@@ -197,7 +207,6 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
             quality_jpeg_or_webp=85
         )
 
-        # No need to return anything; UI handling is done via JavaScript
         return (images,)
 
     @classmethod
