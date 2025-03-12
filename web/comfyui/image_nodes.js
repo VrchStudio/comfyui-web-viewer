@@ -32,10 +32,10 @@ async function computeHash(str) {
 }
 
 // Global flag to enable/disable debug logging
-const ENABLE_DEBUG = true;
+const ENABLE_DEBUG = false;
 
 app.registerExtension({
-    name: "vrch.ImageTDBackground",
+    name: "vrch.ImagePreviewBackgroundNode",
 
     async nodeCreated(node) {
         // Only process nodes of type "VrchImagePreviewBackgroundNode"
@@ -45,26 +45,68 @@ app.registerExtension({
             const enableWidget = node.widgets.find(w => w.name === "background_display");
             const intervalWidget = node.widgets.find(w => w.name === "refresh_interval_ms");
             const displayOptionWidget = node.widgets.find(w => w.name === "display_option");
+            const batchDisplayWidget = node.widgets.find(w => w.name === "batch_display");
+            const batchDisplayIntervalWidget = node.widgets.find(w => w.name === "batch_display_interval_ms");
+            const batchImagesSizeWidget = node.widgets.find(w => w.name === "batch_images_size");
 
-            const widgets = [channelWidget, enableWidget, intervalWidget, displayOptionWidget];
+            const widgets = [channelWidget, enableWidget, intervalWidget, displayOptionWidget, 
+                batchDisplayWidget, batchDisplayIntervalWidget, batchImagesSizeWidget];
+
+            // Global variable for batch index and timer
+            let batchIndex = 0;
+            let batchTimer = null;
+
+            // Function to set up the batch display timer if enabled
+            function setupBatchInterval() {
+                if (batchTimer) {
+                    clearInterval(batchTimer);
+                    batchTimer = null;
+                }
+                if (batchDisplayWidget && batchDisplayWidget.value) {
+                    let ms = parseInt(batchDisplayIntervalWidget.value || 1000, 10);
+                    let imagesSize = parseInt(batchImagesSizeWidget.value || 1, 10);
+                    // Reset batchIndex to 0 when (re)starting timer
+                    batchIndex = 0;
+                    batchTimer = setInterval(() => {
+                        batchIndex = (batchIndex + 1) % imagesSize;
+                        reinitBackground();
+                        updateBackground();
+                        if (ENABLE_DEBUG) {
+                            console.log(`Batch display timer updated index to ${batchIndex}`);
+                        }
+                    }, ms);
+                }
+            }
 
             // Set callbacks for widget changes to update the background immediately
             widgets.forEach(widget => {
                 if (widget) {
                     widget.callback = () => {
-                        console.log(`callback:::${widget.name}:::${widget.value}`);
+                        if (ENABLE_DEBUG) {
+                            console.log(`callback:::${widget.name}:::${widget.value}`);
+                        }
+                        // For batch related widgets, update the batch timer
+                        if (["batch_display", "batch_display_interval_ms", "batch_images_size"].includes(widget.name)) {
+                            setupBatchInterval();
+                        }
                         reinitBackground();
                         updateBackground();
                     };
                 }
             });
 
-            // Function that returns the final image path
+            // Function that returns the final image path, with different logic based on batchDisplayWidget
             function getImagePath() {
                 const channel = channelWidget.value || "1";
                 const extension = "jpeg";
                 const folder = "preview_background";
-                const filename = `channel_${channel}.${extension}`;
+                let filename;
+                if (batchDisplayWidget && batchDisplayWidget.value) {
+                    // Use batch display logic: include current batch index formatted为两位数
+                    filename = `channel_${channel}_${String(batchIndex).padStart(2, '0')}.${extension}`;
+                } else {
+                    filename = `channel_${channel}.${extension}`;
+                }
                 const basePath = window.location.href;
                 return `${basePath}view?filename=${filename}&subfolder=${folder}&type=output&rand=${Math.random()}`;
             }
@@ -141,9 +183,12 @@ app.registerExtension({
                 }
             }
 
-            // Initialize polling and update immediately
-            setupInterval();
-            updateBackground();
+            // Initialize polling and update with a short delay
+            setTimeout(() => {
+                setupInterval();
+                setupBatchInterval();
+                updateBackground();
+            }, 1000);
         }
     },
 
