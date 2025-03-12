@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- add workflow for audio picture book (SDXL version)
+  
+### Updated
+
+- update `AUDIO Recorder @ vrch.ai` node to set `look_interval` min value to 0.5
+- update `IMAGE Preview in Background @ vrch.ai` node to introduce batch images display options
+- update image_nodes.md
+- update README.md
+
 ## 1.0.23 - 2025-03-08
 
 ### Added
