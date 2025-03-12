@@ -84,9 +84,9 @@ class VrchAudioRecorderNode:
                 }),
                 "loop": ("BOOLEAN", {"default": False}),
                 "loop_interval": ("FLOAT", {
-                    "default": 1.0,  
-                    "min": 0.1,           
-                    "max": 60.0,     
+                    "default": 1.0,
+                    "min": 0.5,
+                    "max": 60.0,
                     "step": 0.1,
                 }),
                 "new_generation_after_recording": ("BOOLEAN", {"default": False}),
