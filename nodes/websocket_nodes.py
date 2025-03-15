@@ -6,10 +6,6 @@ from PIL import Image
 import asyncio
 import websockets
 import threading
-import urllib.parse
-
-# Fixed endpoint path for communication
-FIXED_PATH = "/channel"
 
 # Category for organizational purposes
 CATEGORY = "vrch.ai/viewer/websocket"
@@ -28,9 +24,7 @@ class SimpleWebSocketServer:
         self.host = host
         self.port = port
         self.debug = debug
-        self.fixed_path = FIXED_PATH
-        # Dictionary: client_id -> list of websocket connections
-        self.clients = {}
+        self.clients = []  # List of websocket connections
         self.loop = asyncio.new_event_loop()
         self.server = None
         # Start the server in a separate thread
@@ -40,57 +34,45 @@ class SimpleWebSocketServer:
     def _run(self):
         # Set the event loop for this thread
         asyncio.set_event_loop(self.loop)
-
-        # Define asynchronous function to start the server
-        async def start_server():
-            self.server = await websockets.serve(self._handler, self.host, self.port)
-            if self.debug:
-                print(f"[DEBUG] WebSocket server started on {self.host}:{self.port}{self.fixed_path}")
-
-        # Schedule the server start task in the event loop
-        self.loop.create_task(start_server())
-        # Run the event loop indefinitely
+        # Schedule the server coroutine
+        self.loop.create_task(self._start_server())
+        if self.debug:
+            print(f"[DEBUG] WebSocket server task scheduled on {self.host}:{self.port}")
         self.loop.run_forever()
 
-    async def _handler(self, websocket, path):
-        # Parse the URL to get the path and query parameters
-        parsed = urllib.parse.urlparse(path)
-        resource_path = parsed.path  # e.g., "/channel"
-        # Reject connection if the path does not match the fixed path
-        if resource_path != self.fixed_path:
+    async def _start_server(self):
+        try:
+            # Start the websocket server; handler now accepts path as optional
+            self.server = await websockets.serve(self._handler, self.host, self.port)
             if self.debug:
-                print(f"[DEBUG] Reject connection: got '{resource_path}', expected '{self.fixed_path}'")
-            await websocket.close()
-            return
-        # Parse query parameters from the URL
-        params = urllib.parse.parse_qs(parsed.query)
-        client_id = params.get("client_id", ["default"])[0]
+                print(f"[DEBUG] WebSocket server started on {self.host}:{self.port}")
+        except Exception as e:
+            print(f"[DEBUG] Failed to start WebSocket server: {e}")
+
+    async def _handler(self, websocket, path=None):
+        # If path is not provided, set it to empty string
+        if path is None:
+            path = ""
         if self.debug:
-            print(f"[DEBUG] Accepted connection from client_id: {client_id} on {resource_path}")
-        # Store the websocket connection in the clients dictionary
-        if client_id not in self.clients:
-            self.clients[client_id] = []
-        self.clients[client_id].append(websocket)
+            print(f"[DEBUG] New connection from {websocket.remote_address} on path: '{path}'")
+        self.clients.append(websocket)
         try:
             async for _ in websocket:
-                # Keep the connection alive
                 pass
         except Exception as e:
             if self.debug:
-                print(f"[DEBUG] Exception for client {client_id}: {e}")
+                print(f"[DEBUG] Exception in connection: {e}")
         finally:
-            # Remove the websocket connection from the dictionary
-            if client_id in self.clients and websocket in self.clients[client_id]:
-                self.clients[client_id].remove(websocket)
-                if self.debug:
-                    print(f"[DEBUG] Client {client_id} disconnected")
+            if websocket in self.clients:
+                self.clients.remove(websocket)
+            if self.debug:
+                print(f"[DEBUG] Connection closed from {websocket.remote_address}")
 
-    def send_to_client(self, client_id, data):
+    def send_to_all(self, data):
         if self.debug:
-            print(f"[DEBUG] Sending {len(data)} bytes to client_id: {client_id}")
-        if client_id in self.clients:
-            for ws in list(self.clients[client_id]):
-                asyncio.run_coroutine_threadsafe(ws.send(data), self.loop)
+            print(f"[DEBUG] Sending {len(data)} bytes to {len(self.clients)} client(s)")
+        for ws in list(self.clients):
+            asyncio.run_coroutine_threadsafe(ws.send(data), self.loop)
 
     def stop(self):
         if self.debug:
@@ -99,7 +81,6 @@ class SimpleWebSocketServer:
             self.loop.call_soon_threadsafe(self.loop.stop)
             self.thread.join()
 
-# ComfyUI Node: Sends images over the websocket server
 class VrchImageWebSocketWebViewerNode:
     @classmethod
     def INPUT_TYPES(cls):
@@ -107,41 +88,42 @@ class VrchImageWebSocketWebViewerNode:
             "required": {
                 "images": ("IMAGE",),
                 "format": (["PNG", "JPEG"], {"default": "PNG"}),
-                "client_id": ("STRING", {"default": "default", "multiline": False}),
                 "host": ("STRING", {"default": "0.0.0.0", "multiline": False}),
                 "port": ("INT", {"default": 8189, "min": 1, "max": 65535}),
                 "debug": ("BOOLEAN", {"default": False}),
             }
         }
+
     RETURN_TYPES = ()
     FUNCTION = "send_images"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
 
-    def send_images(self, images, format, client_id, host, port, debug):
+    # Process and send images via the global websocket server
+    def send_images(self, images, format, host, port, debug):
         results = []
-        # Get or create the global websocket server instance
         server = get_global_server(host, port, debug)
         for tensor in images:
-            # Convert tensor to numpy array and scale values to [0, 255]
+            # Convert tensor to a NumPy array and scale to [0,255]
             arr = 255.0 * tensor.cpu().numpy()
+            # Create PIL image and get binary data
             img = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
             buf = io.BytesIO()
             img.save(buf, format=format)
             binary_data = buf.getvalue()
-            # Build header: two 32-bit big-endian integers (values 1 and 2)
+            # Prepend header: two 32-bit big-endian integers (values 1 and 2)
             header = struct.pack(">II", 1, 2)
             data = header + binary_data
-            server.send_to_client(client_id, data)
+            server.send_to_all(data)
             results.append({
                 "source": "websocket",
                 "content-type": f"image/{format.lower()}",
                 "type": "output",
             })
         if debug:
-            print(f"[DEBUG] Sent {len(images)} images to client '{client_id}' via global server")
+            print(f"[DEBUG] Sent {len(images)} images via global server on {host}:{port}")
         return {"ui": {"images": results}}
 
     @classmethod
-    def IS_CHANGED(cls, images, format, client_id, host, port, debug):
+    def IS_CHANGED(cls, images, format, host, port, debug):
         return time.time()
