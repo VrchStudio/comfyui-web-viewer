@@ -116,11 +116,12 @@ class VrchImageWebSocketWebViewerNode:
                 "host": ("STRING", {"default": DEFAULT_SERVER_IP, "multiline": False}),
                 "port": ("INT", {"default": DEFAULT_SERVER_PORT, "min": 1, "max": 65535}),
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
-                "format": (["PNG", "JPEG"], {"default": "PNG"}),
+                "format": (["PNG", "JPEG"], {"default": "JPEG"}),
                 "debug": ("BOOLEAN", {"default": False}),
             }
         }
-    RETURN_TYPES = ()
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("IMAGES",)
     FUNCTION = "send_images"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
@@ -140,4 +141,4 @@ class VrchImageWebSocketWebViewerNode:
             server.send_to_channel(ch, data)
         if debug:
             print(f"[DEBUG] Sent {len(images)} images to channel {ch} via global server on {host}:{port} with path '/image'")
-        return {}
+        return (images,)
