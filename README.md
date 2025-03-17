@@ -64,6 +64,14 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
   - [Real Time Voice Clone](./docs/tutorial_004_real_time_voice_clone_by_f5_tts.md)
   - [Audio Picture Book with Your Own Voice](./docs/tutorial_006_srt_to_audio_picture_book.md)
 
+### `WebSocket Web Viewer Nodes`
+
+- Documentation: [Usage of WebSocket Viewer nodes](./docs/websocket_viewer_nodes.md)
+- Example workflows:
+  - [TBA]
+- Tutorials:
+  - [TBA]
+
 ### `OSC Control Nodes`
 
 - Documentation: [Usage of OSC Control nodes](./docs/osc_control_nodes.md)
@@ -94,7 +102,7 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 - Example workflows:
   - [Workflow Example: Preview Image in Background](./workflows/example_image_nodes_001_preview_in_background.json)
 
-### `Test Nodes`
+### `Text Nodes`
 
 - Documentation: [Usage of Text nodes](./docs/text_nodes.md)
 - Example workflows:
