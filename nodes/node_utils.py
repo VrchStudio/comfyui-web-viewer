@@ -3,7 +3,7 @@ import socket
 class VrchNodeUtils:
     
     @staticmethod
-    def get_default_ip_address():
+    def get_default_ip_address(fallback_ip="127.0.0.1"):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect(("8.8.8.8", 80))
@@ -11,7 +11,7 @@ class VrchNodeUtils:
             s.close()
             return local_ip
         except Exception:
-            return "127.0.0.1"
+            return fallback_ip
 
     @staticmethod
     def remap(value, in_min=0.0, in_max=1.0, out_min=0.0, out_max=1.0):

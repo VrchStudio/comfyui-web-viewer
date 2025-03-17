@@ -4,8 +4,9 @@ from .nodes.audio_nodes import *
 from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
+from .nodes.websocket_nodes import *
 
-__version__ = "1.0.24"
+__version__ = "1.0.25"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -22,9 +23,10 @@ NODE_CLASS_MAPPINGS = {
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
     "VrchImageChannelLoaderNode": VrchImageChannelLoaderNode,
     "VrchImageFlipBookWebViewerNode": VrchImageFlipBookWebViewerNode,
+    "VrchImagePreviewBackgroundNode": VrchImagePreviewBackgroundNode,
     "VrchImageSaverNode": VrchImageSaverNode,
     "VrchImageSwitchOSCControlNode": VrchImageSwitchOSCControlNode,
-    "VrchImagePreviewBackgroundNode": VrchImagePreviewBackgroundNode,
+    "VrchImageWebSocketWebViewerNode": VrchImageWebSocketWebViewerNode,
     "VrchImageWebViewerNode": VrchImageWebViewerNode,
     "VrchIntKeyControlNode": VrchIntKeyControlNode,
     "VrchIntOSCControlNode": VrchIntOSCControlNode,
@@ -56,9 +58,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchFloatOSCControlNode": "FLOAT OSC Control @ vrch.ai",
     "VrchJsonUrlLoaderNode": "JSON URL Loader @ vrch.ai",
     "VrchImageFlipBookWebViewerNode": "IMAGE Flipbook Web Viewer @vrch.ai",
+    "VrchImagePreviewBackgroundNode": "IMAGE Preview in Background @ vrch.ai",
     "VrchImageSaverNode": "IMAGE Saver @ vrch.ai",
     "VrchImageSwitchOSCControlNode": "IMAGE Switch OSC Control @ vrch.ai",
-    "VrchImagePreviewBackgroundNode": "IMAGE Preview in Background @ vrch.ai",
+    "VrchImageWebSocketWebViewerNode": "IMAGE WebSocket Web Viewer @ vrch.ai",
     "VrchImageWebViewerNode": "IMAGE Web Viewer @ vrch.ai",
     "VrchImageChannelLoaderNode": "IMAGE Web Viewer Channel Loader @ vrch.ai",
     "VrchIntKeyControlNode": "INT Key Control @ vrch.ai",
