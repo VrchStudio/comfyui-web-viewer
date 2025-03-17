@@ -44,16 +44,16 @@ class SimpleWebSocketServer:
         asyncio.set_event_loop(self.loop)
         self.loop.create_task(self._start_server())
         if self.debug:
-            print(f"[DEBUG] Server task scheduled on {self.host}:{self.port} with path {self.path}")
+            print(f"[SimpleWebSocketServer] Server task scheduled on {self.host}:{self.port} with path {self.path}")
         self.loop.run_forever()
 
     async def _start_server(self):
         try:
             self.server = await websockets.serve(self._handler, self.host, self.port)
             if self.debug:
-                print(f"[DEBUG] Server started on {self.host}:{self.port} with path {self.fixed_path}")
+                print(f"[SimpleWebSocketServer] Server started on {self.host}:{self.port} with path {self.fixed_path}")
         except Exception as e:
-            print(f"[DEBUG] Failed to start server: {e}")
+            print(f"[SimpleWebSocketServer] Failed to start server: {e}")
 
     async def _handler(self, websocket, path=None):
         # Get resource path from websocket.request
@@ -63,7 +63,7 @@ class SimpleWebSocketServer:
         # Check that resource path matches fixed_path
         if resource_path != self.path:
             if self.debug:
-                print(f"[DEBUG] Reject connection: got '{resource_path}', expected '{self.fixed_path}'")
+                print(f"[SimpleWebSocketServer] Reject connection: got '{resource_path}', expected '{self.fixed_path}'")
             await websocket.close()
             return
         # Parse query parameter "channel"
@@ -76,33 +76,33 @@ class SimpleWebSocketServer:
                 raise ValueError
         except:
             if self.debug:
-                print(f"[DEBUG] Reject connection: invalid channel '{channel_str}'")
+                print(f"[SimpleWebSocketServer] Reject connection: invalid channel '{channel_str}'")
             await websocket.close()
             return
         if self.debug:
-            print(f"[DEBUG] New connection from {websocket.remote_address} on path '{resource_path}' with channel {channel}")
+            print(f"[SimpleWebSocketServer] New connection from {websocket.remote_address} on path '{resource_path}' with channel {channel}")
         self.clients[channel].append(websocket)
         try:
             async for _ in websocket:
                 pass
         except Exception as e:
             if self.debug:
-                print(f"[DEBUG] Exception on channel {channel}: {e}")
+                print(f"[SimpleWebSocketServer] Exception on channel {channel}: {e}")
         finally:
             if websocket in self.clients[channel]:
                 self.clients[channel].remove(websocket)
             if self.debug:
-                print(f"[DEBUG] Connection closed from {websocket.remote_address} on channel {channel}")
+                print(f"[SimpleWebSocketServer] Connection closed from {websocket.remote_address} on channel {channel}")
 
     def send_to_channel(self, channel, data):
         if self.debug:
-            print(f"[DEBUG] Sending {len(data)} bytes to channel {channel} with {len(self.clients[channel])} client(s)")
+            print(f"[SimpleWebSocketServer] Sending {len(data)} bytes to channel {channel} with {len(self.clients[channel])} client(s)")
         for ws in list(self.clients[channel]):
             asyncio.run_coroutine_threadsafe(ws.send(data), self.loop)
 
     def stop(self):
         if self.debug:
-            print("[DEBUG] Stopping server")
+            print("[SimpleWebSocketServer] Stopping server")
         if self.loop:
             self.loop.call_soon_threadsafe(self.loop.stop)
             self.thread.join()
@@ -113,11 +113,15 @@ class VrchImageWebSocketWebViewerNode:
         return {
             "required": {
                 "images": ("IMAGE",),
-                "host": ("STRING", {"default": DEFAULT_SERVER_IP, "multiline": False}),
-                "port": ("INT", {"default": DEFAULT_SERVER_PORT, "min": 1, "max": 65535}),
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
                 "format": (["PNG", "JPEG"], {"default": "JPEG"}),
+                "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
+                "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
+                "show_url":("BOOLEAN", {"default": False}),
                 "debug": ("BOOLEAN", {"default": False}),
+                "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
+                "url": ("STRING", {"default": "", "multiline": True}),
             }
         }
     RETURN_TYPES = ("IMAGE",)
@@ -126,8 +130,19 @@ class VrchImageWebSocketWebViewerNode:
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
 
-    def send_images(self, images, format, host, port, channel, debug):
+    def send_images(self, 
+                    images, 
+                    channel, 
+                    server, 
+                    format, 
+                    window_width,
+                    window_height,
+                    show_url,
+                    debug,
+                    extra_params,
+                    url):
         results = []
+        host, port = server.split(":")
         server = get_global_server(host, port, path="image", debug=debug)
         ch = int(channel)
         for tensor in images:
@@ -140,5 +155,5 @@ class VrchImageWebSocketWebViewerNode:
             data = header + binary_data
             server.send_to_channel(ch, data)
         if debug:
-            print(f"[DEBUG] Sent {len(images)} images to channel {ch} via global server on {host}:{port} with path '/image'")
+            print(f"[VrchImageWebSocketWebViewerNode] Sent {len(images)} images to channel {ch} via global server on {host}:{port} with path '/image'")
         return (images,)
