@@ -14,7 +14,7 @@ If you find the **ComfyUI Web Viewer** useful or inspiring, consider supporting 
 
 - 💖 **Sponsor**: Help us maintain and enhance the project through [GitHub Sponsors](https://github.com/sponsors/VrchStudio).
 - ⭐ **Star the Project**: A star on GitHub greatly motivates us and helps increase visibility!
-- 📩 **Business Inquiries**: For commercial collaborations, reach us at [hi@vrch.io](mailto:hi@vrch.io).
+- 📩 **Business Inquiries**: For commercial collaborations, reach us at [hi@vrch.io](mailto:hi@vrch.io?subject=ComfyUI%20Web%20Viewer%20-%20Commercial%20Inquiry).
 
 <video src="https://github.com/user-attachments/assets/cdac0293-64ce-4b74-95a8-d4dcce2300d2" controls="controls" style="max-width: 100%;">
 </video>
@@ -188,7 +188,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Contact Us
 
-For any inquiries, you can contact us at [hi@vrch.io](mailto:hi@vrch.io).
+For any inquiries, you can contact us at [hi@vrch.io](mailto:hi@vrch.io?subject=ComfyUI%20Web%20Viewer%20-%20General%20Inquiry).
 
 ## Star History
 
