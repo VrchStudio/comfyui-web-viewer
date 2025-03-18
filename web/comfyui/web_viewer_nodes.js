@@ -126,6 +126,9 @@ app.registerExtension({
             const sslWidget = node.widgets.find(w => w.name === "ssl");
             const channelWidget = node.widgets.find(w => w.name === "channel");
             const numberOfImagesWidget = node.widgets.find(w => w.name === "number_of_images");
+            const refreshIntervalWidget = node.widgets.find(w => w.name === "refresh_interval");
+            const imageDisplayDurationWidget = node.widgets.find(w => w.name === "image_display_duration");
+            const fadeAnimDurationWidget = node.widgets.find(w => w.name === "fade_anim_duration");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
             const heightWidget = node.widgets.find(w => w.name === "window_height");
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
@@ -144,7 +147,12 @@ app.registerExtension({
                             const channel = channelWidget ? channelWidget.value : "1";
                             return `channel_${channel}.jpeg`;
                         },
-                        additionalParams: { numberOfImages: numberOfImagesWidget }
+                        additionalParams: { 
+                            numberOfImages: numberOfImagesWidget,
+                            refreshInterval: refreshIntervalWidget,
+                            imageDisplayDuration: imageDisplayDurationWidget,
+                            fadeAnimDuration: fadeAnimDurationWidget,
+                        }
                     });
                 }
             }
@@ -154,7 +162,16 @@ app.registerExtension({
                 updateUrl,
                 urlWidget,
                 showUrlWidget,
-                [serverWidget, sslWidget, channelWidget, numberOfImagesWidget, extraParamsWidget],
+                [
+                    serverWidget, 
+                    sslWidget, 
+                    channelWidget,
+                    numberOfImagesWidget,
+                    refreshIntervalWidget,
+                    imageDisplayDurationWidget,
+                    fadeAnimDurationWidget,
+                    extraParamsWidget,
+                ],
                 "VrchImageFlipbookWebViewerNode"
             );
 

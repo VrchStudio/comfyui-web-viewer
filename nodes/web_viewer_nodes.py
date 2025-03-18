@@ -1,4 +1,5 @@
 import os
+import json
 import shutil
 import torch
 import hashlib
@@ -162,9 +163,13 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
             "required": {
                 "images": ("IMAGE",),
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
-                "number_of_images": ("INT", {"default": 4, "min": 1, "max": 99}),
                 "server": ("STRING", {"default": DEFAULT_SERVER, "multiline": False}),
                 "ssl": ("BOOLEAN", {"default": False}),
+                "number_of_images": ("INT", {"default": 4, "min": 1, "max": 99}),
+                "refresh_interval": ("INT", {"default": 5000, "min": 1, "max": 10000}),
+                "image_display_duration":("INT", {"default": 1000, "min": 1, "max": 10000}),
+                "fade_anim_duration": ("INT", {"default": 200, "min": 1, "max": 10000}),
+                "save_settings": ("BOOLEAN", {"default": False}),
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
@@ -185,14 +190,18 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
 
     def save_and_view_images(self, 
                              images, 
-                             channel, 
-                             number_of_images, 
+                             channel,
                              server, 
                              ssl, 
+                             number_of_images,
+                             refresh_interval,
+                             image_display_duration,
+                             fade_anim_duration,
+                             save_settings,
                              window_width, 
                              window_height, 
+                             show_url,
                              extra_params, 
-                             show_url, 
                              url):
         # Save the images into "web_viewer" directory with filename "channel_{channel}_{index:%02d}.jpeg"
         output_path = os.path.join(self.output_dir, "web_viewer")
@@ -206,7 +215,20 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
             extension="jpeg",
             quality_jpeg_or_webp=85
         )
-
+        
+        if save_settings:
+            # Save the settings to a JSON file
+            settings = {
+                "numberOfImages": number_of_images,
+                "refreshInterval": refresh_interval,
+                "imageDisplayDuration": image_display_duration,
+                "fadeAnimDuration": fade_anim_duration,
+            }
+            settings_filename = f"channel_{channel}_settings.json"
+            settings_path = os.path.join(output_path, settings_filename)
+            with open(settings_path, "w") as f:
+                json.dump(settings, f)
+        
         return (images,)
 
     @classmethod
