@@ -34,24 +34,30 @@
    - **Image Input:**
      - **`images`**: Connect the image(s) you want to display in the web viewer.
    - **Channel:** Select a channel number from **"1"** to **"8"** (default is **"1"**).
-   - **Number_of_Images:** Select the number of images to load (default is **"4"**).
    - **Server:** Enter the server's domain name or IP address (default is **`127.0.0.1:8188`**).
    - **SSL:** Choose whether the connection should use SSL. If checked (`True`), it will use `https`; otherwise, it will use `http`.
+   - **Flipbook Parameters:**
+     - **`number_of_images`**: Set the number of images to load (default is **`4`**, range: 1-99).
+     - **`refresh_interval`**: Time interval for refreshing in milliseconds (default is **`5000`**, range: 1-10000).
+     - **`image_display_duration`**: Duration to display each image in milliseconds (default is **`1000`**, range: 1-10000).
+     - **`fade_anim_duration`**: Duration of fade animation in milliseconds (default is **`200`**, range: 1-10000).
+   - **Save Settings:** Toggle whether to save the flipbook settings to a JSON file. When enabled, creates `channel_{channel}_settings.json`.
    - **Window Dimensions:**
-     - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
-     - **`window_height`**: Set the height of the web viewer window (default is **`960`**).
+     - **`window_width`**: Set the width of the web viewer window (default is **`1280`**, range: 100-10240).
+     - **`window_height`**: Set the height of the web viewer window (default is **`960`**, range: 100-10240).
    - **Show URL:** Toggle whether to display the constructed URL in the interface. Enabling this will make the **`url`** field visible.
    - **Extra Params**: The extra parameters for Image Flipbook Web Viewer, see [web_viewer_nodes_extra_params.md](./web_viewer_nodes_extra_params.md)
-   - **URL Input:** This field automatically updates with the constructed URL based on your inputs (`server`, `ssl`, `channel`, `number_of_images` etc.). You can toggle its visibility using the **`show_url`** option.
+   - **URL Input:** This field automatically updates with the constructed URL based on your inputs. You can toggle its visibility using the **`show_url`** option.
 
 3. **Open Web Viewer:**
    - Click the **"Open Web Viewer"** button to launch the specified URL in a new browser window, displaying your images based on the input parameters.
 
 **Note**:
 - Ensure that the server address and settings are correct and that the server is accessible.
-- The image is saved in the `web_viewer` directory under the ComfyUI output folder with the filename `channel_{channel}_{index}.jpeg` (e.g., `channel_1_03.jpeg`).
+- Images are saved in the `web_viewer` directory under the ComfyUI output folder with filenames like `channel_{channel}_{index}.jpeg`.
+- When **`save_settings`** is enabled, a JSON file with your flipbook parameters is created in the same directory.
 - The "Show URL" option allows you to view and copy the dynamically constructed URL if needed.
-- The image is saved in JPEG format with a quality setting of 85.
+- Images are saved in JPEG format with a quality setting of 85.
 
 ----
 
