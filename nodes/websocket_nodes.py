@@ -31,7 +31,7 @@ class SimpleWebSocketServer:
         self.host = host
         self.port = port
         self.debug = debug
-        # Ensure fixed_path starts with "/"
+        # Ensure path starts with "/"
         self.path = path if path.startswith("/") else "/" + path
         # Use channels 1 to 8
         self.clients = {i: [] for i in range(1, 9)}
@@ -51,7 +51,7 @@ class SimpleWebSocketServer:
         try:
             self.server = await websockets.serve(self._handler, self.host, self.port)
             if self.debug:
-                print(f"[SimpleWebSocketServer] Server started on {self.host}:{self.port} with path {self.fixed_path}")
+                print(f"[SimpleWebSocketServer] Server started on {self.host}:{self.port} with path {self.path}")
         except Exception as e:
             print(f"[SimpleWebSocketServer] Failed to start server: {e}")
 
@@ -63,7 +63,7 @@ class SimpleWebSocketServer:
         # Check that resource path matches fixed_path
         if resource_path != self.path:
             if self.debug:
-                print(f"[SimpleWebSocketServer] Reject connection: got '{resource_path}', expected '{self.fixed_path}'")
+                print(f"[SimpleWebSocketServer] Reject connection: got '{resource_path}', expected '{self.path}'")
             await websocket.close()
             return
         # Parse query parameter "channel"
