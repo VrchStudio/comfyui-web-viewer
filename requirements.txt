@@ -1,7 +1,8 @@
 aiohttp
 ffmpeg-python
+matplotlib
 pydub
 python-osc
 scikit-learn
-matplotlib
 srt
+websockets
