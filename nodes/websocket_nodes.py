@@ -5,6 +5,7 @@ import numpy as np
 import asyncio
 import websockets
 import threading
+import torch
 import urllib.parse
 from PIL import Image
 from .node_utils import VrchNodeUtils
@@ -157,3 +158,137 @@ class VrchImageWebSocketWebViewerNode:
         if debug:
             print(f"[VrchImageWebSocketWebViewerNode] Sent {len(images)} images to channel {ch} via global server on {host}:{port} with path '/image'")
         return (images,)
+
+# Dictionary to keep track of WebSocket client instances
+_websocket_clients = {}
+
+class WebSocketClient:
+    def __init__(self, host, port, path, channel, data_handler=None, debug=False):
+        self.host = host
+        self.port = int(port)
+        self.path = path if path.startswith("/") else "/" + path
+        self.channel = int(channel)
+        self.debug = debug
+        self.received_data = None
+        self.data_handler = data_handler
+        self.lock = threading.Lock()
+        self.running = True
+        self.loop = asyncio.new_event_loop()
+        self.thread = threading.Thread(target=self._run_loop, daemon=True)
+        self.thread.start()
+    
+    def _run_loop(self):
+        asyncio.set_event_loop(self.loop)
+        self.loop.create_task(self._connect_and_listen())
+        self.loop.run_forever()
+    
+    async def _connect_and_listen(self):
+        while self.running:
+            try:
+                uri = f"ws://{self.host}:{self.port}{self.path}?channel={self.channel}"
+                if self.debug:
+                    print(f"[WebSocketClient] Connecting to {uri}")
+                
+                async with websockets.connect(uri) as websocket:
+                    if self.debug:
+                        print(f"[WebSocketClient] Connected to {uri}")
+                    
+                    async for message in websocket:
+                        try:
+                            if not self.running:
+                                break
+                            
+                            # Process the message using the data handler if provided,
+                            # otherwise store the raw message
+                            processed_data = None
+                            if self.data_handler:
+                                processed_data = self.data_handler(message)
+                            else:
+                                processed_data = message
+                            
+                            # Store the processed data
+                            with self.lock:
+                                self.received_data = processed_data
+                            
+                            if self.debug:
+                                print(f"[WebSocketClient] Received data on {self.path} channel {self.channel}")
+                        
+                        except Exception as e:
+                            if self.debug:
+                                print(f"[WebSocketClient] Error processing message: {e}")
+            
+            except Exception as e:
+                if self.debug:
+                    print(f"[WebSocketClient] Connection error: {e}")
+            
+            # Wait before reconnecting
+            await asyncio.sleep(5)
+    
+    def get_latest_data(self):
+        with self.lock:
+            return self.received_data
+    
+    def stop(self):
+        self.running = False
+        if self.loop:
+            self.loop.call_soon_threadsafe(self.loop.stop)
+        self.thread.join(timeout=1)
+
+def image_data_handler(message):
+    """Default handler for processing image messages"""
+    if len(message) < 8:  # At least 8 bytes for the header
+        return None
+        
+    # Unpack header (2 uint32 values)
+    header = struct.unpack(">II", message[:8])
+    image_data = message[8:]
+    
+    # Convert image data to tensor
+    image = Image.open(io.BytesIO(image_data))
+    image_np = np.array(image).astype(np.float32) / 255.0
+    image_tensor = torch.from_numpy(image_np)[None,]
+    
+    return image_tensor
+
+def get_websocket_client(host, port, path, channel, data_handler=None, debug=False):
+    key = f"{host}:{port}:{path}:{channel}"
+    if key not in _websocket_clients:
+        _websocket_clients[key] = WebSocketClient(host, port, path, channel, data_handler, debug)
+    else:
+        # Update debug setting if client already exists
+        _websocket_clients[key].debug = debug
+    return _websocket_clients[key]
+
+class VrchImageWebSocketChannelLoaderNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+    
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("IMAGE",)
+    FUNCTION = "receive_image"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+    
+    def receive_image(self, channel, server, debug):
+        host, port = server.split(":")
+        client = get_websocket_client(host, port, "image", channel, data_handler=image_data_handler, debug=debug)
+        
+        image = client.get_latest_data()
+        if image is not None:
+            return (image,)
+        else:
+            # Return a small black image as placeholder
+            placeholder = torch.zeros((1, 512, 512, 3), dtype=torch.float32)
+            return (placeholder,)
+    
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        # Always trigger evaluation to check for new images
+        return float("NaN")
