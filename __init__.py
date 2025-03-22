@@ -6,7 +6,7 @@ from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
 from .nodes.websocket_nodes import *
 
-__version__ = "1.0.26"
+__version__ = "1.0.27"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -26,6 +26,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchImagePreviewBackgroundNode": VrchImagePreviewBackgroundNode,
     "VrchImageSaverNode": VrchImageSaverNode,
     "VrchImageSwitchOSCControlNode": VrchImageSwitchOSCControlNode,
+    "VrchImageWebSocketChannelLoaderNode": VrchImageWebSocketChannelLoaderNode,
     "VrchImageWebSocketWebViewerNode": VrchImageWebSocketWebViewerNode,
     "VrchImageWebViewerNode": VrchImageWebViewerNode,
     "VrchIntKeyControlNode": VrchIntKeyControlNode,
@@ -61,6 +62,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchImagePreviewBackgroundNode": "IMAGE Preview in Background @ vrch.ai",
     "VrchImageSaverNode": "IMAGE Saver @ vrch.ai",
     "VrchImageSwitchOSCControlNode": "IMAGE Switch OSC Control @ vrch.ai",
+    "VrchImageWebSocketChannelLoaderNode": "IMAGE WebSocket Channel Loader @ vrch.ai",
     "VrchImageWebSocketWebViewerNode": "IMAGE WebSocket Web Viewer @ vrch.ai",
     "VrchImageWebViewerNode": "IMAGE Web Viewer @ vrch.ai",
     "VrchImageChannelLoaderNode": "IMAGE Web Viewer Channel Loader @ vrch.ai",

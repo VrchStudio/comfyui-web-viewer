@@ -30,3 +30,30 @@
 - Make sure that the server address and configuration are correct and that the server is accessible.
 - This node uses the WebSocket protocol to transmit image data in real time to the specified channel; ensure your client browser supports WebSocket connections.
 - When debug mode is enabled, the node outputs detailed logs to the console, which can help you track the image transmission process and troubleshoot any issues.
+
+---
+
+### Node: `IMAGE WebSocket Channel Loader @ vrch.ai` (vrch.ai/viewer/websocket)
+
+1. **Add the `IMAGE WebSocket Channel Loader @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Channel:**
+     - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**) to specify which WebSocket channel to listen on.
+   - **Server:**
+     - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
+   - **Debug Mode:**
+     - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
+
+3. **Receiving Images:**
+   - This node automatically connects to the specified WebSocket channel and listens for incoming image data.
+   - When an image is received, it will be processed and made available as an output that can be connected to other nodes in your workflow.
+   - If no image has been received yet, a black placeholder image will be provided.
+
+**Notes:**
+- This node is designed to work with the `IMAGE WebSocket Web Viewer @ vrch.ai` node, receiving the images it broadcasts.
+- The node automatically establishes and maintains WebSocket connections, reconnecting if the connection is lost.
+- The node continuously monitors for new images, allowing your workflow to react to images sent from any source that connects to the same WebSocket channel.
+- When debug mode is enabled, the node outputs detailed logs to the console, which can help you track the image reception process and troubleshoot any issues.
+
+---
