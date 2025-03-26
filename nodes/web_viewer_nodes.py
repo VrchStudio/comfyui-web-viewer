@@ -169,6 +169,7 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
                 "refresh_interval": ("INT", {"default": 5000, "min": 1, "max": 10000}),
                 "image_display_duration":("INT", {"default": 1000, "min": 1, "max": 10000}),
                 "fade_anim_duration": ("INT", {"default": 200, "min": 1, "max": 10000}),
+                "console_logs": ("STRING", {"default": "", "multiline": False}),
                 "save_settings": ("BOOLEAN", {"default": False}),
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
@@ -197,6 +198,7 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
                              refresh_interval,
                              image_display_duration,
                              fade_anim_duration,
+                             console_logs,
                              save_settings,
                              window_width, 
                              window_height, 
@@ -223,6 +225,7 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
                 "refreshInterval": refresh_interval,
                 "imageDisplayDuration": image_display_duration,
                 "fadeAnimDuration": fade_anim_duration,
+                "consoleLogs": console_logs,
             }
             settings_filename = f"channel_{channel}_settings.json"
             settings_path = os.path.join(output_path, settings_filename)
