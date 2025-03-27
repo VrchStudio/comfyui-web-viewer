@@ -58,7 +58,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchFloatKeyControlNode": "FLOAT Key Control @ vrch.ai",
     "VrchFloatOSCControlNode": "FLOAT OSC Control @ vrch.ai",
     "VrchJsonUrlLoaderNode": "JSON URL Loader @ vrch.ai",
-    "VrchImageFlipBookWebViewerNode": "IMAGE Flipbook Web Viewer @vrch.ai",
+    "VrchImageFlipBookWebViewerNode": "IMAGE Flipbook Web Viewer @ vrch.ai",
     "VrchImagePreviewBackgroundNode": "IMAGE Preview in Background @ vrch.ai",
     "VrchImageSaverNode": "IMAGE Saver @ vrch.ai",
     "VrchImageSwitchOSCControlNode": "IMAGE Switch OSC Control @ vrch.ai",
