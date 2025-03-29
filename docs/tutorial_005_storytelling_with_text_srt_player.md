@@ -4,7 +4,7 @@
 
 ## TL;DR
 
-This tutorial guides you on how to use the **TEXT SRT Playe @ vrch.air** node from [**ComfyUI Web Viewer**](https://github.com/VrchStudio/comfyui-web-viewer), leveraging SRT subtitle files with timestamps to dynamically control storytelling images generation. Combined with the **IMAGE Preview in Background** node, you can create a fully automated, timestamp-based storytelling experience with real-time AI-generated visuals in ComfyUI.
+This tutorial guides you on how to use the **TEXT SRT Playe @ vrch.ai** node from [**ComfyUI Web Viewer**](https://github.com/VrchStudio/comfyui-web-viewer), leveraging SRT subtitle files with timestamps to dynamically control storytelling images generation. Combined with the **IMAGE Preview in Background** node, you can create a fully automated, timestamp-based storytelling experience with real-time AI-generated visuals in ComfyUI.
 
 **Practical Use Cases**:
 - Interactive storytelling for exhibitions or live performances.

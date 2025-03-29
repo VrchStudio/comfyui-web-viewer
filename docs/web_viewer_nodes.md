@@ -41,6 +41,7 @@
      - **`refresh_interval`**: Time interval for refreshing in milliseconds (default is **`5000`**, range: 1-10000).
      - **`image_display_duration`**: Duration to display each image in milliseconds (default is **`1000`**, range: 1-10000).
      - **`fade_anim_duration`**: Duration of fade animation in milliseconds (default is **`200`**, range: 1-10000).
+   - **Server Messages:** Save and send server messages to its web page viewer.
    - **Save Settings:** Toggle whether to save the flipbook settings to a JSON file. When enabled, creates `channel_{channel}_settings.json`.
    - **Window Dimensions:**
      - **`window_width`**: Set the width of the web viewer window (default is **`1280`**, range: 100-10240).

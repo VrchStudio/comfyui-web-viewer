@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.28 - 2025-03-29
+
+### Updated 
+
+- update `IMAGE Flipbook Web Viewer @ vrch.ai` to support send server messages to its web page viewer
+- update web_viewer_nodes.md
+- update web_viewer_nodes_extra_params.md
+- update publish.yml
+- fix typo in `tutorial_005_storytelling_with_text_srt_player.md`
+
+
 ## 1.0.27 - 2025-03-22
 
 ### Added
