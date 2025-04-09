@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Update
 
 - update `IMAGE Websocket Web Viewer @ vrch.ai` to support send settings to its client viewer
+- update web viewer nodes to support save and send settings to their client viewers
 
 ## 1.0.28 - 2025-03-29
 
