@@ -287,7 +287,10 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
                 "server": ("STRING", {"default": DEFAULT_SERVER, "multiline": False}),
                 "ssl": ("BOOLEAN", {"default": False}),
                 "refresh_interval": ("INT", {"default": 5000, "min": 1, "max": 10000}),
-                "visualizer_type": (["bars", "circles", "particles", "spiral", "waterball", "waveform"], {"default": "waveform"}),
+                "visualizer_type": (
+                    ["bars", "circles", "matrix", "particles", "spiral", "waterball", "waveform"], 
+                    {"default": "waveform"},
+                ),
                 "server_messages": ("STRING", {"default": "", "multiline": False}),
                 "save_settings": ("BOOLEAN", {"default": False}),
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
