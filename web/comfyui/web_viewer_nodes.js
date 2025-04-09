@@ -75,6 +75,8 @@ app.registerExtension({
             const serverWidget = node.widgets.find(w => w.name === "server");
             const sslWidget = node.widgets.find(w => w.name === "ssl");
             const channelWidget = node.widgets.find(w => w.name === "channel");
+            const refreshIntervalWidget = node.widgets.find(w => w.name === "refresh_interval");
+            const fadeAnimDurationWidget = node.widgets.find(w => w.name === "fade_anim_duration");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
             const heightWidget = node.widgets.find(w => w.name === "window_height");
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
@@ -92,6 +94,10 @@ app.registerExtension({
                         fileGenerator: (cfg) => {
                             const channel = channelWidget ? channelWidget.value : "1";
                             return `channel_${channel}.jpeg`;
+                        },
+                        additionalParams: { 
+                            refreshInterval: refreshIntervalWidget,
+                            fadeAnimDuration: fadeAnimDurationWidget,
                         }
                     });
                 }
@@ -103,7 +109,14 @@ app.registerExtension({
                 updateUrl,
                 urlWidget,
                 showUrlWidget,
-                [serverWidget, sslWidget, channelWidget, extraParamsWidget],
+                [
+                    serverWidget, 
+                    sslWidget, 
+                    channelWidget, 
+                    refreshIntervalWidget,
+                    fadeAnimDurationWidget,
+                    extraParamsWidget,
+                ],
                 "VrchImageWebViewerNode"
             );
 
@@ -193,6 +206,7 @@ app.registerExtension({
             const serverWidget = node.widgets.find(w => w.name === "server");
             const sslWidget = node.widgets.find(w => w.name === "ssl");
             const channelWidget = node.widgets.find(w => w.name === "channel");
+            const refreshIntervalWidget = node.widgets.find(w => w.name === "refresh_interval");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
             const heightWidget = node.widgets.find(w => w.name === "window_height");
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
@@ -210,6 +224,9 @@ app.registerExtension({
                         fileGenerator: (cfg) => {
                             const channel = channelWidget ? channelWidget.value : "1";
                             return `channel_${channel}.mp4`;
+                        },
+                        additionalParams: { 
+                            refreshInterval: refreshIntervalWidget,
                         }
                     });
                 }
@@ -220,7 +237,13 @@ app.registerExtension({
                 updateUrl,
                 urlWidget,
                 showUrlWidget,
-                [serverWidget, sslWidget, channelWidget],
+                [
+                    serverWidget, 
+                    sslWidget, 
+                    channelWidget,
+                    refreshIntervalWidget,
+                    extraParamsWidget,
+                ],
                 "VrchVideoWebViewerNode"
             );
 
@@ -242,6 +265,8 @@ app.registerExtension({
             const serverWidget = node.widgets.find(w => w.name === "server");
             const sslWidget = node.widgets.find(w => w.name === "ssl");
             const channelWidget = node.widgets.find(w => w.name === "channel");
+            const refreshIntervalWidget = node.widgets.find(w => w.name === "refresh_interval");
+            const visualizerTypeWidget = node.widgets.find(w => w.name === "visualizer_type");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
             const heightWidget = node.widgets.find(w => w.name === "window_height");
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
@@ -259,6 +284,10 @@ app.registerExtension({
                         fileGenerator: (cfg) => {
                             const channel = channelWidget ? channelWidget.value : "1";
                             return `channel_${channel}.mp3`;
+                        },
+                        additionalParams: { 
+                            refreshInterval: refreshIntervalWidget,
+                            visualizerType: visualizerTypeWidget,
                         }
                     });
                 }
@@ -269,7 +298,14 @@ app.registerExtension({
                 updateUrl,
                 urlWidget,
                 showUrlWidget,
-                [serverWidget, sslWidget, channelWidget, extraParamsWidget],
+                [
+                    serverWidget, 
+                    sslWidget, 
+                    channelWidget,
+                    refreshIntervalWidget,
+                    visualizerTypeWidget,
+                    extraParamsWidget,
+                ],
                 "VrchAudioWebViewerNode"
             );
 
@@ -291,6 +327,7 @@ app.registerExtension({
             const serverWidget = node.widgets.find(w => w.name === "server");
             const sslWidget = node.widgets.find(w => w.name === "ssl");
             const channelWidget = node.widgets.find(w => w.name === "channel");
+            const refreshIntervalWidget = node.widgets.find(w => w.name === "refresh_interval");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
             const heightWidget = node.widgets.find(w => w.name === "window_height");
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
@@ -308,6 +345,9 @@ app.registerExtension({
                         fileGenerator: (cfg) => {
                             const channel = channelWidget ? channelWidget.value : "1";
                             return `channel_${channel}.glb`;
+                        },
+                        additionalParams: { 
+                            refreshInterval: refreshIntervalWidget,
                         }
                     });
                 }
@@ -318,7 +358,13 @@ app.registerExtension({
                 updateUrl,
                 urlWidget,
                 showUrlWidget,
-                [serverWidget, sslWidget, channelWidget, extraParamsWidget],
+                [
+                    serverWidget, 
+                    sslWidget, 
+                    channelWidget, 
+                    refreshIntervalWidget,
+                    extraParamsWidget,
+                ],
                 "VrchModelWebViewerNode"
             );
 

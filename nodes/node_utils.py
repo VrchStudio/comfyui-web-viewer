@@ -1,3 +1,5 @@
+import json
+import os
 import socket
 
 class VrchNodeUtils:
@@ -41,3 +43,17 @@ class VrchNodeUtils:
     def select_remap_func(invert: bool):
         return VrchNodeUtils.remap_invert if invert else VrchNodeUtils.remap
 
+    @staticmethod
+    def save_channel_settings(output_path, channel, settings_dict):
+        """
+        Save settings for a channel to a JSON file.
+        
+        Args:
+            output_path (str): Directory path to save the settings file
+            channel (str): Channel identifier
+            settings_dict (dict): Dictionary containing the settings
+        """
+        settings_filename = f"channel_{channel}_settings.json"
+        settings_path = os.path.join(output_path, settings_filename)
+        with open(settings_path, "w") as f:
+            json.dump(settings_dict, f)
