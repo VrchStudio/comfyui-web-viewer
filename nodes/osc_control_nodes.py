@@ -799,16 +799,8 @@ class VrchSwitchOSCControlNode:
 
     def load_switches_osc(
         self,
-        server_ip,
-        port,
-        path1,
-        path2,
-        path3,
-        path4,
-        path5,
-        path6,
-        path7,
-        path8,
+        server_ip, port,
+        path1, path2, path3, path4, path5, path6, path7, path8,
         debug,
     ):
         
@@ -907,24 +899,9 @@ class VrchTextConcatOSCControlNode:
 
     def load_text_concat_osc(
         self,
-        text1,
-        text2,
-        text3,
-        text4,
-        text5,
-        text6,
-        text7,
-        text8,
-        server_ip,
-        port,
-        path1,
-        path2,
-        path3,
-        path4,
-        path5,
-        path6,
-        path7,
-        path8,
+        text1, text2, text3, text4, text5, text6, text7, text8,
+        server_ip, port,
+        path1, path2, path3, path4, path5, path6, path7, path8,
         separator,
         debug,
     ):
@@ -1025,17 +1002,8 @@ class VrchTextSwitchOSCControlNode:
     
     def load_text_switch_osc(
         self,
-        text1,
-        text2,
-        text3,
-        text4,
-        text5,
-        text6,
-        text7,
-        text8,
-        server_ip,
-        port,
-        path,
+        text1, text2, text3, text4, text5, text6, text7, text8,
+        server_ip, port, path,
         debug,
     ):
         # Update texts
