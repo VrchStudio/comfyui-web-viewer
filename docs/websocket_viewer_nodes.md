@@ -11,6 +11,12 @@
      - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
    - **Image Format:**
      - **`format`**: Choose the image format for transmission, supporting **PNG** and **JPEG** (default is **JPEG**).
+   - **Websocket Parameters:**
+     - **`number_of_images`**: Set the number of images to load (default is **`4`**, range: 1-99).
+     - **`image_display_duration`**: Duration to display each image in milliseconds (default is **`1000`**, range: 1-10000).
+     - **`fade_anim_duration`**: Duration of fade animation in milliseconds (default is **`200`**, range: 1-10000).
+   - **Server Messages:** Save and send server messages to its web page viewer.
+   - **Save Settings:** Toggle whether to save the websocket settings to a JSON file. When enabled, sends settings via WebSocket.
    - **Window Dimensions:**
      - **`window_width`**: Set the width of the web viewer window (default is **1280**).
      - **`window_height`**: Set the height of the web viewer window (default is **960**).
@@ -29,6 +35,7 @@
 **Notes:**
 - Make sure that the server address and configuration are correct and that the server is accessible.
 - This node uses the WebSocket protocol to transmit image data in real time to the specified channel; ensure your client browser supports WebSocket connections.
+- When **`save_settings`** is enabled, a JSON with your websocket parameters is sent via the same WebSocket connection.
 - When debug mode is enabled, the node outputs detailed logs to the console, which can help you track the image transmission process and troubleshoot any issues.
 
 ---
