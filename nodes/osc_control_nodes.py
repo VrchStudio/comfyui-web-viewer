@@ -134,10 +134,11 @@ class VrchXYOSCControlNode:
 
         # Check if server parameters have changed
         server_params_changed = (
-            self.server_manager is None or
-            self.server_manager.ip != server_ip or
-            self.server_manager.port != port or
-            self.debug != debug
+            self.server_manager is None 
+            or self.server_manager.ip != server_ip 
+            or self.server_manager.port != port 
+            or self.path != path 
+            or self.debug != debug
         )
 
         if server_params_changed:
@@ -290,11 +291,11 @@ class VrchXYZOSCControlNode:
 
         # Check if server parameters have changed
         server_params_changed = (
-            self.server_manager is None or
-            self.server_manager.ip != server_ip or
-            self.server_manager.port != port or
-            self.path != path or
-            self.debug != debug
+            self.server_manager is None 
+            or self.server_manager.ip != server_ip 
+            or self.server_manager.port != port 
+            or self.path != path 
+            or self.debug != debug
         )
 
         if server_params_changed:
@@ -630,6 +631,7 @@ class VrchFloatOSCControlNode:
             self.server_manager is None
             or self.server_manager.ip != server_ip
             or self.server_manager.port != port
+            or self.path != path
             or self.debug != debug
         )
 
@@ -733,14 +735,17 @@ class VrchSwitchOSCControlNode:
         path8,
         debug,
     ):
+        
+        new_paths = [path1, path2, path3, path4, path5, path6, path7, path8]
+        
         # Check if server parameters or paths have changed
         server_params_changed = (
             self.server_manager is None
             or self.server_manager.ip != server_ip
             or self.server_manager.port != port
+            or self.paths != new_paths
             or self.debug != debug
         )
-        new_paths = [path1, path2, path3, path4, path5, path6, path7, path8]
 
         if server_params_changed or self.paths != new_paths:
             # Unregister previous handlers if they exist
@@ -851,15 +856,18 @@ class VrchTextConcatOSCControlNode:
         self.texts = [text1, text2, text3, text4, text5, text6, text7, text8]
         self.separator = separator
         self.debug = debug
+        
+        new_paths = [path1, path2, path3, path4, path5, path6, path7, path8]
 
         # Check if server parameters or paths have changed
         server_params_changed = (
             self.server_manager is None
             or self.server_manager.ip != server_ip
             or self.server_manager.port != port
+            or self.paths != new_paths
             or self.debug != debug
         )
-        new_paths = [path1, path2, path3, path4, path5, path6, path7, path8]
+        
 
         if server_params_changed or self.paths != new_paths:
             # Unregister previous handlers if they exist
@@ -963,6 +971,7 @@ class VrchTextSwitchOSCControlNode:
             self.server_manager is None
             or self.server_manager.ip != server_ip
             or self.server_manager.port != port
+            or self.path != path
             or self.debug != debug
         )
         if server_params_changed or self.path != path:
@@ -1075,6 +1084,7 @@ class VrchImageSwitchOSCControlNode:
             self.server_manager is None
             or self.server_manager.ip != server_ip
             or self.server_manager.port != port
+            or self.path != path
             or self.debug != debug
         )
         if server_params_changed or self.path != path:
@@ -1508,10 +1518,11 @@ class VrchDelayOscControlNode:
 
         # Check if server parameters have changed
         server_params_changed = (
-            self.server_manager is None or
-            self.server_manager.ip != server_ip or
-            self.server_manager.port != port or
-            self.debug != debug
+            self.server_manager is None 
+            or self.server_manager.ip != server_ip 
+            or self.server_manager.port != port 
+            or self.path != path 
+            or self.debug != debug
         )
 
         if server_params_changed:
