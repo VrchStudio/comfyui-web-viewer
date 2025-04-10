@@ -668,6 +668,10 @@ class VrchFloatOSCControlNode:
         self.server_manager = None
         self.path = None
         self.debug = False
+        # Add default value tracking
+        self.default_value = 0.0
+        self.server_connected = False  # Server connection status
+        self.server_data_received = False  # Flag to check if value was received from server
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -680,6 +684,7 @@ class VrchFloatOSCControlNode:
             "output_min": ("FLOAT", {"default": 0.00, "min": -9999.00, "max": 9999.00, "step": 0.01}),
             "output_max": ("FLOAT", {"default": 100.00, "min": -9999.00, "max": 9999.00, "step": 0.01}),
             "output_invert": ("BOOLEAN", {"default": False}),
+            "output_default": ("FLOAT", {"default": 0.0, "min": -9999.00, "max": 9999.00, "step": 0.01}),
             "debug": ("BOOLEAN", {"default": False}),
         }}
 
@@ -693,7 +698,7 @@ class VrchFloatOSCControlNode:
         return float("NaN")
 
     def load_float_osc(
-        self, server_ip, port, path, input_min, input_max, output_min, output_max, output_invert, debug
+        self, server_ip, port, path, input_min, input_max, output_min, output_max, output_invert, output_default, debug
     ):
 
         if output_min > output_max:
@@ -701,6 +706,12 @@ class VrchFloatOSCControlNode:
 
         if input_min > input_max:
             raise ValueError("[VrchFloatOSCControlNode] Input min value cannot be greater than max value.")
+            
+        if output_default < output_min or output_default > output_max:
+            raise ValueError("[VrchFloatOSCControlNode] Default value must be within the output range.")
+            
+        # Store default value
+        self.default_value = output_default
 
         # Check if server parameters have changed
         server_params_changed = (
@@ -718,35 +729,69 @@ class VrchFloatOSCControlNode:
                     self.path, self.handle_osc_message
                 )
             # Get or create the server manager
-            self.server_manager = VrchOSCServerManager.get_instance(
-                server_ip, port, debug
-            )
-            self.debug = debug
-            # Register new handler
-            self.path = path
-            self.server_manager.register_handler(self.path, self.handle_osc_message)
-            if debug:
-                print(f"[VrchFloatOSCControlNode] Registered Float handler at path {self.path}")
+            try:
+                self.server_manager = VrchOSCServerManager.get_instance(
+                    server_ip, port, debug
+                )
+                self.debug = debug
+                # Register new handler
+                self.path = path
+                self.server_manager.register_handler(self.path, self.handle_osc_message)
+                self.server_connected = True
+                # Reset data received flag when changing server parameters
+                self.server_data_received = False
+                self.value = 0.0
+                if debug:
+                    print(f"[VrchFloatOSCControlNode] Registered Float handler at path {self.path}")
+            except Exception as e:
+                self.server_connected = False
+                if debug:
+                    print(f"[VrchFloatOSCControlNode] Failed to connect to OSC server: {e}")
 
         # Select remap function based on invert option
         remap_func = VrchNodeUtils.select_remap_func(output_invert)
 
-        # Perform the remapping
-        mapped_value = remap_func(
-            float(self.value),
-            float(input_min),
-            float(input_max),
-            float(output_min),
-            float(output_max),
-        )
-        return mapped_value, float(self.value)
+        # Use raw value only if server is connected and data was received
+        # Otherwise use default value
+        if not self.server_connected or not self.server_data_received:
+            mapped_value = float(output_default)
+            raw_value = 0.0
+            if debug:
+                print(f"[VrchFloatOSCControlNode] Using default value: {output_default}")
+        else:
+            # Perform the remapping
+            mapped_value = remap_func(
+                float(self.value),
+                float(input_min),
+                float(input_max),
+                float(output_min),
+                float(output_max),
+            )
+            raw_value = float(self.value)
+            
+        return mapped_value, raw_value
 
     def handle_osc_message(self, address, *args):
-        value = args[0] if args else 0.0
-        if self.debug:
-            print(f"[VrchFloatOSCControlNode] Received OSC message: addr={address}, value={value}")
-        self.value = value
-
+        try:
+            if args:
+                value = args[0]
+                self.value = value
+                self.server_data_received = True
+                if self.debug:
+                    print(f"[VrchFloatOSCControlNode] Received OSC message: addr={address}, value={value}")
+            else:
+                # No arguments, mark as not received
+                self.server_data_received = False
+                self.value = 0.0
+                if self.debug:
+                    print(f"[VrchFloatOSCControlNode] No arguments received, using default value: {self.default_value}")
+                
+        except Exception as e:
+            # Mark as data not received when exception occurs
+            self.server_data_received = False
+            self.value = 0.0
+            if self.debug:
+                print(f"[VrchFloatOSCControlNode] Error handling OSC message: {e}, using default value: {self.default_value}")
 
 
 class VrchSwitchOSCControlNode:
