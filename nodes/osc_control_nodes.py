@@ -204,6 +204,16 @@ class VrchXYZOSCControlNode:
         self.server_manager = None
         self.path = None
         self.debug = False
+        # Add default value properties
+        self.x_default = 0
+        self.y_default = 0
+        self.z_default = 0
+        # Add server connection status
+        self.server_connected = False
+        # Add flags to track if data was received
+        self.server_data_received_x = False
+        self.server_data_received_y = False
+        self.server_data_received_z = False
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -216,16 +226,19 @@ class VrchXYZOSCControlNode:
             "x_output_min": ("INT", {"default": 0, "min": -9999, "max": 9999}),
             "x_output_max": ("INT", {"default": 100, "min": -9999, "max": 9999}),
             "x_output_invert": ("BOOLEAN", {"default": False}),
+            "x_output_default": ("INT", {"default": 50, "min": -9999, "max": 9999}),
             "y_input_min": ("FLOAT", {"default": 0.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
             "y_input_max": ("FLOAT", {"default": 1.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
             "y_output_min": ("INT", {"default": 0, "min": -9999, "max": 9999}),
             "y_output_max": ("INT", {"default": 100, "min": -9999, "max": 9999}),
             "y_output_invert": ("BOOLEAN", {"default": False}),
+            "y_output_default": ("INT", {"default": 50, "min": -9999, "max": 9999}),
             "z_input_min": ("FLOAT", {"default": 0.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
             "z_input_max": ("FLOAT", {"default": 1.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
             "z_output_min": ("INT", {"default": 0, "min": -9999, "max": 9999}),
             "z_output_max": ("INT", {"default": 100, "min": -9999, "max": 9999}),
             "z_output_invert": ("BOOLEAN", {"default": False}),
+            "z_output_default": ("INT", {"default": 50, "min": -9999, "max": 9999}),
             "debug": ("BOOLEAN", {"default": False})
         }}
 
@@ -243,9 +256,10 @@ class VrchXYZOSCControlNode:
         return float("NaN")
 
     def load_xyz_osc(self, server_ip, port, path,
-                     x_input_min, x_input_max, x_output_min, x_output_max, x_output_invert,
-                     y_input_min, y_input_max, y_output_min, y_output_max, y_output_invert,
-                     z_input_min, z_input_max, z_output_min, z_output_max, z_output_invert, debug):
+                     x_input_min, x_input_max, x_output_min, x_output_max, x_output_invert, x_output_default,
+                     y_input_min, y_input_max, y_output_min, y_output_max, y_output_invert, y_output_default,
+                     z_input_min, z_input_max, z_output_min, z_output_max, z_output_invert, z_output_default, 
+                     debug):
 
         if x_output_min > x_output_max:
             raise ValueError("[VrchXYZOSCControlNode] X output min value cannot be greater than max value.")
@@ -260,12 +274,26 @@ class VrchXYZOSCControlNode:
             raise ValueError("[VrchXYZOSCControlNode] Y input min value cannot be greater than max value.")
         if z_input_min > z_input_max:
             raise ValueError("[VrchXYZOSCControlNode] Z input min value cannot be greater than max value.")
+            
+        # Validate default values are within range
+        if x_output_default < x_output_min or x_output_default > x_output_max:
+            raise ValueError("[VrchXYZOSCControlNode] X default value must be within the output range.")
+        if y_output_default < y_output_min or y_output_default > y_output_max:
+            raise ValueError("[VrchXYZOSCControlNode] Y default value must be within the output range.")
+        if z_output_default < z_output_min or z_output_default > z_output_max:
+            raise ValueError("[VrchXYZOSCControlNode] Z default value must be within the output range.")
+
+        # Store default values
+        self.x_default = x_output_default
+        self.y_default = y_output_default
+        self.z_default = z_output_default
 
         # Check if server parameters have changed
         server_params_changed = (
             self.server_manager is None or
             self.server_manager.ip != server_ip or
             self.server_manager.port != port or
+            self.path != path or
             self.debug != debug
         )
 
@@ -274,73 +302,144 @@ class VrchXYZOSCControlNode:
             if self.server_manager and self.path:
                 self.server_manager.unregister_handler(f"{self.path}*", self.handle_osc_message)
             # Get or create the server manager
-            self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
-            self.debug = debug
-            # Register new handler
-            self.path = path
-            self.server_manager.register_handler(f"{self.path}*", self.handle_osc_message)
-            if debug:
-                print(f"[VrchXYZOSCControlNode] Registered XYZ handler at path {self.path}*")
+            try:
+                self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
+                self.debug = debug
+                # Register new handler
+                self.path = path
+                self.server_manager.register_handler(f"{self.path}*", self.handle_osc_message)
+                self.server_connected = True
+                # Reset data received flags when changing server parameters
+                self.server_data_received_x = False
+                self.server_data_received_y = False
+                self.server_data_received_z = False
+                self.x_raw = 0.0
+                self.y_raw = 0.0
+                self.z_raw = 0.0
+                if debug:
+                    print(f"[VrchXYZOSCControlNode] Registered XYZ handler at path {self.path}*")
+            except Exception as e:
+                self.server_connected = False
+                if debug:
+                    print(f"[VrchXYZOSCControlNode] Failed to connect to OSC server: {e}")
 
         # Select remap functions based on invert options
         x_remap_func = VrchNodeUtils.select_remap_func(x_output_invert)
         y_remap_func = VrchNodeUtils.select_remap_func(y_output_invert)
         z_remap_func = VrchNodeUtils.select_remap_func(z_output_invert)
 
-        # Remap the raw values to float values
-        self.x = x_remap_func(
-            float(self.x_raw),
-            float(x_input_min),
-            float(x_input_max),
-            float(x_output_min),
-            float(x_output_max)
-        )
-        self.y = y_remap_func(
-            float(self.y_raw),
-            float(y_input_min),
-            float(y_input_max),
-            float(y_output_min),
-            float(y_output_max)
-        )
-        self.z = z_remap_func(
-            float(self.z_raw),
-            float(z_input_min),
-            float(z_input_max),
-            float(z_output_min),
-            float(z_output_max)
-        )
+        # Use raw values only if server is connected and data was received
+        # Otherwise use default values
+        if not self.server_connected or not self.server_data_received_x:
+            x_value = float(x_output_default)
+            x_raw = 0.0
+            if debug:
+                print(f"[VrchXYZOSCControlNode] Using X default value: {x_output_default}")
+        else:
+            x_value = x_remap_func(
+                float(self.x_raw),
+                float(x_input_min),
+                float(x_input_max),
+                float(x_output_min),
+                float(x_output_max)
+            )
+            x_raw = self.x_raw
+
+        if not self.server_connected or not self.server_data_received_y:
+            y_value = float(y_output_default)
+            y_raw = 0.0
+            if debug:
+                print(f"[VrchXYZOSCControlNode] Using Y default value: {y_output_default}")
+        else:
+            y_value = y_remap_func(
+                float(self.y_raw),
+                float(y_input_min),
+                float(y_input_max),
+                float(y_output_min),
+                float(y_output_max)
+            )
+            y_raw = self.y_raw
+
+        if not self.server_connected or not self.server_data_received_z:
+            z_value = float(z_output_default)
+            z_raw = 0.0
+            if debug:
+                print(f"[VrchXYZOSCControlNode] Using Z default value: {z_output_default}")
+        else:
+            z_value = z_remap_func(
+                float(self.z_raw),
+                float(z_input_min),
+                float(z_input_max),
+                float(z_output_min),
+                float(z_output_max)
+            )
+            z_raw = self.z_raw
+
+        # Store remapped values
+        self.x = x_value
+        self.y = y_value  
+        self.z = z_value
 
         # Convert to integers
-        self.x_int = int(self.x)
-        self.y_int = int(self.y)
-        self.z_int = int(self.z)
+        self.x_int = int(x_value)
+        self.y_int = int(y_value)
+        self.z_int = int(z_value)
 
         return (
             self.x_int, self.y_int, self.z_int,
             self.x, self.y, self.z,
-            self.x_raw, self.y_raw, self.z_raw
+            x_raw, y_raw, z_raw
         )
 
     def handle_osc_message(self, address, *args):
         if self.debug:
             print(f"[VrchXYZOSCControlNode] Received OSC message: addr={address}, args={args}")
 
-        if len(args) == 1:
-            value = args[0] if args else 0.0
+        try:
+            if len(args) == 1:
+                value = args[0] if args else 0.0
+                if address.endswith("/x"):
+                    self.x_raw = value
+                    self.server_data_received_x = True
+                    if self.debug:
+                        print(f"[VrchXYZOSCControlNode] Received X value: {value}")
+                elif address.endswith("/y"):
+                    self.y_raw = value
+                    self.server_data_received_y = True
+                    if self.debug:
+                        print(f"[VrchXYZOSCControlNode] Received Y value: {value}")
+                elif address.endswith("/z"):
+                    self.z_raw = value
+                    self.server_data_received_z = True
+                    if self.debug:
+                        print(f"[VrchXYZOSCControlNode] Received Z value: {value}")
+            elif len(args) == 3:
+                self.x_raw = args[0]
+                self.y_raw = args[1]
+                self.z_raw = args[2]
+                self.server_data_received_x = True
+                self.server_data_received_y = True
+                self.server_data_received_z = True
+                if self.debug:
+                    print(f"[VrchXYZOSCControlNode] Received XYZ values: {args}")
+            else:
+                if self.debug:
+                    print(f"[VrchXYZOSCControlNode] handle_osc_message() called with invalid args: {args}")
+        except Exception as e:
+            # In case of error, mark data as not received
             if address.endswith("/x"):
-                self.x_raw = value
+                self.server_data_received_x = False
             elif address.endswith("/y"):
-                self.y_raw = value
+                self.server_data_received_y = False
             elif address.endswith("/z"):
-                self.z_raw = value
-        elif len(args) == 3:
-            self.x_raw = args[0]
-            self.y_raw = args[1]
-            self.z_raw = args[2]
-        else:
-            print(f"[VrchXYZOSCControlNode] handle_osc_message() call with invalid args: {args}")
-
-
+                self.server_data_received_z = False
+            else:
+                self.server_data_received_x = False
+                self.server_data_received_y = False
+                self.server_data_received_z = False
+                
+            if self.debug:
+                print(f"[VrchXYZOSCControlNode] Error handling OSC message: {e}")
 
 class VrchIntOSCControlNode:
 
