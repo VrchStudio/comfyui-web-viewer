@@ -13,6 +13,7 @@
      - **`x_output_min`:** Minimum X output value (integer, default is `0`).
      - **`x_output_max`:** Maximum X output value (integer, default is `100`).
      - **`x_output_invert`:** Invert the X output mapping if checked (default is `False`).
+     - **`x_output_default`:** Default X value used when no OSC data is received (default is `50`).
    - **Y Input Range:**
      - **`y_input_min`:** Minimum expected Y input value (default is `0.0`).
      - **`y_input_max`:** Maximum expected Y input value (default is `1.0`).
@@ -20,6 +21,7 @@
      - **`y_output_min`:** Minimum Y output value (integer, default is `0`).
      - **`y_output_max`:** Maximum Y output value (integer, default is `100`).
      - **`y_output_invert`:** Invert the Y output mapping if checked (default is `False`).
+     - **`y_output_default`:** Default Y value used when no OSC data is received (default is `50`).
    - **Debug (`debug`):** Enable debug mode to print detailed logs (default is `False`).
 
 3. **Use the Node:**
@@ -27,6 +29,8 @@
      - Send OSC messages to the specified `path` with either two arguments (`x` and `y` values) or to sub-paths `path/x` and `path/y` with single values.
    - **Data Mapping:**
      - The node maps the incoming `x` and `y` values from the input range to the output range, optionally inverting the mapping.
+   - **Default Values:**
+     - If no OSC data is received or the server connection fails, the node will use the specified default values.
    - **Outputs:**
      - **`X_INT`, `Y_INT`**: The remapped integer values of X and Y.
      - **`X_FLOAT`, `Y_FLOAT`**: The remapped float values of X and Y.
@@ -38,6 +42,7 @@
 **Note:**
 - Ensure your OSC client is sending messages to the correct `server_ip`, `port`, and `path`.
 - The input and output ranges allow you to calibrate and map values as needed.
+- Default values provide a fallback when no OSC messages are received.
 - The node supports both combined (`/xy` with two arguments) and separate (`/xy/x` and `/xy/y`) OSC messages.
 
 ---
@@ -57,6 +62,7 @@
      - **`x_output_min`:** Minimum X output value (integer, default is `0`).
      - **`x_output_max`:** Maximum X output value (integer, default is `100`).
      - **`x_output_invert`:** Invert the X output mapping if checked (default is `False`).
+     - **`x_output_default`:** Default X value used when no OSC data is received (default is `50`).
    - **Y Input Range:**
      - **`y_input_min`:** Minimum expected Y input value (default is `0.0`).
      - **`y_input_max`:** Maximum expected Y input value (default is `1.0`).
@@ -64,6 +70,7 @@
      - **`y_output_min`:** Minimum Y output value (integer, default is `0`).
      - **`y_output_max`:** Maximum Y output value (integer, default is `100`).
      - **`y_output_invert`:** Invert the Y output mapping if checked (default is `False`).
+     - **`y_output_default`:** Default Y value used when no OSC data is received (default is `50`).
    - **Z Input Range:**
      - **`z_input_min`:** Minimum expected Z input value (default is `0.0`).
      - **`z_input_max`:** Maximum expected Z input value (default is `1.0`).
@@ -71,6 +78,7 @@
      - **`z_output_min`:** Minimum Z output value (integer, default is `0`).
      - **`z_output_max`:** Maximum Z output value (integer, default is `100`).
      - **`z_output_invert`:** Invert the Z output mapping if checked (default is `False`).
+     - **`z_output_default`:** Default Z value used when no OSC data is received (default is `50`).
    - **Debug (`debug`):** Enable debug mode to print detailed logs (default is `False`).
 
 3. **Use the Node:**
@@ -78,6 +86,8 @@
      - Send OSC messages to the specified `path` with three arguments (`x`, `y`, and `z` values) or to sub-paths `path/x`, `path/y`, and `path/z` with single values.
    - **Data Mapping:**
      - The node maps the incoming `x`, `y`, and `z` values from the input ranges to the output ranges, optionally inverting the mappings.
+   - **Default Values:**
+     - If no OSC data is received or the server connection fails, the node will use the specified default values.
    - **Outputs:**
      - **`X_INT`, `Y_INT`, `Z_INT`**: The remapped integer values of X, Y, and Z.
      - **`X_FLOAT`, `Y_FLOAT`, `Z_FLOAT`**: The remapped float values of X, Y, and Z.
@@ -89,6 +99,7 @@
 **Note:**
 - Ensure your OSC client is sending messages to the correct `server_ip`, `port`, and `path`.
 - The input and output ranges allow you to calibrate and map values as needed.
+- Default values provide a fallback when no OSC messages are received.
 - The node supports both combined (`/xyz` with three arguments) and separate (`/xyz/x`, `/xyz/y`, `/xyz/z`) OSC messages.
 
 ---
@@ -108,6 +119,7 @@
      - **`output_min`:** Minimum output value (integer, default is `0`).
      - **`output_max`:** Maximum output value (integer, default is `100`).
      - **`output_invert`:** Invert the output mapping if checked (default is `False`).
+     - **`output_default`:** Default value used when no OSC data is received (default is `0`).
    - **Debug (`debug`):** Enable debug mode to print detailed logs (default is `False`).
 
 3. **Use the Node:**
@@ -115,6 +127,8 @@
      - Send OSC messages to the specified `path` with a single value.
    - **Data Mapping:**
      - The node maps the incoming value from the input range to the output range, optionally inverting the mapping.
+   - **Default Value:**
+     - If no OSC data is received or the server connection fails, the node will use the specified default value.
    - **Outputs:**
      - **`VALUE`**: The remapped integer value.
      - **`RAW_VALUE`**: The raw input value received from the OSC message.
@@ -125,6 +139,7 @@
 **Note:**
 - Ensure your OSC client is sending messages to the correct `server_ip`, `port`, and `path`.
 - Adjust the input and output ranges to suit your application's needs.
+- The default value provides a fallback when no OSC messages are received.
 - The node clamps and maps values to ensure they stay within the specified ranges.
 
 ---
@@ -144,6 +159,7 @@
      - **`output_min`:** Minimum output value (float, default is `0.0`).
      - **`output_max`:** Maximum output value (float, default is `100.0`).
      - **`output_invert`:** Invert the output mapping if checked (default is `False`).
+     - **`output_default`:** Default value used when no OSC data is received (default is `0.0`).
    - **Debug (`debug`):** Enable debug mode to print detailed logs (default is `False`).
 
 3. **Use the Node:**
@@ -151,6 +167,8 @@
      - Send OSC messages to the specified `path` with a single value.
    - **Data Mapping:**
      - The node maps the incoming value from the input range to the output range, optionally inverting the mapping.
+   - **Default Value:**
+     - If no OSC data is received or the server connection fails, the node will use the specified default value.
    - **Outputs:**
      - **`VALUE`**: The remapped float value.
      - **`RAW_VALUE`**: The raw input value received from the OSC message.
@@ -161,6 +179,7 @@
 **Note:**
 - Ensure your OSC client is sending messages to the correct `server_ip`, `port`, and `path`.
 - Adjust the input and output ranges to suit your application's needs.
+- The default value provides a fallback when no OSC messages are received.
 - The node clamps and maps values to ensure they stay within the specified ranges.
 
 ---
