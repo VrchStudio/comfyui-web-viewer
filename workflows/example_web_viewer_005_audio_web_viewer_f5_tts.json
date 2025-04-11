@@ -11,7 +11,7 @@
       ],
       "size": [
         391.9416809082031,
-        173.97555541992188
+        194
       ],
       "flags": {},
       "order": 4,
@@ -25,18 +25,26 @@
         {
           "name": "sample_text",
           "type": "STRING",
-          "link": 19,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "sample_text"
-          }
+          },
+          "link": 19
         },
         {
           "name": "speech",
           "type": "STRING",
-          "link": 32,
+          "pos": [
+            10,
+            60
+          ],
           "widget": {
             "name": "speech"
-          }
+          },
+          "link": 32
         }
       ],
       "outputs": [
@@ -102,11 +110,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            410.236328125
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": null
         }
       ],
       "outputs": [
@@ -146,11 +158,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            164.87130737304688
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": null
         }
       ],
       "outputs": [
@@ -181,7 +197,7 @@
       ],
       "size": [
         416.107177734375,
-        336.21661376953125
+        388
       ],
       "flags": {},
       "order": 3,
@@ -209,9 +225,9 @@
         true,
         true,
         "F2",
-        null,
-        null,
-        null
+        "",
+        "",
+        ""
       ]
     },
     {
@@ -222,8 +238,8 @@
         -408.033447265625
       ],
       "size": [
-        403.46722412109375,
-        353.8019714355469
+        386.8297119140625,
+        386
       ],
       "flags": {},
       "order": 5,
@@ -249,12 +265,16 @@
         "1",
         "127.0.0.1:8188",
         false,
+        3000,
+        "circles",
+        "",
+        "",
         500,
         600,
         false,
         "",
-        "http://vrch.ai/viewer?mode=audio&server=127.0.0.1:8188&ssl=false&file=channel_1.mp3&path=web_viewer",
-        null
+        "http://vrch.ai/viewer?mode=audio&server=127.0.0.1:8188&ssl=false&filename=channel_1.mp3&path=web_viewer&refreshInterval=3000&visualizerType=circles",
+        ""
       ]
     }
   ],
@@ -296,16 +316,16 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1.061076460950001,
+      "scale": 0.8264462809917354,
       "offset": [
-        1003.8349404785547,
-        562.4945593358352
+        1196.146402158017,
+        809.7034766491362
       ]
     },
     "node_versions": {
       "ComfyUI-F5-TTS": "39981dafa1bdff3d0021f0a68b1330071989f775",
       "ComfyUI-Chibi-Nodes": "290ccef2a8c1bc3917e1c00dbe5c206b66fb8ded",
-      "comfyui-web-viewer": "93daa27bd76f869eb88bafda6e621abe460c8d59"
+      "comfyui-web-viewer": "4b3c80bd145bf47a7dd44434d57d1688b87907e7"
     }
   },
   "version": 0.4

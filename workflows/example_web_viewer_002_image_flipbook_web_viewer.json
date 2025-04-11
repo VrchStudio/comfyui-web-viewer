@@ -177,7 +177,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        639560808131120,
+        890120932016009,
         "randomize",
         6,
         2,
@@ -269,8 +269,8 @@
         412
       ],
       "size": [
-        428.4000244140625,
-        344
+        428.3102111816406,
+        513.2980346679688
       ],
       "flags": {},
       "order": 6,
@@ -294,15 +294,20 @@
       },
       "widgets_values": [
         "1",
-        4,
         "127.0.0.1:8188",
+        false,
+        4,
+        1000,
+        1000,
+        300,
+        "",
         false,
         1280,
         960,
-        false,
+        true,
         "",
-        "http://vrch.ai/viewer?mode=flipbook&server=127.0.0.1:8188&ssl=false&file=channel_1.jpeg&path=web_viewer&numberOfImages=4",
-        null
+        "http://vrch.ai/viewer?mode=flipbook&server=127.0.0.1:8188&ssl=false&filename=channel_1.jpeg&path=web_viewer&numberOfImages=4&refreshInterval=1000&imageDisplayDuration=1000&fadeAnimDuration=300",
+        ""
       ]
     }
   ],
@@ -384,15 +389,15 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.7972024500000007,
+      "scale": 0.6830134553650723,
       "offset": [
-        -24.132361175842064,
-        45.193188172566956
+        76.38120591985603,
+        287.10573212951056
       ]
     },
     "node_versions": {
-      "comfy-core": "0.3.13",
-      "comfyui-web-viewer": "93daa27bd76f869eb88bafda6e621abe460c8d59"
+      "comfy-core": "0.3.24",
+      "comfyui-web-viewer": "4b3c80bd145bf47a7dd44434d57d1688b87907e7"
     }
   },
   "version": 0.4

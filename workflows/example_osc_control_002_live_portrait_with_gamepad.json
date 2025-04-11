@@ -3,113 +3,16 @@
   "last_link_id": 221,
   "nodes": [
     {
-      "id": 40,
-      "type": "VrchXYOSCControlNode",
-      "pos": {
-        "0": 1170,
-        "1": 1030
-      },
-      "size": {
-        "0": 315,
-        "1": 470
-      },
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "server_ip",
-          "type": "STRING",
-          "link": 210,
-          "widget": {
-            "name": "server_ip"
-          }
-        },
-        {
-          "name": "port",
-          "type": "INT",
-          "link": 197,
-          "widget": {
-            "name": "port"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "X_INT",
-          "type": "INT",
-          "links": null,
-          "shape": 3
-        },
-        {
-          "name": "Y_INT",
-          "type": "INT",
-          "links": null,
-          "shape": 3
-        },
-        {
-          "name": "X_FLOAT",
-          "type": "FLOAT",
-          "links": [
-            46
-          ],
-          "slot_index": 2,
-          "shape": 3
-        },
-        {
-          "name": "Y_FLOAT",
-          "type": "FLOAT",
-          "links": [
-            47
-          ],
-          "slot_index": 3,
-          "shape": 3
-        },
-        {
-          "name": "X_RAW",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        },
-        {
-          "name": "Y_RAW",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "title": "pupil position",
-      "properties": {
-        "Node name for S&R": "VrchXYOSCControlNode"
-      },
-      "widgets_values": [
-        "192.168.123.104",
-        8000,
-        "/4/xy_STICK_RIGHT",
-        0,
-        1,
-        -20,
-        20,
-        false,
-        0,
-        1,
-        -20,
-        20,
-        true,
-        false
-      ]
-    },
-    {
       "id": 42,
       "type": "VrchFloatOSCControlNode",
-      "pos": {
-        "0": 1560,
-        "1": 1010
-      },
-      "size": {
-        "0": 315,
-        "1": 270
-      },
+      "pos": [
+        1560,
+        1010
+      ],
+      "size": [
+        315,
+        294
+      ],
       "flags": {},
       "order": 11,
       "mode": 0,
@@ -117,35 +20,43 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 213,
+          "pos": [
+            10,
+            56
+          ],
           "widget": {
             "name": "server_ip"
-          }
+          },
+          "link": 213
         },
         {
           "name": "port",
           "type": "INT",
-          "link": 200,
+          "pos": [
+            10,
+            80
+          ],
           "widget": {
             "name": "port"
-          }
+          },
+          "link": 200
         }
       ],
       "outputs": [
         {
           "name": "VALUE",
           "type": "FLOAT",
+          "shape": 3,
           "links": [
             140
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "RAW_VALUE",
           "type": "FLOAT",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "title": "wink",
@@ -161,20 +72,21 @@
         false,
         25,
         false,
+        false,
         false
       ]
     },
     {
       "id": 47,
       "type": "VrchFloatOSCControlNode",
-      "pos": {
-        "0": 1930,
-        "1": 1020
-      },
-      "size": {
-        "0": 315,
-        "1": 270
-      },
+      "pos": [
+        1930,
+        1020
+      ],
+      "size": [
+        315,
+        294
+      ],
       "flags": {},
       "order": 14,
       "mode": 0,
@@ -182,35 +94,43 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 216,
+          "pos": [
+            10,
+            56
+          ],
           "widget": {
             "name": "server_ip"
-          }
+          },
+          "link": 216
         },
         {
           "name": "port",
           "type": "INT",
-          "link": 203,
+          "pos": [
+            10,
+            80
+          ],
           "widget": {
             "name": "port"
-          }
+          },
+          "link": 203
         }
       ],
       "outputs": [
         {
           "name": "VALUE",
           "type": "FLOAT",
+          "shape": 3,
           "links": [
             137
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "RAW_VALUE",
           "type": "FLOAT",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "title": "oral - aaa",
@@ -226,20 +146,21 @@
         false,
         120,
         false,
+        false,
         false
       ]
     },
     {
       "id": 48,
       "type": "VrchFloatOSCControlNode",
-      "pos": {
-        "0": 1960,
-        "1": 1370
-      },
-      "size": {
-        "0": 315,
-        "1": 270
-      },
+      "pos": [
+        1960,
+        1370
+      ],
+      "size": [
+        315,
+        294
+      ],
       "flags": {},
       "order": 15,
       "mode": 0,
@@ -247,35 +168,43 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 217,
+          "pos": [
+            10,
+            56
+          ],
           "widget": {
             "name": "server_ip"
-          }
+          },
+          "link": 217
         },
         {
           "name": "port",
           "type": "INT",
-          "link": 204,
+          "pos": [
+            10,
+            80
+          ],
           "widget": {
             "name": "port"
-          }
+          },
+          "link": 204
         }
       ],
       "outputs": [
         {
           "name": "VALUE",
           "type": "FLOAT",
+          "shape": 3,
           "links": [
             138
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "RAW_VALUE",
           "type": "FLOAT",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "title": "oral - eee",
@@ -291,20 +220,21 @@
         false,
         15,
         false,
+        false,
         false
       ]
     },
     {
       "id": 73,
       "type": "VrchChannelX4OSCControlNode",
-      "pos": {
-        "0": 2740,
-        "1": 1020
-      },
-      "size": {
-        "0": 380.4000244140625,
-        "1": 342
-      },
+      "pos": [
+        2740,
+        1020
+      ],
+      "size": [
+        380.4000244140625,
+        382
+      ],
       "flags": {},
       "order": 17,
       "mode": 0,
@@ -352,50 +282,58 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 219,
+          "pos": [
+            10,
+            176
+          ],
           "widget": {
             "name": "server_ip"
-          }
+          },
+          "link": 219
         },
         {
           "name": "port",
           "type": "INT",
-          "link": 206,
+          "pos": [
+            10,
+            200
+          ],
           "widget": {
             "name": "port"
-          }
+          },
+          "link": 206
         }
       ],
       "outputs": [
         {
           "name": "ANY_OUTPUT_1",
           "type": "*",
+          "shape": 3,
           "links": [
             143
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "ANY_OUTPUT_2",
           "type": "*",
+          "shape": 3,
           "links": [
             151
           ],
-          "slot_index": 1,
-          "shape": 3
+          "slot_index": 1
         },
         {
           "name": "ANY_OUTPUT_3",
           "type": "*",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         },
         {
           "name": "ANY_OUTPUT_4",
           "type": "*",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "title": "OSC GamePad LB/RB",
@@ -415,14 +353,14 @@
     {
       "id": 70,
       "type": "VrchChannelX4OSCControlNode",
-      "pos": {
-        "0": 2750,
-        "1": 1420
-      },
-      "size": {
-        "0": 380.4000244140625,
-        "1": 342
-      },
+      "pos": [
+        2750,
+        1420
+      ],
+      "size": [
+        380.4000244140625,
+        382
+      ],
       "flags": {},
       "order": 18,
       "mode": 0,
@@ -470,53 +408,61 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 220,
+          "pos": [
+            10,
+            176
+          ],
           "widget": {
             "name": "server_ip"
-          }
+          },
+          "link": 220
         },
         {
           "name": "port",
           "type": "INT",
-          "link": 207,
+          "pos": [
+            10,
+            200
+          ],
           "widget": {
             "name": "port"
-          }
+          },
+          "link": 207
         }
       ],
       "outputs": [
         {
           "name": "ANY_OUTPUT_1",
           "type": "*",
+          "shape": 3,
           "links": [
             142
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "ANY_OUTPUT_2",
           "type": "*",
+          "shape": 3,
           "links": [
             145
           ],
-          "slot_index": 1,
-          "shape": 3
+          "slot_index": 1
         },
         {
           "name": "ANY_OUTPUT_3",
           "type": "*",
+          "shape": 3,
           "links": [
             153
           ],
-          "slot_index": 2,
-          "shape": 3
+          "slot_index": 2
         },
         {
           "name": "ANY_OUTPUT_4",
           "type": "*",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "title": "OSC GamePad A/B/X/Y",
@@ -534,178 +480,16 @@
       ]
     },
     {
-      "id": 43,
-      "type": "VrchFloatOSCControlNode",
-      "pos": {
-        "0": 1560,
-        "1": 1340
-      },
-      "size": {
-        "0": 315,
-        "1": 270
-      },
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "server_ip",
-          "type": "STRING",
-          "link": 214,
-          "widget": {
-            "name": "server_ip"
-          }
-        },
-        {
-          "name": "port",
-          "type": "INT",
-          "link": 201,
-          "widget": {
-            "name": "port"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "VALUE",
-          "type": "FLOAT",
-          "links": [
-            135
-          ],
-          "slot_index": 0,
-          "shape": 3
-        },
-        {
-          "name": "RAW_VALUE",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "title": "blink - close",
-      "properties": {
-        "Node name for S&R": "VrchFloatOSCControlNode"
-      },
-      "widgets_values": [
-        "192.168.123.104",
-        8000,
-        "/4/button_RT",
-        0,
-        1,
-        -20,
-        0,
-        true,
-        false
-      ]
-    },
-    {
-      "id": 41,
-      "type": "VrchXYOSCControlNode",
-      "pos": {
-        "0": 820,
-        "1": 1020
-      },
-      "size": {
-        "0": 315,
-        "1": 470
-      },
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "server_ip",
-          "type": "STRING",
-          "link": 209,
-          "widget": {
-            "name": "server_ip"
-          }
-        },
-        {
-          "name": "port",
-          "type": "INT",
-          "link": 196,
-          "widget": {
-            "name": "port"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "X_INT",
-          "type": "INT",
-          "links": null,
-          "shape": 3
-        },
-        {
-          "name": "Y_INT",
-          "type": "INT",
-          "links": null,
-          "shape": 3
-        },
-        {
-          "name": "X_FLOAT",
-          "type": "FLOAT",
-          "links": [
-            49
-          ],
-          "slot_index": 2,
-          "shape": 3
-        },
-        {
-          "name": "Y_FLOAT",
-          "type": "FLOAT",
-          "links": [
-            48
-          ],
-          "slot_index": 3,
-          "shape": 3
-        },
-        {
-          "name": "X_RAW",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        },
-        {
-          "name": "Y_RAW",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "title": "head position (pitch/yaw)",
-      "properties": {
-        "Node name for S&R": "VrchXYOSCControlNode"
-      },
-      "widgets_values": [
-        "192.168.123.104",
-        8000,
-        "/4/xy_STICK_LEFT",
-        0,
-        1,
-        -20,
-        20,
-        false,
-        0,
-        1,
-        -20,
-        20,
-        false,
-        false
-      ]
-    },
-    {
       "id": 72,
       "type": "VrchChannelX4OSCControlNode",
-      "pos": {
-        "0": 2750,
-        "1": 1830
-      },
-      "size": {
-        "0": 380.4000244140625,
-        "1": 342
-      },
+      "pos": [
+        2750,
+        1830
+      ],
+      "size": [
+        380.4000244140625,
+        382
+      ],
       "flags": {},
       "order": 19,
       "mode": 0,
@@ -753,54 +537,62 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 221,
+          "pos": [
+            10,
+            176
+          ],
           "widget": {
             "name": "server_ip"
-          }
+          },
+          "link": 221
         },
         {
           "name": "port",
           "type": "INT",
-          "link": 208,
+          "pos": [
+            10,
+            200
+          ],
           "widget": {
             "name": "port"
-          }
+          },
+          "link": 208
         }
       ],
       "outputs": [
         {
           "name": "ANY_OUTPUT_1",
           "type": "*",
+          "shape": 3,
           "links": [
             146
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "ANY_OUTPUT_2",
           "type": "*",
+          "shape": 3,
           "links": [
             148
           ],
-          "slot_index": 1,
-          "shape": 3
+          "slot_index": 1
         },
         {
           "name": "ANY_OUTPUT_3",
           "type": "*",
+          "shape": 3,
           "links": [],
-          "slot_index": 2,
-          "shape": 3
+          "slot_index": 2
         },
         {
           "name": "ANY_OUTPUT_4",
           "type": "*",
+          "shape": 3,
           "links": [
             155
           ],
-          "slot_index": 3,
-          "shape": 3
+          "slot_index": 3
         }
       ],
       "title": "OSC GamePad Up/Left/Down/Right",
@@ -820,14 +612,14 @@
     {
       "id": 52,
       "type": "Float",
-      "pos": {
-        "0": 2329,
-        "1": 960
-      },
-      "size": {
-        "0": 282.6849670410156,
-        "1": 58
-      },
+      "pos": [
+        2329,
+        960
+      ],
+      "size": [
+        282.6849670410156,
+        58
+      ],
       "flags": {},
       "order": 0,
       "mode": 0,
@@ -836,6 +628,7 @@
         {
           "name": "FLOAT",
           "type": "FLOAT",
+          "shape": 3,
           "links": [
             125,
             126,
@@ -847,8 +640,7 @@
             133,
             134
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -861,14 +653,14 @@
     {
       "id": 76,
       "type": "String",
-      "pos": {
-        "0": 2332,
-        "1": 1081
-      },
-      "size": {
-        "0": 275.770751953125,
-        "1": 58
-      },
+      "pos": [
+        2332,
+        1081
+      ],
+      "size": [
+        275.770751953125,
+        58
+      ],
       "flags": {},
       "order": 1,
       "mode": 0,
@@ -877,6 +669,7 @@
         {
           "name": "STRING",
           "type": "STRING",
+          "shape": 3,
           "links": [
             159,
             160,
@@ -886,8 +679,7 @@
             164,
             165
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -900,14 +692,14 @@
     {
       "id": 45,
       "type": "VrchFloatOSCControlNode",
-      "pos": {
-        "0": 827,
-        "1": 1624
-      },
-      "size": {
-        "0": 315,
-        "1": 270
-      },
+      "pos": [
+        827,
+        1624
+      ],
+      "size": [
+        315,
+        294
+      ],
       "flags": {},
       "order": 9,
       "mode": 0,
@@ -915,35 +707,43 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 211,
+          "pos": [
+            10,
+            56
+          ],
           "widget": {
             "name": "server_ip"
-          }
+          },
+          "link": 211
         },
         {
           "name": "port",
           "type": "INT",
-          "link": 198,
+          "pos": [
+            10,
+            80
+          ],
           "widget": {
             "name": "port"
-          }
+          },
+          "link": 198
         }
       ],
       "outputs": [
         {
           "name": "VALUE",
           "type": "FLOAT",
+          "shape": 3,
           "links": [
             152
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "RAW_VALUE",
           "type": "FLOAT",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "title": "head position (roll)",
@@ -959,85 +759,21 @@
         -20,
         20,
         false,
+        false,
         false
-      ]
-    },
-    {
-      "id": 49,
-      "type": "VrchFloatOSCControlNode",
-      "pos": {
-        "0": 1969,
-        "1": 1755
-      },
-      "size": {
-        "0": 315,
-        "1": 270
-      },
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "server_ip",
-          "type": "STRING",
-          "link": 218,
-          "widget": {
-            "name": "server_ip"
-          }
-        },
-        {
-          "name": "port",
-          "type": "INT",
-          "link": 205,
-          "widget": {
-            "name": "port"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "VALUE",
-          "type": "FLOAT",
-          "links": [
-            154
-          ],
-          "slot_index": 0,
-          "shape": 3
-        },
-        {
-          "name": "RAW_VALUE",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "title": "oral - woo",
-      "properties": {
-        "Node name for S&R": "VrchFloatOSCControlNode"
-      },
-      "widgets_values": [
-        "192.168.123.104",
-        8000,
-        "/4/button_RT",
-        0,
-        1,
-        false,
-        15,
-        false,
-        true
       ]
     },
     {
       "id": 50,
       "type": "ImageResizeKJ",
-      "pos": {
-        "0": 3172,
-        "1": 521
-      },
-      "size": {
-        "0": 315,
-        "1": 242
-      },
+      "pos": [
+        3172,
+        521
+      ],
+      "size": [
+        315,
+        262
+      ],
       "flags": {},
       "order": 6,
       "mode": 0,
@@ -1050,47 +786,55 @@
         {
           "name": "get_image_size",
           "type": "IMAGE",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "width_input",
           "type": "INT",
-          "link": null,
+          "pos": [
+            10,
+            196
+          ],
           "widget": {
             "name": "width_input"
-          }
+          },
+          "link": null
         },
         {
           "name": "height_input",
           "type": "INT",
-          "link": null,
+          "pos": [
+            10,
+            220
+          ],
           "widget": {
             "name": "height_input"
-          }
+          },
+          "link": null
         }
       ],
       "outputs": [
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "shape": 3,
           "links": [
             62
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "width",
           "type": "INT",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         },
         {
           "name": "height",
           "type": "INT",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "properties": {
@@ -1109,14 +853,14 @@
     {
       "id": 15,
       "type": "LoadImage",
-      "pos": {
-        "0": 2829,
-        "1": 506
-      },
-      "size": {
-        "0": 210,
-        "1": 314
-      },
+      "pos": [
+        2829,
+        506
+      ],
+      "size": [
+        210,
+        314
+      ],
       "flags": {},
       "order": 2,
       "mode": 0,
@@ -1125,17 +869,17 @@
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "shape": 3,
           "links": [
             61
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "MASK",
           "type": "MASK",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "properties": {
@@ -1147,52 +891,16 @@
       ]
     },
     {
-      "id": 71,
-      "type": "VrchImageWebViewerNode",
-      "pos": {
-        "0": 3648,
-        "1": 1165
-      },
-      "size": {
-        "0": 230,
-        "1": 270
-      },
-      "flags": {},
-      "order": 21,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 124
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "Node name for S&R": "VrchImageWebViewerNode"
-      },
-      "widgets_values": [
-        "1",
-        "192.168.123.104:8188",
-        false,
-        600,
-        600,
-        false,
-        "http://vrch.ai/viewer?mode=image&server=192.168.123.104:8188&ssl=false&file=channel_1.jpeg&path=web_viewer",
-        null
-      ]
-    },
-    {
       "id": 74,
       "type": "Note",
-      "pos": {
-        "0": 3207,
-        "1": 1857
-      },
-      "size": {
-        "0": 365.713134765625,
-        "1": 260.54083251953125
-      },
+      "pos": [
+        3207,
+        1857
+      ],
+      "size": [
+        365.713134765625,
+        260.54083251953125
+      ],
       "flags": {},
       "order": 3,
       "mode": 0,
@@ -1209,146 +917,16 @@
       "bgcolor": "#653"
     },
     {
-      "id": 46,
-      "type": "VrchFloatOSCControlNode",
-      "pos": {
-        "0": 1582,
-        "1": 1756
-      },
-      "size": {
-        "0": 315,
-        "1": 270
-      },
-      "flags": {},
-      "order": 13,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "server_ip",
-          "type": "STRING",
-          "link": 215,
-          "widget": {
-            "name": "server_ip"
-          }
-        },
-        {
-          "name": "port",
-          "type": "INT",
-          "link": 202,
-          "widget": {
-            "name": "port"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "VALUE",
-          "type": "FLOAT",
-          "links": [
-            144
-          ],
-          "slot_index": 0,
-          "shape": 3
-        },
-        {
-          "name": "RAW_VALUE",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "title": "eyebrow",
-      "properties": {
-        "Node name for S&R": "VrchFloatOSCControlNode"
-      },
-      "widgets_values": [
-        "192.168.123.104",
-        8000,
-        "/4/button_LT",
-        0,
-        1,
-        0,
-        15,
-        false,
-        true
-      ]
-    },
-    {
-      "id": 44,
-      "type": "VrchFloatOSCControlNode",
-      "pos": {
-        "0": 1199,
-        "1": 1755
-      },
-      "size": {
-        "0": 315,
-        "1": 270
-      },
-      "flags": {},
-      "order": 10,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "server_ip",
-          "type": "STRING",
-          "link": 212,
-          "widget": {
-            "name": "server_ip"
-          }
-        },
-        {
-          "name": "port",
-          "type": "INT",
-          "link": 199,
-          "widget": {
-            "name": "port"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "VALUE",
-          "type": "FLOAT",
-          "links": [
-            136
-          ],
-          "slot_index": 0,
-          "shape": 3
-        },
-        {
-          "name": "RAW_VALUE",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "title": "smile",
-      "properties": {
-        "Node name for S&R": "VrchFloatOSCControlNode"
-      },
-      "widgets_values": [
-        "192.168.123.104",
-        8000,
-        "/4/button_LT",
-        0,
-        1,
-        0,
-        1.3,
-        false,
-        true
-      ]
-    },
-    {
       "id": 39,
       "type": "ExpressionEditor",
-      "pos": {
-        "0": 3253,
-        "1": 1079
-      },
-      "size": {
-        "0": 270.6428527832031,
-        "1": 646
-      },
+      "pos": [
+        3253,
+        1079
+      ],
+      "size": [
+        270.6428527832031,
+        718
+      ],
       "flags": {},
       "order": 20,
       "mode": 0,
@@ -1356,145 +934,193 @@
         {
           "name": "src_image",
           "type": "IMAGE",
-          "link": 62,
-          "shape": 7
+          "shape": 7,
+          "link": 62
         },
         {
           "name": "motion_link",
           "type": "EDITOR_LINK",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "sample_image",
           "type": "IMAGE",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "add_exp",
           "type": "EXP_DATA",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "pupil_x",
           "type": "FLOAT",
-          "link": 46,
+          "pos": [
+            10,
+            240
+          ],
           "widget": {
             "name": "pupil_x"
-          }
+          },
+          "link": 46
         },
         {
           "name": "pupil_y",
           "type": "FLOAT",
-          "link": 47,
+          "pos": [
+            10,
+            264
+          ],
           "widget": {
             "name": "pupil_y"
-          }
+          },
+          "link": 47
         },
         {
           "name": "rotate_pitch",
           "type": "FLOAT",
-          "link": 48,
+          "pos": [
+            10,
+            96
+          ],
           "widget": {
             "name": "rotate_pitch"
-          }
+          },
+          "link": 48
         },
         {
           "name": "rotate_yaw",
           "type": "FLOAT",
-          "link": 49,
+          "pos": [
+            10,
+            120
+          ],
           "widget": {
             "name": "rotate_yaw"
-          }
+          },
+          "link": 49
         },
         {
           "name": "wink",
           "type": "FLOAT",
-          "link": 142,
+          "pos": [
+            10,
+            216
+          ],
           "widget": {
             "name": "wink"
-          }
+          },
+          "link": 142
         },
         {
           "name": "blink",
           "type": "FLOAT",
-          "link": 143,
+          "pos": [
+            10,
+            168
+          ],
           "widget": {
             "name": "blink"
-          }
+          },
+          "link": 143
         },
         {
           "name": "eyebrow",
           "type": "FLOAT",
-          "link": 145,
+          "pos": [
+            10,
+            192
+          ],
           "widget": {
             "name": "eyebrow"
-          }
+          },
+          "link": 145
         },
         {
           "name": "aaa",
           "type": "FLOAT",
-          "link": 148,
+          "pos": [
+            10,
+            288
+          ],
           "widget": {
             "name": "aaa"
-          }
+          },
+          "link": 148
         },
         {
           "name": "eee",
           "type": "FLOAT",
-          "link": 146,
+          "pos": [
+            10,
+            312
+          ],
           "widget": {
             "name": "eee"
-          }
+          },
+          "link": 146
         },
         {
           "name": "woo",
           "type": "FLOAT",
-          "link": 155,
+          "pos": [
+            10,
+            336
+          ],
           "widget": {
             "name": "woo"
-          }
+          },
+          "link": 155
         },
         {
           "name": "rotate_roll",
           "type": "FLOAT",
-          "link": 153,
+          "pos": [
+            10,
+            144
+          ],
           "widget": {
             "name": "rotate_roll"
-          }
+          },
+          "link": 153
         },
         {
           "name": "smile",
           "type": "FLOAT",
-          "link": 151,
+          "pos": [
+            10,
+            360
+          ],
           "widget": {
             "name": "smile"
-          }
+          },
+          "link": 151
         }
       ],
       "outputs": [
         {
           "name": "image",
           "type": "IMAGE",
+          "shape": 3,
           "links": [
             124
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "motion_link",
           "type": "EDITOR_LINK",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         },
         {
           "name": "save_exp",
           "type": "EXP_DATA",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "properties": {
@@ -1522,14 +1148,14 @@
     {
       "id": 83,
       "type": "Note",
-      "pos": {
-        "0": 216,
-        "1": 646
-      },
-      "size": {
-        "0": 543.9141235351562,
-        "1": 168.5306854248047
-      },
+      "pos": [
+        216,
+        646
+      ],
+      "size": [
+        543.9141235351562,
+        168.5306854248047
+      ],
       "flags": {},
       "order": 4,
       "mode": 0,
@@ -1546,16 +1172,573 @@
       "bgcolor": "#653"
     },
     {
+      "id": 41,
+      "type": "VrchXYOSCControlNode",
+      "pos": [
+        820,
+        1020
+      ],
+      "size": [
+        315,
+        518
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            136
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 209
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            160
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 196
+        }
+      ],
+      "outputs": [
+        {
+          "name": "X_INT",
+          "type": "INT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "Y_INT",
+          "type": "INT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "X_FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            49
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "Y_FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            48
+          ],
+          "slot_index": 3
+        },
+        {
+          "name": "X_RAW",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "Y_RAW",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "title": "head position (pitch/yaw)",
+      "properties": {
+        "Node name for S&R": "VrchXYOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/4/xy_STICK_LEFT",
+        0,
+        1,
+        -20,
+        20,
+        false,
+        0,
+        0,
+        1,
+        -20,
+        20,
+        false,
+        0,
+        false
+      ]
+    },
+    {
+      "id": 40,
+      "type": "VrchXYOSCControlNode",
+      "pos": [
+        1170,
+        1030
+      ],
+      "size": [
+        315,
+        518
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            136
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 210
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            160
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 197
+        }
+      ],
+      "outputs": [
+        {
+          "name": "X_INT",
+          "type": "INT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "Y_INT",
+          "type": "INT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "X_FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            46
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "Y_FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            47
+          ],
+          "slot_index": 3
+        },
+        {
+          "name": "X_RAW",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "Y_RAW",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "title": "pupil position",
+      "properties": {
+        "Node name for S&R": "VrchXYOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/4/xy_STICK_RIGHT",
+        0,
+        1,
+        -20,
+        20,
+        false,
+        0,
+        0,
+        1,
+        -20,
+        20,
+        false,
+        0,
+        false
+      ]
+    },
+    {
+      "id": 44,
+      "type": "VrchFloatOSCControlNode",
+      "pos": [
+        1199,
+        1755
+      ],
+      "size": [
+        315,
+        294
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 212
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 199
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            136
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "title": "smile",
+      "properties": {
+        "Node name for S&R": "VrchFloatOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/4/button_LT",
+        0,
+        1,
+        0,
+        1.3,
+        true,
+        0,
+        false
+      ]
+    },
+    {
+      "id": 46,
+      "type": "VrchFloatOSCControlNode",
+      "pos": [
+        1582,
+        1756
+      ],
+      "size": [
+        315,
+        294
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 215
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 202
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            144
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "title": "eyebrow",
+      "properties": {
+        "Node name for S&R": "VrchFloatOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/4/button_LT",
+        0,
+        1,
+        0,
+        15,
+        true,
+        0,
+        false
+      ]
+    },
+    {
+      "id": 49,
+      "type": "VrchFloatOSCControlNode",
+      "pos": [
+        1969,
+        1755
+      ],
+      "size": [
+        315,
+        294
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 218
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 205
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            154
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "title": "oral - woo",
+      "properties": {
+        "Node name for S&R": "VrchFloatOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/4/button_RT",
+        0,
+        1,
+        false,
+        15,
+        true,
+        0,
+        false
+      ]
+    },
+    {
+      "id": 43,
+      "type": "VrchFloatOSCControlNode",
+      "pos": [
+        1559.98388671875,
+        1370.611083984375
+      ],
+      "size": [
+        315,
+        294
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 214
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 201
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            135
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "title": "blink - close",
+      "properties": {
+        "Node name for S&R": "VrchFloatOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/4/button_RT",
+        0,
+        1,
+        -20,
+        0,
+        true,
+        false,
+        false
+      ]
+    },
+    {
+      "id": 71,
+      "type": "VrchImageWebViewerNode",
+      "pos": [
+        3648,
+        1165
+      ],
+      "size": [
+        230,
+        386
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 124
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchImageWebViewerNode"
+      },
+      "widgets_values": [
+        "1",
+        "192.168.123.104:8188",
+        false,
+        100,
+        80,
+        false,
+        "http://vrch.ai/viewer?mode=image&server=192.168.123.104:8188&ssl=false&file=channel_1.jpeg&path=web_viewer",
+        600,
+        600,
+        false,
+        "",
+        "http://vrch.ai/viewer?mode=image&server=192.168.123.104:8188&ssl=false&filename=channel_1.jpeg&path=web_viewer&refreshInterval=100&fadeAnimDuration=80",
+        ""
+      ]
+    },
+    {
       "id": 84,
       "type": "VrchOSCControlSettingsNode",
-      "pos": {
-        "0": 247,
-        "1": 957
-      },
-      "size": {
-        "0": 378,
-        "1": 126
-      },
+      "pos": [
+        247,
+        957
+      ],
+      "size": [
+        378,
+        126
+      ],
       "flags": {},
       "order": 5,
       "mode": 0,
@@ -1604,7 +1787,7 @@
         "Node name for S&R": "VrchOSCControlSettingsNode"
       },
       "widgets_values": [
-        "192.168.123.104",
+        "192.168.123.112",
         8000,
         false
       ]
@@ -2134,6 +2317,7 @@
   ],
   "groups": [
     {
+      "id": 1,
       "title": "Server Settings",
       "bounding": [
         215,
@@ -2146,6 +2330,7 @@
       "flags": {}
     },
     {
+      "id": 2,
       "title": "Simple facial expression editing",
       "bounding": [
         770,
@@ -2161,11 +2346,18 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.9646149645000034,
+      "scale": 0.4665073802097333,
       "offset": [
-        201.75782954514005,
-        -438.4841490467852
+        -88.92181490966635,
+        -271.8219701247119
       ]
+    },
+    "node_versions": {
+      "comfyui-web-viewer": "4b3c80bd145bf47a7dd44434d57d1688b87907e7",
+      "ComfyUI-Logic": "fb8897351f715ea75eebf52e74515b6d07c693b8",
+      "ComfyUI-KJNodes": "6e3af6e7b97afb1aeb259def593c10113dda5591",
+      "comfy-core": "0.3.24",
+      "ComfyUI-AdvancedLivePortrait": "3bba732915e22f18af0d221b9c5c282990181f1b"
     }
   },
   "version": 0.4

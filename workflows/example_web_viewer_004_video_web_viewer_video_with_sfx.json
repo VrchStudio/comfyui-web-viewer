@@ -11,7 +11,7 @@
       ],
       "size": [
         315,
-        246
+        266
       ],
       "flags": {},
       "order": 30,
@@ -25,16 +25,20 @@
         {
           "name": "mask_optional",
           "type": "MASK",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "larger_side",
           "type": "INT",
-          "link": 345,
+          "pos": [
+            10,
+            104
+          ],
           "widget": {
             "name": "larger_side"
-          }
+          },
+          "link": 345
         }
       ],
       "outputs": [
@@ -75,7 +79,7 @@
       ],
       "size": [
         221.59730529785156,
-        98
+        170
       ],
       "flags": {},
       "order": 42,
@@ -84,26 +88,38 @@
         {
           "name": "width",
           "type": "INT",
-          "link": 384,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "width"
-          }
+          },
+          "link": 384
         },
         {
           "name": "height",
           "type": "INT",
-          "link": 385,
+          "pos": [
+            10,
+            60
+          ],
           "widget": {
             "name": "height"
-          }
+          },
+          "link": 385
         },
         {
           "name": "length",
           "type": "INT",
-          "link": 394,
+          "pos": [
+            10,
+            84
+          ],
           "widget": {
             "name": "length"
-          }
+          },
+          "link": 394
         }
       ],
       "outputs": [
@@ -141,7 +157,7 @@
       ],
       "size": [
         282.28857421875,
-        151.23635864257812
+        174
       ],
       "flags": {},
       "order": 53,
@@ -150,16 +166,20 @@
         {
           "name": "latent",
           "type": "LATENT",
-          "link": 413,
-          "shape": 7
+          "shape": 7,
+          "link": 413
         },
         {
           "name": "steps",
           "type": "INT",
-          "link": 381,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "steps"
-          }
+          },
+          "link": 381
         }
       ],
       "outputs": [
@@ -291,7 +311,7 @@
       ],
       "size": [
         361.20001220703125,
-        59.028564453125
+        88
       ],
       "flags": {},
       "order": 1,
@@ -373,23 +393,27 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 317,
-          "slot_index": 0,
+          "shape": 7,
+          "pos": [
+            10,
+            220.79005432128906
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 317,
+          "slot_index": 0
         }
       ],
       "outputs": [
         {
           "name": "text",
           "type": "STRING",
+          "shape": 3,
           "links": [
             273
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "title": "User Prompt",
@@ -419,11 +443,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 348,
+          "shape": 7,
+          "pos": [
+            10,
+            186
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 348
         }
       ],
       "outputs": [
@@ -454,7 +482,7 @@
       ],
       "size": [
         400,
-        202
+        242
       ],
       "flags": {},
       "order": 36,
@@ -463,28 +491,40 @@
         {
           "name": "prompt",
           "type": "STRING",
-          "link": 314,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "prompt"
-          }
+          },
+          "link": 314
         },
         {
           "name": "replace1",
           "type": "STRING",
-          "link": 315,
+          "shape": 7,
+          "pos": [
+            10,
+            84
+          ],
           "widget": {
             "name": "replace1"
           },
-          "shape": 7
+          "link": 315
         },
         {
           "name": "replace2",
           "type": "STRING",
-          "link": 316,
+          "shape": 7,
+          "pos": [
+            10,
+            132
+          ],
           "widget": {
             "name": "replace2"
           },
-          "shape": 7
+          "link": 316
         }
       ],
       "outputs": [
@@ -578,7 +618,7 @@
       ],
       "size": [
         283.35858154296875,
-        76
+        88
       ],
       "flags": {},
       "order": 2,
@@ -765,8 +805,8 @@
         {
           "name": "lora",
           "type": "PEFTLORA",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         }
       ],
       "outputs": [
@@ -797,7 +837,7 @@
       ],
       "size": [
         386.7123107910156,
-        386
+        458
       ],
       "flags": {},
       "order": 45,
@@ -806,44 +846,56 @@
         {
           "name": "context",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            416
+          ],
           "widget": {
             "name": "context"
           },
-          "shape": 7
+          "link": null
         },
         {
           "name": "prompt",
           "type": "STRING",
-          "link": 273,
+          "pos": [
+            10,
+            56
+          ],
           "widget": {
             "name": "prompt"
-          }
+          },
+          "link": 273
         },
         {
           "name": "system",
           "type": "STRING",
-          "link": 272,
+          "pos": [
+            10,
+            152
+          ],
           "widget": {
             "name": "system"
-          }
+          },
+          "link": 272
         }
       ],
       "outputs": [
         {
           "name": "response",
           "type": "STRING",
+          "shape": 3,
           "links": [
             349
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "context",
           "type": "STRING",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "properties": {
@@ -886,22 +938,26 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            477.4605407714844
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": null
         }
       ],
       "outputs": [
         {
           "name": "text",
           "type": "STRING",
+          "shape": 3,
           "links": [
             272
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "title": "System Prompt",
@@ -981,20 +1037,20 @@
         {
           "name": "audio",
           "type": "AUDIO",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "meta_batch",
           "type": "VHS_BatchManager",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         }
       ],
       "outputs": [
@@ -1090,22 +1146,26 @@
         {
           "name": "meta_batch",
           "type": "VHS_BatchManager",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "video",
           "type": "STRING",
-          "link": 285,
+          "pos": [
+            10,
+            96
+          ],
           "widget": {
             "name": "video"
-          }
+          },
+          "link": 285
         }
       ],
       "outputs": [
@@ -1229,7 +1289,7 @@
       ],
       "size": [
         280.9585876464844,
-        126
+        146
       ],
       "flags": {},
       "order": 52,
@@ -1243,16 +1303,20 @@
         {
           "name": "attn_override",
           "type": "ATTN_OVERRIDE",
-          "link": 461,
-          "shape": 7
+          "shape": 7,
+          "link": 461
         },
         {
           "name": "cfg",
           "type": "FLOAT",
-          "link": 482,
+          "pos": [
+            10,
+            104
+          ],
           "widget": {
             "name": "cfg"
-          }
+          },
+          "link": 482
         }
       ],
       "outputs": [
@@ -1308,29 +1372,6 @@
       ]
     },
     {
-      "id": 213,
-      "type": "Note",
-      "pos": [
-        951.9317626953125,
-        894.58251953125
-      ],
-      "size": [
-        386.6794738769531,
-        152.2682647705078
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {},
-      "widgets_values": [
-        "The value of server address should be your ComfyUI server ip anddress and port number, e.g. 127.0.0.1:8188.\n\nComfyUI Web Viewer custom node\nhttps://github.com/VrchStudio/comfyui-web-viewer\n\n\nComfyUI-VideoHelperSuite\nhttps://github.com/Kosinkadink/ComfyUI-VideoHelperSuite"
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
-    },
-    {
       "id": 133,
       "type": "Textbox",
       "pos": [
@@ -1342,17 +1383,21 @@
         200
       ],
       "flags": {},
-      "order": 8,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            186
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": null
         }
       ],
       "outputs": [
@@ -1391,11 +1436,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 475,
+          "shape": 7,
+          "pos": [
+            10,
+            186
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 475
         }
       ],
       "outputs": [
@@ -1426,7 +1475,7 @@
       ],
       "size": [
         386.7123107910156,
-        386
+        458
       ],
       "flags": {},
       "order": 59,
@@ -1435,44 +1484,56 @@
         {
           "name": "context",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            416
+          ],
           "widget": {
             "name": "context"
           },
-          "shape": 7
+          "link": null
         },
         {
           "name": "prompt",
           "type": "STRING",
-          "link": 478,
+          "pos": [
+            10,
+            56
+          ],
           "widget": {
             "name": "prompt"
-          }
+          },
+          "link": 478
         },
         {
           "name": "system",
           "type": "STRING",
-          "link": 476,
+          "pos": [
+            10,
+            152
+          ],
           "widget": {
             "name": "system"
-          }
+          },
+          "link": 476
         }
       ],
       "outputs": [
         {
           "name": "response",
           "type": "STRING",
+          "shape": 3,
           "links": [
             475
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "context",
           "type": "STRING",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "properties": {
@@ -1509,7 +1570,7 @@
         218.67637634277344
       ],
       "flags": {},
-      "order": 9,
+      "order": 8,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -1532,28 +1593,32 @@
         363.7074890136719
       ],
       "flags": {},
-      "order": 10,
+      "order": 9,
       "mode": 0,
       "inputs": [
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            349.7074890136719
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": null
         }
       ],
       "outputs": [
         {
           "name": "text",
           "type": "STRING",
+          "shape": 3,
           "links": [
             476
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "title": "System Prompt",
@@ -1583,11 +1648,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 349,
+          "shape": 7,
+          "pos": [
+            10,
+            186
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 349
         }
       ],
       "outputs": [
@@ -1628,11 +1697,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 490,
+          "shape": 7,
+          "pos": [
+            10,
+            186
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 490
         }
       ],
       "outputs": [
@@ -1672,11 +1745,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 491,
+          "shape": 7,
+          "pos": [
+            10,
+            186
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 491
         }
       ],
       "outputs": [
@@ -1707,7 +1784,7 @@
       ],
       "size": [
         222.53562927246094,
-        78
+        98
       ],
       "flags": {},
       "order": 56,
@@ -1726,10 +1803,14 @@
         {
           "name": "frame_rate",
           "type": "FLOAT",
-          "link": 493,
+          "pos": [
+            10,
+            56.00001525878906
+          ],
           "widget": {
             "name": "frame_rate"
-          }
+          },
+          "link": 493
         }
       ],
       "outputs": [
@@ -1769,14 +1850,14 @@
         155.20713806152344
       ],
       "flags": {},
-      "order": 11,
+      "order": 10,
       "mode": 0,
       "inputs": [
         {
           "name": "bigvgan_vocoder_model",
           "type": "VOCODER_MODEL",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         }
       ],
       "outputs": [
@@ -1811,7 +1892,7 @@
         58
       ],
       "flags": {},
-      "order": 12,
+      "order": 11,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -1841,7 +1922,7 @@
       ],
       "size": [
         411.29339599609375,
-        354
+        356
       ],
       "flags": {},
       "order": 65,
@@ -1860,32 +1941,44 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 471,
-          "shape": 7
+          "shape": 7,
+          "link": 471
         },
         {
           "name": "prompt",
           "type": "STRING",
-          "link": 474,
+          "pos": [
+            10,
+            172
+          ],
           "widget": {
             "name": "prompt"
-          }
+          },
+          "link": 474
         },
         {
           "name": "seed",
           "type": "INT",
-          "link": 484,
+          "pos": [
+            10,
+            148
+          ],
           "widget": {
             "name": "seed"
-          }
+          },
+          "link": 484
         },
         {
           "name": "duration",
           "type": "FLOAT",
-          "link": 495,
+          "pos": [
+            10,
+            76
+          ],
           "widget": {
             "name": "duration"
-          }
+          },
+          "link": 495
         }
       ],
       "outputs": [
@@ -1938,11 +2031,11 @@
         {
           "name": "CONDITIONING",
           "type": "CONDITIONING",
+          "shape": 3,
           "links": [
             431
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "title": "Negative Prompt",
@@ -1962,7 +2055,7 @@
       ],
       "size": [
         340.4589538574219,
-        352
+        364
       ],
       "flags": {},
       "order": 29,
@@ -2070,7 +2163,7 @@
         58
       ],
       "flags": {},
-      "order": 13,
+      "order": 12,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2104,7 +2197,7 @@
         58
       ],
       "flags": {},
-      "order": 14,
+      "order": 13,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2135,7 +2228,7 @@
       ],
       "size": [
         315,
-        106
+        126
       ],
       "flags": {},
       "order": 34,
@@ -2144,18 +2237,26 @@
         {
           "name": "a",
           "type": "FLOAT",
-          "link": 499,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "a"
-          }
+          },
+          "link": 499
         },
         {
           "name": "b",
           "type": "FLOAT",
-          "link": 500,
+          "pos": [
+            10,
+            60
+          ],
           "widget": {
             "name": "b"
-          }
+          },
+          "link": 500
         }
       ],
       "outputs": [
@@ -2196,11 +2297,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 480,
+          "shape": 7,
+          "pos": [
+            10,
+            100.66475677490234
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 480
         }
       ],
       "outputs": [
@@ -2231,7 +2336,7 @@
       ],
       "size": [
         400,
-        202
+        242
       ],
       "flags": {},
       "order": 55,
@@ -2240,28 +2345,40 @@
         {
           "name": "prompt",
           "type": "STRING",
-          "link": 485,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "prompt"
-          }
+          },
+          "link": 485
         },
         {
           "name": "replace1",
           "type": "STRING",
-          "link": 492,
+          "shape": 7,
+          "pos": [
+            10,
+            84
+          ],
           "widget": {
             "name": "replace1"
           },
-          "shape": 7
+          "link": 492
         },
         {
           "name": "replace2",
           "type": "STRING",
-          "link": 486,
+          "shape": 7,
+          "pos": [
+            10,
+            132
+          ],
           "widget": {
             "name": "replace2"
           },
-          "shape": 7
+          "link": 486
         }
       ],
       "outputs": [
@@ -2307,11 +2424,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 488,
+          "shape": 7,
+          "pos": [
+            10,
+            186
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 488
         }
       ],
       "outputs": [
@@ -2345,17 +2466,21 @@
         200
       ],
       "flags": {},
-      "order": 15,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            186
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": null
         }
       ],
       "outputs": [
@@ -2385,7 +2510,7 @@
       ],
       "size": [
         315,
-        306
+        330
       ],
       "flags": {},
       "order": 66,
@@ -2399,40 +2524,44 @@
         {
           "name": "audio",
           "type": "AUDIO",
-          "link": 472,
-          "shape": 7
+          "shape": 7,
+          "link": 472
         },
         {
           "name": "meta_batch",
           "type": "VHS_BatchManager",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "frame_rate",
           "type": "FLOAT",
-          "link": 494,
+          "pos": [
+            10,
+            96
+          ],
           "widget": {
             "name": "frame_rate"
-          }
+          },
+          "link": 494
         }
       ],
       "outputs": [
         {
           "name": "Filenames",
           "type": "VHS_FILENAMES",
+          "shape": 3,
           "links": [
             437,
             438
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -2473,20 +2602,20 @@
         130
       ],
       "flags": {},
-      "order": 16,
+      "order": 15,
       "mode": 0,
       "inputs": [],
       "outputs": [
         {
           "name": "SEED",
           "type": "INT",
+          "dir": 4,
+          "shape": 3,
           "links": [
             445,
             484
           ],
-          "slot_index": 0,
-          "shape": 3,
-          "dir": 4
+          "slot_index": 0
         }
       ],
       "properties": {},
@@ -2506,10 +2635,10 @@
       ],
       "size": [
         315,
-        82
+        98
       ],
       "flags": {},
-      "order": 17,
+      "order": 16,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2541,7 +2670,7 @@
       ],
       "size": [
         290.3044128417969,
-        60.59393310546875
+        78
       ],
       "flags": {
         "collapsed": false
@@ -2557,21 +2686,25 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 433,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "text"
-          }
+          },
+          "link": 433
         }
       ],
       "outputs": [
         {
           "name": "CONDITIONING",
           "type": "CONDITIONING",
+          "shape": 3,
           "links": [
             430
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "title": "Positive Prompt",
@@ -2622,7 +2755,7 @@
       ],
       "size": [
         280.16015625,
-        236.75421142578125
+        246
       ],
       "flags": {},
       "order": 58,
@@ -2661,18 +2794,26 @@
         {
           "name": "noise_seed",
           "type": "INT",
-          "link": 445,
+          "pos": [
+            10,
+            160
+          ],
           "widget": {
             "name": "noise_seed"
-          }
+          },
+          "link": 445
         },
         {
           "name": "cfg",
           "type": "FLOAT",
-          "link": 483,
+          "pos": [
+            10,
+            184
+          ],
           "widget": {
             "name": "cfg"
-          }
+          },
+          "link": 483
         }
       ],
       "outputs": [
@@ -2747,7 +2888,7 @@
         267.42938232421875
       ],
       "flags": {},
-      "order": 18,
+      "order": 17,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2778,7 +2919,7 @@
         314
       ],
       "flags": {},
-      "order": 19,
+      "order": 18,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2817,7 +2958,7 @@
         58
       ],
       "flags": {},
-      "order": 20,
+      "order": 19,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2851,17 +2992,21 @@
         113.08045196533203
       ],
       "flags": {},
-      "order": 21,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            99.08045196533203
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": null
         }
       ],
       "outputs": [
@@ -2895,7 +3040,7 @@
         58
       ],
       "flags": {},
-      "order": 22,
+      "order": 21,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2934,10 +3079,14 @@
         {
           "name": "value",
           "type": "FLOAT",
-          "link": 501,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "value"
-          }
+          },
+          "link": 501
         }
       ],
       "outputs": [
@@ -2976,11 +3125,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 364,
+          "shape": 7,
+          "pos": [
+            10,
+            184.2014617919922
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 364
         }
       ],
       "outputs": [
@@ -3014,17 +3167,21 @@
         113.08045196533203
       ],
       "flags": {},
-      "order": 23,
+      "order": 22,
       "mode": 0,
       "inputs": [
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            99.08045196533203
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": null
         }
       ],
       "outputs": [
@@ -3058,7 +3215,7 @@
         250.2269287109375
       ],
       "flags": {},
-      "order": 24,
+      "order": 23,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -3081,7 +3238,7 @@
         207.94631958007812
       ],
       "flags": {},
-      "order": 25,
+      "order": 24,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -3110,10 +3267,14 @@
         {
           "name": "Value",
           "type": "INT",
-          "link": 496,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "Value"
-          }
+          },
+          "link": 496
         }
       ],
       "outputs": [
@@ -3145,7 +3306,7 @@
         98
       ],
       "flags": {},
-      "order": 26,
+      "order": 25,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -3180,6 +3341,29 @@
       ]
     },
     {
+      "id": 213,
+      "type": "Note",
+      "pos": [
+        951.970703125,
+        987.9535522460938
+      ],
+      "size": [
+        386.6794738769531,
+        152.2682647705078
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "The value of server address should be your ComfyUI server ip anddress and port number, e.g. 127.0.0.1:8188.\n\nComfyUI Web Viewer custom node\nhttps://github.com/VrchStudio/comfyui-web-viewer\n\n\nComfyUI-VideoHelperSuite\nhttps://github.com/Kosinkadink/ComfyUI-VideoHelperSuite"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
       "id": 214,
       "type": "VrchVideoWebViewerNode",
       "pos": [
@@ -3188,7 +3372,7 @@
       ],
       "size": [
         400,
-        320
+        386
       ],
       "flags": {},
       "order": 69,
@@ -3197,10 +3381,14 @@
         {
           "name": "filename",
           "type": "STRING",
-          "link": 446,
+          "pos": [
+            10,
+            12
+          ],
           "widget": {
             "name": "filename"
-          }
+          },
+          "link": 446
         }
       ],
       "outputs": [],
@@ -3211,13 +3399,16 @@
         "",
         "1",
         "127.0.0.1:8188",
-        true,
-        1280,
-        960,
         false,
+        5000,
         "",
-        "https://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=true&file=channel_1.mp4&path=web_viewer&https://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=true&file=channel_1.mp4&path=web_viewer",
-        null
+        false,
+        800,
+        600,
+        null,
+        "",
+        "http://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=false&filename=channel_1.mp4&path=web_viewer&refreshInterval=5000",
+        ""
       ]
     }
   ],
@@ -3909,8 +4100,8 @@
       "bounding": [
         328.05767822265625,
         467.6528015136719,
-        1035.4912109375,
-        675.8985595703125
+        1041.837646484375,
+        707.9661254882812
       ],
       "color": "#b58b2a",
       "font_size": 24,
@@ -3985,15 +4176,15 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.30735605491428225,
+      "scale": 0.3504938994813927,
       "offset": [
-        2780.7083279393737,
-        1686.7671299938593
+        2539.855237607278,
+        1633.2295627393164
       ]
     },
     "node_versions": {
       "image-resize-comfyui": "ae5888637742ff1668b6cd32954ba48d81dbd39d",
-      "comfy-core": "0.3.13",
+      "comfy-core": "0.3.24",
       "ComfyUI-VideoHelperSuite": "b0f9796ea3d716997aa2c5e1e5e5000cac8365d9",
       "ComfyUI_essentials": "8727258f04be6647d7b9013993d1d335acf84169",
       "ComfyUI-Chibi-Nodes": "290ccef2a8c1bc3917e1c00dbe5c206b66fb8ded",
@@ -4007,7 +4198,7 @@
       "rgthree-comfy": "2613da28c639b90b310e35c6ffde9ee0a3d60bfe",
       "ComfyUI_LayerStyle": "e06df57bd0cd45e60586f4c3626d1bf2519216b5",
       "Derfuu_ComfyUI_ModdedNodes": "d0905bed31249f2bd0814c67585cf4fe3c77c015",
-      "comfyui-web-viewer": "93daa27bd76f869eb88bafda6e621abe460c8d59"
+      "comfyui-web-viewer": "4b3c80bd145bf47a7dd44434d57d1688b87907e7"
     }
   },
   "version": 0.4

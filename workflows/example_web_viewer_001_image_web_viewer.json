@@ -270,7 +270,7 @@
       ],
       "size": [
         400,
-        320
+        386
       ],
       "flags": {},
       "order": 6,
@@ -296,12 +296,16 @@
         "1",
         "127.0.0.1:8188",
         false,
+        300,
+        150,
+        false,
+        "",
         1280,
         960,
         false,
         "",
-        "http://vrch.ai/viewer?mode=image&server=127.0.0.1:8188&ssl=false&file=channel_1.jpeg&path=web_viewer",
-        null
+        "http://vrch.ai/viewer?mode=image&server=127.0.0.1:8188&ssl=false&filename=channel_1.jpeg&path=web_viewer&refreshInterval=300&fadeAnimDuration=150",
+        ""
       ]
     }
   ],
@@ -383,15 +387,15 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.7247295000000004,
-      "offset": {
-        "0": 15.539511680603027,
-        "1": 260.81927490234375
-      }
+      "scale": 0.6830134553650723,
+      "offset": [
+        78.35213521673094,
+        300.57586806701073
+      ]
     },
     "node_versions": {
-      "comfy-core": "0.3.13",
-      "comfyui-web-viewer": "2304b8084ed6e70f236e9511ca3eeec4ed9ebe21"
+      "comfy-core": "0.3.24",
+      "comfyui-web-viewer": "4b3c80bd145bf47a7dd44434d57d1688b87907e7"
     }
   },
   "version": 0.4
