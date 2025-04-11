@@ -1,4 +1,5 @@
 import io
+import json
 import time
 import struct
 import numpy as np
@@ -117,6 +118,11 @@ class VrchImageWebSocketWebViewerNode:
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
                 "format": (["PNG", "JPEG"], {"default": "JPEG"}),
+                "number_of_images": ("INT", {"default": 4, "min": 1, "max": 99}),
+                "image_display_duration":("INT", {"default": 1000, "min": 1, "max": 10000}),
+                "fade_anim_duration": ("INT", {"default": 200, "min": 1, "max": 10000}),
+                "server_messages": ("STRING", {"default": "", "multiline": False}),
+                "save_settings": ("BOOLEAN", {"default": False}),
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url":("BOOLEAN", {"default": False}),
@@ -135,7 +141,12 @@ class VrchImageWebSocketWebViewerNode:
                     images, 
                     channel, 
                     server, 
-                    format, 
+                    format,
+                    number_of_images,
+                    image_display_duration,
+                    fade_anim_duration,
+                    server_messages,
+                    save_settings,
                     window_width,
                     window_height,
                     show_url,
@@ -155,6 +166,22 @@ class VrchImageWebSocketWebViewerNode:
             header = struct.pack(">II", 1, 2)
             data = header + binary_data
             server.send_to_channel(ch, data)
+            
+        # Send server settings
+        if save_settings:
+            settings = {
+                "settings": {
+                    "numberOfImages": number_of_images,
+                    "imageDisplayDuration": image_display_duration,
+                    "fadeAnimDuration": fade_anim_duration,
+                    "serverMessages": server_messages,
+                }
+            }
+            settings_json = json.dumps(settings)
+            server.send_to_channel(ch, settings_json)
+            if debug:
+                print(f"[VrchImageWebSocketWebViewerNode] Sending settings to channel {ch} via global server on {host}:{port} with path '/image': {settings_json}")
+            
         if debug:
             print(f"[VrchImageWebSocketWebViewerNode] Sent {len(images)} images to channel {ch} via global server on {host}:{port} with path '/image'")
         return (images,)

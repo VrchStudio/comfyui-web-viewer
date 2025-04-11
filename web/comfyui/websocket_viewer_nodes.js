@@ -20,6 +20,9 @@ app.registerExtension({
             // Find existing widgets
             const serverWidget = node.widgets.find(w => w.name === "server");
             const channelWidget = node.widgets.find(w => w.name === "channel");
+            const numberOfImagesWidget = node.widgets.find(w => w.name === "number_of_images");
+            const imageDisplayDurationWidget = node.widgets.find(w => w.name === "image_display_duration");
+            const fadeAnimDurationWidget = node.widgets.find(w => w.name === "fade_anim_duration");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
             const heightWidget = node.widgets.find(w => w.name === "window_height");
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
@@ -33,6 +36,11 @@ app.registerExtension({
                         extraParamsWidget: extraParamsWidget,
                         mode: "image-websocket",
                         protocol: "websocket",
+                        additionalParams: {
+                            numberOfImages: numberOfImagesWidget,
+                            imageDisplayDuration: imageDisplayDurationWidget,
+                            fadeAnimDuration: fadeAnimDurationWidget,
+                        }
                     });
                 }
             }
@@ -43,7 +51,15 @@ app.registerExtension({
                 updateUrl,
                 urlWidget,
                 showUrlWidget,
-                [serverWidget, channelWidget, extraParamsWidget],
+                [
+                    serverWidget, 
+                    channelWidget, 
+                    extraParamsWidget,
+                    numberOfImagesWidget,
+                    imageDisplayDurationWidget,
+                    fadeAnimDurationWidget,
+                    extraParamsWidget,
+                ],
                 "VrchImageWebSocketWebViewerNode"
             );
 

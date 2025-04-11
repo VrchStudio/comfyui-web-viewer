@@ -8,6 +8,10 @@
    - **Channel:** Select a channel number from **"1"** to **"8"** (default is **"1"**).
    - **Server:** Enter the server's domain name or IP address (default is **`127.0.0.1:8188`**).
    - **SSL:** Choose whether the connection should use SSL. If checked (`True`), it will use `https`; otherwise, it will use `http`.
+   - **Refresh Interval:** Time in milliseconds between refresh attempts (default is **`300`**, range: 1-10000).
+   - **Fade Animation Duration:** Duration of fade animation in milliseconds (default is **`200`**, range: 1-10000).
+   - **Server Messages:** Save and send server messages to its web page viewer.
+   - **Save Settings:** Toggle whether to save the image viewer settings to a JSON file. When enabled, creates `channel_{channel}_settings.json`.
    - **Window Dimensions:**
      - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
      - **`window_height`**: Set the height of the web viewer window (default is **`960`**).
@@ -73,6 +77,9 @@
    - **Channel:** Select a channel number from **"1"** to **"8"** (default is **"1"**).
    - **Server:** Enter the server's domain name or IP address (default is **`127.0.0.1:8188`**).
    - **SSL:** Choose whether the connection should use SSL. If checked (`True`), it will use `https`; otherwise, it will use `http`.
+   - **Refresh Interval:** Time in milliseconds between refresh attempts (default is **`5000`**, range: 1-10000).
+   - **Server Messages:** Save and send server messages to its web page viewer.
+   - **Save Settings:** Toggle whether to save the video viewer settings to a JSON file. When enabled, creates `channel_{channel}_settings.json`.
    - **Window Dimensions:**
      - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
      - **`window_height`**: Set the height of the web viewer window (default is **`960`**).
@@ -103,6 +110,10 @@
      This channel number is appended to the saved filename, e.g., `channel_1.mp3`.
    - **Server:** Enter the server's domain name or IP address (default is **`127.0.0.1:8188`**).
    - **SSL:** Choose whether the connection should use SSL. If checked (`True`), it will use `https`; otherwise, it will use `http`.
+   - **Refresh Interval:** Time in milliseconds between refresh attempts (default is **`5000`**, range: 1-10000).
+   - **Visualizer Type:** Choose from visualizer types: **"bars"**, **"circles"**, **"matrix"**, **"particles"**, **"spiral"**, **"waterball"**, or **"waveform"** (default is **"waveform"**).
+   - **Server Messages:** Save and send server messages to its web page viewer.
+   - **Save Settings:** Toggle whether to save the audio viewer settings to a JSON file. When enabled, creates `channel_{channel}_settings.json`.
    - **Window Dimensions:**
      - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
      - **`window_height`**: Set the height of the web viewer window (default is **`960`**).
@@ -133,6 +144,9 @@
      The channel number is appended to the saved filename (e.g., `channel_1.glb`).
    - **Server:** Enter the server's domain name or IP address (default is **`127.0.0.1:8188`**).
    - **SSL:** Choose whether to use SSL; if enabled, `https` is used, otherwise `http`.
+   - **Refresh Interval:** Time in milliseconds between refresh attempts (default is **`5000`**, range: 1-10000).
+   - **Server Messages:** Save and send server messages to its web page viewer.
+   - **Save Settings:** Toggle whether to save the 3D model viewer settings to a JSON file. When enabled, creates `channel_{channel}_settings.json`.
    - **Window Dimensions:**
      - **`window_width`**: Set the width of the web viewer window (default is **`1280`**).
      - **`window_height`**: Set the height of the web viewer window (default is **`960`**).

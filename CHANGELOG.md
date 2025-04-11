@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.29 - 2025-04-11
+
+### Update
+
+- update websocket viewer nodes to support send settings to its client viewer
+- update web viewer nodes to support save and send settings to their client viewers
+- update osc control nodes to support default value
+- update web_viewer_nodes.md
+- update web_viewer_nodes_extra_params.md
+- update websocket_viewer_nodes.md
+- update websocket_viewer_nodes_extra_params.md
+- update osc_control_nodes.md
+- update workflows to match nodes changes
+
 ## 1.0.28 - 2025-03-29
 
 ### Updated 
@@ -14,7 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update web_viewer_nodes_extra_params.md
 - update publish.yml
 - fix typo in `tutorial_005_storytelling_with_text_srt_player.md`
-
 
 ## 1.0.27 - 2025-03-22
 

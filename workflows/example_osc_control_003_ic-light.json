@@ -5,10 +5,10 @@
     {
       "id": 40,
       "type": "Reroute",
-      "pos": {
-        "0": 630.1083984375,
-        "1": 791.4616088867188
-      },
+      "pos": [
+        917.6790161132812,
+        756.7918701171875
+      ],
       "size": [
         75,
         26
@@ -43,14 +43,14 @@
     {
       "id": 4,
       "type": "CLIPTextEncode",
-      "pos": {
-        "0": 17.226234436035156,
-        "1": 872.2525024414062
-      },
-      "size": {
-        "0": 354.3748474121094,
-        "1": 74.71156311035156
-      },
+      "pos": [
+        304.7970275878906,
+        837.582763671875
+      ],
+      "size": [
+        354.3748474121094,
+        78
+      ],
       "flags": {},
       "order": 26,
       "mode": 0,
@@ -63,21 +63,25 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 220,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "text"
-          }
+          },
+          "link": 220
         }
       ],
       "outputs": [
         {
           "name": "CONDITIONING",
           "type": "CONDITIONING",
+          "shape": 3,
           "links": [
             157
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -92,14 +96,14 @@
     {
       "id": 5,
       "type": "CLIPTextEncode",
-      "pos": {
-        "0": 31.226234436035156,
-        "1": 1010.2525024414062
-      },
-      "size": {
-        "0": 357.7424011230469,
-        "1": 77.3104019165039
-      },
+      "pos": [
+        318.7970275878906,
+        975.582763671875
+      ],
+      "size": [
+        357.7424011230469,
+        88
+      ],
       "flags": {},
       "order": 17,
       "mode": 0,
@@ -114,11 +118,11 @@
         {
           "name": "CONDITIONING",
           "type": "CONDITIONING",
+          "shape": 3,
           "links": [
             158
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -133,14 +137,14 @@
     {
       "id": 42,
       "type": "GrowMaskWithBlur",
-      "pos": {
-        "0": 511.2262268066406,
-        "1": 1336.2525634765625
-      },
-      "size": {
-        "0": 315,
-        "1": 246
-      },
+      "pos": [
+        798.7968139648438,
+        1301.5826416015625
+      ],
+      "size": [
+        315,
+        246
+      ],
       "flags": {},
       "order": 31,
       "mode": 0,
@@ -155,17 +159,17 @@
         {
           "name": "mask",
           "type": "MASK",
+          "shape": 3,
           "links": [
             154
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "mask_inverted",
           "type": "MASK",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "properties": {
@@ -185,14 +189,14 @@
     {
       "id": 44,
       "type": "ICLightConditioning",
-      "pos": {
-        "0": 1025.2261962890625,
-        "1": 827.2525024414062
-      },
-      "size": {
-        "0": 342.5999755859375,
-        "1": 138
-      },
+      "pos": [
+        1312.797119140625,
+        792.582763671875
+      ],
+      "size": [
+        342.5999755859375,
+        138
+      ],
       "flags": {},
       "order": 29,
       "mode": 0,
@@ -221,34 +225,34 @@
         {
           "name": "opt_background",
           "type": "LATENT",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         }
       ],
       "outputs": [
         {
           "name": "positive",
           "type": "CONDITIONING",
+          "shape": 3,
           "links": [
             161
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
+          "shape": 3,
           "links": [
             162
           ],
-          "slot_index": 1,
-          "shape": 3
+          "slot_index": 1
         },
         {
           "name": "empty_latent",
           "type": "LATENT",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "properties": {
@@ -261,14 +265,14 @@
     {
       "id": 20,
       "type": "VAEEncode",
-      "pos": {
-        "0": 1071.2261962890625,
-        "1": 1047.2525634765625
-      },
-      "size": {
-        "0": 210,
-        "1": 46
-      },
+      "pos": [
+        1358.797119140625,
+        1012.582763671875
+      ],
+      "size": [
+        210,
+        46
+      ],
       "flags": {},
       "order": 34,
       "mode": 0,
@@ -290,11 +294,11 @@
         {
           "name": "LATENT",
           "type": "LATENT",
+          "shape": 3,
           "links": [
             123
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -305,14 +309,14 @@
     {
       "id": 22,
       "type": "CreateShapeMask",
-      "pos": {
-        "0": 28.226234436035156,
-        "1": 1181.2525634765625
-      },
-      "size": {
-        "0": 315,
-        "1": 270
-      },
+      "pos": [
+        315.7970275878906,
+        1146.5826416015625
+      ],
+      "size": [
+        315,
+        370
+      ],
       "flags": {},
       "order": 30,
       "mode": 0,
@@ -320,76 +324,104 @@
         {
           "name": "frame_width",
           "type": "INT",
-          "link": 167,
-          "slot_index": 0,
+          "pos": [
+            10,
+            176
+          ],
           "widget": {
             "name": "frame_width"
-          }
+          },
+          "link": 167,
+          "slot_index": 0
         },
         {
           "name": "frame_height",
           "type": "INT",
-          "link": 168,
+          "pos": [
+            10,
+            200
+          ],
           "widget": {
             "name": "frame_height"
-          }
+          },
+          "link": 168
         },
         {
           "name": "location_x",
           "type": "INT",
-          "link": 260,
+          "pos": [
+            10,
+            104
+          ],
           "widget": {
             "name": "location_x"
-          }
+          },
+          "link": 260
         },
         {
           "name": "location_y",
           "type": "INT",
-          "link": 261,
+          "pos": [
+            10,
+            128
+          ],
           "widget": {
             "name": "location_y"
-          }
+          },
+          "link": 261
         },
         {
           "name": "shape_width",
           "type": "INT",
-          "link": 281,
+          "pos": [
+            10,
+            224
+          ],
           "widget": {
             "name": "shape_width"
-          }
+          },
+          "link": 281
         },
         {
           "name": "shape_height",
           "type": "INT",
-          "link": 282,
+          "pos": [
+            10,
+            248
+          ],
           "widget": {
             "name": "shape_height"
-          }
+          },
+          "link": 282
         },
         {
           "name": "shape",
           "type": "COMBO",
-          "link": 217,
+          "pos": [
+            10,
+            56
+          ],
           "widget": {
             "name": "shape"
-          }
+          },
+          "link": 217
         }
       ],
       "outputs": [
         {
           "name": "mask",
           "type": "MASK",
+          "shape": 3,
           "links": [
             152
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "mask_inverted",
           "type": "MASK",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "properties": {
@@ -410,14 +442,14 @@
     {
       "id": 43,
       "type": "RemapMaskRange",
-      "pos": {
-        "0": 510.2262268066406,
-        "1": 1187.2525634765625
-      },
-      "size": {
-        "0": 315,
-        "1": 82
-      },
+      "pos": [
+        797.7968139648438,
+        1152.5826416015625
+      ],
+      "size": [
+        315,
+        82
+      ],
       "flags": {},
       "order": 32,
       "mode": 0,
@@ -432,11 +464,11 @@
         {
           "name": "mask",
           "type": "MASK",
+          "shape": 3,
           "links": [
             155
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -450,14 +482,14 @@
     {
       "id": 95,
       "type": "PreviewImage",
-      "pos": {
-        "0": 505.5528564453125,
-        "1": 1993.9417724609375
-      },
-      "size": {
-        "0": 524.9093627929688,
-        "1": 766.022216796875
-      },
+      "pos": [
+        516.16357421875,
+        2040.4930419921875
+      ],
+      "size": [
+        524.9093627929688,
+        766.022216796875
+      ],
       "flags": {},
       "order": 38,
       "mode": 0,
@@ -477,14 +509,14 @@
     {
       "id": 37,
       "type": "LoadAndApplyICLightUnet",
-      "pos": {
-        "0": 754.2262573242188,
-        "1": 692.2525024414062
-      },
-      "size": {
-        "0": 381.3333740234375,
-        "1": 58
-      },
+      "pos": [
+        1041.7969970703125,
+        657.582763671875
+      ],
+      "size": [
+        381.3333740234375,
+        58
+      ],
       "flags": {},
       "order": 16,
       "mode": 0,
@@ -499,11 +531,11 @@
         {
           "name": "MODEL",
           "type": "MODEL",
+          "shape": 3,
           "links": [
             137
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -514,78 +546,16 @@
       ]
     },
     {
-      "id": 19,
-      "type": "KSampler",
-      "pos": {
-        "0": 1006.2262573242188,
-        "1": 1192.2525634765625
-      },
-      "size": {
-        "0": 315,
-        "1": 474
-      },
-      "flags": {},
-      "order": 36,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 137,
-          "slot_index": 0
-        },
-        {
-          "name": "positive",
-          "type": "CONDITIONING",
-          "link": 161
-        },
-        {
-          "name": "negative",
-          "type": "CONDITIONING",
-          "link": 162,
-          "slot_index": 2
-        },
-        {
-          "name": "latent_image",
-          "type": "LATENT",
-          "link": 123
-        }
-      ],
-      "outputs": [
-        {
-          "name": "LATENT",
-          "type": "LATENT",
-          "links": [
-            77
-          ],
-          "slot_index": 0,
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "KSampler"
-      },
-      "widgets_values": [
-        100361857014338,
-        "fixed",
-        4,
-        1,
-        "euler",
-        "sgm_uniform",
-        0.9
-      ]
-    },
-    {
       "id": 114,
       "type": "VrchChannelOSCControlNode",
-      "pos": {
-        "0": -615.5584106445312,
-        "1": 1263.6357421875
-      },
-      "size": {
-        "0": 330,
-        "1": 150
-      },
+      "pos": [
+        -615.5584106445312,
+        1263.6357421875
+      ],
+      "size": [
+        330,
+        190
+      ],
       "flags": {},
       "order": 27,
       "mode": 0,
@@ -603,29 +573,37 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 311,
+          "pos": [
+            10,
+            56
+          ],
           "widget": {
             "name": "server_ip"
-          }
+          },
+          "link": 311
         },
         {
           "name": "port",
           "type": "INT",
-          "link": 320,
+          "pos": [
+            10,
+            80
+          ],
           "widget": {
             "name": "port"
-          }
+          },
+          "link": 320
         }
       ],
       "outputs": [
         {
           "name": "ANY_OUTPUT",
           "type": "*",
+          "shape": 3,
           "links": [
             281
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -641,14 +619,14 @@
     {
       "id": 113,
       "type": "VrchChannelOSCControlNode",
-      "pos": {
-        "0": -611.5584106445312,
-        "1": 1469.6357421875
-      },
-      "size": {
-        "0": 330,
-        "1": 150
-      },
+      "pos": [
+        -611.5584106445312,
+        1469.6357421875
+      ],
+      "size": [
+        330,
+        190
+      ],
       "flags": {},
       "order": 28,
       "mode": 0,
@@ -666,29 +644,37 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 312,
+          "pos": [
+            10,
+            56
+          ],
           "widget": {
             "name": "server_ip"
-          }
+          },
+          "link": 312
         },
         {
           "name": "port",
           "type": "INT",
-          "link": 321,
+          "pos": [
+            10,
+            80
+          ],
           "widget": {
             "name": "port"
-          }
+          },
+          "link": 321
         }
       ],
       "outputs": [
         {
           "name": "ANY_OUTPUT",
           "type": "*",
+          "shape": 3,
           "links": [
             282
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -702,160 +688,12 @@
       ]
     },
     {
-      "id": 74,
-      "type": "VrchIntOSCControlNode",
-      "pos": {
-        "0": -1123.558349609375,
-        "1": 941.6357421875
-      },
-      "size": {
-        "0": 315,
-        "1": 246
-      },
-      "flags": {},
-      "order": 24,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "output_max",
-          "type": "INT",
-          "link": 211,
-          "widget": {
-            "name": "output_max"
-          }
-        },
-        {
-          "name": "server_ip",
-          "type": "STRING",
-          "link": 308,
-          "widget": {
-            "name": "server_ip"
-          }
-        },
-        {
-          "name": "port",
-          "type": "INT",
-          "link": 317,
-          "widget": {
-            "name": "port"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "VALUE",
-          "type": "INT",
-          "links": [
-            278
-          ],
-          "slot_index": 0,
-          "shape": 3
-        },
-        {
-          "name": "RAW_VALUE",
-          "type": "FLOAT",
-          "links": [],
-          "slot_index": 1,
-          "shape": 3
-        }
-      ],
-      "title": "Shape Height",
-      "properties": {
-        "Node name for S&R": "VrchIntOSCControlNode"
-      },
-      "widgets_values": [
-        "192.168.123.104",
-        8000,
-        "/1/fader1",
-        0,
-        1,
-        false,
-        false,
-        false,
-        false
-      ]
-    },
-    {
-      "id": 73,
-      "type": "VrchIntOSCControlNode",
-      "pos": {
-        "0": -1119.558349609375,
-        "1": 1236.6357421875
-      },
-      "size": {
-        "0": 315,
-        "1": 246
-      },
-      "flags": {},
-      "order": 23,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "output_max",
-          "type": "INT",
-          "link": 210,
-          "widget": {
-            "name": "output_max"
-          }
-        },
-        {
-          "name": "server_ip",
-          "type": "STRING",
-          "link": 309,
-          "widget": {
-            "name": "server_ip"
-          }
-        },
-        {
-          "name": "port",
-          "type": "INT",
-          "link": 318,
-          "widget": {
-            "name": "port"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "VALUE",
-          "type": "INT",
-          "links": [
-            280
-          ],
-          "slot_index": 0,
-          "shape": 3
-        },
-        {
-          "name": "RAW_VALUE",
-          "type": "FLOAT",
-          "links": [],
-          "slot_index": 1,
-          "shape": 3
-        }
-      ],
-      "title": "Shape Width",
-      "properties": {
-        "Node name for S&R": "VrchIntOSCControlNode"
-      },
-      "widgets_values": [
-        "192.168.123.104",
-        8000,
-        "/1/fader2",
-        0,
-        1,
-        false,
-        false,
-        false,
-        false
-      ]
-    },
-    {
       "id": 111,
       "type": "LoadImage",
-      "pos": {
-        "0": -2366.70556640625,
-        "1": 1143.226806640625
-      },
+      "pos": [
+        -2366.70556640625,
+        1143.226806640625
+      ],
       "size": [
         282.1108703613281,
         314
@@ -868,17 +706,17 @@
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "shape": 3,
           "links": [
             274
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "MASK",
           "type": "MASK",
-          "links": [],
-          "shape": 3
+          "shape": 3,
+          "links": []
         }
       ],
       "title": "Load Image 2",
@@ -893,10 +731,10 @@
     {
       "id": 112,
       "type": "LoadImage",
-      "pos": {
-        "0": -2368.852783203125,
-        "1": 1507.81787109375
-      },
+      "pos": [
+        -2368.852783203125,
+        1507.81787109375
+      ],
       "size": [
         296.0121765136719,
         314
@@ -909,17 +747,17 @@
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "shape": 3,
           "links": [
             275
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "MASK",
           "type": "MASK",
-          "links": [],
-          "shape": 3
+          "shape": 3,
+          "links": []
         }
       ],
       "title": "Load Image 3",
@@ -934,14 +772,14 @@
     {
       "id": 9,
       "type": "LoadImage",
-      "pos": {
-        "0": -2377.852783203125,
-        "1": 374.81787109375
-      },
-      "size": {
-        "0": 318.9287109375,
-        "1": 365.693603515625
-      },
+      "pos": [
+        -2377.852783203125,
+        374.81787109375
+      ],
+      "size": [
+        318.9287109375,
+        365.693603515625
+      ],
       "flags": {},
       "order": 2,
       "mode": 0,
@@ -950,17 +788,17 @@
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "shape": 3,
           "links": [
             270
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "MASK",
           "type": "MASK",
-          "links": [],
-          "shape": 3
+          "shape": 3,
+          "links": []
         }
       ],
       "title": "Load Image 0",
@@ -975,10 +813,10 @@
     {
       "id": 108,
       "type": "LoadImage",
-      "pos": {
-        "0": -2375.852783203125,
-        "1": 800.81787109375
-      },
+      "pos": [
+        -2375.852783203125,
+        800.81787109375
+      ],
       "size": [
         303.0495910644531,
         314
@@ -991,17 +829,17 @@
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "shape": 3,
           "links": [
             271
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "MASK",
           "type": "MASK",
-          "links": [],
-          "shape": 3
+          "shape": 3,
+          "links": []
         }
       ],
       "title": "Load Image 1",
@@ -1016,14 +854,14 @@
     {
       "id": 103,
       "type": "VrchTextConcatOSCControlNode",
-      "pos": {
-        "0": -1937.852783203125,
-        "1": 661.81787109375
-      },
-      "size": {
-        "0": 400,
-        "1": 714
-      },
+      "pos": [
+        -1937.852783203125,
+        661.81787109375
+      ],
+      "size": [
+        400,
+        774
+      ],
       "flags": {},
       "order": 13,
       "mode": 0,
@@ -1031,28 +869,36 @@
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 306,
+          "pos": [
+            10,
+            496
+          ],
           "widget": {
             "name": "server_ip"
-          }
+          },
+          "link": 306
         },
         {
           "name": "port",
           "type": "INT",
-          "link": 315,
+          "pos": [
+            10,
+            520
+          ],
           "widget": {
             "name": "port"
-          }
+          },
+          "link": 315
         }
       ],
       "outputs": [
         {
           "name": "TEXT_OUTPUT",
           "type": "STRING",
+          "shape": 3,
           "links": [
             253
-          ],
-          "shape": 3
+          ]
         }
       ],
       "properties": {
@@ -1084,14 +930,14 @@
     {
       "id": 110,
       "type": "VrchImageSwitchOSCControlNode",
-      "pos": {
-        "0": -1926.852783203125,
-        "1": 375.81787109375
-      },
-      "size": {
-        "0": 315,
-        "1": 190
-      },
+      "pos": [
+        -1926.852783203125,
+        375.81787109375
+      ],
+      "size": [
+        315,
+        230
+      ],
       "flags": {},
       "order": 12,
       "mode": 0,
@@ -1099,54 +945,62 @@
         {
           "name": "image0",
           "type": "IMAGE",
-          "link": 270,
-          "shape": 7
+          "shape": 7,
+          "link": 270
         },
         {
           "name": "image1",
           "type": "IMAGE",
-          "link": 271,
-          "shape": 7
+          "shape": 7,
+          "link": 271
         },
         {
           "name": "image2",
           "type": "IMAGE",
-          "link": 274,
-          "shape": 7
+          "shape": 7,
+          "link": 274
         },
         {
           "name": "image3",
           "type": "IMAGE",
-          "link": 275,
-          "shape": 7
+          "shape": 7,
+          "link": 275
         },
         {
           "name": "server_ip",
           "type": "STRING",
-          "link": 305,
+          "pos": [
+            10,
+            96
+          ],
           "widget": {
             "name": "server_ip"
-          }
+          },
+          "link": 305
         },
         {
           "name": "port",
           "type": "INT",
-          "link": 314,
+          "pos": [
+            10,
+            120
+          ],
           "widget": {
             "name": "port"
-          }
+          },
+          "link": 314
         }
       ],
       "outputs": [
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "shape": 3,
           "links": [
             272,
             273
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -1162,14 +1016,14 @@
     {
       "id": 46,
       "type": "ImageResizeKJ",
-      "pos": {
-        "0": -1539,
-        "1": 376
-      },
-      "size": {
-        "0": 313.05291748046875,
-        "1": 238
-      },
+      "pos": [
+        -1539,
+        376
+      ],
+      "size": [
+        313.05291748046875,
+        262
+      ],
       "flags": {},
       "order": 18,
       "mode": 0,
@@ -1182,56 +1036,64 @@
         {
           "name": "get_image_size",
           "type": "IMAGE",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "width_input",
           "type": "INT",
-          "link": null,
+          "pos": [
+            10,
+            196
+          ],
           "widget": {
             "name": "width_input"
-          }
+          },
+          "link": null
         },
         {
           "name": "height_input",
           "type": "INT",
-          "link": null,
+          "pos": [
+            10,
+            220
+          ],
           "widget": {
             "name": "height_input"
-          }
+          },
+          "link": null
         }
       ],
       "outputs": [
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "shape": 3,
           "links": [
             166
-          ],
-          "shape": 3
+          ]
         },
         {
           "name": "width",
           "type": "INT",
+          "shape": 3,
           "links": [
             167,
             210,
             262
           ],
-          "slot_index": 1,
-          "shape": 3
+          "slot_index": 1
         },
         {
           "name": "height",
           "type": "INT",
+          "shape": 3,
           "links": [
             168,
             211,
             263
           ],
-          "slot_index": 2,
-          "shape": 3
+          "slot_index": 2
         }
       ],
       "properties": {
@@ -1248,194 +1110,16 @@
       ]
     },
     {
-      "id": 107,
-      "type": "VrchXYOSCControlNode",
-      "pos": {
-        "0": -1487,
-        "1": 739
-      },
-      "size": {
-        "0": 315,
-        "1": 470
-      },
-      "flags": {},
-      "order": 25,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "x_output_max",
-          "type": "INT",
-          "link": 262,
-          "widget": {
-            "name": "x_output_max"
-          }
-        },
-        {
-          "name": "y_output_max",
-          "type": "INT",
-          "link": 263,
-          "widget": {
-            "name": "y_output_max"
-          }
-        },
-        {
-          "name": "server_ip",
-          "type": "STRING",
-          "link": 307,
-          "widget": {
-            "name": "server_ip"
-          }
-        },
-        {
-          "name": "port",
-          "type": "INT",
-          "link": 316,
-          "widget": {
-            "name": "port"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "X_INT",
-          "type": "INT",
-          "links": [
-            260
-          ],
-          "slot_index": 0,
-          "shape": 3
-        },
-        {
-          "name": "Y_INT",
-          "type": "INT",
-          "links": [
-            261
-          ],
-          "slot_index": 1,
-          "shape": 3
-        },
-        {
-          "name": "X_FLOAT",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        },
-        {
-          "name": "Y_FLOAT",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        },
-        {
-          "name": "X_RAW",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        },
-        {
-          "name": "Y_RAW",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VrchXYOSCControlNode"
-      },
-      "widgets_values": [
-        "192.168.123.104",
-        8000,
-        "/1/xy1",
-        0,
-        1,
-        0,
-        100,
-        false,
-        0,
-        1,
-        0,
-        100,
-        true,
-        false
-      ]
-    },
-    {
-      "id": 104,
-      "type": "VrchIntOSCControlNode",
-      "pos": {
-        "0": -1117,
-        "1": 1531
-      },
-      "size": {
-        "0": 315,
-        "1": 270
-      },
-      "flags": {},
-      "order": 14,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "server_ip",
-          "type": "STRING",
-          "link": 310,
-          "widget": {
-            "name": "server_ip"
-          }
-        },
-        {
-          "name": "port",
-          "type": "INT",
-          "link": 319,
-          "widget": {
-            "name": "port"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "VALUE",
-          "type": "INT",
-          "links": [
-            276,
-            279
-          ],
-          "slot_index": 0,
-          "shape": 3
-        },
-        {
-          "name": "RAW_VALUE",
-          "type": "FLOAT",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "title": "Shape Size by Amplitude",
-      "properties": {
-        "Node name for S&R": "VrchIntOSCControlNode"
-      },
-      "widgets_values": [
-        "192.168.123.104",
-        8000,
-        "/data/microphone/amplitude",
-        0,
-        0.12,
-        50,
-        1024,
-        false,
-        false
-      ]
-    },
-    {
       "id": 82,
       "type": "PreviewImage",
-      "pos": {
-        "0": -732.8362426757812,
-        "1": 1992.9459228515625
-      },
-      "size": {
-        "0": 606.1448364257812,
-        "1": 756.5897216796875
-      },
+      "pos": [
+        -722.2254638671875,
+        2039.4971923828125
+      ],
+      "size": [
+        606.1448364257812,
+        756.5897216796875
+      ],
       "flags": {},
       "order": 19,
       "mode": 0,
@@ -1455,14 +1139,14 @@
     {
       "id": 41,
       "type": "PreviewImage",
-      "pos": {
-        "0": -79.83621978759766,
-        "1": 1997.9459228515625
-      },
-      "size": {
-        "0": 543.6597290039062,
-        "1": 751.4212036132812
-      },
+      "pos": [
+        -69.22545623779297,
+        2044.4971923828125
+      ],
+      "size": [
+        543.6597290039062,
+        751.4212036132812
+      ],
       "flags": {},
       "order": 35,
       "mode": 0,
@@ -1480,106 +1164,16 @@
       "widgets_values": []
     },
     {
-      "id": 77,
-      "type": "CR String To Combo",
-      "pos": {
-        "0": -533,
-        "1": 610
-      },
-      "size": {
-        "0": 315,
-        "1": 78
-      },
-      "flags": {},
-      "order": 21,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 216,
-          "widget": {
-            "name": "text"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "any",
-          "type": "*",
-          "links": [
-            217
-          ],
-          "slot_index": 0,
-          "shape": 3
-        },
-        {
-          "name": "show_help",
-          "type": "STRING",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "CR String To Combo"
-      },
-      "widgets_values": [
-        ""
-      ]
-    },
-    {
-      "id": 81,
-      "type": "ShowText|pysssss",
-      "pos": {
-        "0": -540,
-        "1": 463
-      },
-      "size": {
-        "0": 320,
-        "1": 80
-      },
-      "flags": {},
-      "order": 20,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 253,
-          "widget": {
-            "name": "text"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            220
-          ],
-          "slot_index": 0,
-          "shape": 6
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "ShowText|pysssss"
-      },
-      "widgets_values": [
-        ""
-      ]
-    },
-    {
       "id": 57,
       "type": "LoraLoader",
-      "pos": {
-        "0": 387.2262268066406,
-        "1": 687.2525024414062
-      },
-      "size": {
-        "0": 315,
-        "1": 126
-      },
+      "pos": [
+        674.796875,
+        652.582763671875
+      ],
+      "size": [
+        315,
+        126
+      ],
       "flags": {},
       "order": 10,
       "mode": 0,
@@ -1599,21 +1193,21 @@
         {
           "name": "MODEL",
           "type": "MODEL",
+          "shape": 3,
           "links": [
             182
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "CLIP",
           "type": "CLIP",
+          "shape": 3,
           "links": [
             184,
             185
           ],
-          "slot_index": 1,
-          "shape": 3
+          "slot_index": 1
         }
       ],
       "properties": {
@@ -1628,14 +1222,14 @@
     {
       "id": 45,
       "type": "VAEEncode",
-      "pos": {
-        "0": 758,
-        "1": 908
-      },
-      "size": {
-        "0": 210,
-        "1": 46
-      },
+      "pos": [
+        1045.57080078125,
+        873.3302612304688
+      ],
+      "size": [
+        210,
+        46
+      ],
       "flags": {},
       "order": 22,
       "mode": 0,
@@ -1657,10 +1251,10 @@
         {
           "name": "LATENT",
           "type": "LATENT",
+          "shape": 3,
           "links": [
             160
-          ],
-          "shape": 3
+          ]
         }
       ],
       "properties": {
@@ -1671,14 +1265,14 @@
     {
       "id": 35,
       "type": "MaskToImage",
-      "pos": {
-        "0": 761,
-        "1": 1046
-      },
-      "size": {
-        "0": 210,
-        "1": 26
-      },
+      "pos": [
+        1048.57080078125,
+        1011.3302001953125
+      ],
+      "size": [
+        210,
+        26
+      ],
       "flags": {},
       "order": 33,
       "mode": 0,
@@ -1693,12 +1287,12 @@
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "shape": 3,
           "links": [
             133,
             151
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -1707,49 +1301,18 @@
       "widgets_values": []
     },
     {
-      "id": 96,
-      "type": "Fast Groups Bypasser (rgthree)",
-      "pos": {
-        "0": 1128.1622314453125,
-        "1": 2404.94970703125
-      },
-      "size": {
-        "0": 328.900634765625,
-        "1": 178
-      },
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "OPT_CONNECTION",
-          "type": "*",
-          "links": null
-        }
-      ],
-      "properties": {
-        "matchColors": "",
-        "matchTitle": "",
-        "showNav": true,
-        "sort": "position",
-        "customSortAlphabet": "",
-        "toggleRestriction": "default"
-      }
-    },
-    {
       "id": 119,
       "type": "Note",
-      "pos": {
-        "0": 14,
-        "1": 555
-      },
-      "size": {
-        "0": 306.02056884765625,
-        "1": 83.91346740722656
-      },
+      "pos": [
+        301.57080078125,
+        520.3302001953125
+      ],
+      "size": [
+        306.02056884765625,
+        88
+      ],
       "flags": {},
-      "order": 5,
+      "order": 4,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -1765,46 +1328,46 @@
     {
       "id": 2,
       "type": "CheckpointLoaderSimple",
-      "pos": {
-        "0": 20,
-        "1": 691
-      },
-      "size": {
-        "0": 315,
-        "1": 98
-      },
+      "pos": [
+        307.57080078125,
+        656.3302612304688
+      ],
+      "size": [
+        315,
+        98
+      ],
       "flags": {},
-      "order": 6,
+      "order": 5,
       "mode": 0,
       "inputs": [],
       "outputs": [
         {
           "name": "MODEL",
           "type": "MODEL",
+          "shape": 3,
           "links": [
             181
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "CLIP",
           "type": "CLIP",
+          "shape": 3,
           "links": [
             183
           ],
-          "slot_index": 1,
-          "shape": 3
+          "slot_index": 1
         },
         {
           "name": "VAE",
           "type": "VAE",
+          "shape": 3,
           "links": [
             10,
             222
           ],
-          "slot_index": 2,
-          "shape": 3
+          "slot_index": 2
         }
       ],
       "properties": {
@@ -1817,16 +1380,16 @@
     {
       "id": 120,
       "type": "Note",
-      "pos": {
-        "0": 388,
-        "1": 555
-      },
-      "size": {
-        "0": 361.4335021972656,
-        "1": 76.09417724609375
-      },
+      "pos": [
+        675.5706176757812,
+        520.3302001953125
+      ],
+      "size": [
+        361.4335021972656,
+        88
+      ],
       "flags": {},
-      "order": 7,
+      "order": 6,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -1842,14 +1405,14 @@
     {
       "id": 7,
       "type": "VAEDecode",
-      "pos": {
-        "0": 1335,
-        "1": 1094
-      },
-      "size": {
-        "0": 210,
-        "1": 46
-      },
+      "pos": [
+        1622.5709228515625,
+        1059.330078125
+      ],
+      "size": [
+        210,
+        46
+      ],
       "flags": {},
       "order": 37,
       "mode": 0,
@@ -1870,12 +1433,12 @@
         {
           "name": "IMAGE",
           "type": "IMAGE",
+          "shape": 3,
           "links": [
             303,
             304
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -1884,54 +1447,18 @@
       "widgets_values": []
     },
     {
-      "id": 115,
-      "type": "VrchImageWebViewerNode",
-      "pos": {
-        "0": 1092.163818359375,
-        "1": 2022.9459228515625
-      },
-      "size": {
-        "0": 400,
-        "1": 270.0000915527344
-      },
-      "flags": {},
-      "order": 39,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 304
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "Node name for S&R": "VrchImageWebViewerNode"
-      },
-      "widgets_values": [
-        "1",
-        "192.168.123.104:8188",
-        false,
-        512,
-        512,
-        false,
-        "http://vrch.ai/viewer?mode=image&server=192.168.123.104:8188&ssl=false&file=channel_1.jpeg&path=web_viewer",
-        null
-      ]
-    },
-    {
       "id": 118,
       "type": "Note",
-      "pos": {
-        "0": -2972,
-        "1": 138
-      },
-      "size": {
-        "0": 455.90106201171875,
-        "1": 170.35110473632812
-      },
+      "pos": [
+        -2972,
+        138
+      ],
+      "size": [
+        455.90106201171875,
+        170.35110473632812
+      ],
       "flags": {},
-      "order": 8,
+      "order": 7,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -1946,79 +1473,18 @@
       "bgcolor": "#653"
     },
     {
-      "id": 76,
-      "type": "VrchTextSwitchOSCControlNode",
-      "pos": {
-        "0": -972,
-        "1": 376
-      },
-      "size": {
-        "0": 320.4036865234375,
-        "1": 522.0000610351562
-      },
-      "flags": {},
-      "order": 15,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "server_ip",
-          "type": "STRING",
-          "link": 313,
-          "widget": {
-            "name": "server_ip"
-          }
-        },
-        {
-          "name": "port",
-          "type": "INT",
-          "link": 322,
-          "widget": {
-            "name": "port"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "TEXT_OUTPUT",
-          "type": "STRING",
-          "links": [
-            216
-          ],
-          "slot_index": 0,
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VrchTextSwitchOSCControlNode"
-      },
-      "widgets_values": [
-        "circle",
-        "square",
-        "triangle",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "192.168.123.104",
-        8000,
-        "/1/radio1",
-        false
-      ]
-    },
-    {
       "id": 121,
       "type": "VrchOSCControlSettingsNode",
-      "pos": {
-        "0": -2930,
-        "1": 462
-      },
-      "size": {
-        "0": 378,
-        "1": 126
-      },
+      "pos": [
+        -2930,
+        462
+      ],
+      "size": [
+        378,
+        126
+      ],
       "flags": {},
-      "order": 9,
+      "order": 8,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -2057,9 +1523,695 @@
         "Node name for S&R": "VrchOSCControlSettingsNode"
       },
       "widgets_values": [
-        "192.168.123.104",
+        "192.168.123.112",
         8000,
         false
+      ]
+    },
+    {
+      "id": 107,
+      "type": "VrchXYOSCControlNode",
+      "pos": [
+        -1487,
+        739
+      ],
+      "size": [
+        315,
+        518
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "x_output_max",
+          "type": "INT",
+          "pos": [
+            10,
+            280
+          ],
+          "widget": {
+            "name": "x_output_max"
+          },
+          "link": 262
+        },
+        {
+          "name": "y_output_max",
+          "type": "INT",
+          "pos": [
+            10,
+            424
+          ],
+          "widget": {
+            "name": "y_output_max"
+          },
+          "link": 263
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            136
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 307
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            160
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 316
+        }
+      ],
+      "outputs": [
+        {
+          "name": "X_INT",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            260
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "Y_INT",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            261
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "X_FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "Y_FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "X_RAW",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "Y_RAW",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchXYOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/1/xy1",
+        0,
+        1,
+        0,
+        100,
+        false,
+        0,
+        0,
+        1,
+        0,
+        true,
+        false,
+        0,
+        false
+      ]
+    },
+    {
+      "id": 76,
+      "type": "VrchTextSwitchOSCControlNode",
+      "pos": [
+        -789.6124877929688,
+        396.45782470703125
+      ],
+      "size": [
+        320.4036865234375,
+        582
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            496
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 313
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            520
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 322
+        }
+      ],
+      "outputs": [
+        {
+          "name": "TEXT_OUTPUT",
+          "type": "STRING",
+          "shape": 3,
+          "links": [
+            216
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchTextSwitchOSCControlNode"
+      },
+      "widgets_values": [
+        "circle",
+        "square",
+        "triangle",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "192.168.123.104",
+        8000,
+        "/1/radio1",
+        false
+      ]
+    },
+    {
+      "id": 81,
+      "type": "ShowText|pysssss",
+      "pos": [
+        -414.573486328125,
+        403.59027099609375
+      ],
+      "size": [
+        320,
+        80
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "pos": [
+            10,
+            36
+          ],
+          "widget": {
+            "name": "text"
+          },
+          "link": 253
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "shape": 6,
+          "links": [
+            220
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 77,
+      "type": "CR String To Combo",
+      "pos": [
+        -411.5420837402344,
+        555.9071655273438
+      ],
+      "size": [
+        315,
+        78
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "text"
+          },
+          "link": 216
+        }
+      ],
+      "outputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "shape": 3,
+          "links": [
+            217
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "show_help",
+          "type": "STRING",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CR String To Combo"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 74,
+      "type": "VrchIntOSCControlNode",
+      "pos": [
+        -1112.2333984375,
+        841.0606689453125
+      ],
+      "size": [
+        301.3936462402344,
+        314
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "output_max",
+          "type": "INT",
+          "pos": [
+            10,
+            200
+          ],
+          "widget": {
+            "name": "output_max"
+          },
+          "link": 211
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 308
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 317
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            278
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [],
+          "slot_index": 1
+        }
+      ],
+      "title": "Shape Height",
+      "properties": {
+        "Node name for S&R": "VrchIntOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/1/fader1",
+        0,
+        1,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": 73,
+      "type": "VrchIntOSCControlNode",
+      "pos": [
+        -1116.8514404296875,
+        1208.0615234375
+      ],
+      "size": [
+        315,
+        314
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "output_max",
+          "type": "INT",
+          "pos": [
+            10,
+            200
+          ],
+          "widget": {
+            "name": "output_max"
+          },
+          "link": 210
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 309
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 318
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            280
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [],
+          "slot_index": 1
+        }
+      ],
+      "title": "Shape Width",
+      "properties": {
+        "Node name for S&R": "VrchIntOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/1/fader2",
+        0,
+        1,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": 104,
+      "type": "VrchIntOSCControlNode",
+      "pos": [
+        -1115.6934814453125,
+        1575.503662109375
+      ],
+      "size": [
+        315,
+        294
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 310
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 319
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            276,
+            279
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "title": "Shape Size by Amplitude",
+      "properties": {
+        "Node name for S&R": "VrchIntOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/data/microphone/amplitude",
+        0,
+        0.12,
+        50,
+        1024,
+        false,
+        50,
+        false
+      ]
+    },
+    {
+      "id": 96,
+      "type": "Fast Groups Bypasser (rgthree)",
+      "pos": [
+        1142.0484619140625,
+        2564.813232421875
+      ],
+      "size": [
+        328.900634765625,
+        178
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "OPT_CONNECTION",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "matchColors": "",
+        "matchTitle": "",
+        "showNav": true,
+        "sort": "position",
+        "customSortAlphabet": "",
+        "toggleRestriction": "default"
+      }
+    },
+    {
+      "id": 115,
+      "type": "VrchImageWebViewerNode",
+      "pos": [
+        1102.7745361328125,
+        2069.497314453125
+      ],
+      "size": [
+        400,
+        386
+      ],
+      "flags": {},
+      "order": 39,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 304
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchImageWebViewerNode"
+      },
+      "widgets_values": [
+        "1",
+        "192.168.123.112:8188",
+        false,
+        200,
+        100,
+        false,
+        "http://vrch.ai/viewer?mode=image&server=192.168.123.104:8188&ssl=false&file=channel_1.jpeg&path=web_viewer",
+        600,
+        600,
+        false,
+        "",
+        "http://vrch.ai/viewer?mode=image&server=192.168.123.112:8188&ssl=false&filename=channel_1.jpeg&path=web_viewer&refreshInterval=200&fadeAnimDuration=100",
+        ""
+      ]
+    },
+    {
+      "id": 19,
+      "type": "KSampler",
+      "pos": [
+        1293.797119140625,
+        1157.5826416015625
+      ],
+      "size": [
+        301.66925048828125,
+        381.4648742675781
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 137,
+          "slot_index": 0
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 161
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 162,
+          "slot_index": 2
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 123
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "shape": 3,
+          "links": [
+            77
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        100361857014338,
+        "fixed",
+        4,
+        1,
+        "euler",
+        "sgm_uniform",
+        0.9
       ]
     }
   ],
@@ -2611,22 +2763,24 @@
   ],
   "groups": [
     {
+      "id": 1,
       "title": "OSC Control Panel - IC-Light",
       "bounding": [
         -2388,
         280,
-        2193,
-        1535
+        2309.212890625,
+        1619.203125
       ],
       "color": "#3f789e",
       "font_size": 24,
       "flags": {}
     },
     {
+      "id": 2,
       "title": "IC-Light Image Generation",
       "bounding": [
-        -15,
-        462,
+        272.57080078125,
+        427.3302307128906,
         1594,
         1214
       ],
@@ -2635,10 +2789,11 @@
       "flags": {}
     },
     {
+      "id": 3,
       "title": "Output Panel",
       "bounding": [
-        -771,
-        1904,
+        -760.3892211914062,
+        1950.55126953125,
         2352,
         901
       ],
@@ -2647,6 +2802,7 @@
       "flags": {}
     },
     {
+      "id": 4,
       "title": "Server Settings",
       "bounding": [
         -2993,
@@ -2662,11 +2818,19 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.9646149645000018,
+      "scale": 0.826446280991736,
       "offset": [
-        3333.484878243333,
-        -20.005229160869874
+        2954.2350510242413,
+        -343.29321364724655
       ]
+    },
+    "node_versions": {
+      "comfy-core": "0.3.24",
+      "ComfyUI-KJNodes": "6e3af6e7b97afb1aeb259def593c10113dda5591",
+      "ComfyUI-IC-Light": "8a9f9c92c155e754a05840c7621443c5919a9b25",
+      "comfyui-web-viewer": "4b3c80bd145bf47a7dd44434d57d1688b87907e7",
+      "ComfyUI-Custom-Scripts": "d6657cc1f04539dbeea38d7bf6d73bc025004fa4",
+      "ComfyUI_Comfyroll_CustomNodes": "d78b780ae43fcf8c6b7c6505e6ffb4584281ceca"
     }
   },
   "version": 0.4

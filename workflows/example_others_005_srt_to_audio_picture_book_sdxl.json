@@ -335,49 +335,6 @@
       }
     },
     {
-      "id": 30,
-      "type": "VrchAudioWebViewerNode",
-      "pos": [
-        17.59232521057129,
-        238.0811004638672
-      ],
-      "size": [
-        390.484375,
-        290
-      ],
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "link": 24
-        }
-      ],
-      "outputs": [
-        {
-          "name": "AUDIO",
-          "type": "AUDIO",
-          "links": null
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VrchAudioWebViewerNode"
-      },
-      "widgets_values": [
-        "1",
-        "192.168.123.104:8188",
-        false,
-        500,
-        600,
-        false,
-        "",
-        "http://vrch.ai/viewer?mode=audio&server=192.168.123.104:8188&ssl=false&file=channel_1.mp3&path=web_viewer",
-        ""
-      ]
-    },
-    {
       "id": 54,
       "type": "Seed (rgthree)",
       "pos": [
@@ -1080,6 +1037,41 @@
       ]
     },
     {
+      "id": 80,
+      "type": "VrchImagePreviewBackgroundNode",
+      "pos": [
+        1552.1634521484375,
+        196.3371124267578
+      ],
+      "size": [
+        406.02667236328125,
+        202
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 115
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "VrchImagePreviewBackgroundNode"
+      },
+      "widgets_values": [
+        "1",
+        true,
+        300,
+        "fit",
+        false,
+        200,
+        4
+      ]
+    },
+    {
       "id": 74,
       "type": "VrchImageWebViewerNode",
       "pos": [
@@ -1088,7 +1080,7 @@
       ],
       "size": [
         400,
-        290
+        386
       ],
       "flags": {},
       "order": 21,
@@ -1112,46 +1104,65 @@
       },
       "widgets_values": [
         "1",
-        "192.168.123.104:8188",
+        "192.168.123.112:8188",
         false,
+        300,
+        150,
+        false,
+        "",
         1280,
         960,
         false,
         "",
-        "http://vrch.ai/viewer?mode=image&server=192.168.123.104:8188&ssl=false&file=channel_1.jpeg&path=web_viewer",
+        "http://vrch.ai/viewer?mode=image&server=192.168.123.112:8188&ssl=false&filename=channel_1.jpeg&path=web_viewer&refreshInterval=300&fadeAnimDuration=150",
         ""
       ]
     },
     {
-      "id": 80,
-      "type": "VrchImagePreviewBackgroundNode",
+      "id": 30,
+      "type": "VrchAudioWebViewerNode",
       "pos": [
-        1556.6175537109375,
-        107.14884185791016
+        17.59232521057129,
+        238.0811004638672
       ],
       "size": [
-        406.02667236328125,
-        175.93309020996094
+        390.484375,
+        386
       ],
       "flags": {},
-      "order": 22,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 115
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 24
         }
       ],
-      "outputs": [],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": null
+        }
+      ],
       "properties": {
-        "Node name for S&R": "VrchImagePreviewBackgroundNode"
+        "Node name for S&R": "VrchAudioWebViewerNode"
       },
       "widgets_values": [
         "1",
-        true,
-        300,
-        "fit"
+        "192.168.123.112:8188",
+        false,
+        3000,
+        "circles",
+        false,
+        "",
+        500,
+        600,
+        false,
+        "",
+        "http://vrch.ai/viewer?mode=audio&server=192.168.123.112:8188&ssl=false&filename=channel_1.mp3&path=web_viewer&refreshInterval=3000&visualizerType=circles",
+        ""
       ]
     }
   ],
@@ -1390,10 +1401,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.4500000000000284,
+      "scale": 0.28966437973668846,
       "offset": [
-        2155.4379583078976,
-        1520.8480920654665
+        2409.0405482603305,
+        2019.2903433430054
       ]
     },
     "node_versions": {
@@ -1401,11 +1412,11 @@
       "ComfyUI-Logic": "fb8897351f715ea75eebf52e74515b6d07c693b8",
       "ComfyUI-Chibi-Nodes": "290ccef2a8c1bc3917e1c00dbe5c206b66fb8ded",
       "ComfyUI-Custom-Scripts": "d6657cc1f04539dbeea38d7bf6d73bc025004fa4",
-      "comfyui-web-viewer": "7081004129ee7badc49457dbfdc40fda33ee07ad",
       "rgthree-comfy": "2613da28c639b90b310e35c6ffde9ee0a3d60bfe",
       "comfyui-ollama": "cfa314d36efbb2344ba22a76256200016ad9570a",
       "comfy-core": "0.3.24",
       "efficiency-nodes-comfyui": "a6df20f4c60af49f08bbe122bc486c286f5d0745",
+      "comfyui-web-viewer": "4b3c80bd145bf47a7dd44434d57d1688b87907e7",
       "comfyui-art-venture": "c241bdb6ff009fd9a51125d480ce46e7593ae332"
     }
   },

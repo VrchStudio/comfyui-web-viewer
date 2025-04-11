@@ -102,6 +102,10 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "server": ("STRING", {"default": DEFAULT_SERVER, "multiline": False}),
                 "ssl": ("BOOLEAN", {"default": False}),
+                "refresh_interval": ("INT", {"default": 300, "min": 1, "max": 10000}),
+                "fade_anim_duration": ("INT", {"default": 200, "min": 1, "max": 10000}),
+                "server_messages": ("STRING", {"default": "", "multiline": False}),
+                "save_settings": ("BOOLEAN", {"default": False}),
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
@@ -120,7 +124,20 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
         # The output directory where images will be saved
         self.output_dir = folder_paths.output_directory
 
-    def save_and_view_images(self, images, channel, server, ssl, window_width, window_height, extra_params, show_url, url):
+    def save_and_view_images(self, 
+                             images, 
+                             channel, 
+                             server, 
+                             ssl, 
+                             refresh_interval,
+                             fade_anim_duration,
+                             server_messages,
+                             save_settings,
+                             window_width, 
+                             window_height, 
+                             extra_params, 
+                             show_url, 
+                             url):
         # Save the image into "web_viewer" directory with filename "{channel}.jpeg"
         output_path = os.path.join(self.output_dir, "web_viewer")
         os.makedirs(output_path, exist_ok=True)
@@ -133,6 +150,15 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
             extension="jpeg",
             quality_jpeg_or_webp=85
         )
+        
+        if save_settings:
+            # Save the settings to a JSON file
+            settings = {
+                "refreshInterval": refresh_interval,
+                "fadeAnimDuration": fade_anim_duration,
+                "serverMessages": server_messages,
+            }
+            VrchNodeUtils.save_channel_settings(output_path, channel, settings)
 
         return (images,)
 
@@ -227,10 +253,7 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
                 "fadeAnimDuration": fade_anim_duration,
                 "serverMessages": server_messages,
             }
-            settings_filename = f"channel_{channel}_settings.json"
-            settings_path = os.path.join(output_path, settings_filename)
-            with open(settings_path, "w") as f:
-                json.dump(settings, f)
+            VrchNodeUtils.save_channel_settings(output_path, channel, settings)
         
         return (images,)
 
@@ -263,6 +286,13 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "server": ("STRING", {"default": DEFAULT_SERVER, "multiline": False}),
                 "ssl": ("BOOLEAN", {"default": False}),
+                "refresh_interval": ("INT", {"default": 5000, "min": 1, "max": 10000}),
+                "visualizer_type": (
+                    ["bars", "circles", "matrix", "particles", "spiral", "waterball", "waveform"], 
+                    {"default": "waveform"},
+                ),
+                "server_messages": ("STRING", {"default": "", "multiline": False}),
+                "save_settings": ("BOOLEAN", {"default": False}),
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
@@ -281,7 +311,20 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
         # The output directory where audio will be saved
         self.output_dir = folder_paths.output_directory
 
-    def save_and_view_audio(self, audio, channel, server, ssl, window_width, window_height, extra_params, show_url, url):
+    def save_and_view_audio(self, 
+                            audio, 
+                            channel, 
+                            server, 
+                            ssl, 
+                            refresh_interval,
+                            visualizer_type,
+                            server_messages, 
+                            save_settings, 
+                            window_width,
+                            window_height, 
+                            extra_params, 
+                            show_url, 
+                            url):
         # Save the audio into "web_viewer" directory with filename "{channel}.mp3"
         output_path = os.path.join(self.output_dir, "web_viewer")
         os.makedirs(output_path, exist_ok=True)
@@ -293,6 +336,15 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
             path="web_viewer",
             extension="mp3"
         )
+        
+        if save_settings:
+            # Save the settings to a JSON file
+            settings = {
+                "refreshInterval": refresh_interval,
+                "visualizerType": visualizer_type,
+                "serverMessages": server_messages,
+            }
+            VrchNodeUtils.save_channel_settings(output_path, channel, settings)
 
         return (audio,)
 
@@ -320,6 +372,9 @@ class VrchModelWebViewerNode():
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "server": ("STRING", {"default": DEFAULT_SERVER, "multiline": False}),
                 "ssl": ("BOOLEAN", {"default": False}),
+                "refresh_interval": ("INT", {"default": 5000, "min": 1, "max": 10000}),
+                "server_messages": ("STRING", {"default": "", "multiline": False}),
+                "save_settings": ("BOOLEAN", {"default": False}),
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
@@ -335,10 +390,22 @@ class VrchModelWebViewerNode():
     CATEGORY = CATEGORY
 
     def __init__(self):
-        # The output directory where audio will be saved
+        # The output directory where models will be saved
         self.output_dir = folder_paths.output_directory
 
-    def save_and_view_3d_model(self, model_file, channel, server, ssl, window_width, window_height, extra_params, show_url, url):
+    def save_and_view_3d_model(self, 
+                               model_file, 
+                               channel, 
+                               server, 
+                               ssl, 
+                               refresh_interval, 
+                               server_messages, 
+                               save_settings,
+                               window_width, 
+                               window_height, 
+                               extra_params, 
+                               show_url, 
+                               url):
         # Save the 3d model into "web_viewer" directory with filename "channel_{channel}.glb"
         output_path = self.output_dir
         web_viewer_folder = "web_viewer"
@@ -364,6 +431,14 @@ class VrchModelWebViewerNode():
         
         # Move the file to the new destination
         shutil.move(src_file, dst_file)
+        
+        if save_settings:
+            # Save the settings to a JSON file
+            settings = {
+                "refreshInterval": refresh_interval,
+                "serverMessages": server_messages,
+            }
+            VrchNodeUtils.save_channel_settings(os.path.join(output_path, web_viewer_folder), channel, settings)
         
         # Return the new path relative to the output directory
         return (os.path.join(web_viewer_folder, new_filename),)
@@ -391,6 +466,9 @@ class VrchVideoWebViewerNode:
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "server": ("STRING", {"default": DEFAULT_SERVER, "multiline": False}),
                 "ssl": ("BOOLEAN", {"default": False}),
+                "refresh_interval": ("INT", {"default": 5000, "min": 1, "max": 10000}),
+                "server_messages": ("STRING", {"default": "", "multiline": False}),
+                "save_settings": ("BOOLEAN", {"default": False}),
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
@@ -416,12 +494,33 @@ class VrchVideoWebViewerNode:
         if ext.lstrip('.') not in self.allowed_extensions:
             raise ValueError(f"Unsupported file extension '{ext}'. Allowed extensions: {self.allowed_extensions}")
 
-    def save_and_view_video(self, channel, server, ssl, window_width, window_height, extra_params, show_url, url, filename=None):
+    def save_and_view_video(self, 
+                            filename, 
+                            channel, 
+                            server, 
+                            ssl, 
+                            refresh_interval, 
+                            server_messages, 
+                            save_settings,
+                            window_width, 
+                            window_height, 
+                            extra_params, 
+                            show_url, 
+                            url):
         self.validate(filename)
         output_path = os.path.join(self.output_dir, "web_viewer")
         os.makedirs(output_path, exist_ok=True)
         dst_file = os.path.join(output_path, f"channel_{channel}.mp4")
         shutil.copyfile(filename, dst_file)
+        
+        if save_settings:
+            # Save the settings to a JSON file
+            settings = {
+                "refreshInterval": refresh_interval,
+                "serverMessages": server_messages,
+            }
+            VrchNodeUtils.save_channel_settings(output_path, channel, settings)
+        
         return ()
 
     @classmethod

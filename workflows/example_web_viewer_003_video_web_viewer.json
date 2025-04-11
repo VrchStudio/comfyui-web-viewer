@@ -11,7 +11,7 @@
       ],
       "size": [
         340.4589538574219,
-        352
+        364
       ],
       "flags": {},
       "order": 22,
@@ -111,7 +111,7 @@
       ],
       "size": [
         315,
-        246
+        266
       ],
       "flags": {},
       "order": 21,
@@ -125,16 +125,20 @@
         {
           "name": "mask_optional",
           "type": "MASK",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "larger_side",
           "type": "INT",
-          "link": 345,
+          "pos": [
+            10,
+            104
+          ],
           "widget": {
             "name": "larger_side"
-          }
+          },
+          "link": 345
         }
       ],
       "outputs": [
@@ -222,22 +226,26 @@
         {
           "name": "meta_batch",
           "type": "VHS_BatchManager",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "video",
           "type": "STRING",
-          "link": 285,
+          "pos": [
+            10,
+            96
+          ],
           "widget": {
             "name": "video"
-          }
+          },
+          "link": 285
         }
       ],
       "outputs": [
@@ -344,20 +352,20 @@
         {
           "name": "audio",
           "type": "AUDIO",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "meta_batch",
           "type": "VHS_BatchManager",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         }
       ],
       "outputs": [
@@ -448,7 +456,7 @@
       ],
       "size": [
         221.59730529785156,
-        98
+        170
       ],
       "flags": {},
       "order": 28,
@@ -457,26 +465,38 @@
         {
           "name": "width",
           "type": "INT",
-          "link": 384,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "width"
-          }
+          },
+          "link": 384
         },
         {
           "name": "height",
           "type": "INT",
-          "link": 385,
+          "pos": [
+            10,
+            60
+          ],
           "widget": {
             "name": "height"
-          }
+          },
+          "link": 385
         },
         {
           "name": "length",
           "type": "INT",
-          "link": 394,
+          "pos": [
+            10,
+            84
+          ],
           "widget": {
             "name": "length"
-          }
+          },
+          "link": 394
         }
       ],
       "outputs": [
@@ -594,7 +614,7 @@
       ],
       "size": [
         282.28857421875,
-        151.23635864257812
+        174
       ],
       "flags": {},
       "order": 41,
@@ -603,16 +623,20 @@
         {
           "name": "latent",
           "type": "LATENT",
-          "link": 413,
-          "shape": 7
+          "shape": 7,
+          "link": 413
         },
         {
           "name": "steps",
           "type": "INT",
-          "link": 381,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "steps"
-          }
+          },
+          "link": 381
         }
       ],
       "outputs": [
@@ -659,8 +683,8 @@
         {
           "name": "attn_override",
           "type": "ATTN_OVERRIDE",
-          "link": 366,
-          "shape": 7
+          "shape": 7,
+          "link": 366
         }
       ],
       "outputs": [
@@ -837,7 +861,7 @@
       ],
       "size": [
         315,
-        82
+        98
       ],
       "flags": {},
       "order": 2,
@@ -872,7 +896,7 @@
       ],
       "size": [
         290.3044128417969,
-        60.59393310546875
+        78
       ],
       "flags": {
         "collapsed": false
@@ -888,21 +912,25 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 433,
+          "pos": [
+            10,
+            36
+          ],
           "widget": {
             "name": "text"
-          }
+          },
+          "link": 433
         }
       ],
       "outputs": [
         {
           "name": "CONDITIONING",
           "type": "CONDITIONING",
+          "shape": 3,
           "links": [
             430
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "title": "Positive Prompt",
@@ -979,7 +1007,7 @@
       ],
       "size": [
         283.35858154296875,
-        76
+        88
       ],
       "flags": {},
       "order": 3,
@@ -1027,11 +1055,11 @@
         {
           "name": "CONDITIONING",
           "type": "CONDITIONING",
+          "shape": 3,
           "links": [
             431
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "title": "Negative Prompt",
@@ -1141,10 +1169,14 @@
         {
           "name": "noise_seed",
           "type": "INT",
-          "link": 445,
+          "pos": [
+            10,
+            160
+          ],
           "widget": {
             "name": "noise_seed"
-          }
+          },
+          "link": 445
         }
       ],
       "outputs": [
@@ -1192,12 +1224,12 @@
         {
           "name": "SEED",
           "type": "INT",
+          "dir": 4,
+          "shape": 3,
           "links": [
             445
           ],
-          "slot_index": 0,
-          "shape": 3,
-          "dir": 4
+          "slot_index": 0
         }
       ],
       "properties": {},
@@ -1367,11 +1399,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            127.83305358886719
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": null
         }
       ],
       "outputs": [
@@ -1506,11 +1542,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 364,
+          "shape": 7,
+          "pos": [
+            10,
+            184.2014617919922
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 364
         }
       ],
       "outputs": [
@@ -1541,7 +1581,7 @@
       ],
       "size": [
         386.7123107910156,
-        386
+        458
       ],
       "flags": {},
       "order": 31,
@@ -1550,44 +1590,56 @@
         {
           "name": "context",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            416
+          ],
           "widget": {
             "name": "context"
           },
-          "shape": 7
+          "link": null
         },
         {
           "name": "prompt",
           "type": "STRING",
-          "link": 273,
+          "pos": [
+            10,
+            56
+          ],
           "widget": {
             "name": "prompt"
-          }
+          },
+          "link": 273
         },
         {
           "name": "system",
           "type": "STRING",
-          "link": 272,
+          "pos": [
+            10,
+            152
+          ],
           "widget": {
             "name": "system"
-          }
+          },
+          "link": 272
         }
       ],
       "outputs": [
         {
           "name": "response",
           "type": "STRING",
+          "shape": 3,
           "links": [
             349
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         },
         {
           "name": "context",
           "type": "STRING",
-          "links": null,
-          "shape": 3
+          "shape": 3,
+          "links": null
         }
       ],
       "properties": {
@@ -1670,30 +1722,6 @@
       ]
     },
     {
-      "id": 161,
-      "type": "Note",
-      "pos": [
-        1269.1812744140625,
-        -376.82086181640625
-      ],
-      "size": [
-        361.20001220703125,
-        59.028564453125
-      ],
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "title": "Enable this node if you encounter OOM issue",
-      "properties": {},
-      "widgets_values": [
-        "As said above"
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
-    },
-    {
       "id": 159,
       "type": "Note",
       "pos": [
@@ -1705,7 +1733,7 @@
         250.2269287109375
       ],
       "flags": {},
-      "order": 13,
+      "order": 12,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -1783,11 +1811,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 349,
+          "shape": 7,
+          "pos": [
+            10,
+            186
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 349
         }
       ],
       "outputs": [
@@ -1827,23 +1859,27 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 317,
-          "slot_index": 0,
+          "shape": 7,
+          "pos": [
+            10,
+            220.79005432128906
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 317,
+          "slot_index": 0
         }
       ],
       "outputs": [
         {
           "name": "text",
           "type": "STRING",
+          "shape": 3,
           "links": [
             273
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "title": "User Prompt",
@@ -1873,11 +1909,15 @@
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": 348,
+          "shape": 7,
+          "pos": [
+            10,
+            186
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": 348
         }
       ],
       "outputs": [
@@ -1911,14 +1951,14 @@
         106
       ],
       "flags": {},
-      "order": 14,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {
           "name": "lora",
           "type": "PEFTLORA",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         }
       ],
       "outputs": [
@@ -1941,73 +1981,6 @@
       ]
     },
     {
-      "id": 134,
-      "type": "easy promptReplace",
-      "pos": [
-        -1834.20458984375,
-        -884.154541015625
-      ],
-      "size": [
-        400,
-        202
-      ],
-      "flags": {},
-      "order": 24,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 314,
-          "widget": {
-            "name": "prompt"
-          }
-        },
-        {
-          "name": "replace1",
-          "type": "STRING",
-          "link": 315,
-          "widget": {
-            "name": "replace1"
-          },
-          "shape": 7
-        },
-        {
-          "name": "replace2",
-          "type": "STRING",
-          "link": 316,
-          "widget": {
-            "name": "replace2"
-          },
-          "shape": 7
-        }
-      ],
-      "outputs": [
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "links": [
-            317
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "easy promptReplace"
-      },
-      "widgets_values": [
-        "",
-        "{image_description}",
-        "",
-        "{user_instruct}",
-        "",
-        "",
-        ""
-      ],
-      "color": "#233",
-      "bgcolor": "#355"
-    },
-    {
       "id": 111,
       "type": "Textbox",
       "pos": [
@@ -2019,28 +1992,32 @@
         491.4605407714844
       ],
       "flags": {},
-      "order": 15,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            477.4605407714844
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": null
         }
       ],
       "outputs": [
         {
           "name": "text",
           "type": "STRING",
+          "shape": 3,
           "links": [
             272
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "title": "System Prompt",
@@ -2064,17 +2041,21 @@
         200
       ],
       "flags": {},
-      "order": 16,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
           "name": "passthrough",
           "type": "STRING",
-          "link": null,
+          "shape": 7,
+          "pos": [
+            10,
+            186
+          ],
           "widget": {
             "name": "passthrough"
           },
-          "shape": 7
+          "link": null
         }
       ],
       "outputs": [
@@ -2118,32 +2099,32 @@
         {
           "name": "audio",
           "type": "AUDIO",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "meta_batch",
           "type": "VHS_BatchManager",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": null,
-          "shape": 7
+          "shape": 7,
+          "link": null
         }
       ],
       "outputs": [
         {
           "name": "Filenames",
           "type": "VHS_FILENAMES",
+          "shape": 3,
           "links": [
             437,
             438
           ],
-          "slot_index": 0,
-          "shape": 3
+          "slot_index": 0
         }
       ],
       "properties": {
@@ -2173,11 +2154,35 @@
       }
     },
     {
+      "id": 161,
+      "type": "Note",
+      "pos": [
+        1270.22119140625,
+        -415.290283203125
+      ],
+      "size": [
+        361.20001220703125,
+        88
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Enable this node if you encounter OOM issue",
+      "properties": {},
+      "widgets_values": [
+        "As said above"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
       "id": 213,
       "type": "Note",
       "pos": [
-        824.3380737304688,
-        881.1611938476562
+        829.9661254882812,
+        1011.16357421875
       ],
       "size": [
         386.6794738769531,
@@ -2204,7 +2209,7 @@
       ],
       "size": [
         400,
-        320
+        386
       ],
       "flags": {},
       "order": 48,
@@ -2213,10 +2218,14 @@
         {
           "name": "filename",
           "type": "STRING",
-          "link": 446,
+          "pos": [
+            10,
+            12
+          ],
           "widget": {
             "name": "filename"
-          }
+          },
+          "link": 446
         }
       ],
       "outputs": [],
@@ -2228,13 +2237,95 @@
         "1",
         "127.0.0.1:8188",
         false,
-        1280,
-        960,
-        false,
+        5000,
         "",
-        "http://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=false&file=channel_1.mp4&path=web_viewer&http://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=false&file=channel_1.mp4&path=web_viewer",
-        null
+        false,
+        800,
+        600,
+        null,
+        "",
+        "http://vrch.ai/viewer?mode=video&server=127.0.0.1:8188&ssl=false&filename=channel_1.mp4&path=web_viewer&refreshInterval=5000",
+        ""
       ]
+    },
+    {
+      "id": 134,
+      "type": "easy promptReplace",
+      "pos": [
+        -1834.4541015625,
+        -919.904541015625
+      ],
+      "size": [
+        400,
+        242
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "pos": [
+            10,
+            36
+          ],
+          "widget": {
+            "name": "prompt"
+          },
+          "link": 314
+        },
+        {
+          "name": "replace1",
+          "type": "STRING",
+          "shape": 7,
+          "pos": [
+            10,
+            84
+          ],
+          "widget": {
+            "name": "replace1"
+          },
+          "link": 315
+        },
+        {
+          "name": "replace2",
+          "type": "STRING",
+          "shape": 7,
+          "pos": [
+            10,
+            132
+          ],
+          "widget": {
+            "name": "replace2"
+          },
+          "link": 316
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            317
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy promptReplace"
+      },
+      "widgets_values": [
+        "",
+        "{image_description}",
+        "",
+        "{user_instruct}",
+        "",
+        "",
+        ""
+      ],
+      "color": "#233",
+      "bgcolor": "#355"
     }
   ],
   "links": [
@@ -2717,8 +2808,8 @@
       "bounding": [
         173.0813751220703,
         454.0921630859375,
-        1071.2965087890625,
-        649.622314453125
+        1071.5938720703125,
+        762.2493286132812
       ],
       "color": "#b58b2a",
       "font_size": 24,
@@ -2767,10 +2858,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.6588450000000005,
+      "scale": 0.4240976183724851,
       "offset": [
-        612.3617239882029,
-        128.9858169749382
+        1745.9017238307006,
+        923.9153874690596
       ]
     },
     "node_versions": {
@@ -2778,7 +2869,7 @@
       "ComfyUI-Easy-Use": "db14b955a59ef8568ed2511b73373d5437449341",
       "image-resize-comfyui": "ae5888637742ff1668b6cd32954ba48d81dbd39d",
       "ComfyUI-VideoHelperSuite": "b0f9796ea3d716997aa2c5e1e5e5000cac8365d9",
-      "comfy-core": "0.3.13",
+      "comfy-core": "0.3.24",
       "ComfyUI-LTXTricks": "06fed1c7974de7198840209b3b7eb7a84742d460",
       "rgthree-comfy": "2613da28c639b90b310e35c6ffde9ee0a3d60bfe",
       "comfyui-image-round": "de5090763b6f33e5e4850ad929e2ac6dee66c054",
@@ -2786,7 +2877,7 @@
       "ComfyUI-Chibi-Nodes": "290ccef2a8c1bc3917e1c00dbe5c206b66fb8ded",
       "comfyui-ollama": "cfa314d36efbb2344ba22a76256200016ad9570a",
       "ComfyUI_essentials": "8727258f04be6647d7b9013993d1d335acf84169",
-      "comfyui-web-viewer": "93daa27bd76f869eb88bafda6e621abe460c8d59"
+      "comfyui-web-viewer": "4b3c80bd145bf47a7dd44434d57d1688b87907e7"
     }
   },
   "version": 0.4
