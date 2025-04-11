@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update websocket_viewer_nodes.md
 - update websocket_viewer_nodes_extra_params.md
 - update osc_control_nodes.md
+- update workflows to match nodes changes
 
 ## 1.0.28 - 2025-03-29
 
