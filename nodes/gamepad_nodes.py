@@ -14,28 +14,28 @@ class VrchGamepadLoaderNode:
             "required": {
                 "index": (["0", "1", "2", "3", "4", "5", "6", "7"], {"default": "0"}),
                 "name": ("STRING", {"default": ""}),
+                "refresh_interval": ("INT", {"default": 100, "min": 10, "max": 10000}),
                 "debug": ("BOOLEAN", {"default": False}),
                 "raw_data": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
             },
         }
         
-    # Updated return types to use standard ComfyUI supported types
     RETURN_TYPES = (
+        "JSON",   # RAW_DATA
         "FLOAT",  # LEFT_STICK
         "FLOAT",  # RIGHT_STICK
         "BOOL",   # BUTTONS_BOOLEAN
         "INT",    # BUTTONS_INT
         "FLOAT",  # BUTTONS_FLOAT
-        "JSON",   # RAW_DATA
     )
     
     RETURN_NAMES = (
+        "RAW_DATA",
         "LEFT_STICK",
         "RIGHT_STICK",
-        "BUTTONS_BOOLEAN",
-        "BUTTONS_INT",
-        "BUTTONS_FLOAT",
-        "RAW_DATA",
+        "BOOLEAN_BUTTONS",
+        "INT_BUTTONS",
+        "FLOAT_BUTTONS",
     )
     
     CATEGORY = CATEGORY
@@ -44,8 +44,9 @@ class VrchGamepadLoaderNode:
     def load_gamepad(self, 
                      index: str, 
                      name: str, 
-                     raw_data: str, 
-                     debug: bool=False):
+                     refresh_interval: int=100,
+                     debug: bool=False,
+                     raw_data: str=""):
         """
         Load gamepad data and return it as JSON.
         """
@@ -60,9 +61,11 @@ class VrchGamepadLoaderNode:
             # Initialize default values
             left_stick = [0.0, 0.0]   # Default left stick values [x, y]
             right_stick = [0.0, 0.0]  # Default right stick values [x, y]
-            buttons_boolean = [False] * 16  # Default button boolean states
-            buttons_int = [0] * 16    # Default button int states
-            buttons_float = [0.0] * 16  # Default button float values
+            
+            # Initialize with empty arrays - will be sized based on actual gamepad data
+            buttons_boolean = []
+            buttons_int = []
+            buttons_float = []
             
             # Try to parse the gamepad data from raw_data
             if raw_data:
@@ -83,6 +86,13 @@ class VrchGamepadLoaderNode:
                     
                     # Extract button data if available
                     if "buttons" in parsed_data and isinstance(parsed_data["buttons"], list):
+                        button_count = len(parsed_data["buttons"])
+                        
+                        # Initialize arrays with the correct size based on actual gamepad data
+                        buttons_boolean = [False] * button_count
+                        buttons_int = [0] * button_count
+                        buttons_float = [0.0] * button_count
+                        
                         for i, btn in enumerate(parsed_data["buttons"]):
                             if isinstance(btn, dict):
                                 is_pressed = bool(btn.get("pressed", False))
@@ -96,6 +106,11 @@ class VrchGamepadLoaderNode:
                             buttons_boolean[i] = is_pressed
                             buttons_int[i] = 1 if is_pressed else 0
                             buttons_float[i] = value
+                    else:
+                        # If no buttons data found, initialize with default empty arrays
+                        buttons_boolean = []
+                        buttons_int = []
+                        buttons_float = []
                             
                 except json.JSONDecodeError:
                     if debug:
@@ -104,34 +119,42 @@ class VrchGamepadLoaderNode:
                     if debug:
                         print(f"[VrchGamepadLoaderNode] Error processing gamepad data: {str(e)}")
 
+            # Ensure we have at least empty arrays even if no data was processed
+            if not buttons_boolean:
+                buttons_boolean = []
+            if not buttons_int:
+                buttons_int = []
+            if not buttons_float:
+                buttons_float = []
+
             if debug:
-                print("[VrchGamepadLoaderNode] Gamepad data:", json.dumps(gamepad_data, indent=2, ensure_ascii=False))
+                print(f"[VrchGamepadLoaderNode] Gamepad data:", json.dumps(gamepad_data, indent=2, ensure_ascii=False))
                 print(f"[VrchGamepadLoaderNode] LEFT_STICK: {left_stick}")
                 print(f"[VrchGamepadLoaderNode] RIGHT_STICK: {right_stick}")
                 print(f"[VrchGamepadLoaderNode] BUTTONS_BOOLEAN: {buttons_boolean}")
                 print(f"[VrchGamepadLoaderNode] BUTTONS_INT: {buttons_int}")
                 print(f"[VrchGamepadLoaderNode] BUTTONS_FLOAT: {buttons_float}")
+                print(f"[VrchGamepadLoaderNode] Number of buttons: {len(buttons_boolean)}")
                 
-            # Return the data in the new requested format, everything as JSON
             return (
-                left_stick,         # ComfyUI converts Python lists to JSON automatically
+                gamepad_data,
+                left_stick,
                 right_stick,
                 buttons_boolean,
                 buttons_int,
                 buttons_float,
-                gamepad_data
             )
             
         except Exception as e:
             print(f"[VrchGamepadLoaderNode] Error loading gamepad data: {str(e)}")
             # Return default values for all outputs
             return (
+                {}              # RAW_DATA
                 [0.0, 0.0],     # LEFT_STICK
                 [0.0, 0.0],     # RIGHT_STICK
-                [False] * 16,   # BUTTONS_BOOLEAN
-                [0] * 16,       # BUTTONS_INT
-                [0.0] * 16,     # BUTTONS_FLOAT
-                {}              # RAW_DATA
+                [],             # BUTTONS_BOOLEAN (empty array instead of fixed size)
+                [],             # BUTTONS_INT (empty array instead of fixed size)
+                [],             # BUTTONS_FLOAT (empty array instead of fixed size)
             )
         
     @classmethod
