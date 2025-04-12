@@ -5,7 +5,7 @@ from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
 from .nodes.websocket_nodes import *
-from .nodes.gamepad_control_nodes import *
+from .nodes.gamepad_nodes import *
 
 __version__ = "1.0.29"
 

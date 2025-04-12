@@ -16,6 +16,8 @@ app.registerExtension({
             const nameWidget = node.widgets.find(w => w.name === "name");
             const rawDataWidget = node.widgets.find(w => w.name === "raw_data");
             const debugWidget = node.widgets.find(w => w.name === "debug");
+            // Set up the timer to fetch gamepad data
+            let timerId = null;
 
             // Function to extract gamepad data into a serializable object
             const extractGamepadData = (gamepad) => {
@@ -34,8 +36,27 @@ app.registerExtension({
                 };
             };
 
-            // Set up the timer to fetch gamepad data
-            let timerId = null;
+            // Function to update widget visibility
+            const updateWidgetVisibility = () => {
+                if (debugWidget) {
+                    if (debugWidget.value) {
+                        showWidget(node, rawDataWidget);
+                    } else {
+                        hideWidget(node, rawDataWidget);
+                    }
+                }
+            };
+
+            if (debugWidget) {
+                debugWidget.callback = (value) => {
+                    updateWidgetVisibility();
+                };
+            }
+
+            if (rawDataWidget) {
+                // Set the initial visibility of the raw data widget
+                hideWidget(node, rawDataWidget);
+            }
 
             // fetch gamepad data from browser gamepad API
             const fetchGamepadData = async () => {
@@ -70,6 +91,11 @@ app.registerExtension({
             timerId = setInterval(() => {
                 fetchGamepadData();
             }, 100);
+
+            // Set a delay initialization for the URL and widget visibility
+            setTimeout(() => {
+                updateWidgetVisibility();
+            }, 1000);
 
             // Clear the timer when the node is removed
             const onRemoved = this.onRemoved;
