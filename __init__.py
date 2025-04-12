@@ -5,6 +5,7 @@ from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
 from .nodes.websocket_nodes import *
+from .nodes.gamepad_control_nodes import *
 
 __version__ = "1.0.29"
 
@@ -34,6 +35,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchInstantQueueKeyControlNode": VrchInstantQueueKeyControlNode,
     "VrchModelWebViewerNode": VrchModelWebViewerNode,
     "VrchOSCControlSettingsNode": VrchOSCControlSettingsNode,
+    "VrchGamepadLoaderNode": VrchGamepadLoaderNode,
     "VrchSwitchOSCControlNode": VrchSwitchOSCControlNode,
     "VrchTextConcatOSCControlNode": VrchTextConcatOSCControlNode,
     "VrchTextKeyControlNode": VrchTextKeyControlNode,
@@ -71,6 +73,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchInstantQueueKeyControlNode": "Instant Queue Key Control @ vrch.ai",
     "VrchModelWebViewerNode": "3D MODEL Web Viewer @ vrch.ai",
     "VrchOSCControlSettingsNode": "OSC Control Settings @ vrch.ai",
+    "VrchGamepadLoaderNode": "Gamepad Loader @ vrch.ai",
     "VrchSwitchOSCControlNode": "SWITCH OSC Control @ vrch.ai",
     "VrchTextConcatOSCControlNode": "TEXT Concat OSC Control @ vrch.ai",
     "VrchTextKeyControlNode": "TEXT Key Control @ vrch.ai",
