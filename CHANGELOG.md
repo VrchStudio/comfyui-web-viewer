@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - add a new Gamepad node `VrchGamepadLoaderNode`
 - add gamepad_nodes.md
+- add Gamepad node example workflow
 
 ## 1.0.29 - 2025-04-11
 
