@@ -90,6 +90,12 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 - Example workflows:
   - [Workflow Example: Key Control Nodes](./workflows/example_key_control_001_basic.json)
 
+### `Gamepad Nodes`
+
+- Documentation: [Usage of Gamepad nodes](./docs/gamepad_nodes.md)
+- Example workflows:
+  - [Workflow Example: Gamepade Nodes](./workflows/example_gamepad_nodes_001_basic.json)
+
 ### `Audio Nodes`
 
 - Documentation: [Usage of Audio nodes](./docs/audio_nodes.md)
