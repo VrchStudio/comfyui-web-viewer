@@ -7,22 +7,26 @@ CATEGORY="vrch.ai/logic"
 class VrchIntRemapNode:
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required":{
-            "input":("INT",{"default":None, "forceInput": True}),
-            "input_min":("INT",{"default":0,"min":-999999,"max":999999}),
-            "input_max":("INT",{"default":1,"min":-999999,"max":999999}),
-            "output_min":("INT",{"default":0,"min":-999999,"max":999999}),
-            "output_max":("INT",{"default":100,"min":-999999,"max":999999}),
-            "output_invert":("BOOLEAN",{"default":False}),
-            "output_default":("INT",{"default":0}),
-        }}
+        return {
+            "optional": {
+                "input": ("INT",     {"default": None, "forceInput": True}),
+            },
+            "required": {
+                "input_min":     ("INT",     {"default": 0,    "min": -999999, "max": 999999}),
+                "input_max":     ("INT",     {"default": 1,    "min": -999999, "max": 999999}),
+                "output_min":    ("INT",     {"default": 0,    "min": -999999, "max": 999999}),
+                "output_max":    ("INT",     {"default": 100,  "min": -999999, "max": 999999}),
+                "output_invert": ("BOOLEAN", {"default": False}),
+                "output_default":("INT",     {"default": 0}),
+            },
+        }
 
     RETURN_TYPES=("INT",)
     RETURN_NAMES=("OUTPUT",)
     FUNCTION="remap_int"
     CATEGORY=CATEGORY
 
-    def remap_int(self, input, input_min, input_max, output_min, output_max, output_invert, output_default):
+    def remap_int(self, input=None, input_min=0, input_max=1, output_min=0, output_max=100, output_invert=False, output_default=0):
         if input_min > input_max:
             raise ValueError("[VrchIntRemapNode] input_min cannot be greater than input_max.")
         if output_min > output_max:
@@ -48,22 +52,26 @@ class VrchIntRemapNode:
 class VrchFloatRemapNode:
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required":{
-            "input":("FLOAT",{"default":None, "forceInput": True}),
-            "input_min":("FLOAT",{"default":0.0,"min":-999999.0,"max":999999.0,"step":0.01}),
-            "input_max":("FLOAT",{"default":1.0,"min":-999999.0,"max":999999.0,"step":0.01}),
-            "output_min":("FLOAT",{"default":0.0,"min":-999999.0,"max":999999.0,"step":0.01}),
-            "output_max":("FLOAT",{"default":100.0,"min":-999999.0,"max":999999.0,"step":0.01}),
-            "output_invert":("BOOLEAN",{"default":False}),
-            "output_default":("FLOAT",{"default":0.0}),
-        }}
+        return {
+            "optional": {
+                "input": ("FLOAT",   {"default": None,   "forceInput": True}),
+            },
+            "required": {
+                "input_min":     ("FLOAT",   {"default": 0.0,    "min": -999999.0, "max": 999999.0, "step": 0.01}),
+                "input_max":     ("FLOAT",   {"default": 1.0,    "min": -999999.0, "max": 999999.0, "step": 0.01}),
+                "output_min":    ("FLOAT",   {"default": 0.0,    "min": -999999.0, "max": 999999.0, "step": 0.01}),
+                "output_max":    ("FLOAT",   {"default": 100.0,  "min": -999999.0, "max": 999999.0, "step": 0.01}),
+                "output_invert": ("BOOLEAN", {"default": False}),
+                "output_default":("FLOAT",   {"default": 0.0}),
+            },
+        }
 
     RETURN_TYPES=("FLOAT",)
     RETURN_NAMES=("OUTPUT",)
     FUNCTION="remap_float"
     CATEGORY=CATEGORY
 
-    def remap_float(self, input, input_min, input_max, output_min, output_max, output_invert, output_default):
+    def remap_float(self, input=None, input_min=0.0, input_max=1.0, output_min=0.0, output_max=100.0, output_invert=False, output_default=0.0):
         if input_min > input_max:
             raise ValueError("[VrchFloatRemapNode] input_min cannot be greater than input_max.")
         if output_min > output_max:
