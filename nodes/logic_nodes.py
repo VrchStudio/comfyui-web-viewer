@@ -88,15 +88,18 @@ class VrchFloatRemapNode:
 class VrchTriggerToggleNode:
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required":{
-            "trigger": ("BOOLEAN", {"default": None, "forceInput": True}),
-            "initial_state": ("BOOLEAN", {"default": False}), 
-            "debug": ("BOOLEAN", {"default": False}),
-        }}
+        return {
+            "optional": {
+                "trigger": ("BOOLEAN", {"default": None, "forceInput": True}),
+            },
+            "required": {
+                "initial_state": ("BOOLEAN", {"default": False}), 
+                "debug":         ("BOOLEAN", {"default": False}),
+            },
+        }
 
     RETURN_TYPES = ("BOOLEAN", "JSON",)
     RETURN_NAMES = ("OUTPUT", "JSON",)
-    OUTPUT_NODE = True
     FUNCTION = "switch"
     CATEGORY = CATEGORY
 
@@ -104,7 +107,7 @@ class VrchTriggerToggleNode:
         self.last_initial_state = None
         self.state = False
 
-    def switch(self, trigger, initial_state, debug):
+    def switch(self, trigger=None, initial_state=False, debug=False):
         
         # If initial_state input changed, reset current state
         if self.last_initial_state is None or initial_state != self.last_initial_state:
@@ -132,51 +135,143 @@ class VrchTriggerToggleNode:
     def IS_CHANGED(cls, **kwargs):
         return float("NaN")
 
-# Insert new 4-channel trigger toggle node
 class VrchTriggerToggleX4Node:
     @classmethod
     def INPUT_TYPES(cls):
-        return {"required":{
-            "trigger1": ("BOOLEAN", {"default": None, "forceInput": True}),
-            "trigger2": ("BOOLEAN", {"default": None, "forceInput": True}),
-            "trigger3": ("BOOLEAN", {"default": None, "forceInput": True}),
-            "trigger4": ("BOOLEAN", {"default": None, "forceInput": True}),
-            # default outputs before any toggle
-            "initial_state1": ("BOOLEAN", {"default": False}),
-            "initial_state2": ("BOOLEAN", {"default": False}),
-            "initial_state3": ("BOOLEAN", {"default": False}),
-            "initial_state4": ("BOOLEAN", {"default": False}),
-        }}
+        return {
+            "optional": {
+                "trigger1": ("BOOLEAN", {"default": None, "forceInput": True}),
+                "trigger2": ("BOOLEAN", {"default": None, "forceInput": True}),
+                "trigger3": ("BOOLEAN", {"default": None, "forceInput": True}),
+                "trigger4": ("BOOLEAN", {"default": None, "forceInput": True}),
+            },
+            "required": {
+                "initial_state1": ("BOOLEAN", {"default": False}),
+                "initial_state2": ("BOOLEAN", {"default": False}),
+                "initial_state3": ("BOOLEAN", {"default": False}),
+                "initial_state4": ("BOOLEAN", {"default": False}),
+                "debug":          ("BOOLEAN", {"default": False}),
+            },
+        }
 
-    RETURN_TYPES = ("BOOLEAN","BOOLEAN","BOOLEAN","BOOLEAN")
-    RETURN_NAMES = ("OUTPUT1","OUTPUT2","OUTPUT3","OUTPUT4")
+    RETURN_TYPES = ("BOOLEAN", "BOOLEAN", "BOOLEAN", "BOOLEAN", "JSON")
+    RETURN_NAMES = ("OUTPUT1", "OUTPUT2", "OUTPUT3", "OUTPUT4", "JSON")
     FUNCTION = "switch"
     CATEGORY = CATEGORY
 
     def __init__(self):
-        self.last_initial_states = [None, None, None, None]
-        self.state1 = False
-        self.state2 = False
-        self.state3 = False
-        self.state4 = False
+        self.last_initial_states = [None] * 4
+        self.states = [False] * 4
 
-    def switch(self, trigger1, trigger2, trigger3, trigger4,
-               initial_state1, initial_state2, initial_state3, initial_state4):
-        # Reset any channel whose initial_state input has changed
-        for idx, init_state in enumerate((initial_state1, initial_state2, initial_state3, initial_state4)):
-            if self.last_initial_states[idx] is None or init_state != self.last_initial_states[idx]:
-                setattr(self, f'state{idx+1}', init_state)
-                self.last_initial_states[idx] = init_state
-        # Toggle each state on True input
-        if trigger1:
-            self.state1 = not self.state1
-        if trigger2:
-            self.state2 = not self.state2
-        if trigger3:
-            self.state3 = not self.state3
-        if trigger4:
-            self.state4 = not self.state4
-        return (self.state1, self.state2, self.state3, self.state4)
+    def switch(self,
+               trigger1=None, trigger2=None, trigger3=None, trigger4=None,
+               initial_state1=False, initial_state2=False, initial_state3=False, initial_state4=False,
+               debug=False):
+        triggers = [trigger1, trigger2, trigger3, trigger4]
+        initials = [initial_state1, initial_state2, initial_state3, initial_state4]
+
+        # reset & toggle
+        for i in range(4):
+            if self.last_initial_states[i] is None or initials[i] != self.last_initial_states[i]:
+                self.states[i] = initials[i]
+                self.last_initial_states[i] = initials[i]
+            if triggers[i]:
+                self.states[i] = not self.states[i]
+
+        # build grouped JSON data
+        raw_data = {
+            f"trigger{i+1}": {
+                "trigger": triggers[i],
+                "initial_state": initials[i],
+                "current_state": self.states[i]
+            }
+            for i in range(4)
+        }
+        json_data = json.dumps(raw_data, indent=2, ensure_ascii=False)
+
+        if debug:
+            # print debug info in JSON format
+            print(f"[VrchTriggerToggleX4Node] {json_data}")
+
+        return (*self.states, json_data)
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("NaN")
+
+class VrchTriggerToggleX8Node:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "optional": {
+                "trigger1": ("BOOLEAN", {"default": None, "forceInput": True}),
+                "trigger2": ("BOOLEAN", {"default": None, "forceInput": True}),
+                "trigger3": ("BOOLEAN", {"default": None, "forceInput": True}),
+                "trigger4": ("BOOLEAN", {"default": None, "forceInput": True}),
+                "trigger5": ("BOOLEAN", {"default": None, "forceInput": True}),
+                "trigger6": ("BOOLEAN", {"default": None, "forceInput": True}),
+                "trigger7": ("BOOLEAN", {"default": None, "forceInput": True}),
+                "trigger8": ("BOOLEAN", {"default": None, "forceInput": True}),
+            },
+            "required":{
+                "initial_state1": ("BOOLEAN", {"default": False}),
+                "initial_state2": ("BOOLEAN", {"default": False}),
+                "initial_state3": ("BOOLEAN", {"default": False}),
+                "initial_state4": ("BOOLEAN", {"default": False}),
+                "initial_state5": ("BOOLEAN", {"default": False}),
+                "initial_state6": ("BOOLEAN", {"default": False}),
+                "initial_state7": ("BOOLEAN", {"default": False}),
+                "initial_state8": ("BOOLEAN", {"default": False}),
+                "debug":          ("BOOLEAN", {"default": False}),
+            },
+        }
+
+    RETURN_TYPES = ("BOOLEAN","BOOLEAN","BOOLEAN","BOOLEAN",
+                    "BOOLEAN","BOOLEAN","BOOLEAN","BOOLEAN","JSON")
+    RETURN_NAMES = ("OUTPUT1","OUTPUT2","OUTPUT3","OUTPUT4",
+                    "OUTPUT5","OUTPUT6","OUTPUT7","OUTPUT8","JSON")
+    FUNCTION = "switch"
+    CATEGORY = CATEGORY
+
+    def __init__(self):
+        self.last_initial_states = [None] * 8
+        self.states = [False] * 8
+
+    def switch(self,
+               trigger1 = None, trigger2 = None, trigger3 = None, trigger4 = None,
+               trigger5 = None, trigger6 = None, trigger7 = None, trigger8 = None,
+               initial_state1 = False, initial_state2 = False, initial_state3 = False, initial_state4 = False,
+               initial_state5 = False, initial_state6 = False, initial_state7 = False, initial_state8 = False,
+               debug = False):
+        triggers = [trigger1, trigger2, trigger3, trigger4,
+                    trigger5, trigger6, trigger7, trigger8]
+        initials = [initial_state1, initial_state2, initial_state3, initial_state4,
+                    initial_state5, initial_state6, initial_state7, initial_state8]
+
+        # reset initial changes and toggle on trigger
+        for i in range(8):
+            if self.last_initial_states[i] is None or initials[i] != self.last_initial_states[i]:
+                self.states[i] = initials[i]
+                self.last_initial_states[i] = initials[i]
+            if triggers[i]:
+                self.states[i] = not self.states[i]
+
+        # build grouped JSON data
+        raw_data = {
+            f"trigger{i+1}": {
+                "trigger":       triggers[i],
+                "initial_state": initials[i],
+                "current_state": self.states[i]
+            }
+            for i in range(8)
+        }
+        json_data = json.dumps(raw_data, indent=2, ensure_ascii=False)
+
+        if debug:
+            # print debug info in JSON format
+            print(f"[VrchTriggerToggleX8Node] {json_data}")
+
+        return (*self.states, json_data)
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
