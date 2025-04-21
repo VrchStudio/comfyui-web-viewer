@@ -1,0 +1,3290 @@
+{
+  "last_node_id": 212,
+  "last_link_id": 235,
+  "nodes": [
+    {
+      "id": 134,
+      "type": "easy showAnything",
+      "pos": [
+        -1100,
+        910
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 41,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 102
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "false"
+      ]
+    },
+    {
+      "id": 132,
+      "type": "easy showAnything",
+      "pos": [
+        -1100,
+        1140
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 43,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 104
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "false"
+      ]
+    },
+    {
+      "id": 133,
+      "type": "easy showAnything",
+      "pos": [
+        -1100,
+        1020
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 42,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 103
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "false"
+      ]
+    },
+    {
+      "id": 117,
+      "type": "easy showAnything",
+      "pos": [
+        -1870,
+        310
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 57,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 235
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "50"
+      ]
+    },
+    {
+      "id": 118,
+      "type": "easy showAnything",
+      "pos": [
+        -1870,
+        170
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 56,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 234
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "50"
+      ]
+    },
+    {
+      "id": 116,
+      "type": "easy showAnything",
+      "pos": [
+        -1870,
+        40
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 55,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 233
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "50"
+      ]
+    },
+    {
+      "id": 149,
+      "type": "easy showAnything",
+      "pos": [
+        -1866,
+        1594
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 45,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 119
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "0"
+      ]
+    },
+    {
+      "id": 151,
+      "type": "easy showAnything",
+      "pos": [
+        -1873,
+        1728
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 46,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 120
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "0.0"
+      ]
+    },
+    {
+      "id": 150,
+      "type": "easy showAnything",
+      "pos": [
+        -1868,
+        1870
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 47,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 121
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 148,
+      "type": "easy showAnything",
+      "pos": [
+        -1867,
+        2011
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 48,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 122
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "false"
+      ]
+    },
+    {
+      "id": 100,
+      "type": "easy showAnything",
+      "pos": [
+        -1894,
+        -447
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 111
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "50"
+      ]
+    },
+    {
+      "id": 99,
+      "type": "easy showAnything",
+      "pos": [
+        -1890,
+        -596
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 110
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "50"
+      ]
+    },
+    {
+      "id": 153,
+      "type": "easy showAnything",
+      "pos": [
+        -1895,
+        -311
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 123
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "50.0"
+      ]
+    },
+    {
+      "id": 154,
+      "type": "easy showAnything",
+      "pos": [
+        -1889,
+        -176
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 124
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "50.0"
+      ]
+    },
+    {
+      "id": 172,
+      "type": "easy showAnything",
+      "pos": [
+        -788,
+        1701
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 50,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 136
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "bbb"
+      ]
+    },
+    {
+      "id": 176,
+      "type": "String",
+      "pos": [
+        -1519,
+        1695
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "shape": 3,
+          "links": [
+            140
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "String"
+      },
+      "widgets_values": [
+        "aaa"
+      ]
+    },
+    {
+      "id": 177,
+      "type": "String",
+      "pos": [
+        -1518,
+        1797
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "shape": 3,
+          "links": [
+            141
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "String"
+      },
+      "widgets_values": [
+        "bbb"
+      ]
+    },
+    {
+      "id": 178,
+      "type": "Int",
+      "pos": [
+        -1513,
+        1903
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            142
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Int"
+      },
+      "widgets_values": [
+        111
+      ]
+    },
+    {
+      "id": 179,
+      "type": "Int",
+      "pos": [
+        -1517,
+        2000
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            143
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Int"
+      },
+      "widgets_values": [
+        222
+      ]
+    },
+    {
+      "id": 180,
+      "type": "Float",
+      "pos": [
+        -1514,
+        2096
+      ],
+      "size": [
+        210,
+        58.0545768737793
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            144
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Float"
+      },
+      "widgets_values": [
+        1.11
+      ]
+    },
+    {
+      "id": 181,
+      "type": "Float",
+      "pos": [
+        -1514,
+        2192
+      ],
+      "size": [
+        210,
+        58.0545768737793
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            145
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Float"
+      },
+      "widgets_values": [
+        2.22
+      ]
+    },
+    {
+      "id": 171,
+      "type": "VrchChannelX4OSCControlNode",
+      "pos": [
+        -1215,
+        1693
+      ],
+      "size": [
+        380.4000244140625,
+        382
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any_channel_1_on",
+          "type": "*",
+          "link": 140
+        },
+        {
+          "name": "any_channel_1_off",
+          "type": "*",
+          "link": 141
+        },
+        {
+          "name": "any_channel_2_on",
+          "type": "*",
+          "link": 142
+        },
+        {
+          "name": "any_channel_2_off",
+          "type": "*",
+          "link": 143
+        },
+        {
+          "name": "any_channel_3_on",
+          "type": "*",
+          "link": 144
+        },
+        {
+          "name": "any_channel_3_off",
+          "type": "*",
+          "link": 145
+        },
+        {
+          "name": "any_channel_4_on",
+          "type": "*",
+          "link": 146
+        },
+        {
+          "name": "any_channel_4_off",
+          "type": "*",
+          "link": 147
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            176
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 227
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            200
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 228
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ANY_OUTPUT_1",
+          "type": "*",
+          "shape": 3,
+          "links": [
+            136
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "ANY_OUTPUT_2",
+          "type": "*",
+          "shape": 3,
+          "links": [
+            137
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "ANY_OUTPUT_3",
+          "type": "*",
+          "shape": 3,
+          "links": [
+            138
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "ANY_OUTPUT_4",
+          "type": "*",
+          "shape": 3,
+          "links": [
+            139
+          ],
+          "slot_index": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchChannelX4OSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/3/toggle1",
+        "/3/toggle2",
+        "/3/push1",
+        "/3/push2",
+        false
+      ]
+    },
+    {
+      "id": 182,
+      "type": "Bool",
+      "pos": [
+        -1508,
+        2314
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "BOOLEAN",
+          "type": "BOOLEAN",
+          "shape": 3,
+          "links": [
+            146
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Bool"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 183,
+      "type": "Bool",
+      "pos": [
+        -1508,
+        2420
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "BOOLEAN",
+          "type": "BOOLEAN",
+          "shape": 3,
+          "links": [
+            147
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Bool"
+      },
+      "widgets_values": [
+        false
+      ]
+    },
+    {
+      "id": 173,
+      "type": "easy showAnything",
+      "pos": [
+        -791,
+        1831
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 51,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 137
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "222"
+      ]
+    },
+    {
+      "id": 174,
+      "type": "easy showAnything",
+      "pos": [
+        -793,
+        1965
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 52,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 138
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "2.22"
+      ]
+    },
+    {
+      "id": 175,
+      "type": "easy showAnything",
+      "pos": [
+        -791,
+        2109
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 53,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 139
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "false"
+      ]
+    },
+    {
+      "id": 167,
+      "type": "String",
+      "pos": [
+        -1508,
+        1549
+      ],
+      "size": [
+        226.056640625,
+        58
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "shape": 3,
+          "links": [
+            134
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "String"
+      },
+      "widgets_values": [
+        "bbb"
+      ]
+    },
+    {
+      "id": 166,
+      "type": "String",
+      "pos": [
+        -1507,
+        1425
+      ],
+      "size": [
+        231.2980194091797,
+        58
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "shape": 3,
+          "links": [
+            133
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "String"
+      },
+      "widgets_values": [
+        "aaa"
+      ]
+    },
+    {
+      "id": 168,
+      "type": "VrchChannelOSCControlNode",
+      "pos": [
+        -1214,
+        1420
+      ],
+      "size": [
+        315,
+        190
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any_channel_on",
+          "type": "*",
+          "link": 133
+        },
+        {
+          "name": "any_channel_off",
+          "type": "*",
+          "link": 134
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 225
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 226
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ANY_OUTPUT",
+          "type": "*",
+          "shape": 3,
+          "links": [
+            135
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchChannelOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/3/toggle1",
+        false
+      ]
+    },
+    {
+      "id": 163,
+      "type": "easy showAnything",
+      "pos": [
+        -824,
+        1418
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 49,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 135
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "bbb"
+      ]
+    },
+    {
+      "id": 120,
+      "type": "easy showAnything",
+      "pos": [
+        -1154,
+        -509
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 108
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "0"
+      ]
+    },
+    {
+      "id": 123,
+      "type": "easy showAnything",
+      "pos": [
+        -1154,
+        -367
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 109
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "0"
+      ]
+    },
+    {
+      "id": 122,
+      "type": "easy showAnything",
+      "pos": [
+        -1142,
+        -123
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 94
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "0.0"
+      ]
+    },
+    {
+      "id": 124,
+      "type": "easy showAnything",
+      "pos": [
+        -1135,
+        14
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 35,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 96
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "0.0"
+      ]
+    },
+    {
+      "id": 125,
+      "type": "VrchSwitchOSCControlNode",
+      "pos": [
+        -1540,
+        242
+      ],
+      "size": [
+        315,
+        438
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            176
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 219
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            200
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 220
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SWITCH_1",
+          "type": "BOOLEAN",
+          "shape": 3,
+          "links": [
+            97
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "SWITCH_2",
+          "type": "BOOLEAN",
+          "shape": 3,
+          "links": [
+            98
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "SWITCH_3",
+          "type": "BOOLEAN",
+          "shape": 3,
+          "links": [
+            99
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "SWITCH_4",
+          "type": "BOOLEAN",
+          "shape": 3,
+          "links": [
+            100
+          ],
+          "slot_index": 3
+        },
+        {
+          "name": "SWITCH_5",
+          "type": "BOOLEAN",
+          "shape": 3,
+          "links": [
+            101
+          ],
+          "slot_index": 4
+        },
+        {
+          "name": "SWITCH_6",
+          "type": "BOOLEAN",
+          "shape": 3,
+          "links": [
+            102
+          ],
+          "slot_index": 5
+        },
+        {
+          "name": "SWITCH_7",
+          "type": "BOOLEAN",
+          "shape": 3,
+          "links": [
+            103
+          ],
+          "slot_index": 6
+        },
+        {
+          "name": "SWITCH_8",
+          "type": "BOOLEAN",
+          "shape": 3,
+          "links": [
+            104
+          ],
+          "slot_index": 7
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchSwitchOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/3/push1",
+        "/3/push2",
+        "/3/push3",
+        "/3/push4",
+        "/3/toggle1",
+        "/3/toggle2",
+        "/3/toggle3",
+        "/3/toggle4",
+        false
+      ]
+    },
+    {
+      "id": 126,
+      "type": "easy showAnything",
+      "pos": [
+        -1117,
+        243
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 97
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "false"
+      ]
+    },
+    {
+      "id": 130,
+      "type": "easy showAnything",
+      "pos": [
+        -1111,
+        385
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 98
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "false"
+      ]
+    },
+    {
+      "id": 131,
+      "type": "easy showAnything",
+      "pos": [
+        -1111,
+        519
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 38,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 99
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "false"
+      ]
+    },
+    {
+      "id": 129,
+      "type": "easy showAnything",
+      "pos": [
+        -1108,
+        654
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 39,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 100
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "false"
+      ]
+    },
+    {
+      "id": 128,
+      "type": "easy showAnything",
+      "pos": [
+        -1100,
+        790
+      ],
+      "size": [
+        210,
+        88
+      ],
+      "flags": {},
+      "order": 40,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "shape": 7,
+          "link": 101
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "false"
+      ]
+    },
+    {
+      "id": 142,
+      "type": "ShowText|pysssss",
+      "pos": [
+        -1539,
+        941
+      ],
+      "size": [
+        315,
+        112
+      ],
+      "flags": {},
+      "order": 44,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "pos": [
+            10,
+            36
+          ],
+          "widget": {
+            "name": "text"
+          },
+          "link": 106
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "shape": 6,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 204,
+      "type": "PreviewImage",
+      "pos": [
+        -1886,
+        2180
+      ],
+      "size": [
+        210,
+        246
+      ],
+      "flags": {},
+      "order": 54,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 208
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 207,
+      "type": "VrchImageSwitchOSCControlNode",
+      "pos": [
+        -2265,
+        2171
+      ],
+      "size": [
+        315,
+        270
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image0",
+          "type": "IMAGE",
+          "shape": 7,
+          "link": 205
+        },
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "shape": 7,
+          "link": 206
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "shape": 7,
+          "link": 207
+        },
+        {
+          "name": "image3",
+          "type": "IMAGE",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            96
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 229
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            120
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 230
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            208
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchImageSwitchOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/3/radio1",
+        true
+      ]
+    },
+    {
+      "id": 210,
+      "type": "Int",
+      "pos": [
+        -3409.131591796875,
+        1213.2530517578125
+      ],
+      "size": [
+        315,
+        58
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            210,
+            214,
+            216,
+            218,
+            220,
+            222,
+            224,
+            226,
+            228,
+            230,
+            232
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Port",
+      "properties": {
+        "Node name for S&R": "Int"
+      },
+      "widgets_values": [
+        8000
+      ]
+    },
+    {
+      "id": 138,
+      "type": "ShowText|pysssss",
+      "pos": [
+        -1916.4808349609375,
+        789.3424682617188
+      ],
+      "size": [
+        210,
+        85.58305358886719
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "pos": [
+            10,
+            36
+          ],
+          "widget": {
+            "name": "text"
+          },
+          "link": 107
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "shape": 6,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 152,
+      "type": "VrchAnyOSCControlNode",
+      "pos": [
+        -2329.07666015625,
+        1678.3753662109375
+      ],
+      "size": [
+        315,
+        190
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            96
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 223
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            120
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 224
+        }
+      ],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            119
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            120
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "TEXT",
+          "type": "STRING",
+          "shape": 3,
+          "links": [
+            121
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "BOOL",
+          "type": "BOOLEAN",
+          "shape": 3,
+          "links": [
+            122
+          ],
+          "slot_index": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchAnyOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/data/gameController/shoulder/left",
+        false
+      ]
+    },
+    {
+      "id": 143,
+      "type": "VrchTextConcatOSCControlNode",
+      "pos": [
+        -2312.700439453125,
+        821.0763549804688
+      ],
+      "size": [
+        318.8970947265625,
+        774
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            496
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 213
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            520
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 214
+        }
+      ],
+      "outputs": [
+        {
+          "name": "TEXT_OUTPUT",
+          "type": "STRING",
+          "shape": 3,
+          "links": [
+            107
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchTextConcatOSCControlNode"
+      },
+      "widgets_values": [
+        "red light",
+        "blue light",
+        "yellow light",
+        "green light",
+        "dog",
+        "cat",
+        "boy",
+        "girl",
+        "192.168.123.104",
+        8000,
+        "/3/toggle1",
+        "/3/toggle2",
+        "/3/toggle3",
+        "/3/toggle4",
+        "/3/toggle5",
+        "/3/toggle6",
+        "/3/toggle7",
+        "/3/toggle8",
+        ",",
+        false
+      ]
+    },
+    {
+      "id": 186,
+      "type": "LoadImage",
+      "pos": [
+        -2675.86328125,
+        2086.13525390625
+      ],
+      "size": [
+        315,
+        314.00006103515625
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            205
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "11.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 187,
+      "type": "LoadImage",
+      "pos": [
+        -2672.73828125,
+        2473.2421875
+      ],
+      "size": [
+        303.4268798828125,
+        314
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            206
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "12.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 202,
+      "type": "LoadImage",
+      "pos": [
+        -2671.5546875,
+        2842.1953125
+      ],
+      "size": [
+        296.40509033203125,
+        314
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            207
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "9.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 141,
+      "type": "VrchTextSwitchOSCControlNode",
+      "pos": [
+        -1917.42578125,
+        935.7265625
+      ],
+      "size": [
+        345.6325988769531,
+        582
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            496
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 221
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            520
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 222
+        }
+      ],
+      "outputs": [
+        {
+          "name": "TEXT_OUTPUT",
+          "type": "STRING",
+          "shape": 3,
+          "links": [
+            106
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchTextSwitchOSCControlNode"
+      },
+      "widgets_values": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "192.168.123.104",
+        8000,
+        "/3/radio1",
+        false
+      ]
+    },
+    {
+      "id": 121,
+      "type": "VrchFloatOSCControlNode",
+      "pos": [
+        -1542.9140625,
+        -119.984375
+      ],
+      "size": [
+        315,
+        294
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 217
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 218
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            94
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            96
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchFloatOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/3/fader2",
+        0,
+        1,
+        false,
+        100,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": 144,
+      "type": "VrchIntOSCControlNode",
+      "pos": [
+        -1546.59765625,
+        -502.28125
+      ],
+      "size": [
+        315,
+        294
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 215
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 216
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            108
+          ]
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            109
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchIntOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/3/fader1",
+        0,
+        1,
+        0,
+        100,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": 145,
+      "type": "VrchXYOSCControlNode",
+      "pos": [
+        -2300.1376953125,
+        -567.599853515625
+      ],
+      "size": [
+        315,
+        518
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            136
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 209
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            160
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 210
+        }
+      ],
+      "outputs": [
+        {
+          "name": "X_INT",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            110
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "Y_INT",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            111
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "X_FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            123
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "Y_FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [
+            124
+          ],
+          "slot_index": 3
+        },
+        {
+          "name": "X_RAW",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "Y_RAW",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchXYOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/3/xy1",
+        0,
+        1,
+        0,
+        100,
+        false,
+        50,
+        0,
+        1,
+        0,
+        100,
+        false,
+        50,
+        false
+      ]
+    },
+    {
+      "id": 212,
+      "type": "VrchXYZOSCControlNode",
+      "pos": [
+        -2309.463623046875,
+        33.45243835449219
+      ],
+      "size": [
+        315,
+        722
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            196
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 231
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            220
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 232
+        }
+      ],
+      "outputs": [
+        {
+          "name": "X_INT",
+          "type": "INT",
+          "links": [
+            233
+          ]
+        },
+        {
+          "name": "Y_INT",
+          "type": "INT",
+          "links": [
+            234
+          ]
+        },
+        {
+          "name": "Z_INT",
+          "type": "INT",
+          "links": [
+            235
+          ]
+        },
+        {
+          "name": "X_FLOAT",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "Y_FLOAT",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "Z_FLOAT",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "X_RAW",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "Y_RAW",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "Z_RAW",
+          "type": "FLOAT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchXYZOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.112",
+        8000,
+        "/xyz",
+        0,
+        1,
+        0,
+        100,
+        false,
+        50,
+        0,
+        1,
+        0,
+        100,
+        false,
+        50,
+        0,
+        1,
+        0,
+        100,
+        false,
+        50,
+        false
+      ]
+    },
+    {
+      "id": 211,
+      "type": "Note",
+      "pos": [
+        -3451.060791015625,
+        768.91015625
+      ],
+      "size": [
+        535.8948364257812,
+        163.19281005859375
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Instructions",
+      "properties": {
+        "text": ""
+      },
+      "widgets_values": [
+        "1. Change Server IP Address to your ComfyUI server IP address.\n2. Search and install app \"TouchOSC\".\n3. Import and open \"comfyui_osc_control.tosc\" control panel.\n4. Test OSC Control nodes by using the actions in \"Test\" tab.\n5. Please check \"ComfyUI Web Viewer\" repo for more details:\n   - https://github.com/VrchStudio/comfyui-web-viewer\n\nby Tianzi@vrch.io"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 208,
+      "type": "String",
+      "pos": [
+        -3404.131591796875,
+        1072.2530517578125
+      ],
+      "size": [
+        315,
+        58
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "shape": 3,
+          "links": [
+            209,
+            213,
+            215,
+            217,
+            219,
+            221,
+            223,
+            225,
+            227,
+            229,
+            231
+          ],
+          "slot_index": 0
+        }
+      ],
+      "title": "Server",
+      "properties": {
+        "Node name for S&R": "String"
+      },
+      "widgets_values": [
+        "192.168.123.112"
+      ]
+    }
+  ],
+  "links": [
+    [
+      94,
+      121,
+      0,
+      122,
+      0,
+      "*"
+    ],
+    [
+      96,
+      121,
+      1,
+      124,
+      0,
+      "*"
+    ],
+    [
+      97,
+      125,
+      0,
+      126,
+      0,
+      "*"
+    ],
+    [
+      98,
+      125,
+      1,
+      130,
+      0,
+      "*"
+    ],
+    [
+      99,
+      125,
+      2,
+      131,
+      0,
+      "*"
+    ],
+    [
+      100,
+      125,
+      3,
+      129,
+      0,
+      "*"
+    ],
+    [
+      101,
+      125,
+      4,
+      128,
+      0,
+      "*"
+    ],
+    [
+      102,
+      125,
+      5,
+      134,
+      0,
+      "*"
+    ],
+    [
+      103,
+      125,
+      6,
+      133,
+      0,
+      "*"
+    ],
+    [
+      104,
+      125,
+      7,
+      132,
+      0,
+      "*"
+    ],
+    [
+      106,
+      141,
+      0,
+      142,
+      0,
+      "STRING"
+    ],
+    [
+      107,
+      143,
+      0,
+      138,
+      0,
+      "STRING"
+    ],
+    [
+      108,
+      144,
+      0,
+      120,
+      0,
+      "*"
+    ],
+    [
+      109,
+      144,
+      1,
+      123,
+      0,
+      "*"
+    ],
+    [
+      110,
+      145,
+      0,
+      99,
+      0,
+      "*"
+    ],
+    [
+      111,
+      145,
+      1,
+      100,
+      0,
+      "*"
+    ],
+    [
+      119,
+      152,
+      0,
+      149,
+      0,
+      "*"
+    ],
+    [
+      120,
+      152,
+      1,
+      151,
+      0,
+      "*"
+    ],
+    [
+      121,
+      152,
+      2,
+      150,
+      0,
+      "*"
+    ],
+    [
+      122,
+      152,
+      3,
+      148,
+      0,
+      "*"
+    ],
+    [
+      123,
+      145,
+      2,
+      153,
+      0,
+      "*"
+    ],
+    [
+      124,
+      145,
+      3,
+      154,
+      0,
+      "*"
+    ],
+    [
+      133,
+      166,
+      0,
+      168,
+      0,
+      "*"
+    ],
+    [
+      134,
+      167,
+      0,
+      168,
+      1,
+      "*"
+    ],
+    [
+      135,
+      168,
+      0,
+      163,
+      0,
+      "*"
+    ],
+    [
+      136,
+      171,
+      0,
+      172,
+      0,
+      "*"
+    ],
+    [
+      137,
+      171,
+      1,
+      173,
+      0,
+      "*"
+    ],
+    [
+      138,
+      171,
+      2,
+      174,
+      0,
+      "*"
+    ],
+    [
+      139,
+      171,
+      3,
+      175,
+      0,
+      "*"
+    ],
+    [
+      140,
+      176,
+      0,
+      171,
+      0,
+      "*"
+    ],
+    [
+      141,
+      177,
+      0,
+      171,
+      1,
+      "*"
+    ],
+    [
+      142,
+      178,
+      0,
+      171,
+      2,
+      "*"
+    ],
+    [
+      143,
+      179,
+      0,
+      171,
+      3,
+      "*"
+    ],
+    [
+      144,
+      180,
+      0,
+      171,
+      4,
+      "*"
+    ],
+    [
+      145,
+      181,
+      0,
+      171,
+      5,
+      "*"
+    ],
+    [
+      146,
+      182,
+      0,
+      171,
+      6,
+      "*"
+    ],
+    [
+      147,
+      183,
+      0,
+      171,
+      7,
+      "*"
+    ],
+    [
+      205,
+      186,
+      0,
+      207,
+      0,
+      "IMAGE"
+    ],
+    [
+      206,
+      187,
+      0,
+      207,
+      1,
+      "IMAGE"
+    ],
+    [
+      207,
+      202,
+      0,
+      207,
+      2,
+      "IMAGE"
+    ],
+    [
+      208,
+      207,
+      0,
+      204,
+      0,
+      "IMAGE"
+    ],
+    [
+      209,
+      208,
+      0,
+      145,
+      0,
+      "STRING"
+    ],
+    [
+      210,
+      210,
+      0,
+      145,
+      1,
+      "INT"
+    ],
+    [
+      213,
+      208,
+      0,
+      143,
+      0,
+      "STRING"
+    ],
+    [
+      214,
+      210,
+      0,
+      143,
+      1,
+      "INT"
+    ],
+    [
+      215,
+      208,
+      0,
+      144,
+      0,
+      "STRING"
+    ],
+    [
+      216,
+      210,
+      0,
+      144,
+      1,
+      "INT"
+    ],
+    [
+      217,
+      208,
+      0,
+      121,
+      0,
+      "STRING"
+    ],
+    [
+      218,
+      210,
+      0,
+      121,
+      1,
+      "INT"
+    ],
+    [
+      219,
+      208,
+      0,
+      125,
+      0,
+      "STRING"
+    ],
+    [
+      220,
+      210,
+      0,
+      125,
+      1,
+      "INT"
+    ],
+    [
+      221,
+      208,
+      0,
+      141,
+      0,
+      "STRING"
+    ],
+    [
+      222,
+      210,
+      0,
+      141,
+      1,
+      "INT"
+    ],
+    [
+      223,
+      208,
+      0,
+      152,
+      0,
+      "STRING"
+    ],
+    [
+      224,
+      210,
+      0,
+      152,
+      1,
+      "INT"
+    ],
+    [
+      225,
+      208,
+      0,
+      168,
+      2,
+      "STRING"
+    ],
+    [
+      226,
+      210,
+      0,
+      168,
+      3,
+      "INT"
+    ],
+    [
+      227,
+      208,
+      0,
+      171,
+      8,
+      "STRING"
+    ],
+    [
+      228,
+      210,
+      0,
+      171,
+      9,
+      "INT"
+    ],
+    [
+      229,
+      208,
+      0,
+      207,
+      4,
+      "STRING"
+    ],
+    [
+      230,
+      210,
+      0,
+      207,
+      5,
+      "INT"
+    ],
+    [
+      231,
+      208,
+      0,
+      212,
+      0,
+      "STRING"
+    ],
+    [
+      232,
+      210,
+      0,
+      212,
+      1,
+      "INT"
+    ],
+    [
+      233,
+      212,
+      0,
+      116,
+      0,
+      "*"
+    ],
+    [
+      234,
+      212,
+      1,
+      118,
+      0,
+      "*"
+    ],
+    [
+      235,
+      212,
+      2,
+      117,
+      0,
+      "*"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "Server Settings",
+      "bounding": [
+        -3466,
+        965,
+        567,
+        398
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6209213230591554,
+      "offset": [
+        3301.590119469169,
+        279.2820164713056
+      ]
+    },
+    "node_versions": {
+      "ComfyUI-Easy-Use": "db14b955a59ef8568ed2511b73373d5437449341",
+      "ComfyUI-Logic": "fb8897351f715ea75eebf52e74515b6d07c693b8",
+      "comfyui-web-viewer": "4b3c80bd145bf47a7dd44434d57d1688b87907e7",
+      "ComfyUI-Custom-Scripts": "d6657cc1f04539dbeea38d7bf6d73bc025004fa4",
+      "comfy-core": "0.3.24"
+    }
+  },
+  "version": 0.4
+}

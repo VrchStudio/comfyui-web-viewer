@@ -53,11 +53,11 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 
 - Documentation: [Usage of Web Viewer nodes](./docs/web_viewer_nodes.md)
 - Example workflows: 
-  - [Workflow Example: Image Web Viewer node](./workflows/example_web_viewer_001_image_web_viewer.json)
-  - [Workflow Example: Image Flipbook Viewer node](./workflows/example_web_viewer_002_image_flipbook_web_viewer.json)
-  - [Workflow Example: Video Web Viewer node (video only)](./workflows/example_web_viewer_003_video_web_viewer.json)
-  - [Workflow Example: Video Web Viewer node (video + sound)](./workflows/example_web_viewer_004_video_web_viewer_video_with_sfx.json)
-  - [Workflow Example: Audio Web Viewer node (voice clone)](./workflows/example_web_viewer_005_audio_web_viewer_f5_tts.json)
+  - [Workflow Example: Image Web Viewer node](./example_workflows/example_web_viewer_001_image_web_viewer.json)
+  - [Workflow Example: Image Flipbook Viewer node](./example_workflows/example_web_viewer_002_image_flipbook_web_viewer.json)
+  - [Workflow Example: Video Web Viewer node (video only)](./example_workflows/example_web_viewer_003_video_web_viewer.json)
+  - [Workflow Example: Video Web Viewer node (video + sound)](./example_workflows/example_web_viewer_004_video_web_viewer_video_with_sfx.json)
+  - [Workflow Example: Audio Web Viewer node (voice clone)](./example_workflows/example_web_viewer_005_audio_web_viewer_f5_tts.json)
 - Tutorials:
   - [Fast Image to Video by LTX Videos and Ollama](./docs/tutorial_002_fast_image_to_video_by_ltx_video_and_ollama.md)
   - [Fast Image to Video by LTX Vidoes, MMAudio and Ollama](./docs/tutorial_003_fast_image_to_video_by_ltx_video_and_mmaudio_and_ollama.md)
@@ -78,9 +78,9 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 - TouchOSC Control Panel:
   - [comfyui_osc_control.tosc](./assets/touchosc/comfyui_osc_control.tosc)
 - Example workflows:
-  - [Workflow Example: OSC Control Nodes](./workflows/example_osc_control_001_basic.json)
-  - [Workflow Example: Live Portrait + Gamepad](./workflows/example_osc_control_002_live_portrait_with_gamepad.json)
-  - [Workflow Example: IC-Light](./workflows/example_osc_control_003_ic-light.png)
+  - [Workflow Example: OSC Control Nodes](./example_workflows/example_osc_control_001_basic.json)
+  - [Workflow Example: Live Portrait + Gamepad](./example_workflows/example_osc_control_002_live_portrait_with_gamepad.json)
+  - [Workflow Example: IC-Light](./example_workflows/example_osc_control_003_ic-light.png)
 - Tutorials:
   - [Live Portrait + Gamepad](./docs/tutorial_001_live_portrait_with_gamepad.md)
 
@@ -88,41 +88,41 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 
 - Documentation: [Usage of Key Control nodes](./docs/key_control_nodes.md)
 - Example workflows:
-  - [Workflow Example: Key Control Nodes](./workflows/example_key_control_001_basic.json)
+  - [Workflow Example: Key Control Nodes](./example_workflows/example_key_control_001_basic.json)
 
 ### `Gamepad Nodes`
 
 - Documentation: [Usage of Gamepad nodes](./docs/gamepad_nodes.md)
 - Example workflows:
-  - [Workflow Example: Gamepade Nodes](./workflows/example_gamepad_nodes_001_basic.json)
+  - [Workflow Example: Gamepade Nodes](./example_workflows/example_gamepad_nodes_001_basic.json)
 
 ### `Audio Nodes`
 
 - Documentation: [Usage of Audio nodes](./docs/audio_nodes.md)
 - Example workflows:
-  - [Workflow Example: Audio Recorder Node](./workflows/example_audio_nodes_001_audio_recorder.json)
+  - [Workflow Example: Audio Recorder Node](./example_workflows/example_audio_nodes_001_audio_recorder.json)
 
 ### `Image Nodes`
 
 - Documentation: [Usage of Image nodes](./docs/image_nodes.md)
 - Example workflows:
-  - [Workflow Example: Preview Image in Background](./workflows/example_image_nodes_001_preview_in_background.json)
+  - [Workflow Example: Preview Image in Background](./example_workflows/example_image_nodes_001_preview_in_background.json)
 
 ### `Text Nodes`
 
 - Documentation: [Usage of Text nodes](./docs/text_nodes.md)
 - Example workflows:
-    - [Workflow Example: Text SRT Player Node](./workflows/example_text_nodes_001_text_srt_player.json)
+    - [Workflow Example: Text SRT Player Node](./example_workflows/example_text_nodes_001_text_srt_player.json)
 - Tutorials:
   - [Storytelling with Text SRT Player](./docs/tutorial_005_storytelling_with_text_srt_player.md)
 
 ### `Other Example Workflows`
 
-- [Rapid Text to Image (8K)](./workflows/example_others_001_text_to_image_8k.json)
-- [Auto Switch to Instant Queue and Run Workflow](./workflows/example_others_002_autorun_instant_queue.json)
-- [Apple Vision Pro Ultrawide Wallpaper (5K)](./workflows/example_others_003_text_to_image_5k_avp_ultra_wide.json)
-- [Audio Picture Book with Your Own Voice (FLUX version)](./workflows/example_others_004_srt_to_audio_picture_book.json)
-- [Audio Picture Book with Your Own Voice (SDXL version)](./workflows/example_others_005_srt_to_audio_picture_book_sdxl.json)
+- [Rapid Text to Image (8K)](./example_workflows/example_others_001_text_to_image_8k.json)
+- [Auto Switch to Instant Queue and Run Workflow](./example_workflows/example_others_002_autorun_instant_queue.json)
+- [Apple Vision Pro Ultrawide Wallpaper (5K)](./example_workflows/example_others_003_text_to_image_5k_avp_ultra_wide.json)
+- [Audio Picture Book with Your Own Voice (FLUX version)](./example_workflows/example_others_004_srt_to_audio_picture_book.json)
+- [Audio Picture Book with Your Own Voice (SDXL version)](./example_workflows/example_others_005_srt_to_audio_picture_book_sdxl.json)
 
 ## Troubleshootings
 

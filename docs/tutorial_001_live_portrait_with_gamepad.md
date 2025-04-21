@@ -4,7 +4,7 @@ If you saw the [last post on real-time avatar control with ComfyUI and Vision Pr
 
 With this setup, you can use your gamepad to control live portrait movements and expressions in ComfyUI. It’s all about bringing that next level of interactive control into your setup—perfect for adding expressions, head movement, and more to your avatar with just a joystick and buttons. Follow along and give it a try!
 
-![](../workflows/example_osc_control_002_live_portrait_with_gamepad.png)
+![](../example_workflows/example_osc_control_002_live_portrait_with_gamepad.png)
 
 ## Preparations
 
@@ -15,7 +15,7 @@ With this setup, you can use your gamepad to control live portrait movements and
    - Method 1: search for `ComfyUI-AdvancedLivePortrait` in ComfyUI Manager
    - Method 2: install from github: [https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait](https://github.com/PowerHouseMan/ComfyUI-AdvancedLivePortrait)
 3. Download `Workflow Example: Live Portrait + Gamepad` workflow:
-   - Download it from here: [example_osc_control_002_live_portrait_with_gamepad.json](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_osc_control_002_live_portrait_with_gamepad.json)
+   - Download it from here: [example_osc_control_002_live_portrait_with_gamepad.json](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_osc_control_002_live_portrait_with_gamepad.json)
 4. Install `TouchOSC` app
    - AppStore: [https://apps.apple.com/us/app/touchosc/id1569996730](https://apps.apple.com/us/app/touchosc/id1569996730)
    - Official Website: [https://hexler.net/touchosc](https://hexler.net/touchosc)
@@ -41,7 +41,7 @@ With this setup, you can use your gamepad to control live portrait movements and
 ### Run Workflow in ComfyUI
 
 1. **Load Workflow**
-   - In ComfyUI, load the file [example_osc_control_002_live_portrait_with_gamepad.json](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_osc_control_002_live_portrait_with_gamepad.json)
+   - In ComfyUI, load the file [example_osc_control_002_live_portrait_with_gamepad.json](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_osc_control_002_live_portrait_with_gamepad.json)
 2. **Set Server Address**
    - Go to `Server Settings` group panel
    - Update `Server Address` to your ComfyUI Server IP address, e.g. `192.168.1.100`
@@ -77,6 +77,6 @@ Oral - woo -------------- Right Trigger + Pad Right
 
 ## Materials
 
-- ComfyUI workflow: [example_osc_control_002_live_portrait_with_gamepad.json](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_osc_control_002_live_portrait_with_gamepad.json)
+- ComfyUI workflow: [example_osc_control_002_live_portrait_with_gamepad.json](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_osc_control_002_live_portrait_with_gamepad.json)
 - TouchOSC panel file: [comfyui_osc_control.tosc](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/assets/touchosc/comfyui_osc_control.tosc)
 - Sample portrait picture: [sample_pic_01_woman_head.png](https://raw.githubusercontent.com/VrchStudio/comfyui-web-viewer/refs/heads/main/assets/images/sample_pic_01_woman_head.png)

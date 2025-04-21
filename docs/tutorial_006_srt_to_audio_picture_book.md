@@ -1,8 +1,8 @@
 # Tutorial 006: Audio Picture Book with Your Own Voice
 
-![](../workflows/example_others_004_srt_to_audio_picture_book.png)
+![](../example_workflows/example_others_004_srt_to_audio_picture_book.png)
 
-You can **[Download the Workflow Hewre](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_others_004_srt_to_audio_picture_book.json)**
+You can **[Download the Workflow Hewre](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_others_004_srt_to_audio_picture_book.json)**
 
 ## TL;DR
 
@@ -68,7 +68,7 @@ If you find the **ComfyUI Web Viewer** useful or inspiring, consider supporting 
 ### Run Workflow in ComfyUI
 
 1. **Open the Workflow**  
-   - Import the [example_others_004_srt_to_audio_picture_book](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_others_004_srt_to_audio_picture_book.json) workflow into ComfyUI.
+   - Import the [example_others_004_srt_to_audio_picture_book](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_others_004_srt_to_audio_picture_book.json) workflow into ComfyUI.
 2. **Record Your Voice**
    - In the **`Audio Recorder @ vrch.ai`** node:
        - Press and hold the **[Press and Hold to Record]** button.
@@ -184,7 +184,7 @@ Tonight, every animal slept peacefully under the gentle moonlight.
 ## References
 
 - **Audio Picture Book Workflow**:
-  [example_others_004_srt_to_audio_picture_book](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_others_004_srt_to_audio_picture_book.json)
+  [example_others_004_srt_to_audio_picture_book](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_others_004_srt_to_audio_picture_book.json)
 - **ComfyUI Web Viewer GitHub Repo**:  
   [https://github.com/VrchStudio/comfyui-web-viewer](https://github.com/VrchStudio/comfyui-web-viewer)
 

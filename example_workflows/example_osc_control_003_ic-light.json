@@ -1,0 +1,2837 @@
+{
+  "last_node_id": 121,
+  "last_link_id": 322,
+  "nodes": [
+    {
+      "id": 40,
+      "type": "Reroute",
+      "pos": [
+        917.6790161132812,
+        756.7918701171875
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "link": 222
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            150,
+            159,
+            163
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "showOutputText": true,
+        "horizontal": false
+      }
+    },
+    {
+      "id": 4,
+      "type": "CLIPTextEncode",
+      "pos": [
+        304.7970275878906,
+        837.582763671875
+      ],
+      "size": [
+        354.3748474121094,
+        78
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 184
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "pos": [
+            10,
+            36
+          ],
+          "widget": {
+            "name": "text"
+          },
+          "link": 220
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "shape": 3,
+          "links": [
+            157
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        ""
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 5,
+      "type": "CLIPTextEncode",
+      "pos": [
+        318.7970275878906,
+        975.582763671875
+      ],
+      "size": [
+        357.7424011230469,
+        88
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 185
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "shape": 3,
+          "links": [
+            158
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "bad quality, embedding:EasyNegative, "
+      ],
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 42,
+      "type": "GrowMaskWithBlur",
+      "pos": [
+        798.7968139648438,
+        1301.5826416015625
+      ],
+      "size": [
+        315,
+        246
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 152
+        }
+      ],
+      "outputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "shape": 3,
+          "links": [
+            154
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "mask_inverted",
+          "type": "MASK",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GrowMaskWithBlur"
+      },
+      "widgets_values": [
+        0,
+        0,
+        true,
+        false,
+        13,
+        1,
+        1,
+        false
+      ]
+    },
+    {
+      "id": 44,
+      "type": "ICLightConditioning",
+      "pos": [
+        1312.797119140625,
+        792.582763671875
+      ],
+      "size": [
+        342.5999755859375,
+        138
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 157
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 158
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 159
+        },
+        {
+          "name": "foreground",
+          "type": "LATENT",
+          "link": 160,
+          "slot_index": 3
+        },
+        {
+          "name": "opt_background",
+          "type": "LATENT",
+          "shape": 7,
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "shape": 3,
+          "links": [
+            161
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "shape": 3,
+          "links": [
+            162
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "empty_latent",
+          "type": "LATENT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ICLightConditioning"
+      },
+      "widgets_values": [
+        0.18215
+      ]
+    },
+    {
+      "id": 20,
+      "type": "VAEEncode",
+      "pos": [
+        1358.797119140625,
+        1012.582763671875
+      ],
+      "size": [
+        210,
+        46
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 133,
+          "slot_index": 0
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 150,
+          "slot_index": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "shape": 3,
+          "links": [
+            123
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEEncode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 22,
+      "type": "CreateShapeMask",
+      "pos": [
+        315.7970275878906,
+        1146.5826416015625
+      ],
+      "size": [
+        315,
+        370
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "frame_width",
+          "type": "INT",
+          "pos": [
+            10,
+            176
+          ],
+          "widget": {
+            "name": "frame_width"
+          },
+          "link": 167,
+          "slot_index": 0
+        },
+        {
+          "name": "frame_height",
+          "type": "INT",
+          "pos": [
+            10,
+            200
+          ],
+          "widget": {
+            "name": "frame_height"
+          },
+          "link": 168
+        },
+        {
+          "name": "location_x",
+          "type": "INT",
+          "pos": [
+            10,
+            104
+          ],
+          "widget": {
+            "name": "location_x"
+          },
+          "link": 260
+        },
+        {
+          "name": "location_y",
+          "type": "INT",
+          "pos": [
+            10,
+            128
+          ],
+          "widget": {
+            "name": "location_y"
+          },
+          "link": 261
+        },
+        {
+          "name": "shape_width",
+          "type": "INT",
+          "pos": [
+            10,
+            224
+          ],
+          "widget": {
+            "name": "shape_width"
+          },
+          "link": 281
+        },
+        {
+          "name": "shape_height",
+          "type": "INT",
+          "pos": [
+            10,
+            248
+          ],
+          "widget": {
+            "name": "shape_height"
+          },
+          "link": 282
+        },
+        {
+          "name": "shape",
+          "type": "COMBO",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "shape"
+          },
+          "link": 217
+        }
+      ],
+      "outputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "shape": 3,
+          "links": [
+            152
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "mask_inverted",
+          "type": "MASK",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CreateShapeMask"
+      },
+      "widgets_values": [
+        "triangle",
+        1,
+        292,
+        256,
+        0,
+        512,
+        512,
+        256,
+        512
+      ]
+    },
+    {
+      "id": 43,
+      "type": "RemapMaskRange",
+      "pos": [
+        797.7968139648438,
+        1152.5826416015625
+      ],
+      "size": [
+        315,
+        82
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 154
+        }
+      ],
+      "outputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "shape": 3,
+          "links": [
+            155
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "RemapMaskRange"
+      },
+      "widgets_values": [
+        0,
+        0.85
+      ]
+    },
+    {
+      "id": 95,
+      "type": "PreviewImage",
+      "pos": [
+        516.16357421875,
+        2040.4930419921875
+      ],
+      "size": [
+        524.9093627929688,
+        766.022216796875
+      ],
+      "flags": {},
+      "order": 38,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 303
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 37,
+      "type": "LoadAndApplyICLightUnet",
+      "pos": [
+        1041.7969970703125,
+        657.582763671875
+      ],
+      "size": [
+        381.3333740234375,
+        58
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 182
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "shape": 3,
+          "links": [
+            137
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadAndApplyICLightUnet"
+      },
+      "widgets_values": [
+        "iclight_sd15_fc_unet_ldm.safetensors"
+      ]
+    },
+    {
+      "id": 114,
+      "type": "VrchChannelOSCControlNode",
+      "pos": [
+        -615.5584106445312,
+        1263.6357421875
+      ],
+      "size": [
+        330,
+        190
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any_channel_on",
+          "type": "*",
+          "link": 280
+        },
+        {
+          "name": "any_channel_off",
+          "type": "*",
+          "link": 279
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 311
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 320
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ANY_OUTPUT",
+          "type": "*",
+          "shape": 3,
+          "links": [
+            281
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchChannelOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/1/toggle9",
+        false
+      ]
+    },
+    {
+      "id": 113,
+      "type": "VrchChannelOSCControlNode",
+      "pos": [
+        -611.5584106445312,
+        1469.6357421875
+      ],
+      "size": [
+        330,
+        190
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any_channel_on",
+          "type": "*",
+          "link": 278
+        },
+        {
+          "name": "any_channel_off",
+          "type": "*",
+          "link": 276
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 312
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 321
+        }
+      ],
+      "outputs": [
+        {
+          "name": "ANY_OUTPUT",
+          "type": "*",
+          "shape": 3,
+          "links": [
+            282
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchChannelOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/1/toggle9",
+        false
+      ]
+    },
+    {
+      "id": 111,
+      "type": "LoadImage",
+      "pos": [
+        -2366.70556640625,
+        1143.226806640625
+      ],
+      "size": [
+        282.1108703613281,
+        314
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            274
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "shape": 3,
+          "links": []
+        }
+      ],
+      "title": "Load Image 2",
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "sample_pic_03_hallway.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 112,
+      "type": "LoadImage",
+      "pos": [
+        -2368.852783203125,
+        1507.81787109375
+      ],
+      "size": [
+        296.0121765136719,
+        314
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            275
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "shape": 3,
+          "links": []
+        }
+      ],
+      "title": "Load Image 3",
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "sample_pic_04_abstract_drawing.png",
+        "image"
+      ]
+    },
+    {
+      "id": 9,
+      "type": "LoadImage",
+      "pos": [
+        -2377.852783203125,
+        374.81787109375
+      ],
+      "size": [
+        318.9287109375,
+        365.693603515625
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            270
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "shape": 3,
+          "links": []
+        }
+      ],
+      "title": "Load Image 0",
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "sample_pic_01_woman_head.png",
+        "image"
+      ]
+    },
+    {
+      "id": 108,
+      "type": "LoadImage",
+      "pos": [
+        -2375.852783203125,
+        800.81787109375
+      ],
+      "size": [
+        303.0495910644531,
+        314
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            271
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "shape": 3,
+          "links": []
+        }
+      ],
+      "title": "Load Image 1",
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "sample_pic_02_empty_room.png",
+        "image"
+      ]
+    },
+    {
+      "id": 103,
+      "type": "VrchTextConcatOSCControlNode",
+      "pos": [
+        -1937.852783203125,
+        661.81787109375
+      ],
+      "size": [
+        400,
+        774
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            496
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 306
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            520
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 315
+        }
+      ],
+      "outputs": [
+        {
+          "name": "TEXT_OUTPUT",
+          "type": "STRING",
+          "shape": 3,
+          "links": [
+            253
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchTextConcatOSCControlNode"
+      },
+      "widgets_values": [
+        "red light",
+        "blue light",
+        "yellow light",
+        "green light",
+        "pink light",
+        "fire",
+        "steampunk",
+        "rainbow",
+        "192.168.123.104",
+        8000,
+        "/1/toggle1",
+        "/1/toggle2",
+        "/1/toggle3",
+        "/1/toggle4",
+        "/1/toggle5",
+        "/1/toggle6",
+        "/1/toggle7",
+        "/1/toggle8",
+        ",",
+        false
+      ]
+    },
+    {
+      "id": 110,
+      "type": "VrchImageSwitchOSCControlNode",
+      "pos": [
+        -1926.852783203125,
+        375.81787109375
+      ],
+      "size": [
+        315,
+        230
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image0",
+          "type": "IMAGE",
+          "shape": 7,
+          "link": 270
+        },
+        {
+          "name": "image1",
+          "type": "IMAGE",
+          "shape": 7,
+          "link": 271
+        },
+        {
+          "name": "image2",
+          "type": "IMAGE",
+          "shape": 7,
+          "link": 274
+        },
+        {
+          "name": "image3",
+          "type": "IMAGE",
+          "shape": 7,
+          "link": 275
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            96
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 305
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            120
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 314
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            272,
+            273
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchImageSwitchOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/1/radio2",
+        false
+      ]
+    },
+    {
+      "id": 46,
+      "type": "ImageResizeKJ",
+      "pos": [
+        -1539,
+        376
+      ],
+      "size": [
+        313.05291748046875,
+        262
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 272
+        },
+        {
+          "name": "get_image_size",
+          "type": "IMAGE",
+          "shape": 7,
+          "link": null
+        },
+        {
+          "name": "width_input",
+          "type": "INT",
+          "pos": [
+            10,
+            196
+          ],
+          "widget": {
+            "name": "width_input"
+          },
+          "link": null
+        },
+        {
+          "name": "height_input",
+          "type": "INT",
+          "pos": [
+            10,
+            220
+          ],
+          "widget": {
+            "name": "height_input"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            166
+          ]
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            167,
+            210,
+            262
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            168,
+            211,
+            263
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageResizeKJ"
+      },
+      "widgets_values": [
+        512,
+        384,
+        "lanczos",
+        true,
+        2,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 82,
+      "type": "PreviewImage",
+      "pos": [
+        -722.2254638671875,
+        2039.4971923828125
+      ],
+      "size": [
+        606.1448364257812,
+        756.5897216796875
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 273
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 41,
+      "type": "PreviewImage",
+      "pos": [
+        -69.22545623779297,
+        2044.4971923828125
+      ],
+      "size": [
+        543.6597290039062,
+        751.4212036132812
+      ],
+      "flags": {},
+      "order": 35,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 151
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 57,
+      "type": "LoraLoader",
+      "pos": [
+        674.796875,
+        652.582763671875
+      ],
+      "size": [
+        315,
+        126
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 181
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 183
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "shape": 3,
+          "links": [
+            182
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "shape": 3,
+          "links": [
+            184,
+            185
+          ],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoader"
+      },
+      "widgets_values": [
+        "sd15/Hyper-SD15-4steps-lora.safetensors",
+        1,
+        1
+      ]
+    },
+    {
+      "id": 45,
+      "type": "VAEEncode",
+      "pos": [
+        1045.57080078125,
+        873.3302612304688
+      ],
+      "size": [
+        210,
+        46
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 166,
+          "slot_index": 0
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 163,
+          "slot_index": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "shape": 3,
+          "links": [
+            160
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEEncode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 35,
+      "type": "MaskToImage",
+      "pos": [
+        1048.57080078125,
+        1011.3302001953125
+      ],
+      "size": [
+        210,
+        26
+      ],
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 155
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            133,
+            151
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MaskToImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 119,
+      "type": "Note",
+      "pos": [
+        301.57080078125,
+        520.3302001953125
+      ],
+      "size": [
+        306.02056884765625,
+        88
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "text": ""
+      },
+      "widgets_values": [
+        "dreamshaper_8.safetensors:\n\nhttps://civitai.com/models/4384/dreamshaper"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 2,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        307.57080078125,
+        656.3302612304688
+      ],
+      "size": [
+        315,
+        98
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "shape": 3,
+          "links": [
+            181
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "shape": 3,
+          "links": [
+            183
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "shape": 3,
+          "links": [
+            10,
+            222
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "sd15/dreamshaper_8.safetensors"
+      ]
+    },
+    {
+      "id": 120,
+      "type": "Note",
+      "pos": [
+        675.5706176757812,
+        520.3302001953125
+      ],
+      "size": [
+        361.4335021972656,
+        88
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "text": ""
+      },
+      "widgets_values": [
+        "Hyper-SD15-4steps-lora.safetensors:\n\nhttps://huggingface.co/ByteDance/Hyper-SD/tree/main"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 7,
+      "type": "VAEDecode",
+      "pos": [
+        1622.5709228515625,
+        1059.330078125
+      ],
+      "size": [
+        210,
+        46
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 77
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 10,
+          "slot_index": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "shape": 3,
+          "links": [
+            303,
+            304
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 118,
+      "type": "Note",
+      "pos": [
+        -2972,
+        138
+      ],
+      "size": [
+        455.90106201171875,
+        170.35110473632812
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Instructions",
+      "properties": {
+        "text": ""
+      },
+      "widgets_values": [
+        "1. Change Server IP Address to your ComfyUI server IP address.\n2. Search and install app \"TouchOSC\".\n3. Import and open \"comfyui_osc_control.tosc\" control panel.\n5. Control IC-Light by using the actions in the \"IC-Light\" tab.\n6. Please check \"ComfyUI Web Viewer\" repo for more details:\n   - https://github.com/VrchStudio/comfyui-web-viewer\n\nby Tianzi@vrch.io"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 121,
+      "type": "VrchOSCControlSettingsNode",
+      "pos": [
+        -2930,
+        462
+      ],
+      "size": [
+        378,
+        126
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SERVER_IP",
+          "type": "STRING",
+          "links": [
+            305,
+            306,
+            307,
+            308,
+            309,
+            310,
+            311,
+            312,
+            313
+          ]
+        },
+        {
+          "name": "PORT",
+          "type": "INT",
+          "links": [
+            314,
+            315,
+            316,
+            317,
+            318,
+            319,
+            320,
+            321,
+            322
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchOSCControlSettingsNode"
+      },
+      "widgets_values": [
+        "192.168.123.112",
+        8000,
+        false
+      ]
+    },
+    {
+      "id": 107,
+      "type": "VrchXYOSCControlNode",
+      "pos": [
+        -1487,
+        739
+      ],
+      "size": [
+        315,
+        518
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "x_output_max",
+          "type": "INT",
+          "pos": [
+            10,
+            280
+          ],
+          "widget": {
+            "name": "x_output_max"
+          },
+          "link": 262
+        },
+        {
+          "name": "y_output_max",
+          "type": "INT",
+          "pos": [
+            10,
+            424
+          ],
+          "widget": {
+            "name": "y_output_max"
+          },
+          "link": 263
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            136
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 307
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            160
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 316
+        }
+      ],
+      "outputs": [
+        {
+          "name": "X_INT",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            260
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "Y_INT",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            261
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "X_FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "Y_FLOAT",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "X_RAW",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        },
+        {
+          "name": "Y_RAW",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchXYOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/1/xy1",
+        0,
+        1,
+        0,
+        100,
+        false,
+        0,
+        0,
+        1,
+        0,
+        true,
+        false,
+        0,
+        false
+      ]
+    },
+    {
+      "id": 76,
+      "type": "VrchTextSwitchOSCControlNode",
+      "pos": [
+        -789.6124877929688,
+        396.45782470703125
+      ],
+      "size": [
+        320.4036865234375,
+        582
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            496
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 313
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            520
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 322
+        }
+      ],
+      "outputs": [
+        {
+          "name": "TEXT_OUTPUT",
+          "type": "STRING",
+          "shape": 3,
+          "links": [
+            216
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchTextSwitchOSCControlNode"
+      },
+      "widgets_values": [
+        "circle",
+        "square",
+        "triangle",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "192.168.123.104",
+        8000,
+        "/1/radio1",
+        false
+      ]
+    },
+    {
+      "id": 81,
+      "type": "ShowText|pysssss",
+      "pos": [
+        -414.573486328125,
+        403.59027099609375
+      ],
+      "size": [
+        320,
+        80
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "pos": [
+            10,
+            36
+          ],
+          "widget": {
+            "name": "text"
+          },
+          "link": 253
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "shape": 6,
+          "links": [
+            220
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 77,
+      "type": "CR String To Combo",
+      "pos": [
+        -411.5420837402344,
+        555.9071655273438
+      ],
+      "size": [
+        315,
+        78
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "text"
+          },
+          "link": 216
+        }
+      ],
+      "outputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "shape": 3,
+          "links": [
+            217
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "show_help",
+          "type": "STRING",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CR String To Combo"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 74,
+      "type": "VrchIntOSCControlNode",
+      "pos": [
+        -1112.2333984375,
+        841.0606689453125
+      ],
+      "size": [
+        301.3936462402344,
+        314
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "output_max",
+          "type": "INT",
+          "pos": [
+            10,
+            200
+          ],
+          "widget": {
+            "name": "output_max"
+          },
+          "link": 211
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 308
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 317
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            278
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [],
+          "slot_index": 1
+        }
+      ],
+      "title": "Shape Height",
+      "properties": {
+        "Node name for S&R": "VrchIntOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/1/fader1",
+        0,
+        1,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": 73,
+      "type": "VrchIntOSCControlNode",
+      "pos": [
+        -1116.8514404296875,
+        1208.0615234375
+      ],
+      "size": [
+        315,
+        314
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "output_max",
+          "type": "INT",
+          "pos": [
+            10,
+            200
+          ],
+          "widget": {
+            "name": "output_max"
+          },
+          "link": 210
+        },
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 309
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 318
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            280
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": [],
+          "slot_index": 1
+        }
+      ],
+      "title": "Shape Width",
+      "properties": {
+        "Node name for S&R": "VrchIntOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/1/fader2",
+        0,
+        1,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": 104,
+      "type": "VrchIntOSCControlNode",
+      "pos": [
+        -1115.6934814453125,
+        1575.503662109375
+      ],
+      "size": [
+        315,
+        294
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server_ip",
+          "type": "STRING",
+          "pos": [
+            10,
+            56
+          ],
+          "widget": {
+            "name": "server_ip"
+          },
+          "link": 310
+        },
+        {
+          "name": "port",
+          "type": "INT",
+          "pos": [
+            10,
+            80
+          ],
+          "widget": {
+            "name": "port"
+          },
+          "link": 319
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VALUE",
+          "type": "INT",
+          "shape": 3,
+          "links": [
+            276,
+            279
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "RAW_VALUE",
+          "type": "FLOAT",
+          "shape": 3,
+          "links": null
+        }
+      ],
+      "title": "Shape Size by Amplitude",
+      "properties": {
+        "Node name for S&R": "VrchIntOSCControlNode"
+      },
+      "widgets_values": [
+        "192.168.123.104",
+        8000,
+        "/data/microphone/amplitude",
+        0,
+        0.12,
+        50,
+        1024,
+        false,
+        50,
+        false
+      ]
+    },
+    {
+      "id": 96,
+      "type": "Fast Groups Bypasser (rgthree)",
+      "pos": [
+        1142.0484619140625,
+        2564.813232421875
+      ],
+      "size": [
+        328.900634765625,
+        178
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "OPT_CONNECTION",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "matchColors": "",
+        "matchTitle": "",
+        "showNav": true,
+        "sort": "position",
+        "customSortAlphabet": "",
+        "toggleRestriction": "default"
+      }
+    },
+    {
+      "id": 115,
+      "type": "VrchImageWebViewerNode",
+      "pos": [
+        1102.7745361328125,
+        2069.497314453125
+      ],
+      "size": [
+        400,
+        386
+      ],
+      "flags": {},
+      "order": 39,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 304
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchImageWebViewerNode"
+      },
+      "widgets_values": [
+        "1",
+        "192.168.123.112:8188",
+        false,
+        200,
+        100,
+        false,
+        "http://vrch.ai/viewer?mode=image&server=192.168.123.104:8188&ssl=false&file=channel_1.jpeg&path=web_viewer",
+        600,
+        600,
+        false,
+        "",
+        "http://vrch.ai/viewer?mode=image&server=192.168.123.112:8188&ssl=false&filename=channel_1.jpeg&path=web_viewer&refreshInterval=200&fadeAnimDuration=100",
+        ""
+      ]
+    },
+    {
+      "id": 19,
+      "type": "KSampler",
+      "pos": [
+        1293.797119140625,
+        1157.5826416015625
+      ],
+      "size": [
+        301.66925048828125,
+        381.4648742675781
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 137,
+          "slot_index": 0
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 161
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 162,
+          "slot_index": 2
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 123
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "shape": 3,
+          "links": [
+            77
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        100361857014338,
+        "fixed",
+        4,
+        1,
+        "euler",
+        "sgm_uniform",
+        0.9
+      ]
+    }
+  ],
+  "links": [
+    [
+      10,
+      2,
+      2,
+      7,
+      1,
+      "VAE"
+    ],
+    [
+      77,
+      19,
+      0,
+      7,
+      0,
+      "LATENT"
+    ],
+    [
+      123,
+      20,
+      0,
+      19,
+      3,
+      "LATENT"
+    ],
+    [
+      133,
+      35,
+      0,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      137,
+      37,
+      0,
+      19,
+      0,
+      "MODEL"
+    ],
+    [
+      150,
+      40,
+      0,
+      20,
+      1,
+      "VAE"
+    ],
+    [
+      151,
+      35,
+      0,
+      41,
+      0,
+      "IMAGE"
+    ],
+    [
+      152,
+      22,
+      0,
+      42,
+      0,
+      "MASK"
+    ],
+    [
+      154,
+      42,
+      0,
+      43,
+      0,
+      "MASK"
+    ],
+    [
+      155,
+      43,
+      0,
+      35,
+      0,
+      "MASK"
+    ],
+    [
+      157,
+      4,
+      0,
+      44,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      158,
+      5,
+      0,
+      44,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      159,
+      40,
+      0,
+      44,
+      2,
+      "VAE"
+    ],
+    [
+      160,
+      45,
+      0,
+      44,
+      3,
+      "LATENT"
+    ],
+    [
+      161,
+      44,
+      0,
+      19,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      162,
+      44,
+      1,
+      19,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      163,
+      40,
+      0,
+      45,
+      1,
+      "VAE"
+    ],
+    [
+      166,
+      46,
+      0,
+      45,
+      0,
+      "IMAGE"
+    ],
+    [
+      167,
+      46,
+      1,
+      22,
+      0,
+      "INT"
+    ],
+    [
+      168,
+      46,
+      2,
+      22,
+      1,
+      "INT"
+    ],
+    [
+      181,
+      2,
+      0,
+      57,
+      0,
+      "MODEL"
+    ],
+    [
+      182,
+      57,
+      0,
+      37,
+      0,
+      "MODEL"
+    ],
+    [
+      183,
+      2,
+      1,
+      57,
+      1,
+      "CLIP"
+    ],
+    [
+      184,
+      57,
+      1,
+      4,
+      0,
+      "CLIP"
+    ],
+    [
+      185,
+      57,
+      1,
+      5,
+      0,
+      "CLIP"
+    ],
+    [
+      210,
+      46,
+      1,
+      73,
+      0,
+      "INT"
+    ],
+    [
+      211,
+      46,
+      2,
+      74,
+      0,
+      "INT"
+    ],
+    [
+      216,
+      76,
+      0,
+      77,
+      0,
+      "STRING"
+    ],
+    [
+      217,
+      77,
+      0,
+      22,
+      6,
+      "COMBO"
+    ],
+    [
+      220,
+      81,
+      0,
+      4,
+      1,
+      "STRING"
+    ],
+    [
+      222,
+      2,
+      2,
+      40,
+      0,
+      "*"
+    ],
+    [
+      253,
+      103,
+      0,
+      81,
+      0,
+      "STRING"
+    ],
+    [
+      260,
+      107,
+      0,
+      22,
+      2,
+      "INT"
+    ],
+    [
+      261,
+      107,
+      1,
+      22,
+      3,
+      "INT"
+    ],
+    [
+      262,
+      46,
+      1,
+      107,
+      0,
+      "INT"
+    ],
+    [
+      263,
+      46,
+      2,
+      107,
+      1,
+      "INT"
+    ],
+    [
+      270,
+      9,
+      0,
+      110,
+      0,
+      "IMAGE"
+    ],
+    [
+      271,
+      108,
+      0,
+      110,
+      1,
+      "IMAGE"
+    ],
+    [
+      272,
+      110,
+      0,
+      46,
+      0,
+      "IMAGE"
+    ],
+    [
+      273,
+      110,
+      0,
+      82,
+      0,
+      "IMAGE"
+    ],
+    [
+      274,
+      111,
+      0,
+      110,
+      2,
+      "IMAGE"
+    ],
+    [
+      275,
+      112,
+      0,
+      110,
+      3,
+      "IMAGE"
+    ],
+    [
+      276,
+      104,
+      0,
+      113,
+      1,
+      "*"
+    ],
+    [
+      278,
+      74,
+      0,
+      113,
+      0,
+      "*"
+    ],
+    [
+      279,
+      104,
+      0,
+      114,
+      1,
+      "*"
+    ],
+    [
+      280,
+      73,
+      0,
+      114,
+      0,
+      "*"
+    ],
+    [
+      281,
+      114,
+      0,
+      22,
+      4,
+      "INT"
+    ],
+    [
+      282,
+      113,
+      0,
+      22,
+      5,
+      "INT"
+    ],
+    [
+      303,
+      7,
+      0,
+      95,
+      0,
+      "IMAGE"
+    ],
+    [
+      304,
+      7,
+      0,
+      115,
+      0,
+      "IMAGE"
+    ],
+    [
+      305,
+      121,
+      0,
+      110,
+      4,
+      "STRING"
+    ],
+    [
+      306,
+      121,
+      0,
+      103,
+      0,
+      "STRING"
+    ],
+    [
+      307,
+      121,
+      0,
+      107,
+      2,
+      "STRING"
+    ],
+    [
+      308,
+      121,
+      0,
+      74,
+      1,
+      "STRING"
+    ],
+    [
+      309,
+      121,
+      0,
+      73,
+      1,
+      "STRING"
+    ],
+    [
+      310,
+      121,
+      0,
+      104,
+      0,
+      "STRING"
+    ],
+    [
+      311,
+      121,
+      0,
+      114,
+      2,
+      "STRING"
+    ],
+    [
+      312,
+      121,
+      0,
+      113,
+      2,
+      "STRING"
+    ],
+    [
+      313,
+      121,
+      0,
+      76,
+      0,
+      "STRING"
+    ],
+    [
+      314,
+      121,
+      1,
+      110,
+      5,
+      "INT"
+    ],
+    [
+      315,
+      121,
+      1,
+      103,
+      1,
+      "INT"
+    ],
+    [
+      316,
+      121,
+      1,
+      107,
+      3,
+      "INT"
+    ],
+    [
+      317,
+      121,
+      1,
+      74,
+      2,
+      "INT"
+    ],
+    [
+      318,
+      121,
+      1,
+      73,
+      2,
+      "INT"
+    ],
+    [
+      319,
+      121,
+      1,
+      104,
+      1,
+      "INT"
+    ],
+    [
+      320,
+      121,
+      1,
+      114,
+      3,
+      "INT"
+    ],
+    [
+      321,
+      121,
+      1,
+      113,
+      3,
+      "INT"
+    ],
+    [
+      322,
+      121,
+      1,
+      76,
+      1,
+      "INT"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "OSC Control Panel - IC-Light",
+      "bounding": [
+        -2388,
+        280,
+        2309.212890625,
+        1619.203125
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "IC-Light Image Generation",
+      "bounding": [
+        272.57080078125,
+        427.3302307128906,
+        1594,
+        1214
+      ],
+      "color": "#A88",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "Output Panel",
+      "bounding": [
+        -760.3892211914062,
+        1950.55126953125,
+        2352,
+        901
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "Server Settings",
+      "bounding": [
+        -2993,
+        338,
+        515,
+        389
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.826446280991736,
+      "offset": [
+        2954.2350510242413,
+        -343.29321364724655
+      ]
+    },
+    "node_versions": {
+      "comfy-core": "0.3.24",
+      "ComfyUI-KJNodes": "6e3af6e7b97afb1aeb259def593c10113dda5591",
+      "ComfyUI-IC-Light": "8a9f9c92c155e754a05840c7621443c5919a9b25",
+      "comfyui-web-viewer": "4b3c80bd145bf47a7dd44434d57d1688b87907e7",
+      "ComfyUI-Custom-Scripts": "d6657cc1f04539dbeea38d7bf6d73bc025004fa4",
+      "ComfyUI_Comfyroll_CustomNodes": "d78b780ae43fcf8c6b7c6505e6ffb4584281ceca"
+    }
+  },
+  "version": 0.4
+}
