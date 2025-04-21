@@ -1,4 +1,5 @@
 import hashlib
+import json
 from .node_utils import VrchNodeUtils
 
 CATEGORY="vrch.ai/logic"
@@ -89,11 +90,13 @@ class VrchTriggerToggleNode:
     def INPUT_TYPES(cls):
         return {"required":{
             "trigger": ("BOOLEAN", {"default": None, "forceInput": True}),
-            "initial_state": ("BOOLEAN", {"default": False}),  # default output before any toggle
+            "initial_state": ("BOOLEAN", {"default": False}), 
+            "debug": ("BOOLEAN", {"default": False}),
         }}
 
-    RETURN_TYPES = ("BOOLEAN",)
-    RETURN_NAMES = ("OUTPUT",)
+    RETURN_TYPES = ("BOOLEAN", "JSON",)
+    RETURN_NAMES = ("OUTPUT", "JSON",)
+    OUTPUT_NODE = True
     FUNCTION = "switch"
     CATEGORY = CATEGORY
 
@@ -101,15 +104,29 @@ class VrchTriggerToggleNode:
         self.last_initial_state = None
         self.state = False
 
-    def switch(self, trigger, initial_state):
+    def switch(self, trigger, initial_state, debug):
+        
         # If initial_state input changed, reset current state
         if self.last_initial_state is None or initial_state != self.last_initial_state:
             self.state = initial_state
             self.last_initial_state = initial_state
+            
         # Toggle state only when trigger is True
         if trigger:
             self.state = not self.state
-        return (self.state,)
+            
+        if debug:
+            print(f"[VrchTriggerToggleNode] Trigger: {trigger}, Initial State: {initial_state}, Current State: {self.state}")
+        
+        # Prepare JSON data
+        raw_data = {
+            "trigger": trigger,
+            "initial_state": initial_state,
+            "current_state": self.state,
+        }
+        json_data = json.dumps(raw_data, indent=2, ensure_ascii=False)
+            
+        return (self.state, json_data,)
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
