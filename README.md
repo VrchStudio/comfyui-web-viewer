@@ -108,6 +108,12 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 - Example workflows:
   - [Workflow Example: Preview Image in Background](./example_workflows/example_image_nodes_001_preview_in_background.json)
 
+### `Logic Nodes`
+
+- Documentation: [Usage of Logic nodes](./docs/logic_nodes.md)
+- Example workflows:
+  - [TBA]
+
 ### `Text Nodes`
 
 - Documentation: [Usage of Text nodes](./docs/text_nodes.md)
