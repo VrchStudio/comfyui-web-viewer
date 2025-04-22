@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- add logic nodes
+- add logic_nodes.md
+
+### Updated
+
+- rename `workflows` to `example_workflows`
+- update readme.md
+
 ## 1.0.30 - 2025-04-14
 
 ### Added
@@ -15,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 1.0.29 - 2025-04-11
 
-### Update
+### Updated
 
 - update websocket viewer nodes to support send settings to its client viewer
 - update web viewer nodes to support save and send settings to their client viewers
@@ -61,7 +73,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add a new WebSocket Viewer node `VrchImageWebSocketWebViewerNode`
 - add `VrchImageWebSocketWebViewerNode` documentations
 
-### Updates
+### Updated
+
 - disable Git LFS feature as github quota is exceeded
 - update README.md
 
