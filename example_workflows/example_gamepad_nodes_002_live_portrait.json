@@ -1,0 +1,3581 @@
+{
+  "id": "cade4f5f-842a-4aab-bbe8-9df1d30ee788",
+  "revision": 0,
+  "last_node_id": 209,
+  "last_link_id": 469,
+  "nodes": [
+    {
+      "id": 172,
+      "type": "easy indexAnything",
+      "pos": [
+        1378.5679931640625,
+        -259.6171569824219
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 371
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "title": "Button B",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        1
+      ]
+    },
+    {
+      "id": 179,
+      "type": "easy indexAnything",
+      "pos": [
+        1388.0364990234375,
+        779.7732543945312
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 381
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "Button Down",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        13
+      ]
+    },
+    {
+      "id": 183,
+      "type": "easy indexAnything",
+      "pos": [
+        1386.0755615234375,
+        1163.552490234375
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 389
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "Button Option",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        8
+      ]
+    },
+    {
+      "id": 182,
+      "type": "easy indexAnything",
+      "pos": [
+        1385.3162841796875,
+        1264.336181640625
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 390
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "Button Start",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        9
+      ]
+    },
+    {
+      "id": 184,
+      "type": "easy indexAnything",
+      "pos": [
+        1389.68994140625,
+        1366.90673828125
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 391
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "Button L3",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        10
+      ]
+    },
+    {
+      "id": 185,
+      "type": "easy indexAnything",
+      "pos": [
+        1386.1348876953125,
+        1470.05322265625
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 392
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "Button R3",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        11
+      ]
+    },
+    {
+      "id": 171,
+      "type": "easy indexAnything",
+      "pos": [
+        1381.3089599609375,
+        -357.3543701171875
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 370
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            397,
+            401
+          ]
+        }
+      ],
+      "title": "Button A",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        0
+      ]
+    },
+    {
+      "id": 92,
+      "type": "easy indexAnything",
+      "pos": [
+        1389.6107177734375,
+        -874.5786743164062
+      ],
+      "size": [
+        210,
+        70.89055633544922
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 349
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            398,
+            405
+          ]
+        }
+      ],
+      "title": "Left Stick - X Axis",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        0
+      ]
+    },
+    {
+      "id": 188,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        1961.5379638671875,
+        -721.7975463867188
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 402
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 405
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 401
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            403
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 187,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        1961.5379638671875,
+        -581.7974853515625
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 398
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 399
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 397
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            400
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 119,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        2285.1728515625,
+        -770.4883422851562
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 45,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 403
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            275
+          ]
+        }
+      ],
+      "title": "Rotate - Yaw",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        -1.0000000000000002,
+        1,
+        -20.000000000000004,
+        20.000000000000004,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 168,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        2288.3798828125,
+        -534.9456787109375
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 44,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 400
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            367
+          ]
+        }
+      ],
+      "title": "Rotate - Roll",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        -1.0000000000000002,
+        1,
+        -20.000000000000004,
+        20.000000000000004,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 118,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        2287.23193359375,
+        -1001.1771850585938
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 274
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            273
+          ]
+        }
+      ],
+      "title": "Rotate - Pitch",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        -1.0000000000000002,
+        1,
+        -20.000000000000004,
+        20.000000000000004,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 120,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        1951.556396484375,
+        -182.99203491210938
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 278
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            277
+          ]
+        }
+      ],
+      "title": "Pupil - Y",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        -1.0000000000000002,
+        1,
+        -20.000000000000004,
+        20.000000000000004,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 121,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        1952.6826171875,
+        49.415611267089844
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 280
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            279
+          ]
+        }
+      ],
+      "title": "Pupil - X",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        -1.0000000000000002,
+        1,
+        -20.000000000000004,
+        20.000000000000004,
+        true,
+        0
+      ]
+    },
+    {
+      "id": 186,
+      "type": "Float",
+      "pos": [
+        1955.0980224609375,
+        -869.2988891601562
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "slot_index": 0,
+          "links": [
+            399,
+            402
+          ]
+        }
+      ],
+      "title": "Default Value",
+      "properties": {
+        "Node name for S&R": "Float"
+      },
+      "widgets_values": [
+        0
+      ]
+    },
+    {
+      "id": 176,
+      "type": "easy indexAnything",
+      "pos": [
+        1391.1788330078125,
+        141.45864868164062
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 375
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            415
+          ]
+        }
+      ],
+      "title": "Left Bumper",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        4
+      ]
+    },
+    {
+      "id": 177,
+      "type": "easy indexAnything",
+      "pos": [
+        1393.281005859375,
+        248.99737548828125
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 376
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            416
+          ]
+        }
+      ],
+      "title": "Right Bumper",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        5
+      ]
+    },
+    {
+      "id": 122,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        3070.52978515625,
+        222.99493408203125
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 46,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 412
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            362
+          ]
+        }
+      ],
+      "title": "Blink",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        0,
+        1,
+        -20.000000000000004,
+        0,
+        true,
+        0
+      ]
+    },
+    {
+      "id": 170,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        3087.656982421875,
+        460.62835693359375
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 52,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 419
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            369
+          ]
+        }
+      ],
+      "title": "Wink",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        0,
+        1,
+        0,
+        25.000000000000004,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 191,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        2782.16015625,
+        309.2978515625
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 414
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 413
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 415
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            412
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        false
+      ]
+    },
+    {
+      "id": 174,
+      "type": "easy indexAnything",
+      "pos": [
+        1381.4483642578125,
+        -59.55804443359375
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 373
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            420
+          ]
+        }
+      ],
+      "title": "Button Y",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        3
+      ]
+    },
+    {
+      "id": 192,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        2795.587890625,
+        491.46636962890625
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 40,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 421
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 418
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 420
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            419
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        false
+      ]
+    },
+    {
+      "id": 193,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        2806.4013671875,
+        679.5142211914062
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 41,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 425
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 422
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 424
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            423
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        false
+      ]
+    },
+    {
+      "id": 173,
+      "type": "easy indexAnything",
+      "pos": [
+        1377.1053466796875,
+        -160.2074432373047
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 372
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            424
+          ]
+        }
+      ],
+      "title": "Button X",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        2
+      ]
+    },
+    {
+      "id": 167,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        3061.895263671875,
+        -5.809566974639893
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 51,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 408
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            366
+          ]
+        }
+      ],
+      "title": "Smile",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        0,
+        1,
+        0,
+        1.3000000000000003,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 169,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        3086.375732421875,
+        691.4889526367188
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 53,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 423
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            368
+          ]
+        }
+      ],
+      "title": "Eyebrow",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        0,
+        1,
+        0,
+        15.000000000000004,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 189,
+      "type": "Float",
+      "pos": [
+        2778.235595703125,
+        -48.84653091430664
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "slot_index": 0,
+          "links": [
+            409,
+            413,
+            418,
+            422
+          ]
+        }
+      ],
+      "title": "Default Value",
+      "properties": {
+        "Node name for S&R": "Float"
+      },
+      "widgets_values": [
+        0
+      ]
+    },
+    {
+      "id": 190,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        2777.74267578125,
+        87.04817199707031
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 39,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 417
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 409
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 416
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            408
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 195,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        2232.7734375,
+        830.3450317382812
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 54,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 429
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": []
+        }
+      ],
+      "title": "Oral - aaa -",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        0,
+        1,
+        -30.000000000000007,
+        0,
+        true,
+        0
+      ]
+    },
+    {
+      "id": 178,
+      "type": "easy indexAnything",
+      "pos": [
+        1385.721435546875,
+        679.299072265625
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 380
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            442,
+            443
+          ]
+        }
+      ],
+      "title": "Button Up",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        12
+      ]
+    },
+    {
+      "id": 180,
+      "type": "easy indexAnything",
+      "pos": [
+        1387.9068603515625,
+        879.106201171875
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 382
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            433,
+            444
+          ]
+        }
+      ],
+      "title": "Button Left",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        14
+      ]
+    },
+    {
+      "id": 165,
+      "type": "easy indexAnything",
+      "pos": [
+        1392.1376953125,
+        366.52496337890625
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 363
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            417,
+            421,
+            425,
+            432,
+            446
+          ]
+        }
+      ],
+      "title": "Left Trigger - Float",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        6
+      ]
+    },
+    {
+      "id": 200,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        2227.786376953125,
+        1323.9183349609375
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 55,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 439
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": []
+        }
+      ],
+      "title": "Oral - eee -",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        0,
+        1,
+        -20.000000000000004,
+        0,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 206,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        2216.278564453125,
+        1820.719970703125
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 50,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 448
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": []
+        }
+      ],
+      "title": "Oral - woo -",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        0,
+        1,
+        -20.000000000000004,
+        0,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 181,
+      "type": "easy indexAnything",
+      "pos": [
+        1384.30810546875,
+        976.09716796875
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 383
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            452,
+            453
+          ]
+        }
+      ],
+      "title": "Button Right",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        15
+      ]
+    },
+    {
+      "id": 95,
+      "type": "easy indexAnything",
+      "pos": [
+        1395.1275634765625,
+        475.3433837890625
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 360
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            414,
+            431,
+            445,
+            454,
+            455
+          ]
+        }
+      ],
+      "title": "Right Trigger - Float",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        7
+      ]
+    },
+    {
+      "id": 196,
+      "type": "Float",
+      "pos": [
+        1945.003173828125,
+        590.2515869140625
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "slot_index": 0,
+          "links": [
+            426,
+            427,
+            436,
+            437,
+            450,
+            451
+          ]
+        }
+      ],
+      "title": "Default Value",
+      "properties": {
+        "Node name for S&R": "Float"
+      },
+      "widgets_values": [
+        0
+      ]
+    },
+    {
+      "id": 197,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        1943.246826171875,
+        744.4356079101562
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 35,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 431
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 426
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 433
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            428
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 198,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        1943.042724609375,
+        934.5787963867188
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 42,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 432
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 427
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 444
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            429
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 201,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        1945.408203125,
+        1158.3521728515625
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 445
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 436
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 442
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            438
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 202,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        1941.24560546875,
+        1353.1978759765625
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 43,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 446
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 437
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 443
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            439
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 203,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        1948.310302734375,
+        1576.186767578125
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 454
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 450
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 452
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            447
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 204,
+      "type": "Switch any [Crystools]",
+      "pos": [
+        1941.027099609375,
+        1798.431396484375
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 38,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "on_true",
+          "type": "*",
+          "link": 455
+        },
+        {
+          "name": "on_false",
+          "type": "*",
+          "link": 451
+        },
+        {
+          "name": "boolean",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "boolean"
+          },
+          "link": 453
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": [
+            448
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Switch any [Crystools]"
+      },
+      "widgets_values": [
+        true
+      ]
+    },
+    {
+      "id": 91,
+      "type": "easy indexAnything",
+      "pos": [
+        1388.98486328125,
+        -753.38134765625
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 348
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            274
+          ]
+        }
+      ],
+      "title": "Left Stick - Y Axis",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        1
+      ]
+    },
+    {
+      "id": 97,
+      "type": "easy indexAnything",
+      "pos": [
+        1391.08642578125,
+        -639.0849609375
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 350
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            278
+          ]
+        }
+      ],
+      "title": "Right Stick - X Axis",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        0
+      ]
+    },
+    {
+      "id": 96,
+      "type": "easy indexAnything",
+      "pos": [
+        1392.7733154296875,
+        -529.2034912109375
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any",
+          "type": "*",
+          "link": 351
+        }
+      ],
+      "outputs": [
+        {
+          "name": "out",
+          "type": "*",
+          "links": [
+            280
+          ]
+        }
+      ],
+      "title": "Right Stick - Y Axis",
+      "properties": {
+        "Node name for S&R": "easy indexAnything"
+      },
+      "widgets_values": [
+        1
+      ]
+    },
+    {
+      "id": 194,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        2229.3603515625,
+        601.83349609375
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 47,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 428
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            464
+          ]
+        }
+      ],
+      "title": "Oral - aaa +",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        0,
+        1,
+        0,
+        120.00000000000003,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 199,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        2229.851318359375,
+        1082.775634765625
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 48,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 438
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            465
+          ]
+        }
+      ],
+      "title": "Oral - eee +",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        0,
+        1,
+        0,
+        15.000000000000004,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 205,
+      "type": "VrchFloatRemapNode",
+      "pos": [
+        2218.343505859375,
+        1579.5771484375
+      ],
+      "size": [
+        315,
+        178
+      ],
+      "flags": {},
+      "order": 49,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input",
+          "shape": 7,
+          "type": "FLOAT",
+          "link": 447
+        }
+      ],
+      "outputs": [
+        {
+          "name": "OUTPUT",
+          "type": "FLOAT",
+          "links": [
+            466
+          ]
+        }
+      ],
+      "title": "Oral - woo +",
+      "properties": {
+        "Node name for S&R": "VrchFloatRemapNode"
+      },
+      "widgets_values": [
+        0,
+        1,
+        0,
+        15.000000000000004,
+        false,
+        0
+      ]
+    },
+    {
+      "id": 85,
+      "type": "VrchGamepadLoaderNode",
+      "pos": [
+        339.4404602050781,
+        22.283296585083008
+      ],
+      "size": [
+        373.2296447753906,
+        327.2309875488281
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "RAW_DATA",
+          "type": "JSON",
+          "links": []
+        },
+        {
+          "name": "LEFT_STICK",
+          "type": "FLOAT",
+          "links": [
+            348,
+            349
+          ]
+        },
+        {
+          "name": "RIGHT_STICK",
+          "type": "FLOAT",
+          "links": [
+            350,
+            351
+          ]
+        },
+        {
+          "name": "BOOLEAN_BUTTONS",
+          "type": "BOOL",
+          "links": [
+            370,
+            371,
+            372,
+            373,
+            375,
+            376,
+            380,
+            381,
+            382,
+            383,
+            389,
+            390,
+            391,
+            392,
+            406
+          ]
+        },
+        {
+          "name": "INT_BUTTONS",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "FLOAT_BUTTONS",
+          "type": "FLOAT",
+          "links": [
+            360,
+            363
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchGamepadLoaderNode"
+      },
+      "widgets_values": [
+        "0",
+        "GamepadX (STANDARD GAMEPAD Vendor: 045e Product: 02e0)",
+        50,
+        false,
+        "{\n  \"id\": \"GamepadX (STANDARD GAMEPAD Vendor: 045e Product: 02e0)\",\n  \"index\": 0,\n  \"connected\": true,\n  \"timestamp\": 1284782.199999988,\n  \"mapping\": \"standard\",\n  \"axes\": [\n    0.007797360420227051,\n    0.007797360420227051,\n    0.007797360420227051,\n    0.007797360420227051\n  ],\n  \"buttons\": [\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    },\n    {\n      \"pressed\": false,\n      \"touched\": false,\n      \"value\": 0\n    }\n  ]\n}"
+      ]
+    },
+    {
+      "id": 175,
+      "type": "Show any to JSON [Crystools]",
+      "pos": [
+        773.103515625,
+        23.780820846557617
+      ],
+      "size": [
+        244.3661651611328,
+        326.4266052246094
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any_value",
+          "shape": 7,
+          "type": "*",
+          "link": 406
+        }
+      ],
+      "outputs": [
+        {
+          "name": "string",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Show any to JSON [Crystools]"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 88,
+      "type": "ImageResize",
+      "pos": [
+        674.9328002929688,
+        443.2120361328125
+      ],
+      "size": [
+        315,
+        246
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 225
+        },
+        {
+          "name": "mask_optional",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            235,
+            463
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageResize"
+      },
+      "widgets_values": [
+        "resize only",
+        0,
+        512,
+        0,
+        "reduce size only",
+        "4:3",
+        0.5,
+        20
+      ]
+    },
+    {
+      "id": 15,
+      "type": "LoadImage",
+      "pos": [
+        389.02862548828125,
+        402.9899597167969
+      ],
+      "size": [
+        210,
+        314
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            225
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "sample_pic_01_woman_head.png",
+        "image"
+      ]
+    },
+    {
+      "id": 90,
+      "type": "Note",
+      "pos": [
+        -71.37251281738281,
+        128.9145965576172
+      ],
+      "size": [
+        365.713134765625,
+        260.54083251953125
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "Live-Portrait <-> GamePad Mapping:",
+      "properties": {
+        "text": ""
+      },
+      "widgets_values": [
+        "\nHead Move (pitch/yaw) --- Left Stick\nHead Move (rotate/roll) - Left Stick + A\nPupil Move -------------- Right Stick\nSmile ------------------- Left Trigger + Right Bumper\nWink -------------------- Left Trigger + Y\nBlink ------------------- Right Trigger + Left Bumper\nEyebrow ----------------- Left Trigger + X\nOral - aaa -------------- Right Trigger + Pad Left\nOral - eee -------------- Right Trigger + Pad Up\nOral - woo -------------- Right Trigger + Pad Right"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 209,
+      "type": "Textbox",
+      "pos": [
+        3482.063232421875,
+        933.4053955078125
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "passthrough",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            468,
+            469
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Textbox"
+      },
+      "widgets_values": [
+        "\nHead Move (pitch/yaw) --- Left Stick\nHead Move (rotate/roll) - Left Stick + A\nPupil Move -------------- Right Stick\nSmile ------------------- Left Trigger + Right Bumper\nWink -------------------- Left Trigger + Y\nBlink ------------------- Right Trigger + Left Bumper\nEyebrow ----------------- Left Trigger + X\nOral - aaa -------------- Right Trigger + Pad Left\nOral - eee -------------- Right Trigger + Pad Up\nOral - woo -------------- Right Trigger + Pad Right"
+      ]
+    },
+    {
+      "id": 93,
+      "type": "ExpressionEditor",
+      "pos": [
+        3611.20751953125,
+        109.81562805175781
+      ],
+      "size": [
+        270.7243957519531,
+        702
+      ],
+      "flags": {},
+      "order": 56,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "src_image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 235
+        },
+        {
+          "name": "motion_link",
+          "shape": 7,
+          "type": "EDITOR_LINK",
+          "link": null
+        },
+        {
+          "name": "sample_image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 463
+        },
+        {
+          "name": "add_exp",
+          "shape": 7,
+          "type": "EXP_DATA",
+          "link": null
+        },
+        {
+          "name": "rotate_pitch",
+          "type": "FLOAT",
+          "widget": {
+            "name": "rotate_pitch"
+          },
+          "link": 273
+        },
+        {
+          "name": "rotate_yaw",
+          "type": "FLOAT",
+          "widget": {
+            "name": "rotate_yaw"
+          },
+          "link": 275
+        },
+        {
+          "name": "rotate_roll",
+          "type": "FLOAT",
+          "widget": {
+            "name": "rotate_roll"
+          },
+          "link": 367
+        },
+        {
+          "name": "blink",
+          "type": "FLOAT",
+          "widget": {
+            "name": "blink"
+          },
+          "link": 362
+        },
+        {
+          "name": "eyebrow",
+          "type": "FLOAT",
+          "widget": {
+            "name": "eyebrow"
+          },
+          "link": 368
+        },
+        {
+          "name": "wink",
+          "type": "FLOAT",
+          "widget": {
+            "name": "wink"
+          },
+          "link": 369
+        },
+        {
+          "name": "pupil_x",
+          "type": "FLOAT",
+          "widget": {
+            "name": "pupil_x"
+          },
+          "link": 277
+        },
+        {
+          "name": "pupil_y",
+          "type": "FLOAT",
+          "widget": {
+            "name": "pupil_y"
+          },
+          "link": 279
+        },
+        {
+          "name": "aaa",
+          "type": "FLOAT",
+          "widget": {
+            "name": "aaa"
+          },
+          "link": 464
+        },
+        {
+          "name": "eee",
+          "type": "FLOAT",
+          "widget": {
+            "name": "eee"
+          },
+          "link": 465
+        },
+        {
+          "name": "woo",
+          "type": "FLOAT",
+          "widget": {
+            "name": "woo"
+          },
+          "link": 466
+        },
+        {
+          "name": "smile",
+          "type": "FLOAT",
+          "widget": {
+            "name": "smile"
+          },
+          "link": 366
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            239,
+            467
+          ]
+        },
+        {
+          "name": "motion_link",
+          "type": "EDITOR_LINK",
+          "links": null
+        },
+        {
+          "name": "save_exp",
+          "type": "EXP_DATA",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ExpressionEditor"
+      },
+      "widgets_values": [
+        0,
+        0,
+        0,
+        3.7,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1.3,
+        1,
+        1,
+        "OnlyExpression",
+        2
+      ]
+    },
+    {
+      "id": 87,
+      "type": "VrchImageWebSocketWebViewerNode",
+      "pos": [
+        3985.825439453125,
+        146.41221618652344
+      ],
+      "size": [
+        302.3999938964844,
+        445.47027587890625
+      ],
+      "flags": {},
+      "order": 57,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 239
+        },
+        {
+          "name": "server_messages",
+          "type": "STRING",
+          "widget": {
+            "name": "server_messages"
+          },
+          "link": 469
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchImageWebSocketWebViewerNode"
+      },
+      "widgets_values": [
+        "1",
+        "192.168.123.112:8001",
+        "JPEG",
+        1,
+        50,
+        10,
+        "",
+        true,
+        1280,
+        960,
+        false,
+        false,
+        "",
+        "http://vrch.ai/viewer?mode=image-websocket&server=192.168.123.112:8001&ssl=false&protocol=websocket&path=web_viewer&numberOfImages=1&imageDisplayDuration=50&fadeAnimDuration=10",
+        ""
+      ]
+    },
+    {
+      "id": 207,
+      "type": "VrchImageWebViewerNode",
+      "pos": [
+        3975.7529296875,
+        677.0181274414062
+      ],
+      "size": [
+        311.58978271484375,
+        398.1365051269531
+      ],
+      "flags": {},
+      "order": 58,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 467
+        },
+        {
+          "name": "server_messages",
+          "type": "STRING",
+          "widget": {
+            "name": "server_messages"
+          },
+          "link": 468
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchImageWebViewerNode"
+      },
+      "widgets_values": [
+        "1",
+        "comfyui.ttzz.me",
+        true,
+        100,
+        100,
+        "",
+        true,
+        800,
+        600,
+        false,
+        "",
+        "https://vrch.ai/viewer?mode=image&server=comfyui.ttzz.me&ssl=true&filename=channel_1.jpeg&path=web_viewer&refreshInterval=100&fadeAnimDuration=100",
+        ""
+      ]
+    }
+  ],
+  "links": [
+    [
+      225,
+      15,
+      0,
+      88,
+      0,
+      "IMAGE"
+    ],
+    [
+      235,
+      88,
+      0,
+      93,
+      0,
+      "IMAGE"
+    ],
+    [
+      239,
+      93,
+      0,
+      87,
+      0,
+      "IMAGE"
+    ],
+    [
+      273,
+      118,
+      0,
+      93,
+      4,
+      "FLOAT"
+    ],
+    [
+      274,
+      91,
+      0,
+      118,
+      0,
+      "FLOAT"
+    ],
+    [
+      275,
+      119,
+      0,
+      93,
+      5,
+      "FLOAT"
+    ],
+    [
+      277,
+      120,
+      0,
+      93,
+      10,
+      "FLOAT"
+    ],
+    [
+      278,
+      97,
+      0,
+      120,
+      0,
+      "FLOAT"
+    ],
+    [
+      279,
+      121,
+      0,
+      93,
+      11,
+      "FLOAT"
+    ],
+    [
+      280,
+      96,
+      0,
+      121,
+      0,
+      "FLOAT"
+    ],
+    [
+      348,
+      85,
+      1,
+      91,
+      0,
+      "*"
+    ],
+    [
+      349,
+      85,
+      1,
+      92,
+      0,
+      "*"
+    ],
+    [
+      350,
+      85,
+      2,
+      97,
+      0,
+      "*"
+    ],
+    [
+      351,
+      85,
+      2,
+      96,
+      0,
+      "*"
+    ],
+    [
+      360,
+      85,
+      5,
+      95,
+      0,
+      "*"
+    ],
+    [
+      362,
+      122,
+      0,
+      93,
+      7,
+      "FLOAT"
+    ],
+    [
+      363,
+      85,
+      5,
+      165,
+      0,
+      "*"
+    ],
+    [
+      366,
+      167,
+      0,
+      93,
+      15,
+      "FLOAT"
+    ],
+    [
+      367,
+      168,
+      0,
+      93,
+      6,
+      "FLOAT"
+    ],
+    [
+      368,
+      169,
+      0,
+      93,
+      8,
+      "FLOAT"
+    ],
+    [
+      369,
+      170,
+      0,
+      93,
+      9,
+      "FLOAT"
+    ],
+    [
+      370,
+      85,
+      3,
+      171,
+      0,
+      "*"
+    ],
+    [
+      371,
+      85,
+      3,
+      172,
+      0,
+      "*"
+    ],
+    [
+      372,
+      85,
+      3,
+      173,
+      0,
+      "*"
+    ],
+    [
+      373,
+      85,
+      3,
+      174,
+      0,
+      "*"
+    ],
+    [
+      375,
+      85,
+      3,
+      176,
+      0,
+      "*"
+    ],
+    [
+      376,
+      85,
+      3,
+      177,
+      0,
+      "*"
+    ],
+    [
+      380,
+      85,
+      3,
+      178,
+      0,
+      "*"
+    ],
+    [
+      381,
+      85,
+      3,
+      179,
+      0,
+      "*"
+    ],
+    [
+      382,
+      85,
+      3,
+      180,
+      0,
+      "*"
+    ],
+    [
+      383,
+      85,
+      3,
+      181,
+      0,
+      "*"
+    ],
+    [
+      389,
+      85,
+      3,
+      183,
+      0,
+      "*"
+    ],
+    [
+      390,
+      85,
+      3,
+      182,
+      0,
+      "*"
+    ],
+    [
+      391,
+      85,
+      3,
+      184,
+      0,
+      "*"
+    ],
+    [
+      392,
+      85,
+      3,
+      185,
+      0,
+      "*"
+    ],
+    [
+      397,
+      171,
+      0,
+      187,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      398,
+      92,
+      0,
+      187,
+      0,
+      "*"
+    ],
+    [
+      399,
+      186,
+      0,
+      187,
+      1,
+      "*"
+    ],
+    [
+      400,
+      187,
+      0,
+      168,
+      0,
+      "FLOAT"
+    ],
+    [
+      401,
+      171,
+      0,
+      188,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      402,
+      186,
+      0,
+      188,
+      0,
+      "*"
+    ],
+    [
+      403,
+      188,
+      0,
+      119,
+      0,
+      "FLOAT"
+    ],
+    [
+      405,
+      92,
+      0,
+      188,
+      1,
+      "*"
+    ],
+    [
+      406,
+      85,
+      3,
+      175,
+      0,
+      "*"
+    ],
+    [
+      408,
+      190,
+      0,
+      167,
+      0,
+      "FLOAT"
+    ],
+    [
+      409,
+      189,
+      0,
+      190,
+      1,
+      "*"
+    ],
+    [
+      412,
+      191,
+      0,
+      122,
+      0,
+      "FLOAT"
+    ],
+    [
+      413,
+      189,
+      0,
+      191,
+      1,
+      "*"
+    ],
+    [
+      414,
+      95,
+      0,
+      191,
+      0,
+      "*"
+    ],
+    [
+      415,
+      176,
+      0,
+      191,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      416,
+      177,
+      0,
+      190,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      417,
+      165,
+      0,
+      190,
+      0,
+      "*"
+    ],
+    [
+      418,
+      189,
+      0,
+      192,
+      1,
+      "*"
+    ],
+    [
+      419,
+      192,
+      0,
+      170,
+      0,
+      "FLOAT"
+    ],
+    [
+      420,
+      174,
+      0,
+      192,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      421,
+      165,
+      0,
+      192,
+      0,
+      "*"
+    ],
+    [
+      422,
+      189,
+      0,
+      193,
+      1,
+      "*"
+    ],
+    [
+      423,
+      193,
+      0,
+      169,
+      0,
+      "FLOAT"
+    ],
+    [
+      424,
+      173,
+      0,
+      193,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      425,
+      165,
+      0,
+      193,
+      0,
+      "*"
+    ],
+    [
+      426,
+      196,
+      0,
+      197,
+      1,
+      "*"
+    ],
+    [
+      427,
+      196,
+      0,
+      198,
+      1,
+      "*"
+    ],
+    [
+      428,
+      197,
+      0,
+      194,
+      0,
+      "FLOAT"
+    ],
+    [
+      429,
+      198,
+      0,
+      195,
+      0,
+      "FLOAT"
+    ],
+    [
+      431,
+      95,
+      0,
+      197,
+      0,
+      "*"
+    ],
+    [
+      432,
+      165,
+      0,
+      198,
+      0,
+      "*"
+    ],
+    [
+      433,
+      180,
+      0,
+      197,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      436,
+      196,
+      0,
+      201,
+      1,
+      "*"
+    ],
+    [
+      437,
+      196,
+      0,
+      202,
+      1,
+      "*"
+    ],
+    [
+      438,
+      201,
+      0,
+      199,
+      0,
+      "FLOAT"
+    ],
+    [
+      439,
+      202,
+      0,
+      200,
+      0,
+      "FLOAT"
+    ],
+    [
+      442,
+      178,
+      0,
+      201,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      443,
+      178,
+      0,
+      202,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      444,
+      180,
+      0,
+      198,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      445,
+      95,
+      0,
+      201,
+      0,
+      "*"
+    ],
+    [
+      446,
+      165,
+      0,
+      202,
+      0,
+      "*"
+    ],
+    [
+      447,
+      203,
+      0,
+      205,
+      0,
+      "FLOAT"
+    ],
+    [
+      448,
+      204,
+      0,
+      206,
+      0,
+      "FLOAT"
+    ],
+    [
+      450,
+      196,
+      0,
+      203,
+      1,
+      "*"
+    ],
+    [
+      451,
+      196,
+      0,
+      204,
+      1,
+      "*"
+    ],
+    [
+      452,
+      181,
+      0,
+      203,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      453,
+      181,
+      0,
+      204,
+      2,
+      "BOOLEAN"
+    ],
+    [
+      454,
+      95,
+      0,
+      203,
+      0,
+      "*"
+    ],
+    [
+      455,
+      95,
+      0,
+      204,
+      0,
+      "*"
+    ],
+    [
+      463,
+      88,
+      0,
+      93,
+      2,
+      "IMAGE"
+    ],
+    [
+      464,
+      194,
+      0,
+      93,
+      12,
+      "FLOAT"
+    ],
+    [
+      465,
+      199,
+      0,
+      93,
+      13,
+      "FLOAT"
+    ],
+    [
+      466,
+      205,
+      0,
+      93,
+      14,
+      "FLOAT"
+    ],
+    [
+      467,
+      93,
+      0,
+      207,
+      0,
+      "IMAGE"
+    ],
+    [
+      468,
+      209,
+      0,
+      207,
+      1,
+      "STRING"
+    ],
+    [
+      469,
+      209,
+      0,
+      87,
+      1,
+      "STRING"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 3,
+      "title": "Gamepad Sticks",
+      "bounding": [
+        1374.9609375,
+        -948.1786499023438,
+        332.46728515625,
+        498.9248352050781
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "Gamepad Buttons A/B/X/Y",
+      "bounding": [
+        1367.1053466796875,
+        -430.95440673828125,
+        338.846923828125,
+        462.0772705078125
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "Gamepad Buttons ⬆️⬇️⬅️➡️",
+      "bounding": [
+        1360.478759765625,
+        591.3019409179688,
+        353.44281005859375,
+        462.7356872558594
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 6,
+      "title": "Gamepad Buttons LT/LB/RT/RB",
+      "bounding": [
+        1365.59912109375,
+        57.40462112426758,
+        351.4966735839844,
+        506.1539306640625
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 7,
+      "title": "Gamepad Buttons Others",
+      "bounding": [
+        1363.7027587890625,
+        1086.9976806640625,
+        349.50518798828125,
+        498.04058837890625
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 8,
+      "title": "Portrait - Head Move",
+      "bounding": [
+        1899.5703125,
+        -1096.334716796875,
+        762.4692993164062,
+        765.4857788085938
+      ],
+      "color": "#A88",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 9,
+      "title": "Portrait - Eyeball / Pupil Move",
+      "bounding": [
+        1903.8602294921875,
+        -267.5177917480469,
+        447.688232421875,
+        526.8578491210938
+      ],
+      "color": "#A88",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 10,
+      "title": "Portrait - Expression",
+      "bounding": [
+        2690.037109375,
+        -123.58031463623047,
+        752.349609375,
+        1000.4039306640625
+      ],
+      "color": "#A88",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 12,
+      "title": "Portrait - Oral",
+      "bounding": [
+        1876.8548583984375,
+        491.07781982421875,
+        720.0902099609375,
+        1531.2928466796875
+      ],
+      "color": "#A88",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 13,
+      "title": "Control Panel",
+      "bounding": [
+        -134.96632385253906,
+        -55.757530212402344,
+        1171.37255859375,
+        787.4506225585938
+      ],
+      "color": "#8AA",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.285311670611012,
+      "offset": [
+        557.9103872767384,
+        1685.5876755888414
+      ]
+    },
+    "frontendVersion": "1.16.9",
+    "node_versions": {
+      "ComfyUI-Easy-Use": "44f067632352c449263e11f0d9b708c9fd30e989",
+      "ComfyUI-Crystools": "ad2e9b8be8c601f17cf04d676a16afe538b89497",
+      "comfyui-web-viewer": "1beaf1ad74dbe235ca5652dbb49dd19767e7d656",
+      "ComfyUI-Logic": "fb8897351f715ea75eebf52e74515b6d07c693b8",
+      "image-resize-comfyui": "ae5888637742ff1668b6cd32954ba48d81dbd39d",
+      "comfy-core": "0.3.29",
+      "ComfyUI-Chibi-Nodes": "290ccef2a8c1bc3917e1c00dbe5c206b66fb8ded",
+      "ComfyUI-AdvancedLivePortrait": "3bba732915e22f18af0d221b9c5c282990181f1b"
+    }
+  },
+  "version": 0.4
+}
