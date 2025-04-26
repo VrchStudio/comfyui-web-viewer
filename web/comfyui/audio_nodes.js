@@ -5,41 +5,29 @@ app.registerExtension({
     name: "vrch.AudioSaverNode",
     async beforeRegisterNodeDef(nodeType, nodeData) {
         if (nodeType.comfyClass === "VrchAudioSaverNode") {
-            nodeData.input.required.audioUI = ["AUDIO_UI"];
+            nodeData.input.required.audioUI = ['AUDIO_UI', {}]
         }
-    },
-    getCustomWidgets() {
-        return {
-            AUDIO_UI(node, inputName) {
-                const audio = document.createElement("audio");
-                audio.controls = true;
-                audio.classList.add("comfy-audio");
-                audio.setAttribute("name", "media");
-                const audioUIWidget = node.addDOMWidget(inputName, "audioUI", audio);
-                audioUIWidget.serialize = false;
-
-                if (node.comfyClass === "VrchAudioSaverNode") {
-                    audioUIWidget.element.classList.add("empty-audio-widget");
-                    node.onExecuted = function(message) {
-                        const audios = message.audio;
-                        if (!audios) return;
-                        const audio = audios[0];
-                        audioUIWidget.element.src = api.apiURL(
-                            `/view?filename=${encodeURIComponent(audio.filename)}&type=${audio.type}&subfolder=${encodeURIComponent(audio.subfolder)}`
-                        );
-                        audioUIWidget.element.classList.remove("empty-audio-widget");
-                    };
-                }
-
-                return { widget: audioUIWidget };
-            }
-        };
     },
     async nodeCreated(node) {
         if (node.comfyClass === "VrchAudioSaverNode") {
+
+            const audioUIWidget = node.widgets.find(w => w.name === "audioUI");
+            const enablePreviewWidget = node.widgets.find(w => w.name === "enable_preview");
+
+            if (enablePreviewWidget) {
+                enablePreviewWidget.callback = (value) => {
+                    if (audioUIWidget) {
+                        if (value) {
+                            audioUIWidget.element.classList.remove("empty-audio-widget");
+                        } else {
+                            audioUIWidget.element.classList.add("empty-audio-widget");
+                        }
+                    }
+                };
+            }
+
             node.onExecuted = function(message) {
-                if (message.audio) {
-                    const audioUIWidget = node.widgets.find(w => w.name === "audioUI");
+                if (message != null && message.audio) {
                     if (audioUIWidget) {
                         const audio = message.audio[0];
                         audioUIWidget.element.src = api.apiURL(
@@ -55,27 +43,9 @@ app.registerExtension({
 
 app.registerExtension({
     name: 'vrch.AudioRecorderNode',
-    async getCustomWidgets(app) {
-        return {
-            AUDIOINPUTMIX(node, inputName, inputData, app) {
-                const widget = {
-                    type: inputData[0],
-                    name: inputName,
-                    size: [128, 32],
-                    draw(ctx, node, width, y) {},
-                    computeSize(...args) {
-                        return [128, 32]; // Default widget size
-                    },
-                };
-                node.addCustomWidget(widget);
-                return widget;
-            },
-        };
-    },
-
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeType.comfyClass === 'VrchAudioRecorderNode') {
-            nodeData.input.required.audioUI = ["AUDIO_UI"];
+            nodeData.input.required.audioUI = ['AUDIO_UI', {}]
 
             const orig_nodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {
