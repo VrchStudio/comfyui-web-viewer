@@ -110,7 +110,7 @@ export function delayInit(node, showUrlWidget, urlWidget, updateUrl) {
 export function createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget) {
     const button = document.createElement("button");
     button.textContent = "Open Web Viewer";
-    button.classList.add("comfy-big-button");
+    button.classList.add("vrch-big-button");
     button.onclick = () => {
         if (urlWidget && urlWidget.value) {
             const width = widthWidget ? widthWidget.value : 1280;
