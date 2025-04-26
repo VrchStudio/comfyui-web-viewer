@@ -114,6 +114,7 @@ class VrchTriggerToggleNode:
     def __init__(self):
         self.last_initial_state = None
         self.state = False
+        self.last_trigger = False
 
     def switch(self, trigger=None, initial_state=False, debug=False):
         
@@ -121,10 +122,13 @@ class VrchTriggerToggleNode:
         if self.last_initial_state is None or initial_state != self.last_initial_state:
             self.state = initial_state
             self.last_initial_state = initial_state
+            self.last_trigger = False
             
-        # Toggle state only when trigger is True
-        if trigger:
-            self.state = not self.state
+        # Edge‐detect the trigger: toggle only on rising edge
+        current_trigger = bool(trigger)
+        if current_trigger and not self.last_trigger:
+           self.state = not self.state
+        self.last_trigger = current_trigger
             
         if debug:
             print(f"[VrchTriggerToggleNode] Trigger: {trigger}, Initial State: {initial_state}, Current State: {self.state}")
@@ -175,7 +179,8 @@ class VrchTriggerToggleX4Node:
 
     def __init__(self):
         self.last_initial_states = [None] * 4
-        self.states = [False] * 4
+        self.states               = [False] * 4
+        self.last_triggers        = [False] * 4
 
     def switch(self,
                trigger1=None, trigger2=None, trigger3=None, trigger4=None,
@@ -184,40 +189,45 @@ class VrchTriggerToggleX4Node:
         triggers = [trigger1, trigger2, trigger3, trigger4]
         initials = [initial_state1, initial_state2, initial_state3, initial_state4]
 
-        # reset & toggle
+        # reset on initial_state change and clear trigger latch
         for i in range(4):
             if self.last_initial_states[i] is None or initials[i] != self.last_initial_states[i]:
-                self.states[i] = initials[i]
-                self.last_initial_states[i] = initials[i]
-            if triggers[i]:
-                self.states[i] = not self.states[i]
+                self.states[i]               = initials[i]
+                self.last_initial_states[i]  = initials[i]
+                self.last_triggers[i]        = False
 
-        # build grouped JSON data
+        # edge‑detect each trigger
+        current_triggers = [bool(t) for t in triggers]
+        for i in range(4):
+            if current_triggers[i] and not self.last_triggers[i]:
+                self.states[i] = not self.states[i]
+            self.last_triggers[i] = current_triggers[i]
+
+        # prepare JSON payload
         raw_data = {
             f"trigger{i+1}": {
-                "trigger": triggers[i],
+                "trigger":       triggers[i],
                 "initial_state": initials[i],
-                "current_state": self.states[i]
-            }
-            for i in range(4)
+                "current_state": self.states[i],
+            } for i in range(4)
         }
         json_data = json.dumps(raw_data, indent=2, ensure_ascii=False)
 
         if debug:
-            # print debug info in JSON format
             print(f"[VrchTriggerToggleX4Node] {json_data}")
-            
+
         result = {
             "ui": {
                 "current_state": [*self.states],
             },
-            "result": (*self.states, json_data)
+            "result": (*self.states, json_data,)
         }
         return result
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
         return float("NaN")
+
 
 class VrchTriggerToggleX8Node:
     @classmethod
@@ -233,7 +243,7 @@ class VrchTriggerToggleX8Node:
                 "trigger7": ("BOOLEAN", {"default": None, "forceInput": True}),
                 "trigger8": ("BOOLEAN", {"default": None, "forceInput": True}),
             },
-            "required":{
+            "required": {
                 "initial_state1": ("BOOLEAN", {"default": False}),
                 "initial_state2": ("BOOLEAN", {"default": False}),
                 "initial_state3": ("BOOLEAN", {"default": False}),
@@ -246,56 +256,59 @@ class VrchTriggerToggleX8Node:
             },
         }
 
-    RETURN_TYPES = ("BOOLEAN","BOOLEAN","BOOLEAN","BOOLEAN",
-                    "BOOLEAN","BOOLEAN","BOOLEAN","BOOLEAN","JSON")
-    RETURN_NAMES = ("OUTPUT1","OUTPUT2","OUTPUT3","OUTPUT4",
-                    "OUTPUT5","OUTPUT6","OUTPUT7","OUTPUT8","JSON")
+    RETURN_TYPES = ("BOOLEAN",)*8 + ("JSON",)
+    RETURN_NAMES = tuple(f"OUTPUT{i}" for i in range(1,9)) + ("JSON",)
     FUNCTION = "switch"
     CATEGORY = CATEGORY
 
     def __init__(self):
         self.last_initial_states = [None] * 8
-        self.states = [False] * 8
+        self.states               = [False] * 8
+        self.last_triggers        = [False] * 8
 
     def switch(self,
-               trigger1 = None, trigger2 = None, trigger3 = None, trigger4 = None,
-               trigger5 = None, trigger6 = None, trigger7 = None, trigger8 = None,
-               initial_state1 = False, initial_state2 = False, initial_state3 = False, initial_state4 = False,
-               initial_state5 = False, initial_state6 = False, initial_state7 = False, initial_state8 = False,
-               debug = False):
+               trigger1=None, trigger2=None, trigger3=None, trigger4=None,
+               trigger5=None, trigger6=None, trigger7=None, trigger8=None,
+               initial_state1=False, initial_state2=False, initial_state3=False, initial_state4=False,
+               initial_state5=False, initial_state6=False, initial_state7=False, initial_state8=False,
+               debug=False):
         triggers = [trigger1, trigger2, trigger3, trigger4,
                     trigger5, trigger6, trigger7, trigger8]
         initials = [initial_state1, initial_state2, initial_state3, initial_state4,
                     initial_state5, initial_state6, initial_state7, initial_state8]
 
-        # reset initial changes and toggle on trigger
+        # reset on initial_state change and clear trigger latch
         for i in range(8):
             if self.last_initial_states[i] is None or initials[i] != self.last_initial_states[i]:
-                self.states[i] = initials[i]
-                self.last_initial_states[i] = initials[i]
-            if triggers[i]:
-                self.states[i] = not self.states[i]
+                self.states[i]               = initials[i]
+                self.last_initial_states[i]  = initials[i]
+                self.last_triggers[i]        = False
 
-        # build grouped JSON data
+        # edge‑detect each trigger
+        current_triggers = [bool(t) for t in triggers]
+        for i in range(8):
+            if current_triggers[i] and not self.last_triggers[i]:
+                self.states[i] = not self.states[i]
+            self.last_triggers[i] = current_triggers[i]
+
+        # prepare JSON payload
         raw_data = {
             f"trigger{i+1}": {
                 "trigger":       triggers[i],
                 "initial_state": initials[i],
-                "current_state": self.states[i]
-            }
-            for i in range(8)
+                "current_state": self.states[i],
+            } for i in range(8)
         }
         json_data = json.dumps(raw_data, indent=2, ensure_ascii=False)
 
         if debug:
-            # print debug info in JSON format
             print(f"[VrchTriggerToggleX8Node] {json_data}")
 
         result = {
             "ui": {
                 "current_state": [*self.states],
             },
-            "result": (*self.states, json_data)
+            "result": (*self.states, json_data,)
         }
         return result
 
