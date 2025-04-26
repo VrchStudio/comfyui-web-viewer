@@ -136,8 +136,14 @@ class VrchTriggerToggleNode:
             "current_state": self.state,
         }
         json_data = json.dumps(raw_data, indent=2, ensure_ascii=False)
-            
-        return (self.state, json_data,)
+        
+        result = {
+            "ui": {
+                "current_state": [self.state],
+            },
+            "result": (self.state, json_data,)
+        }
+        return result
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
@@ -200,8 +206,14 @@ class VrchTriggerToggleX4Node:
         if debug:
             # print debug info in JSON format
             print(f"[VrchTriggerToggleX4Node] {json_data}")
-
-        return (*self.states, json_data)
+            
+        result = {
+            "ui": {
+                "current_state": [*self.states],
+            },
+            "result": (*self.states, json_data)
+        }
+        return result
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
@@ -279,7 +291,13 @@ class VrchTriggerToggleX8Node:
             # print debug info in JSON format
             print(f"[VrchTriggerToggleX8Node] {json_data}")
 
-        return (*self.states, json_data)
+        result = {
+            "ui": {
+                "current_state": [*self.states],
+            },
+            "result": (*self.states, json_data)
+        }
+        return result
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
