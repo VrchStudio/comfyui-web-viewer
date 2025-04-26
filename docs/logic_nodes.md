@@ -69,6 +69,9 @@
    - **Output (BOOLEAN):** The current toggle state.
    - **JSON (JSON):** A JSON object containing `trigger`, `initial_state`, and `current_state`.
 
+5. **Visual Indicators:**
+   - Displays a non‑clickable circular indicator in the UI reflecting the current state.
+
 ---
 
 ### Node: `Trigger Toggle x4 @ vrch.ai` (vrch.ai/logic)
@@ -92,6 +95,9 @@
    - **Output1–Output4 (BOOLEAN):** Current states for each channel.
    - **JSON (JSON):** JSON object grouping triggers, initial, and current states for all channels.
 
+5. **Visual Indicators:**
+   - Renders four non‑clickable circular indicators in the UI, one per channel, showing each current state.
+
 ---
 
 ### Node: `Trigger Toggle x8 @ vrch.ai` (vrch.ai/logic)
@@ -114,3 +120,6 @@
 4. **Node Outputs:**
    - **Output1–Output8 (BOOLEAN):** Current states for each channel.
    - **JSON (JSON):** JSON object grouping triggers, initial, and current states for all channels.
+
+5. **Visual Indicators:**
+   - Renders eight non‑clickable circular indicators in the UI, one per channel, showing each current state.
