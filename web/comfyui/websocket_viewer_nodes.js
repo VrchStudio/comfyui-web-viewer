@@ -94,7 +94,6 @@ app.registerExtension({
         if (node.comfyClass === "VrchWebSocketServerNode") {
             // Find the debug widget to access its current value
             const debugWidget = node.widgets.find(w => w.name === "debug");
-            const pathWidget = node.widgets.find(w => w.name === "path");
             
             // Create a container for the indicator
             const container = document.createElement("div");
@@ -121,8 +120,7 @@ app.registerExtension({
                     
                     // Log status update if debug is enabled
                     if (isDebugEnabled) {
-                        const path = pathWidget?.value || "image";
-                        console.log(`[VrchWebSocketServerNode] Server status update: ${isRunning ? 'Running' : 'Stopped'} with path "${path}"`);
+                        console.log(`[VrchWebSocketServerNode] Server status update: ${isRunning ? 'Running' : 'Stopped'}`);
                     }
                 }
                 
