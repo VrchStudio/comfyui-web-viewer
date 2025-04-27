@@ -6,8 +6,9 @@ from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
 from .nodes.websocket_nodes import *
 from .nodes.gamepad_nodes import *
+from .nodes.logic_nodes import *
 
-__version__ = "1.0.30"
+__version__ = "1.0.31"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -21,6 +22,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchDelayOSCControlNode": VrchDelayOscControlNode,
     "VrchFloatKeyControlNode": VrchFloatKeyControlNode,
     "VrchFloatOSCControlNode": VrchFloatOSCControlNode,
+    "VrchFloatRemapNode": VrchFloatRemapNode,
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
     "VrchImageChannelLoaderNode": VrchImageChannelLoaderNode,
     "VrchImageFlipBookWebViewerNode": VrchImageFlipBookWebViewerNode,
@@ -32,6 +34,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchImageWebViewerNode": VrchImageWebViewerNode,
     "VrchIntKeyControlNode": VrchIntKeyControlNode,
     "VrchIntOSCControlNode": VrchIntOSCControlNode,
+    "VrchIntRemapNode": VrchIntRemapNode,
     "VrchInstantQueueKeyControlNode": VrchInstantQueueKeyControlNode,
     "VrchModelWebViewerNode": VrchModelWebViewerNode,
     "VrchOSCControlSettingsNode": VrchOSCControlSettingsNode,
@@ -41,6 +44,9 @@ NODE_CLASS_MAPPINGS = {
     "VrchTextKeyControlNode": VrchTextKeyControlNode,
     "VrchTextSrtPlayerNode": VrchTextSrtPlayerNode,
     "VrchTextSwitchOSCControlNode": VrchTextSwitchOSCControlNode,
+    "VrchTriggerToggleNode": VrchTriggerToggleNode,
+    "VrchTriggerToggleX4Node": VrchTriggerToggleX4Node,
+    "VrchTriggerToggleX8Node": VrchTriggerToggleX8Node,
     "VrchVideoWebViewerNode": VrchVideoWebViewerNode,
     "VrchWebViewerNode": VrchWebViewerNode,
     "VrchXYOSCControlNode": VrchXYOSCControlNode,
@@ -59,6 +65,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchDelayOscControlNode": "Delay OSC Control @ vrch.ai",
     "VrchFloatKeyControlNode": "FLOAT Key Control @ vrch.ai",
     "VrchFloatOSCControlNode": "FLOAT OSC Control @ vrch.ai",
+    "VrchFloatRemapNode": "FLOAT Remap @ vrch.ai",
     "VrchJsonUrlLoaderNode": "JSON URL Loader @ vrch.ai",
     "VrchImageFlipBookWebViewerNode": "IMAGE Flipbook Web Viewer @ vrch.ai",
     "VrchImagePreviewBackgroundNode": "IMAGE Preview in Background @ vrch.ai",
@@ -70,6 +77,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchImageChannelLoaderNode": "IMAGE Web Viewer Channel Loader @ vrch.ai",
     "VrchIntKeyControlNode": "INT Key Control @ vrch.ai",
     "VrchIntOSCControlNode": "INT OSC Control @ vrch.ai",
+    "VrchIntRemapNode": "INT Remap @ vrch.ai",
     "VrchInstantQueueKeyControlNode": "Instant Queue Key Control @ vrch.ai",
     "VrchModelWebViewerNode": "3D MODEL Web Viewer @ vrch.ai",
     "VrchOSCControlSettingsNode": "OSC Control Settings @ vrch.ai",
@@ -79,6 +87,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchTextKeyControlNode": "TEXT Key Control @ vrch.ai",
     "VrchTextSrtPlayerNode": "TEXT SRT Player @ vrch.ai",
     "VrchTextSwitchOSCControlNode": "TEXT Switch OSC Control @ vrch.ai",
+    "VrchTriggerToggleNode": "Trigger Toggle @ vrch.ai",
+    "VrchTriggerToggleX4Node": "Trigger Toggle x4 @ vrch.ai",
+    "VrchTriggerToggleX8Node": "Trigger Toggle x8 @ vrch.ai",
     "VrchVideoWebViewerNode": "VIDEO Web Viewer @ vrch.ai",
     "VrchWebViewerNode": "Web Viewer @ vrch.ai",
     "VrchXYOSCControlNode": "XY OSC Control @ vrch.ai",

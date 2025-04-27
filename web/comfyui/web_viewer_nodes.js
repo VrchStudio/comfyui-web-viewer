@@ -378,7 +378,7 @@ app.registerExtension({
 // Add custom styles for the button
 const style = document.createElement("style");
 style.textContent = `
-    .comfy-big-button {
+    .vrch-big-button {
         background-color: #4CAF50;
         color: white;
         font-size: 16px;
@@ -390,12 +390,12 @@ style.textContent = `
         transition: background-color 0.3s, transform 0.2s;
     }
 
-    .comfy-big-button:hover {
+    .vrch-big-button:hover {
         background-color: #45a049;
         transform: scale(1.05); 
     }
 
-    .comfy-big-button:active {
+    .vrch-big-button:active {
         background-color: #3e8e41;
         transform: scale(1);
     }

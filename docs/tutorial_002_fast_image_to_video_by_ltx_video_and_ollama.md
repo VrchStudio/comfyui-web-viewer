@@ -12,9 +12,9 @@ This ComfyUI workflow leverages the powerful **LTX Videos + STG Framework** to c
 
 This workflow provides a streamlined and customizable solution for generating AI-driven motion pictures with minimal effort.
 
-- You can [download the workflow from here](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_web_viewer_003_video_web_viewer.json)
+- You can [download the workflow from here](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_web_viewer_003_video_web_viewer.json)
 
-![](../workflows/example_web_viewer_003_video_web_viewer.png)
+![](../example_workflows/example_web_viewer_003_video_web_viewer.png)
 
 ## Preparations
 
@@ -95,6 +95,6 @@ Example Style:
 ## References
 
 - ComfyUI Web Viewer GitHub Repo: [ComfyUI Web Viewer](https://github.com/VrchStudio/comfyui-web-viewer)
-- ComfyUI Video Web Viewer workflow: [example_web_viewer_003_video_web_viewer.json](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_web_viewer_003_video_web_viewer.json)
+- ComfyUI Video Web Viewer workflow: [example_web_viewer_003_video_web_viewer.json](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_web_viewer_003_video_web_viewer.json)
 - LTX Videos GitHub Repo: [LTX Videos](https://github.com/Lightricks/ComfyUI-LTXVideo)
 - Another LTX IMAGE to MOTION PICTURE with STG and autocaption workflow: [civitai link](https://civitai.com/models/995093/ltx-image-to-video-with-stg-and-autocaption-workflow)

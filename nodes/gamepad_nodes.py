@@ -38,6 +38,7 @@ class VrchGamepadLoaderNode:
         "FLOAT_BUTTONS",
     )
     
+    OUTPUT_NODE = True
     CATEGORY = CATEGORY
     FUNCTION = "load_gamepad"
 

@@ -13,10 +13,10 @@ This ComfyUI workflow leverages the powerful **LTX Videos + STG Framework** to c
 
 This workflow provides a comprehensive solution for generating AI-driven motion pictures with synchronized audio and highly customizable features.
 
-- You can [download the workflow from here](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_web_viewer_004_video_web_viewer_video_with_sfx.json)
+- You can [download the workflow from here](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_web_viewer_004_video_web_viewer_video_with_sfx.json)
 - see [ComfyUI Web Viewer github repo](https://github.com/VrchStudio/comfyui-web-viewer) for more details
 
-![](../workflows/example_web_viewer_004_video_web_viewer_video_with_sfx.png)
+![](../example_workflows/example_web_viewer_004_video_web_viewer_video_with_sfx.png)
 
 ## What's New
 
@@ -160,7 +160,7 @@ For advanced users, this feature even supports simultaneous viewing on multiple 
 
 ## References
 
-- ComfyUI Video + SFX Workflow: [example_web_viewer_004_video_web_viewer_video_with_sfx.json](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_web_viewer_004_video_web_viewer_video_with_sfx.json)
+- ComfyUI Video + SFX Workflow: [example_web_viewer_004_video_web_viewer_video_with_sfx.json](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_web_viewer_004_video_web_viewer_video_with_sfx.json)
 - ComfyUI Web Viewer GitHub Repo: [https://github.com/VrchStudio/comfyui-web-viewer](https://github.com/VrchStudio/comfyui-web-viewer)
 - LTX Videos GitHub Repo: [https://github.com/Lightricks/ComfyUI-LTXVideo](https://github.com/Lightricks/ComfyUI-LTXVideo)
 - ComfyUI MMAudio GitHub Repo: [https://github.com/kijai/ComfyUI-MMAudio](https://github.com/kijai/ComfyUI-MMAudio)

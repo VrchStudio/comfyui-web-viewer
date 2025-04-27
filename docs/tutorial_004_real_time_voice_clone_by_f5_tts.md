@@ -1,8 +1,8 @@
 # Tutorial 004: Real Time Voice Clone by F5-TTS
 
-![](../workflows/example_web_viewer_005_audio_web_viewer_f5_tts.png)
+![](../example_workflows/example_web_viewer_005_audio_web_viewer_f5_tts.png)
 
-You can **[Download the Workflow Here](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_web_viewer_005_audio_web_viewer_f5_tts.json)**
+You can **[Download the Workflow Here](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_web_viewer_005_audio_web_viewer_f5_tts.json)**
 
 ## TL;DR
 
@@ -39,7 +39,7 @@ You can **[Download the Workflow Here](https://github.com/VrchStudio/comfyui-web
 ### 1. Run Workflow in ComfyUI
 
 1. **Open the Workflow**  
-   - Import the [example_web_viewer_005_audio_web_viewer_f5_tts](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_web_viewer_005_audio_web_viewer_f5_tts.json) workflow into ComfyUI.
+   - Import the [example_web_viewer_005_audio_web_viewer_f5_tts](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_web_viewer_005_audio_web_viewer_f5_tts.json) workflow into ComfyUI.
 
 2. **Record Your Voice**  
    - In the **`Audio Recorder @ vrch.ai`** node:
@@ -81,7 +81,7 @@ The **`Audio Web Viewer @ vrch.ai`** node from the [**ComfyUI Web Viewer**](http
 ## References
 
 - **Real Time Voice Clone Workflow**:  
-  [example_web_viewer_005_audio_web_viewer_f5_tts](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_web_viewer_005_audio_web_viewer_f5_tts.json)
+  [example_web_viewer_005_audio_web_viewer_f5_tts](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_web_viewer_005_audio_web_viewer_f5_tts.json)
 - **ComfyUI Web Viewer GitHub Repo**:  
   [https://github.com/VrchStudio/comfyui-web-viewer](https://github.com/VrchStudio/comfyui-web-viewer)
 - **ComfyUI F5 TTS GitHub Repo**:  

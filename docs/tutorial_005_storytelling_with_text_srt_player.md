@@ -1,6 +1,6 @@
 # Tutorial 005: Storytelling with Text SRT Player
 
-![](../workflows/example_text_nodes_001_text_srt_player.png)
+![](../example_workflows/example_text_nodes_001_text_srt_player.png)
 
 ## TL;DR
 
@@ -31,7 +31,7 @@ This tutorial guides you on how to use the **TEXT SRT Playe @ vrch.ai** node fro
 ### 1. Run Workflow in ComfyUI
 
 1. **Open the Workflow**
-   - Import the [example_text_nodes_001_text_srt_player](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_text_nodes_001_text_srt_player.json) workflow into ComfyUI.
+   - Import the [example_text_nodes_001_text_srt_player](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_text_nodes_001_text_srt_player.json) workflow into ComfyUI.
 
 2. **Use SRT Format Text for Storytelling Images Generation**
    - Here is an example:
@@ -109,7 +109,7 @@ To showcase your real-time AI-generated visuals externally:
 ## References
 
 - **Storytelling with Text SRT Player Workflow**:
-  [example_text_nodes_001_text_srt_player](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/workflows/example_text_nodes_001_text_srt_player.json)
+  [example_text_nodes_001_text_srt_player](https://github.com/VrchStudio/comfyui-web-viewer/blob/main/example_workflows/example_text_nodes_001_text_srt_player.json)
 - **ComfyUI Web Viewer GitHub Repo**:
   [https://github.com/VrchStudio/comfyui-web-viewer](https://github.com/VrchStudio/comfyui-web-viewer)
 
