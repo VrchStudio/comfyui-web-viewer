@@ -15,7 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 
 - rename `workflows` to `example_workflows`
+- rename css style class `comfy-big-button` to `vrch-big-button` to avoid conflict
+- update gamepad workflows
 - update readme.md
+
+### Fixed
+
+- fix the incorrect AudioUI call (Issue #10)
 
 ## 1.0.30 - 2025-04-14
 
