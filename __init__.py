@@ -8,7 +8,7 @@ from .nodes.websocket_nodes import *
 from .nodes.gamepad_nodes import *
 from .nodes.logic_nodes import *
 
-__version__ = "1.0.30"
+__version__ = "1.0.31"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
