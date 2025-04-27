@@ -66,7 +66,7 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 
 ### `WebSocket Web Viewer Nodes`
 
-- Documentation: [Usage of WebSocket Viewer nodes](./docs/websocket_viewer_nodes.md)
+- Documentation: [Usage of WebSocket Viewer nodes](./docs/websocket_nodes.md)
 - Example workflows: n/a
 - Tutorials: n/a
 
