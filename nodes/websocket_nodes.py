@@ -423,6 +423,7 @@ class VrchImageWebSocketChannelLoaderNode:
             "required": {
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "placeholder": (["black", "white", "grey"], {"default": "black"}),
                 "debug": ("BOOLEAN", {"default": False}),
             }
         }
@@ -433,7 +434,7 @@ class VrchImageWebSocketChannelLoaderNode:
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
     
-    def receive_image(self, channel, server, debug):
+    def receive_image(self, channel, server, placeholder, debug):
         host, port = server.split(":")
         client = get_websocket_client(host, port, "/image", channel, data_handler=image_data_handler, debug=debug) # Ensure path is set correctly for loader
         
@@ -441,9 +442,18 @@ class VrchImageWebSocketChannelLoaderNode:
         if image is not None:
             return (image,)
         else:
-            # Return a small black image as placeholder
-            placeholder = torch.zeros((1, 512, 512, 3), dtype=torch.float32)
-            return (placeholder,)
+            # Return a small placeholder image based on user selection
+            if placeholder == "white":
+                placeholder_img = torch.ones((1, 512, 512, 3), dtype=torch.float32)
+            elif placeholder == "grey":
+                placeholder_img = torch.ones((1, 512, 512, 3), dtype=torch.float32) * 0.5
+            else:  # default to black
+                placeholder_img = torch.zeros((1, 512, 512, 3), dtype=torch.float32)
+            
+            if debug:
+                print(f"[VrchImageWebSocketChannelLoaderNode] No image data received, using {placeholder} placeholder")
+                
+            return (placeholder_img,)
     
     @classmethod
     def IS_CHANGED(cls, **kwargs):
