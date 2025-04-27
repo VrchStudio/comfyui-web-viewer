@@ -390,6 +390,15 @@ class WebSocketClient:
         if self.loop:
             self.loop.call_soon_threadsafe(self.loop.stop)
         self.thread.join(timeout=1)
+        
+def get_websocket_client(host, port, path, channel, data_handler=None, debug=False):
+    key = f"{host}:{port}:{path}:{channel}"
+    if key not in _websocket_clients:
+        _websocket_clients[key] = WebSocketClient(host, port, path, channel, data_handler, debug)
+    else:
+        # Update debug setting if client already exists
+        _websocket_clients[key].debug = debug
+    return _websocket_clients[key]
 
 def image_data_handler(message):
     """Default handler for processing image messages"""
@@ -407,14 +416,93 @@ def image_data_handler(message):
     
     return image_tensor
 
-def get_websocket_client(host, port, path, channel, data_handler=None, debug=False):
-    key = f"{host}:{port}:{path}:{channel}"
-    if key not in _websocket_clients:
-        _websocket_clients[key] = WebSocketClient(host, port, path, channel, data_handler, debug)
-    else:
-        # Update debug setting if client already exists
-        _websocket_clients[key].debug = debug
-    return _websocket_clients[key]
+def json_data_handler(message):
+    """Default handler for processing JSON messages"""
+    try:
+        # Try to parse the message as JSON
+        json_data = json.loads(message)
+        return json_data
+    except json.JSONDecodeError:
+        # If it's not valid JSON, return None
+        return None
+
+class VrchJsonWebSocketSenderNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "json_data": ("JSON", {"forceInput": True}),
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+    
+    RETURN_TYPES = ("JSON",)
+    RETURN_NAMES = ("JSON",)
+    FUNCTION = "send_json"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+    
+    def send_json(self, json_data, channel, server, debug):
+        host, port = server.split(":")
+        server = get_global_server(host, port, path="/json", debug=debug)
+        ch = int(channel)
+        
+        # Convert to string if it's not already
+        if isinstance(json_data, dict) or isinstance(json_data, list):
+            json_string = json.dumps(json_data)
+        else:
+            json_string = str(json_data)
+        
+        # Send the JSON data as a string
+        server.send_to_channel("/json", ch, json_string)
+        
+        if debug:
+            print(f"[VrchJsonWebSocketSenderNode] Sent JSON to channel {ch} via server on {host}:{port} with path '/json'")
+            print(f"[VrchJsonWebSocketSenderNode] JSON content: {json_string[:200]}{'...' if len(json_string) > 200 else ''}")
+            
+        return (json_data,)
+
+class VrchJsonWebSocketChannelLoaderNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "debug": ("BOOLEAN", {"default": False}),
+            },
+            "optional": {
+                 "default_json": ("JSON", {"default": '{}'}),
+            }
+        }
+    
+    RETURN_TYPES = ("JSON",)
+    RETURN_NAMES = ("JSON",)
+    FUNCTION = "receive_json"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+    
+    def receive_json(self, channel=1, server="", default_json=None, debug=False):
+        host, port = server.split(":")
+        client = get_websocket_client(host, port, "/json", channel, data_handler=json_data_handler, debug=debug)
+        
+        json_data = client.get_latest_data()
+        if json_data is not None:
+            if debug:
+                print(f"[VrchJsonWebSocketChannelLoaderNode] Received JSON data on channel {channel}")
+                print(f"[VrchJsonWebSocketChannelLoaderNode] JSON content: {str(json_data)[:200]}{'...' if len(str(json_data)) > 200 else ''}")
+            return (json_data,)
+        else:
+            if debug:
+                print(f"[VrchJsonWebSocketChannelLoaderNode] No JSON data received, using default")
+            return (default_json,)
+    
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        # Always trigger evaluation to check for new data
+        return float("NaN")
 
 class VrchImageWebSocketChannelLoaderNode:
     @classmethod
