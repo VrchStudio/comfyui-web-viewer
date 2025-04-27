@@ -136,6 +136,7 @@ class VrchWebSocketServerNode:
         return {
             "required": {
                 "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "path": (["image", "audio", "video", "json", "text"], {"default": "image"}),
                 "debug": ("BOOLEAN", {"default": False}),
             }
         }
@@ -145,30 +146,36 @@ class VrchWebSocketServerNode:
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
 
-    def start_server(self, server, debug):
+    def start_server(self, server, path, debug):
         host, port_str = server.split(":")
         port = int(port_str)
+        
+        # Validate path - only image is implemented currently
+        if path != "image":
+            raise ValueError(f"Unimplement path option: {path}. Only 'image' is supported.")
+            
         # Note: The global server is shared. Starting this node essentially ensures
         # the server is running with the latest debug setting, but doesn't create
         # multiple independent servers on the same host/port.
-        # Path is hardcoded to empty for this management node, specific paths are handled by viewer/loader nodes.
-        ws_server = get_global_server(host, port, path="/image", debug=debug)
+        ws_server = get_global_server(host, port, path=f"/{path}", debug=debug)
         is_running = ws_server.is_running()
 
         if debug:
-            print(f"[VrchWebSocketServerNode] Server on {host}:{port} status check. Running: {is_running}")
+            print(f"[VrchWebSocketServerNode] Server on {host}:{port}/{path} status check. Running: {is_running}")
 
         return {
             "ui": {
-                "server_status": [is_running] # Pass status to UI
+                "server_status": [is_running], # Pass status to UI
+                "debug_status": [debug]        # Pass debug state to UI
             }
         }
 
     @classmethod
-    def IS_CHANGED(cls, server, debug, **kwargs):
+    def IS_CHANGED(cls, server, path, debug, **kwargs):
         # Re-run whenever inputs change to update server settings or check status
         m = hashlib.sha256()
         m.update(server.encode('utf-8'))
+        m.update(path.encode('utf-8'))
         m.update(str(debug).encode('utf-8'))
         return m.hexdigest()
 

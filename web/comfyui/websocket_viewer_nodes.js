@@ -19,7 +19,7 @@ import {
  */
 function createServerStatusIndicatorElement() {
     const indicator = document.createElement("div");
-    indicator.textContent = "Server"; // Initial text
+    indicator.textContent = "Run to Start Server"; // Initial text
     indicator.classList.add("vrch-server-indicator", "off"); // Start as off
     indicator.style.pointerEvents = "none";
     return indicator;
@@ -92,6 +92,10 @@ app.registerExtension({
     name: "vrch.WebSocketServer",
     async nodeCreated(node) {
         if (node.comfyClass === "VrchWebSocketServerNode") {
+            // Find the debug widget to access its current value
+            const debugWidget = node.widgets.find(w => w.name === "debug");
+            const pathWidget = node.widgets.find(w => w.name === "path");
+            
             // Create a container for the indicator
             const container = document.createElement("div");
             container.classList.add("vrch-server-indicator-container");
@@ -106,22 +110,28 @@ app.registerExtension({
             node.onExecuted = function(message) {
                 onExecuted?.apply(this, arguments);
 
-                if (message?.server_status) {
-                    const isRunning = message.server_status[0]; // Expecting a list with one boolean
+                // Get server status and debug status from message
+                const isRunning = message?.server_status?.[0];
+                const isDebugEnabled = message?.debug_status?.[0];
+
+                if (typeof isRunning !== 'undefined') {
                     statusIndicator.textContent = isRunning ? "Running" : "Stopped";
                     statusIndicator.classList.toggle("on", !!isRunning);
                     statusIndicator.classList.toggle("off", !isRunning);
+                    
+                    // Log status update if debug is enabled
+                    if (isDebugEnabled) {
+                        const path = pathWidget?.value || "image";
+                        console.log(`[VrchWebSocketServerNode] Server status update: ${isRunning ? 'Running' : 'Stopped'} with path "${path}"`);
+                    }
+                }
+                
+                // If there's an error message from path validation, it would be handled by ComfyUI's error system
+                // We can add extra debug logging here if needed
+                if (isDebugEnabled && typeof isRunning === 'undefined') {
+                    console.log("[VrchWebSocketServerNode] Executed but no status received:", message);
                 }
             };
-
-             // Add a button to manually refresh status (optional, IS_CHANGED handles auto-refresh)
-             /*
-             const refreshButton = node.addWidget("button", "Refresh Status", null, () => {
-                 // Trigger node execution manually if needed, though IS_CHANGED should handle it
-                 node.graph.runStep(1, false); // Or find a more targeted way if possible
-             });
-             refreshButton.serialize = false;
-             */
         }
     }
 });
@@ -159,7 +169,7 @@ style.textContent = `
         padding: 4px;
     }
     .vrch-server-indicator {
-        width: 80px; /* Wider to fit text */
+        width: 200px; 
         height: 32px;
         border-radius: 16px; /* Pill shape */
         display: flex;
