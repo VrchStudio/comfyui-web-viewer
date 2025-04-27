@@ -25,7 +25,7 @@
    - **Debug Mode:**
      - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
    - **Extra Parameters:**
-     - **`extra_params`**: The extra parameters for Image WebSocket Web Viewer, see [websocket_viewer_nodes_extra_params.md](./websocket_viewer_nodes_extra_params.md)
+     - **`extra_params`**: The extra parameters for Image WebSocket Web Viewer, see [websocket_nodes_extra_params.md](./websocket_nodes_extra_params.md)
    - **URL Input:**
      - **`url`**: This field is automatically updated with a constructed URL based on your inputs (server, channel, extra parameters, etc.). You can control its visibility with the **`show_url`** option.
 
