@@ -67,10 +67,8 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 ### `WebSocket Web Viewer Nodes`
 
 - Documentation: [Usage of WebSocket Viewer nodes](./docs/websocket_viewer_nodes.md)
-- Example workflows:
-  - [TBA]
-- Tutorials:
-  - [TBA]
+- Example workflows: n/a
+- Tutorials: n/a
 
 ### `OSC Control Nodes`
 
@@ -94,7 +92,8 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 
 - Documentation: [Usage of Gamepad nodes](./docs/gamepad_nodes.md)
 - Example workflows:
-  - [Workflow Example: Gamepade Nodes](./example_workflows/example_gamepad_nodes_001_basic.json)
+  - [Workflow Example: Gamepad Nodes](./example_workflows/example_gamepad_nodes_001_basic.json)
+  - [Workflow Example: Gamepad with Live Portrait](./example_workflows/example_gamepad_nodes_002_live_portrait.json)
 
 ### `Audio Nodes`
 
@@ -111,8 +110,7 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
 ### `Logic Nodes`
 
 - Documentation: [Usage of Logic nodes](./docs/logic_nodes.md)
-- Example workflows:
-  - [TBA]
+- Example workflows: n/a
 
 ### `Text Nodes`
 
