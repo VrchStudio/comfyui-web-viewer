@@ -1,3 +1,4 @@
+import hashlib
 import io
 import json
 import time
@@ -41,6 +42,7 @@ class SimpleWebSocketServer:
         self.server = None
         self.thread = threading.Thread(target=self._run, daemon=True)
         self.thread.start()
+        self._is_running = False # Add status flag
 
     def _run(self):
         asyncio.set_event_loop(self.loop)
@@ -48,13 +50,20 @@ class SimpleWebSocketServer:
         if self.debug:
             print(f"[SimpleWebSocketServer] Server task scheduled on {self.host}:{self.port} with path {self.path}")
         self.loop.run_forever()
+        self._is_running = False # Set status to false when loop stops
+        if self.debug:
+            print(f"[SimpleWebSocketServer] Server loop stopped on {self.host}:{self.port}")
+
 
     async def _start_server(self):
         try:
+            # Use websockets.serve directly
             self.server = await websockets.serve(self._handler, self.host, self.port)
+            self._is_running = True # Set status to true when server starts
             if self.debug:
                 print(f"[SimpleWebSocketServer] Server started on {self.host}:{self.port} with path {self.path}")
         except Exception as e:
+            self._is_running = False
             print(f"[SimpleWebSocketServer] Failed to start server: {e}")
 
     async def _handler(self, websocket, path=None):
@@ -105,9 +114,64 @@ class SimpleWebSocketServer:
     def stop(self):
         if self.debug:
             print("[SimpleWebSocketServer] Stopping server")
-        if self.loop:
+        if self.server:
+             # Properly close the server if using websockets.serve directly
+             self.server.close()
+             self.loop.call_soon_threadsafe(asyncio.ensure_future, self.server.wait_closed())
+             # For ComfyUI's server, stopping the loop might be enough or handled elsewhere
+             # pass # Keep pass commented out
+        if self.loop and self.loop.is_running():
             self.loop.call_soon_threadsafe(self.loop.stop)
-            self.thread.join()
+        if self.thread.is_alive():
+            self.thread.join(timeout=1)
+        self._is_running = False
+
+    def is_running(self):
+        # Check if the asyncio loop is running and the server object exists
+        return self.loop.is_running() and self.server is not None and self._is_running
+
+class VrchWebSocketServerNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+
+    RETURN_TYPES = ()
+    FUNCTION = "start_server"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def start_server(self, server, debug):
+        host, port_str = server.split(":")
+        port = int(port_str)
+        # Note: The global server is shared. Starting this node essentially ensures
+        # the server is running with the latest debug setting, but doesn't create
+        # multiple independent servers on the same host/port.
+        # Path is hardcoded to empty for this management node, specific paths are handled by viewer/loader nodes.
+        ws_server = get_global_server(host, port, path="/image", debug=debug)
+        is_running = ws_server.is_running()
+
+        if debug:
+            print(f"[VrchWebSocketServerNode] Server on {host}:{port} status check. Running: {is_running}")
+
+        return {
+            "ui": {
+                "server_status": [is_running] # Pass status to UI
+            }
+        }
+
+    @classmethod
+    def IS_CHANGED(cls, server, debug, **kwargs):
+        # Re-run whenever inputs change to update server settings or check status
+        m = hashlib.sha256()
+        m.update(server.encode('utf-8'))
+        m.update(str(debug).encode('utf-8'))
+        return m.hexdigest()
+
 
 class VrchImageWebSocketWebViewerNode:
     @classmethod
@@ -137,10 +201,10 @@ class VrchImageWebSocketWebViewerNode:
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
 
-    def send_images(self, 
-                    images, 
-                    channel, 
-                    server, 
+    def send_images(self,
+                    images,
+                    channel,
+                    server,
                     format,
                     number_of_images,
                     image_display_duration,
@@ -155,7 +219,7 @@ class VrchImageWebSocketWebViewerNode:
                     url):
         results = []
         host, port = server.split(":")
-        server = get_global_server(host, port, path="image", debug=debug)
+        server = get_global_server(host, port, path="/image", debug=debug) # Ensure path is set correctly for viewer
         ch = int(channel)
         for tensor in images:
             arr = 255.0 * tensor.cpu().numpy()
@@ -305,7 +369,7 @@ class VrchImageWebSocketChannelLoaderNode:
     
     def receive_image(self, channel, server, debug):
         host, port = server.split(":")
-        client = get_websocket_client(host, port, "image", channel, data_handler=image_data_handler, debug=debug)
+        client = get_websocket_client(host, port, "/image", channel, data_handler=image_data_handler, debug=debug) # Ensure path is set correctly for loader
         
         image = client.get_latest_data()
         if image is not None:
