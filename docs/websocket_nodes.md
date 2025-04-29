@@ -80,14 +80,21 @@
    - **Server:**
      - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
    - **Placeholder:**
-     - **`placeholder`**: Choose the color of the placeholder image to display when no image data is received. Options are **"black"**, **"white"**, or **"grey"** (default is **"black"**).
+     - **`placeholder`**: Choose the placeholder to display when no image data is received. Options:
+         - **"black"**: pure black placeholder image.
+         - **"white"**: pure white placeholder image.
+         - **"grey"**: mid-grey placeholder image.
+         - **"image"**: use the provided **`default_image`** as placeholder. Requires supplying **`default_image`**. The node detects changes to this image and outputs it immediately once per change.
+   - **Default Image:** *(Optional)*
+     - **`default_image`**: Image to use when **`placeholder`** is set to **"image"**.
    - **Debug Mode:**
      - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
 
 3. **Receiving Images:**
    - This node automatically connects to the specified WebSocket channel and listens for incoming image data.
    - When an image is received, it will be processed and made available as an output that can be connected to other nodes in your workflow.
-   - If no image has been received yet, a placeholder image with the selected color will be provided.
+   - If **`placeholder`** is set to **"image"** and a new **`default_image`** was provided since the last execution, it is output immediately once (before listening for WebSocket data).
+   - If no WebSocket image is received afterward, the **`default_image`** is used as the placeholder output.
 
 **Notes:**
 - This node is designed to work with the `IMAGE WebSocket Web Viewer @ vrch.ai` node, receiving the images it broadcasts.
