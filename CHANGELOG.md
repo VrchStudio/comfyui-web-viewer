@@ -13,12 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `VrchWebSocketServerNode`
   - `VrchJsonWebSocketSenderNode`
   - `VrchJsonWebSocketChannelLoaderNode`
+- add new image node `VrchImagePreviewBackgroundNewNode`
 
 ### Updated
 
 - rename `websocket_viewer_nodes` to be `websocket_nodes`
-- update `VrchImageWebSocketChannelLoaderNode` with placeholder image colour options
+- rename `IMAGE Preview in Background @ vrch.ai` to be `IMAGE Preview in Background (Legacy) @ vrch.ai`
+- update `VrchImageWebSocketChannelLoaderNode` with `placeholder` options and `default_image` option
 - update websocket_nodes.md
+- update image_nodes.md
 - update readme.md
 
 ## 1.0.31 - 2025-04-27
