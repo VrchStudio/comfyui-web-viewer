@@ -532,8 +532,11 @@ class VrchImageWebSocketChannelLoaderNode:
             "required": {
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
-                "placeholder": (["black", "white", "grey"], {"default": "black"}),
+                "placeholder": (["black", "white", "grey", "image"], {"default": "black"}),
                 "debug": ("BOOLEAN", {"default": False}),
+            },
+            "optional": {
+                "default_image": ("IMAGE",),
             }
         }
     
@@ -543,26 +546,42 @@ class VrchImageWebSocketChannelLoaderNode:
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
     
-    def receive_image(self, channel, server, placeholder, debug):
+    def receive_image(self, channel, server, placeholder, debug, default_image=None):
+        # One-time override: only when placeholder is 'image', check default_image change once
+        if placeholder == "image" and default_image is not None:
+             # use tensor data_ptr to detect new image instance
+             cur_id = default_image.data_ptr() if hasattr(default_image, 'data_ptr') else id(default_image)
+             last_id = getattr(self, '_last_default_image_id', None)
+             if cur_id != last_id:
+                # update stored id and return new default_image immediately
+                self._last_default_image_id = cur_id
+                if debug:
+                    print(f"[VrchImageWebSocketChannelLoaderNode] Detected new default_image, passing it downstream once")
+                return (default_image,)
+            
         host, port = server.split(":")
-        client = get_websocket_client(host, port, "/image", channel, data_handler=image_data_handler, debug=debug) # Ensure path is set correctly for loader
+        # Ensure path is set correctly for loader
+        client = get_websocket_client(host, port, "/image", channel, data_handler=image_data_handler, debug=debug) 
         
         image = client.get_latest_data()
         if image is not None:
             return (image,)
-        else:
-            # Return a small placeholder image based on user selection
-            if placeholder == "white":
-                placeholder_img = torch.ones((1, 512, 512, 3), dtype=torch.float32)
-            elif placeholder == "grey":
-                placeholder_img = torch.ones((1, 512, 512, 3), dtype=torch.float32) * 0.5
-            else:  # default to black
-                placeholder_img = torch.zeros((1, 512, 512, 3), dtype=torch.float32)
-            
-            if debug:
-                print(f"[VrchImageWebSocketChannelLoaderNode] No image data received, using {placeholder} placeholder")
-                
-            return (placeholder_img,)
+        
+        # No image data, select placeholder
+        if placeholder == "image":
+            if default_image is None:
+                raise ValueError("[VrchImageWebSocketChannelLoaderNode] Placeholder 'image' selected but no default_image provided")
+            placeholder_img = default_image
+        elif placeholder == "white":
+            placeholder_img = torch.ones((1, 512, 512, 3), dtype=torch.float32)
+        elif placeholder == "grey":
+            placeholder_img = torch.ones((1, 512, 512, 3), dtype=torch.float32) * 0.5
+        else:  # default to black
+            placeholder_img = torch.zeros((1, 512, 512, 3), dtype=torch.float32)
+        
+        if debug:
+            print(f"[VrchImageWebSocketChannelLoaderNode] No image data received, using {placeholder} placeholder")
+        return (placeholder_img,)
     
     @classmethod
     def IS_CHANGED(cls, **kwargs):
