@@ -1,4 +1,4 @@
-import hashlib
+import io, base64
 import os
 import torch
 import numpy as np
@@ -114,3 +114,54 @@ class VrchImagePreviewBackgroundNode(VrchImageSaverNode):
         )
 
         return ()
+
+class VrchImagePreviewBackgroundNewNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "images": ("IMAGE",),
+                "background_display": ("BOOLEAN", {"default": True}),
+                "display_option": (["original", "fit", "stretch", "crop"], {"default": "fit"}),
+                "batch_display": ("BOOLEAN", {"default": False}),
+                "batch_display_interval_ms": ("INT", {"default": 200, "min": 50, "max": 10000})
+            },
+        }
+    RETURN_TYPES = ()
+    RETURN_NAMES = ()
+    FUNCTION = "preview_images_to_ui"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def preview_images_to_ui(self, 
+                             images, 
+                             background_display=True, 
+                             batch_display=False, 
+                             batch_display_interval_ms=200, 
+                             display_option="fit"):
+        
+        ui_images = []
+        for i, image in enumerate(images):
+            if isinstance(image, torch.Tensor):
+                image = image.cpu().numpy()
+            img = Image.fromarray(np.clip(image * 255.0, 0, 255).astype(np.uint8))
+            buffer = io.BytesIO()
+            img.save(buffer, format="JPEG", quality=85)
+            jpg_bytes = buffer.getvalue()
+
+            # Base64-encode and prepend data-URI header
+            b64 = base64.b64encode(jpg_bytes).decode('utf-8')
+            ui_images.append(f"data:image/jpeg;base64,{b64}")
+        
+        # If batch_display is False, only show the first image
+        if not batch_display:
+            ui_images = [ui_images[0]] if ui_images else []
+            
+        # Send images, display option and enable flag to UI
+        return {
+            "ui": {
+                "background_images": ui_images,
+                "display_option": [display_option],
+                "background_display": [background_display],
+            }
+        }
