@@ -24,12 +24,12 @@
 
 ---
 
-### Node: `IMAGE Preview in Background @ vrch.ai` (vrch.ai/image)
+### Node: `IMAGE Preview in Background (Legacy) @ vrch.ai` (vrch.ai/image)
 
 ![](../assets/images/example_003_preview_image_in_background.png)
 
 #### 1. Adding the Node
-Add the `IMAGE Preview in Background @ vrch.ai` node to your ComfyUI workflow.
+Add the `IMAGE Preview in Background (Legacy) @ vrch.ai` node to your ComfyUI workflow.
 
 #### 2. Node Configuration
 - **Image Input:**
@@ -63,3 +63,30 @@ Add the `IMAGE Preview in Background @ vrch.ai` node to your ComfyUI workflow.
 - The node dynamically updates the background preview by refreshing the saved image at the set interval. Adjust the refresh interval and batch display parameters as needed for optimal preview performance.
 
 ---
+
+### Node: `IMAGE Preview in Background @ vrch.ai` (vrch.ai/image)
+
+This node sends image data directly to the ComfyUI front‑end without saving files, enabling low‑latency background previews.
+
+#### 1. Adding the Node
+Add the `IMAGE Preview in Background @ vrch.ai` node to your ComfyUI workflow.
+
+#### 2. Node Configuration
+- **`images`**: Provide one or more images to be previewed in the background.
+- **`background_display`**: Toggle to enable or disable the background preview.
+- **`batch_display`**: Toggle to enable batch mode; when enabled, all provided images will cycle in the background.
+- **`batch_display_interval_ms`**: Interval (ms) between image switches when batch display is enabled.
+- **`display_option`**: How the image is rendered. Options:
+  - `original`: draw at native resolution, centered
+  - `fit`: scale to fit canvas, preserving aspect ratio
+  - `stretch`: fill entire canvas, distorting aspect ratio
+  - `crop`: scale to fill canvas, cropping overflow
+
+#### 3. Behavior
+- When **`background_display`** is enabled, images are sent as Base64‑encoded strings in the `ui.images` field.
+- If **`batch_display`** is **false**, only the first image is shown.
+- The **`display_option`** value is sent via `ui.display_option` and controls the canvas scaling mode.
+
+#### 4. Notes
+- No disk I/O required; previews are delivered through the UI payload.
+- Batch mode loops through all images automatically at the specified interval.
