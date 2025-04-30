@@ -7,6 +7,7 @@ from .nodes.osc_control_nodes import *
 from .nodes.websocket_nodes import *
 from .nodes.gamepad_nodes import *
 from .nodes.logic_nodes import *
+from .nodes.midi_nodes import *
 
 __version__ = "1.0.31"
 
@@ -40,6 +41,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
     "VrchJsonWebSocketChannelLoaderNode": VrchJsonWebSocketChannelLoaderNode,
     "VrchJsonWebSocketSenderNode": VrchJsonWebSocketSenderNode,
+    "VrchMidiDeviceLoaderNode": VrchMidiDeviceLoaderNode,
     "VrchModelWebViewerNode": VrchModelWebViewerNode,
     "VrchOSCControlSettingsNode": VrchOSCControlSettingsNode,
     "VrchSwitchOSCControlNode": VrchSwitchOSCControlNode,
@@ -87,6 +89,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchJsonUrlLoaderNode": "JSON URL Loader @ vrch.ai",
     "VrchJsonWebSocketChannelLoaderNode": "JSON WebSocket Channel Loader @ vrch.ai",
     "VrchJsonWebSocketSenderNode": "JSON WebSocket Sender @ vrch.ai",
+    "VrchMidiDeviceLoaderNode": "MIDI Device Loader @ vrch.ai",
     "VrchModelWebViewerNode": "3D MODEL Web Viewer @ vrch.ai",
     "VrchOSCControlSettingsNode": "OSC Control Settings @ vrch.ai",
     "VrchSwitchOSCControlNode": "SWITCH OSC Control @ vrch.ai",
