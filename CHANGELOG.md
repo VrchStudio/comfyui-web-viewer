@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `VrchJsonWebSocketSenderNode`
   - `VrchJsonWebSocketChannelLoaderNode`
 - add new image node `VrchImagePreviewBackgroundNewNode`
+- add midi nodes
+- add midi nodes documentation
 
 ### Updated
 
