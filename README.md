@@ -95,6 +95,11 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
   - [Workflow Example: Gamepad Nodes](./example_workflows/example_gamepad_nodes_001_basic.json)
   - [Workflow Example: Gamepad with Live Portrait](./example_workflows/example_gamepad_nodes_002_live_portrait.json)
 
+### `Midi Device Nodes`
+
+- Documentation: [Usage of Midi Device nodes](./docs/midi_nodes.md)
+- Example workflows: TBA
+
 ### `Audio Nodes`
 
 - Documentation: [Usage of Audio nodes](./docs/audio_nodes.md)
