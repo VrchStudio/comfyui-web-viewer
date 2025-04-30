@@ -75,26 +75,25 @@
 1. **Add the `IMAGE WebSocket Channel Loader @ vrch.ai` node to your ComfyUI workflow.**
 
 2. **Configure the Node:**
-   - **Channel:**
-     - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**) to specify which WebSocket channel to listen on.
-   - **Server:**
-     - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
-   - **Placeholder:**
-     - **`placeholder`**: Choose the placeholder to display when no image data is received. Options:
+   - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**) to specify which WebSocket channel to listen on.
+   - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
+   - **`placeholder`**: Choose the placeholder to display when no image data is received. Options:
          - **"black"**: pure black placeholder image.
          - **"white"**: pure white placeholder image.
          - **"grey"**: mid-grey placeholder image.
          - **"image"**: use the provided **`default_image`** as placeholder. Requires supplying **`default_image`**. The node detects changes to this image and outputs it immediately once per change.
-   - **Default Image:** *(Optional)*
-     - **`default_image`**: Image to use when **`placeholder`** is set to **"image"**.
-   - **Debug Mode:**
-     - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
+   - **`default_image`**: *(Optional)* Image to use when **`placeholder`** is set to **"image"**.
+   - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
 
-3. **Receiving Images:**
+3. **Outputs:**
+   - **`IMAGE`**: The output image tensor or placeholder.
+   - **`IS_DEFAULT_IMAGE`**: Boolean flag, `True` if the `IMAGE` output is the provided `default_image`, `False` otherwise.
+
+4. **Receiving Images:**
    - This node automatically connects to the specified WebSocket channel and listens for incoming image data.
-   - When an image is received, it will be processed and made available as an output that can be connected to other nodes in your workflow.
-   - If **`placeholder`** is set to **"image"** and a new **`default_image`** was provided since the last execution, it is output immediately once (before listening for WebSocket data).
-   - If no WebSocket image is received afterward, the **`default_image`** is used as the placeholder output.
+   - When an image is received, it will be processed and made available as the `IMAGE` output with `IS_DEFAULT_IMAGE` set to `False`.
+   - If **`placeholder`** is set to **"image"** and a new **`default_image`** was provided since the last execution, it is output immediately once (`IMAGE` + `True`).
+   - If no WebSocket image is received afterward, the **`default_image`** is used as the placeholder output (`IS_DEFAULT_IMAGE=False` in that case?).
 
 **Notes:**
 - This node is designed to work with the `IMAGE WebSocket Web Viewer @ vrch.ai` node, receiving the images it broadcasts.

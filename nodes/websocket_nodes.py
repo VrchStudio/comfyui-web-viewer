@@ -540,14 +540,13 @@ class VrchImageWebSocketChannelLoaderNode:
             }
         }
     
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("IMAGE",)
+    RETURN_TYPES = ("IMAGE","BOOLEAN")
+    RETURN_NAMES = ("IMAGE","IS_DEFAULT_IMAGE")
     FUNCTION = "receive_image"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
     
     def receive_image(self, channel, server, placeholder, debug, default_image=None):
-        # One-time override: only when placeholder is 'image', check default_image change once
         if placeholder == "image" and default_image is not None:
              # use tensor data_ptr to detect new image instance
              cur_id = default_image.data_ptr() if hasattr(default_image, 'data_ptr') else id(default_image)
@@ -557,7 +556,7 @@ class VrchImageWebSocketChannelLoaderNode:
                 self._last_default_image_id = cur_id
                 if debug:
                     print(f"[VrchImageWebSocketChannelLoaderNode] Detected new default_image, passing it downstream once")
-                return (default_image,)
+                return (default_image, True)
             
         host, port = server.split(":")
         # Ensure path is set correctly for loader
@@ -565,13 +564,14 @@ class VrchImageWebSocketChannelLoaderNode:
         
         image = client.get_latest_data()
         if image is not None:
-            return (image,)
+            return (image, False)
         
         # No image data, select placeholder
         if placeholder == "image":
             if default_image is None:
                 raise ValueError("[VrchImageWebSocketChannelLoaderNode] Placeholder 'image' selected but no default_image provided")
             placeholder_img = default_image
+            return (placeholder_img, True)  # Using default_image as placeholder, so IS_DEFAULT_IMAGE should be True
         elif placeholder == "white":
             placeholder_img = torch.ones((1, 512, 512, 3), dtype=torch.float32)
         elif placeholder == "grey":
@@ -581,7 +581,7 @@ class VrchImageWebSocketChannelLoaderNode:
         
         if debug:
             print(f"[VrchImageWebSocketChannelLoaderNode] No image data received, using {placeholder} placeholder")
-        return (placeholder_img,)
+        return (placeholder_img, False)
     
     @classmethod
     def IS_CHANGED(cls, **kwargs):
