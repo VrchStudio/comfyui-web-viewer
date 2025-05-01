@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `VrchJsonWebSocketSenderNode`
   - `VrchJsonWebSocketChannelLoaderNode`
 - add new image node `VrchImagePreviewBackgroundNewNode`
+- add new gamepad node `VrchXboxControllerNode`
 - add midi nodes
 - add midi nodes documentation
 
@@ -24,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update `VrchImageWebSocketChannelLoaderNode` with `placeholder` options and `default_image` option
 - update websocket_nodes.md
 - update image_nodes.md
+- update gamepade_nodes.md
 - update readme.md
 
 ## 1.0.31 - 2025-04-27
