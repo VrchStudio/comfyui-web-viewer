@@ -55,6 +55,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchVideoWebViewerNode": VrchVideoWebViewerNode,
     "VrchWebSocketServerNode": VrchWebSocketServerNode,
     "VrchWebViewerNode": VrchWebViewerNode,
+    "VrchXboxControllerNode": VrchXboxControllerNode,
     "VrchXYOSCControlNode": VrchXYOSCControlNode,
     "VrchXYZOSCControlNode": VrchXYZOSCControlNode,
 }
@@ -103,6 +104,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchVideoWebViewerNode": "VIDEO Web Viewer @ vrch.ai",
     "VrchWebSocketServerNode": "WebSocket Server @ vrch.ai",
     "VrchWebViewerNode": "Web Viewer @ vrch.ai",
+    "VrchXboxControllerNode": "Xbox Controller Mapper @ vrch.ai",
     "VrchXYOSCControlNode": "XY OSC Control @ vrch.ai",
     "VrchXYZOSCControlNode": "XYZ OSC Control @ vrch.ai",
 }
