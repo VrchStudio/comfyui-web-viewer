@@ -261,6 +261,8 @@ class VrchXboxControllerNode:
         right_stick = [0.0, 0.0]   # [x, y] values for right analog stick  
         left_trigger = 0.0         # Value for left trigger (LT)  
         right_trigger = 0.0        # Value for right trigger (RT)  
+        buttonsBoolean = [0]*17  # Array for boolean button states (0 or 1)
+        buttonsFloat = [0]*17    # Array for float button values (0.0 to 1.0)
           
         # Initialize button states (all False by default)  
         a_button = False           # A button (bottom face button)  
@@ -306,14 +308,24 @@ class VrchXboxControllerNode:
         if not raw_data:  
             if debug:  
                 print("[VrchXboxControllerNode] No raw data provided.")  
-            return (  
-                left_stick, right_stick, left_trigger, right_trigger,  
-                a_button, b_button, x_button, y_button,  
-                lb_button, rb_button, view_button, menu_button,  
-                left_stick_press, right_stick_press,  
-                dpad_up, dpad_down, dpad_left, dpad_right,  
-                xbox_button, full_mapping  
-            )  
+            returned_data = {
+                "ui": {
+                    "buttonsBoolean": buttonsBoolean,
+                    "buttonsFloat": buttonsFloat,
+                    "leftStick": left_stick,
+                    "rightStick": right_stick,
+                },
+                "result":(
+                    full_mapping,
+                    left_stick, right_stick, left_trigger, right_trigger,  
+                    a_button, b_button, x_button, y_button,  
+                    lb_button, rb_button, view_button, menu_button,  
+                    left_stick_press, right_stick_press,  
+                    dpad_up, dpad_down, dpad_left, dpad_right,  
+                    xbox_button,
+                ),
+            }
+            return returned_data
           
         # Parse and process the raw_data  
         try:  
@@ -344,8 +356,16 @@ class VrchXboxControllerNode:
                         right_stick[1] = float(axes[3])  # Right stick Y-axis  
                   
                 # Process buttons data  
-                if "buttons" in parsed_data and isinstance(parsed_data["buttons"], list):  
-                    buttons = parsed_data["buttons"]  
+                if "buttons" in parsed_data and isinstance(parsed_data["buttons"], list): 
+                    # Extract button data from parsed_data 
+                    buttons = parsed_data["buttons"]
+                    
+                    # Map buttons to boolean and float arrays
+                    for i, btn in enumerate(buttons):
+                        if i < len(buttonsBoolean):
+                            buttonsBoolean[i] = self._get_button_state(buttons, i)
+                        if i < len(buttonsFloat):
+                            buttonsFloat[i] = self._get_button_value(buttons, i) 
                       
                     # Map buttons to Xbox controller layout  
                     # Standard Xbox controller button mapping  
@@ -410,33 +430,53 @@ class VrchXboxControllerNode:
             # Print debug information if enabled  
             if debug:  
                 print(f"[VrchXboxControllerNode] Xbox controller mapping: {full_mapping}")  
+                
+            returned_data = {
+                "ui": {
+                    "buttonsBoolean": buttonsBoolean,
+                    "buttonsFloat": buttonsFloat,
+                    "leftStick": left_stick,
+                    "rightStick": right_stick,
+                },
+                "result":(
+                    full_mapping,
+                    left_stick, right_stick, left_trigger, right_trigger,  
+                    a_button, b_button, x_button, y_button,  
+                    lb_button, rb_button, view_button, menu_button,  
+                    left_stick_press, right_stick_press,  
+                    dpad_up, dpad_down, dpad_left, dpad_right,  
+                    xbox_button,
+                ),
+            }
               
             # Return all mapped values  
-            return (  
-                full_mapping,
-                left_stick, right_stick, left_trigger, right_trigger,  
-                a_button, b_button, x_button, y_button,  
-                lb_button, rb_button, view_button, menu_button,  
-                left_stick_press, right_stick_press,  
-                dpad_up, dpad_down, dpad_left, dpad_right,  
-                xbox_button,
-            )  
+            return returned_data
               
         except Exception as e:  
             # Handle any errors during processing  
             if debug:  
                 print(f"[VrchXboxControllerNode] Error processing Xbox controller data: {str(e)}")  
+                
+            returned_data = {
+                "ui": {
+                    "buttonsBoolean": buttonsBoolean,
+                    "buttonsFloat": buttonsFloat,
+                    "leftStick": left_stick,
+                    "rightStick": right_stick,
+                },
+                "result":(
+                    full_mapping,
+                    left_stick, right_stick, left_trigger, right_trigger,  
+                    a_button, b_button, x_button, y_button,  
+                    lb_button, rb_button, view_button, menu_button,  
+                    left_stick_press, right_stick_press,  
+                    dpad_up, dpad_down, dpad_left, dpad_right,  
+                    xbox_button,
+                ),
+            }
               
             # Return default values in case of error  
-            return (
-                full_mapping,
-                left_stick, right_stick, left_trigger, right_trigger,  
-                a_button, b_button, x_button, y_button,  
-                lb_button, rb_button, view_button, menu_button,  
-                left_stick_press, right_stick_press,  
-                dpad_up, dpad_down, dpad_left, dpad_right,  
-                xbox_button,
-            )  
+            return returned_data
       
     def _get_button_state(self, buttons, index):  
         """  
