@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - rename `websocket_viewer_nodes` to be `websocket_nodes`
 - rename `IMAGE Preview in Background @ vrch.ai` to be `IMAGE Preview in Background (Legacy) @ vrch.ai`
 - update `VrchImageWebSocketChannelLoaderNode` with `placeholder` options and `default_image` option
+- update `VrchWebSocketServerNode` to register default paths
 - update websocket_nodes.md
 - update image_nodes.md
 - update gamepade_nodes.md
