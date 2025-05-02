@@ -14,7 +14,7 @@ class VrchGamepadLoaderNode:
             "required": {
                 "index": (["0", "1", "2", "3", "4", "5", "6", "7"], {"default": "0"}),
                 "name": ("STRING", {"default": ""}),
-                "refresh_interval": ("INT", {"default": 100, "min": 10, "max": 10000}),
+                "refresh_interval": ("INT", {"default": 50, "min": 10, "max": 10000}),
                 "debug": ("BOOLEAN", {"default": False}),
                 "raw_data": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
             },
