@@ -112,36 +112,9 @@ app.registerExtension({
                 // Get the refresh interval value (default to 100ms if not available)
                 const interval = refreshIntervalWidget ? Math.max(10, refreshIntervalWidget.value) : 100;
                 
-                // Setup counter for periodic cleanup
-                let cleanupCounter = 1000;
-                const CLEANUP_INTERVAL = 50; // Clean up every ~1000 updates
-                
                 // Set up the new timer with the current interval value
                 timerId = setInterval(() => {
                     fetchGamepadData();
-                    
-                    // Periodic cleanup to prevent memory exhaustion
-                    cleanupCounter++;
-                    if (cleanupCounter >= CLEANUP_INTERVAL) {
-                        cleanupCounter = 0;
-                        
-                        // Clean up ComfyUI API history if available
-                        if (window.api && window.api.history && Object.keys(window.api.history).length > 100) {
-                            const historyKeys = Object.keys(window.api.history).sort((a, b) => parseInt(b) - parseInt(a));
-                            const keysToKeep = historyKeys.slice(0, 50);
-                            const newHistory = {};
-                            
-                            for (const key of keysToKeep) {
-                                newHistory[key] = window.api.history[key];
-                            }
-                            
-                            window.api.history = newHistory;
-                            
-                            if (debugWidget && debugWidget.value) {
-                                console.log("[VrchGamepadLoaderNode] Cleaned up API history to prevent memory exhaustion");
-                            }
-                        }
-                    }
                 }, interval);
                 
                 if (debugWidget && debugWidget.value) {

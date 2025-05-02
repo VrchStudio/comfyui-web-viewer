@@ -29,6 +29,15 @@ class VrchGamepadLoaderNode:
         "FLOAT",     # BUTTONS_FLOAT
     )
     
+    OUTPUT_IS_LIST = (
+        False,       # RAW_DATA
+        True,        # LEFT_STICK
+        True,        # RIGHT_STICK
+        True,        # BUTTONS_BOOLEAN
+        True,        # BUTTONS_INT
+        True,        # BUTTONS_FLOAT
+    )
+    
     RETURN_NAMES = (
         "RAW_DATA",
         "LEFT_STICK",
@@ -217,6 +226,29 @@ class VrchXboxControllerNode:
         "BOOLEAN",    # DPAD_RIGHT - D-pad right direction  
         "BOOLEAN",    # XBOX_BUTTON - Xbox logo button  
     )  
+    
+    OUTPUT_IS_LIST = (
+        False,       # FULL_MAPPING - JSON object  
+        True,        # LEFT_STICK - Array with [x, y] values  
+        True,        # RIGHT_STICK - Array with [x, y] values  
+        False,       # LEFT_TRIGGER - Value from 0.0 to 1.0  
+        False,       # RIGHT_TRIGGER - Value from 0.0 to 1.0  
+        False,       # A_BUTTON - Bottom face button  
+        False,       # B_BUTTON - Right face button  
+        False,       # X_BUTTON - Left face button  
+        False,       # Y_BUTTON - Top face button  
+        False,       # LB_BUTTON - Left bumper  
+        False,       # RB_BUTTON - Right bumper  
+        False,       # VIEW_BUTTON - Left center button (formerly Back)  
+        False,       # MENU_BUTTON - Right center button (formerly Start)  
+        False,       # LEFT_STICK_PRESS - Left stick click  
+        False,       # RIGHT_STICK_PRESS - Right stick click  
+        False,       # DPAD_UP - D-pad up direction  
+        False,       # DPAD_DOWN - D-pad down direction  
+        False,       # DPAD_LEFT - D-pad left direction  
+        False,       # DPAD_RIGHT - D-pad right direction  
+        False,       # XBOX_BUTTON - Xbox logo button  
+    )
       
     # Names for the outputs, matching the types above  
     RETURN_NAMES = (  
