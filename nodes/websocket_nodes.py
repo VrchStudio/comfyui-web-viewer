@@ -212,26 +212,30 @@ class VrchWebSocketServerNode:
     CATEGORY = CATEGORY
 
     def start_server(self, server, debug):
+        # Detect change in server address or first initialization
+        server_changed = server != getattr(self, '_last_server', None)
         host, port_str = server.split(":")
         port = int(port_str)
-            
-        # Note: The global server is shared. Starting this node essentially ensures
-        # the server is running with the latest debug setting, but doesn't create
-        # multiple independent servers on the same host/port.
+        # Get or create the global server
         ws_server = get_global_server(host, port, debug=debug)
-                
-        # Check if the server is running
-        is_running = ws_server.is_running()
+        # Register default paths on first init or server change
+        if server_changed or not getattr(self, '_initialized', False):
+            for p in ["/image", "/json", "/audio", "/video", "/text"]:
+                ws_server.register_path(p)
+            self._initialized = True
+            self._last_server = server
+            if debug:
+                print(f"[VrchWebSocketServerNode] Registered default paths on {host}:{port}")
         
+        is_running = ws_server.is_running()
         if debug:
             print(f"[VrchWebSocketServerNode] Server on {host}:{port} status check. Running: {is_running}")
-
         return {
             "ui": {
-                "server_status": [is_running], # Pass status to UI
-                "debug_status": [debug]        # Pass debug state to UI
+                "server_status": [is_running],
+                "debug_status": [debug]
             },
-            "result": (server,)  # Return the server string
+            "result": (server,)
         }
 
     @classmethod
