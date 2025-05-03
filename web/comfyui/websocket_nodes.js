@@ -52,6 +52,7 @@ app.registerExtension({
                         mode: "image-websocket",
                         protocol: "websocket",
                         additionalParams: {
+                            channel: channelWidget,
                             numberOfImages: numberOfImagesWidget,
                             imageDisplayDuration: imageDisplayDurationWidget,
                             fadeAnimDuration: fadeAnimDurationWidget,
