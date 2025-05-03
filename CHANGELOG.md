@@ -27,7 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update `VrchGamepadLoaderNode` to improve its memory management
 - update websocket_nodes.md
 - update image_nodes.md
-- update gamepade_nodes.md
+- update gamepad_nodes.md
+- update gamepad nodes example workflows
 - update readme.md
 
 ## 1.0.31 - 2025-04-27
