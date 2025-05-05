@@ -10,7 +10,6 @@ class VrchMidiDeviceLoaderNode:
             "required": {  
                 "device_id": ("STRING", {"default": ""}),  
                 "name": ("STRING", {"default": ""}),  
-                "refresh_interval": ("INT", {"default": 100, "min": 10, "max": 10000}),  
                 "debug": ("BOOLEAN", {"default": False}),  
                 "raw_data": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),  
             },  
@@ -37,8 +36,7 @@ class VrchMidiDeviceLoaderNode:
   
     def load_midi_device(self,   
                       device_id: str,   
-                      name: str,   
-                      refresh_interval: int=100,  
+                      name: str,
                       debug: bool=False,  
                       raw_data: str=""):  
         """  

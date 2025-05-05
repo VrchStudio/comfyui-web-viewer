@@ -14,12 +14,9 @@ app.registerExtension({
             // Get required widgets  
             const deviceIdWidget = node.widgets.find(w => w.name === "device_id");  
             const nameWidget = node.widgets.find(w => w.name === "name");  
-            const refreshIntervalWidget = node.widgets.find(w => w.name === "refresh_interval");  
             const rawDataWidget = node.widgets.find(w => w.name === "raw_data");  
             const debugWidget = node.widgets.find(w => w.name === "debug");  
-            
-            // Set up timer  
-            let timerId = null;  
+             
             // MIDI access object  
             let midiAccess = null;  
             // Current MIDI input device  
@@ -101,10 +98,14 @@ app.registerExtension({
                               
                         // Add more MIDI message type handlers as needed  
                     }  
-                      
+
                     // Update raw data widget  
-                    rawDataWidget.value = JSON.stringify(midiState, null, 2);  
-                      
+                    const json_data = JSON.stringify(midiState, null, 2);
+                    if (json_data && rawDataWidget && rawDataWidget.value != json_data) {
+                        // Only update if the data has changed
+                        rawDataWidget.value = json_data;
+                    }
+
                 } catch (error) {  
                     console.error("[VrchMidiDeviceLoaderNode] Error processing MIDI message:", error);  
                 }  
