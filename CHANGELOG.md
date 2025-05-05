@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.32 - 2025-05-05
+
+### Added
+
+- add new websocket nodes, including:
+  - `VrchWebSocketServerNode`
+  - `VrchJsonWebSocketSenderNode`
+  - `VrchJsonWebSocketChannelLoaderNode`
+- add new image node `VrchImagePreviewBackgroundNewNode`
+- add new gamepad node `VrchXboxControllerNode`
+- add midi nodes
+- add midi nodes documentation
+
+### Updated
+
+- rename `websocket_viewer_nodes` to be `websocket_nodes`
+- rename `IMAGE Preview in Background @ vrch.ai` to be `IMAGE Preview in Background (Legacy) @ vrch.ai`
+- update `VrchImageWebSocketChannelLoaderNode` with `placeholder` options and `default_image` option
+- update `VrchWebSocketServerNode` to register default paths
+- update `VrchGamepadLoaderNode` to improve its memory management
+- update websocket_nodes.md
+- update image_nodes.md
+- update gamepad_nodes.md
+- update gamepad nodes example workflows
+- update readme.md
+
 ## 1.0.31 - 2025-04-27
 
 ### Added

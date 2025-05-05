@@ -188,6 +188,111 @@ app.registerExtension({
             setupBatchInterval();
             updateBackground();
         }
+
+        // Handle new direct UI preview node
+        if (node.comfyClass === "VrchImagePreviewBackgroundNewNode") {
+
+            const enableWidget = node.widgets.find(w => w.name === "background_display");
+            const displayOptionWidget = node.widgets.find(w => w.name === "display_option");
+            const batchDisplayWidget = node.widgets.find(w => w.name === "batch_display");
+            const batchDisplayIntervalWidget = node.widgets.find(w => w.name === "batch_display_interval_ms");
+
+            const widgets = [enableWidget, displayOptionWidget, 
+                batchDisplayWidget, batchDisplayIntervalWidget];
+
+            widgets.forEach(widget => {
+                if (widget) {
+                    widget.callback = () => {
+                        if (ENABLE_DEBUG) {
+                            console.log(`callback:::${widget.name}:::${widget.value}`);
+                        }
+                        // For batch related widgets, update the batch timer
+                        if (["batch_display", "batch_display_interval_ms"].includes(widget.name)) {
+                            setupBatchInterval();
+                        }
+                        // For display option, reinitialize the background
+                        if (widget.name === "display_option") {
+                            window._td_bg_display_option = widget.value;
+                            if (app.canvas) {
+                                app.canvas.draw(true, true);
+                            }
+                        }
+                        updateBackground();
+                    };
+                }
+            });
+
+            // Global variable for batch index and timer
+            let batchIndex = 0;
+            let batchTimer = null;
+            // Function to set up the batch display timer if enabled
+            function setupBatchInterval() {
+                if (batchTimer) {
+                    clearInterval(batchTimer);
+                    batchTimer = null;
+                }
+                if (batchDisplayWidget && batchDisplayWidget.value) {
+                    let ms = parseInt(batchDisplayIntervalWidget.value || 1000, 10);
+                    let imageSize = window._td_bg_imgs.length;                    // Reset batchIndex to 0 when (re)starting timer
+                    batchIndex = 0;
+                    if (imageSize > 0) {
+                        batchTimer = setInterval(() => {
+                            batchIndex = (batchIndex + 1) % imageSize;
+                            updateBackground();
+                            if (ENABLE_DEBUG) {
+                                console.log(`Batch display timer updated index to ${batchIndex}`);
+                            }
+                        }, ms);
+                    }
+                }
+            }
+
+            function updateBackground() {
+                if (!enableWidget.value) {
+                    // If disabled, clear the image and trigger redraw
+                    if (window._td_bg_img.src) {
+                        window._td_bg_img.src = "";
+                    }
+                    // Reset batch index
+                    batchIndex = 0;
+                    // Clear batch timer
+                    if (batchTimer) {
+                        clearInterval(batchTimer);
+                        batchTimer = null;
+                    }
+                    return;
+                }
+                const base64 = window._td_bg_imgs?.[batchIndex];
+                if (base64) {
+                    window._td_bg_img.src = base64;
+                }
+            }
+
+            // initialize enabled flag
+            window._td_bg_enabled = window._td_bg_enabled ?? false;
+            // Global image object for background
+            if (!window._td_bg_img) {
+                window._td_bg_img = new Image();
+                window._td_bg_img.onload = () => {
+                    // Trigger canvas redraw when image is loaded
+                    if (app.canvas) {
+                        app.canvas.draw(true, true);
+                    }
+                };
+            }
+
+            // Initialize polling and update
+            setupBatchInterval();
+            updateBackground();
+
+            // onExecuted receives images as base64 strings
+            node.onExecuted = function(message) {
+                window._td_bg_enabled = message.background_display?.[0] ?? false;
+                window._td_bg_imgs = message.background_images || [];
+                window._td_bg_display_option = message.display_option?.[0] || 'fit';
+                updateBackground();
+            };
+        }
     },
 
     init() {
@@ -201,19 +306,23 @@ app.registerExtension({
 
             // 2) If a background image is loaded, draw it with "fit" scaling
             if (window._td_bg_img && window._td_bg_img.width) {
-                // Retrieve the node to read widget values
-                const tdNodes = app.graph._nodes.filter(n => n?.comfyClass === "VrchImagePreviewBackgroundNode");
+                // Determine enable and display mode from old or new preview node
+                const nodes = app.graph._nodes.filter(n => ["VrchImagePreviewBackgroundNode","VrchImagePreviewBackgroundNewNode"].includes(n?.comfyClass));
                 let enableVal = false;
-                let displayOptionVal = "fit";
-                if (tdNodes.length) {
-                    const n = tdNodes[0];
-                    const eWidget = n.widgets.find(w => w.name === "background_display");
-                    const displayOptionWidget = n.widgets.find(w => w.name === "display_option");
-                    enableVal = eWidget ? eWidget.value : false;
-                    displayOptionVal = displayOptionWidget ? displayOptionWidget.value : "fit";
+                let displayOptionVal = 'fit';
+                const oldNode = nodes.find(n => n.comfyClass === 'VrchImagePreviewBackgroundNode');
+                const newNode = nodes.find(n => n.comfyClass === 'VrchImagePreviewBackgroundNewNode');
+
+                if (newNode) {
+                    enableVal = window._td_bg_enabled;
+                    displayOptionVal = window._td_bg_display_option || displayOptionVal;
+                } else if (oldNode) {
+                    const eW = oldNode.widgets.find(w => w.name === 'background_display');
+                    const dW = oldNode.widgets.find(w => w.name === 'display_option');
+                    enableVal = eW? eW.value:false;
+                    displayOptionVal = dW? dW.value:'fit';
                 }
 
-                // If background display is not enabled, do nothing
                 if (!enableVal) return;
 
                 const ctx = this.bgcanvas.getContext("2d");
@@ -267,7 +376,6 @@ app.registerExtension({
                         offsetY = (canvasHeight - drawHeight) / 2;
                     }
                 }
-                
                 ctx.drawImage(window._td_bg_img, offsetX, offsetY, drawWidth, drawHeight);
                 ctx.restore();
             }
