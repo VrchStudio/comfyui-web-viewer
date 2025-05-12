@@ -2,6 +2,8 @@
 
 The **ComfyUI Web Viewer** by [vrch.ai](https://vrch.ai) is a custom node collection offering a real-time AI-generated interactive art framework. This utility integrates realtime streaming into ComfyUI workflows, supporting keyboard control nodes, OSC control nodes, sound input nodes, and more. Accessible from any device with a web browser, it enables real time interaction with AI-generated content, making it ideal for interactive visual projects and enhancing ComfyUI workflows with efficient content management and display.
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/VrchStudio/comfyui-web-viewer)
+
 **✨ Features:**
 
 - **Real-Time AI Generation & Interaction**: Immediate response for interactive creativity.
