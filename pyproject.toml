@@ -12,4 +12,4 @@ Repository = "https://github.com/VrchStudio/comfyui-web-viewer"
 [tool.comfy]
 PublisherId = "vrchdev"
 DisplayName = "ComfyUI Web Viewer"
-Icon = ""
+Icon = "https://vrch.ai/images/vrch_Logo_vertical_black.png"
