@@ -310,6 +310,9 @@ app.registerExtension({
                     channelWidget,
                     refreshIntervalWidget,
                     visualizerTypeWidget,
+                    fadeInDurationWidget,
+                    fadeOutDurationWidget,
+                    crossfadeDurationWidget,
                     extraParamsWidget,
                 ],
                 "VrchAudioWebViewerNode"
