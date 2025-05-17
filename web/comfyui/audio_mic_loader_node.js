@@ -92,28 +92,33 @@ app.registerExtension({
             
             // Reload button
             const reloadButton = document.createElement("button");
-            reloadButton.textContent = "Refresh";
+            reloadButton.textContent = "Reload";
             reloadButton.classList.add("vrch-mic-reload-button");
             
-            // Mute button
+            // Mute button with speaker icon instead of text
             const muteButton = document.createElement("button");
-            muteButton.textContent = "Mute";
+            muteButton.innerHTML = '<span class="vrch-mic-speaker-icon">🔊</span>';
             muteButton.classList.add("vrch-mic-mute-button");
             
-            // Status indicator
+            // Status indicator - now text-based on its own line
             const statusIndicator = document.createElement("div");
-            statusIndicator.classList.add("vrch-mic-status-indicator");
+            statusIndicator.classList.add("vrch-mic-status-label");
             
             // Add elements to their containers
             controlsContainer.appendChild(deviceSelect);
             controlsContainer.appendChild(reloadButton);
             controlsContainer.appendChild(muteButton);
-            controlsContainer.appendChild(statusIndicator);
+            
+            // Create a separate container for the status label to put it on its own line
+            const statusContainer = document.createElement("div");
+            statusContainer.classList.add("vrch-mic-status-container");
+            statusContainer.appendChild(statusIndicator);
             
             visualizerContainer.appendChild(waveformCanvas);
             visualizerContainer.appendChild(spectrumCanvas);
             visualizerContainer.appendChild(volumeMeterContainer);
             visualizerContainer.appendChild(controlsContainer);
+            visualizerContainer.appendChild(statusContainer);
             
             // Add the visualizer container as a DOM widget
             node.addDOMWidget("mic_visualizer_widget", "Microphone", visualizerContainer);
@@ -125,6 +130,13 @@ app.registerExtension({
                         throw new Error("MediaDevices API not supported in this browser");
                     }
                     
+                    // Request permission first to get proper device labels
+                    try {
+                        await navigator.mediaDevices.getUserMedia({ audio: true });
+                    } catch (permissionError) {
+                        console.warn("Could not get microphone permission:", permissionError);
+                    }
+                    
                     // Clear existing options except default
                     while (deviceSelect.options.length > 1) {
                         deviceSelect.remove(1);
@@ -134,28 +146,39 @@ app.registerExtension({
                     const mediaDevices = await navigator.mediaDevices.enumerateDevices();
                     devices = mediaDevices.filter(device => device.kind === "audioinput");
                     
+                    // Store selected device ID before clearing
+                    const previouslySelectedDeviceId = deviceSelect.value || deviceIdWidget.value;
+                    let selectedDeviceStillExists = false;
+                    
                     // Add devices to dropdown
                     devices.forEach(device => {
                         const option = document.createElement("option");
                         option.value = device.deviceId;
                         option.textContent = device.label || `Microphone (${device.deviceId.slice(0, 5)}...)`;
                         deviceSelect.appendChild(option);
+                        
+                        // Check if previously selected device still exists
+                        if (device.deviceId === previouslySelectedDeviceId) {
+                            selectedDeviceStillExists = true;
+                        }
                     });
                     
-                    // If we have a stored device ID, try to select it
-                    if (deviceIdWidget.value) {
-                        deviceSelect.value = deviceIdWidget.value;
-                        // If the stored ID isn't in the list, reset it
-                        if (deviceSelect.value !== deviceIdWidget.value) {
-                            deviceIdWidget.value = "";
-                        }
+                    // Restore previously selected device if it still exists
+                    if (previouslySelectedDeviceId && selectedDeviceStillExists) {
+                        deviceSelect.value = previouslySelectedDeviceId;
+                        deviceIdWidget.value = previouslySelectedDeviceId;
+                    } else if (devices.length > 0 && deviceIdWidget.value) {
+                        // Reset if device doesn't exist anymore
+                        deviceIdWidget.value = "";
                     }
                     
                     updateStatusIndicator("Ready");
+                    return true; // Indicate successful completion
                     
                 } catch (error) {
                     console.error("Error listing audio devices:", error);
                     updateStatusIndicator("Error");
+                    return false; // Indicate error
                 }
             };
             
@@ -214,7 +237,7 @@ app.registerExtension({
                     
                     // Start visualization and data collection
                     isCapturing = true;
-                    updateStatusIndicator("Active");
+                    updateStatusIndicator("Ready");
                     startVisualization();
                     
                 } catch (error) {
@@ -253,7 +276,7 @@ app.registerExtension({
                 }
                 
                 isCapturing = false;
-                updateStatusIndicator("Stopped");
+                updateStatusIndicator("Disconnected");
                 
                 // Clear visualizations
                 clearCanvas(waveformCanvas);
@@ -355,7 +378,6 @@ app.registerExtension({
                         const micData = {
                             device_id: deviceIdWidget.value,
                             name: nameWidget.value,
-                            ts: Date.now(),
                             sr: parseInt(sampleRateWidget.value, 10),
                             ch: 1,  // Mono for simplicity
                             hop: parseInt(frameSizeWidget.value, 10),
@@ -398,9 +420,9 @@ app.registerExtension({
                 ctx.lineTo(width, height / 2);
                 ctx.stroke();
                 
-                // Draw waveform
+                // Draw waveform - changed from green to grayscale
                 ctx.beginPath();
-                ctx.strokeStyle = "#4CAF50";
+                ctx.strokeStyle = "#CCCCCC"; // Light gray instead of green
                 ctx.lineWidth = 2;
                 
                 const sliceWidth = width / data.length;
@@ -445,15 +467,15 @@ app.registerExtension({
                     const value = data[dataIndex];
                     
                     const percent = value / 255;
-                    const barHeight = height * percent;
+                    // Calculate bar height based on full height
+                    const barHeight = percent * height;
                     const x = i * barWidth;
                     const y = height - barHeight;
                     
-                    // Create gradient based on frequency
+                    // Restore colorful spectrum
                     const hue = i / barCount * 120; // 0-120 gives a range from red to green
                     ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
-                    
-                    ctx.fillRect(x, y, barWidth - 1, barHeight);
+                    ctx.fillRect(x, y, barWidth, barHeight); // Removed -1 to eliminate gaps
                 }
             };
             
@@ -473,35 +495,21 @@ app.registerExtension({
                     gainNode.gain.value = mute ? 0 : 1;
                 }
                 
-                muteButton.textContent = mute ? "Unmute" : "Mute";
-                muteButton.style.backgroundColor = mute ? "#F44336" : "#4CAF50";
+                // Update icon instead of text
+                muteButton.innerHTML = mute ? 
+                    '<span class="vrch-mic-speaker-icon">🔇</span>' : 
+                    '<span class="vrch-mic-speaker-icon">🔊</span>';
+                // muteButton.style.backgroundColor = mute ? "#F44336" : "#4CAF50";
                 
                 if (mute) {
                     volumeMeterFill.style.width = "0%";
                 }
             };
             
-            // Function to update status indicator
+            // Function to update status indicator - now text-only
             const updateStatusIndicator = (status) => {
-                statusIndicator.textContent = status;
-                
-                switch (status) {
-                    case "Active":
-                        statusIndicator.style.backgroundColor = "#4CAF50";
-                        break;
-                    case "Ready":
-                        statusIndicator.style.backgroundColor = "#FFC107";
-                        break;
-                    case "Stopped":
-                    case "No device":
-                        statusIndicator.style.backgroundColor = "#607D8B";
-                        break;
-                    case "Error":
-                        statusIndicator.style.backgroundColor = "#F44336";
-                        break;
-                    default:
-                        statusIndicator.style.backgroundColor = "#607D8B";
-                }
+                // Just set the text content - no background color changes
+                statusIndicator.textContent = `Status: ${status}`;
             };
             
             // Set up event listeners
@@ -513,18 +521,61 @@ app.registerExtension({
                 }
             });
             
-            reloadButton.addEventListener("click", () => {
-                listAudioDevices();
+            reloadButton.addEventListener("click", async () => {
+                // First stop any existing capture
+                stopCapturing();
+                
+                // Then reload device list
+                const devicesLoaded = await listAudioDevices();
+                
+                // Automatically restart if a device is selected
+                if (devicesLoaded && deviceSelect.value) {
+                    startCapturing();
+                }
             });
             
             muteButton.addEventListener("click", () => {
                 setMuted(!isMuted);
             });
-            
-            // Initial setup
-            updateWidgetVisibility();
-            listAudioDevices();
-            updateStatusIndicator("Ready");
+
+            // Set a delay initialization for the widget visibility
+            setTimeout(async () => {
+                // Initial setup
+                updateWidgetVisibility();
+                
+                // Store the previously selected deviceId for recovery
+                const savedDeviceId = deviceIdWidget.value;
+                
+                // Request microphone permissions and list devices
+                await navigator.mediaDevices.getUserMedia({ audio: true }).catch(err => {
+                    console.warn("Microphone permission request failed:", err);
+                });
+                
+                // List audio devices with proper permissions
+                const devicesLoaded = await listAudioDevices();
+                
+                // Try to restore the previously selected device
+                if (devicesLoaded) {
+                    if (savedDeviceId && savedDeviceId !== "") {
+                        // Set the dropdown value to match the stored device ID
+                        for (let i = 0; i < deviceSelect.options.length; i++) {
+                            if (deviceSelect.options[i].value === savedDeviceId) {
+                                deviceSelect.selectedIndex = i;
+                                console.log("Restored previously selected microphone:", savedDeviceId);
+                                
+                                // Start capturing with a slight delay to ensure the device is properly selected
+                                setTimeout(() => {
+                                    startCapturing();
+                                }, 100);
+                                
+                                break;
+                            }
+                        }
+                    } else {
+                        updateStatusIndicator("Ready");
+                    }
+                }
+            }, 1000);
             
             // Cleanup when node is removed
             const onRemoved = node.onRemoved;
@@ -590,6 +641,7 @@ style.textContent = `
     .vrch-mic-mute-button {
         background-color: #4CAF50;
         color: white;
+        height: 30px;
         font-size: 14px;
         font-weight: bold;
         border: none;
@@ -598,6 +650,10 @@ style.textContent = `
         margin: 0 5px;
         cursor: pointer;
         transition: background-color 0.3s;
+        min-width: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .vrch-mic-reload-button:hover,
@@ -605,14 +661,21 @@ style.textContent = `
         background-color: #45a049;
     }
 
-    .vrch-mic-status-indicator {
-        width: 80px;
-        font-size: 12px;
-        color: white;
+    .vrch-mic-status-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+    
+    .vrch-mic-status-label {
+        font-size: 14px;
+        color: #999;
         text-align: center;
-        padding: 3px;
-        border-radius: 4px;
-        background-color: #607D8B;
+    }
+    
+    .vrch-mic-speaker-icon {
+        font-size: 16px;
     }
 `;
 document.head.appendChild(style);
