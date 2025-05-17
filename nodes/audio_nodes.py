@@ -5,7 +5,7 @@ import base64
 import ffmpeg
 from pathlib import Path
 import torchaudio
-import folder_paths
+import folder_paths # type: ignore
 from ..utils.music_genres_classifier import *
 
 ASSETS_DIR = os.path.join(Path(__file__).parent.parent, "assets")
@@ -18,7 +18,7 @@ class VrchAudioSaverNode:
         self.output_dir = folder_paths.get_output_directory()
 
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
             "required": {
                 "audio": ("AUDIO",),
@@ -71,7 +71,7 @@ class VrchAudioSaverNode:
         
 class VrchAudioRecorderNode:
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
             "required": {
                 "base64_data": ("STRING", {"multiline": False}),
@@ -146,7 +146,7 @@ class VrchAudioRecorderNode:
         return (audio,)
     
     @classmethod
-    def IS_CHANGED(s, base64_data, record_mode, record_duration_max, 
+    def IS_CHANGED(cls, base64_data, record_mode, record_duration_max, 
                    loop, loop_interval, shortcut, shortcut_key, 
                    new_generation_after_recording):
         
@@ -171,7 +171,7 @@ class VrchAudioGenresNode:
         self.model = self.classfier.load_model(self.model_file)  # Load the model here
 
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
             "required": { 
                 "audio": ("AUDIO", ),
@@ -211,10 +211,153 @@ class VrchAudioGenresNode:
         
         result = ""
         if predicted_probabilities:
-            for genre, probability in predicted_probabilities.items():
+            for genre, probability in predicted_probabilities.items(): # type: ignore
                 result += f"{genre}: {probability:.4f}\n"
         else:
             result = "Error: Unable to process the audio input."
 
         return (audio, result,)
+
+class VrchMicLoaderNode:
+    """
+    Node for capturing and processing microphone input in real-time.
+    """
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "device_id": ("STRING", {"default": ""}),
+                "name": ("STRING", {"default": ""}),
+                "sensitivity": ("FLOAT", {"default": 0.5, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "frame_size": (["256", "512", "1024"], {"default": "512"}),
+                "sample_rate": (["16000", "24000", "48000"], {"default": "48000"}),
+                "debug": ("BOOLEAN", {"default": False}),
+                "raw_data": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
+            },
+        }
     
+    RETURN_TYPES = (
+        "JSON",     # RAW_DATA
+        "FLOAT",    # WAVEFORM
+        "FLOAT",    # SPECTRUM
+        "FLOAT",    # VOLUME
+        "BOOLEAN",  # IS_ACTIVE
+    )
+    
+    OUTPUT_IS_LIST = (
+        False,      # RAW_DATA
+        True,       # WAVEFORM
+        True,       # SPECTRUM
+        False,      # VOLUME
+        False,      # IS_ACTIVE
+    )
+    
+    RETURN_NAMES = (
+        "RAW_DATA",
+        "WAVEFORM",
+        "SPECTRUM",
+        "VOLUME",
+        "IS_ACTIVE",
+    )
+    
+    CATEGORY = CATEGORY
+    FUNCTION = "load_microphone"
+    
+    def load_microphone(self, 
+                       device_id: str, 
+                       name: str, 
+                       sensitivity: float = 0.5,
+                       frame_size: str = "512",
+                       sample_rate: str = "48000",
+                       debug: bool = False, 
+                       raw_data: str = ""):
+        """
+        Load and process microphone data.
+        """
+        try:
+            # Initialize default values
+            waveform = [0.0] * 128     # Default waveform data
+            spectrum = [0.0] * 128     # Default spectrum data
+            volume = 0.0               # Current volume level
+            is_active = False          # Whether microphone is active
+            
+            # Create base result data structure
+            mic_data = {
+                "device_id": device_id,
+                "name": name
+            }
+            
+            # Parse raw_data if available
+            if raw_data:
+                try:
+                    parsed_data = json.loads(raw_data)
+                    
+                    # Get pre-calculated waveform from JS
+                    if "waveform" in parsed_data and isinstance(parsed_data["waveform"], list):
+                        waveform = parsed_data["waveform"]
+                        
+                    # Get pre-calculated spectrum from JS
+                    if "spectrum" in parsed_data and isinstance(parsed_data["spectrum"], list):
+                        spectrum = parsed_data["spectrum"]
+                    
+                    # Get volume level
+                    if "volume" in parsed_data:
+                        volume = float(parsed_data["volume"])
+                    
+                    # Get activity state
+                    if "is_active" in parsed_data:
+                        is_active = bool(parsed_data["is_active"])
+                    
+                    # Add other data to mic_data
+                    mic_data.update({
+                        "ts": parsed_data.get("ts", 0),
+                        "sr": parsed_data.get("sr", int(sample_rate)),
+                        "ch": parsed_data.get("ch", 1),
+                        "hop": parsed_data.get("hop", int(frame_size))
+                    })
+                    
+                except json.JSONDecodeError:
+                    if debug:
+                        print("[VrchMicLoaderNode] Failed to parse microphone data as JSON")
+                except Exception as e:
+                    if debug:
+                        print(f"[VrchMicLoaderNode] Error processing microphone data: {str(e)}")
+                        
+            if debug:
+                print(f"[VrchMicLoaderNode] Device ID: {device_id}, Name: {name}")
+                print(f"[VrchMicLoaderNode] Volume: {volume}, Active: {is_active}")
+                print(f"[VrchMicLoaderNode] Waveform length: {len(waveform)}")
+                print(f"[VrchMicLoaderNode] Spectrum length: {len(spectrum)}")
+            
+            # Return processed data
+            return (
+                mic_data,
+                waveform,
+                spectrum,
+                volume,
+                is_active,
+            )
+            
+        except Exception as e:
+            print(f"[VrchMicLoaderNode] Error loading microphone data: {str(e)}")
+            # Return default values
+            return (
+                {},              # RAW_DATA
+                [0.0] * 128,     # WAVEFORM
+                [0.0] * 128,     # SPECTRUM
+                0.0,             # VOLUME
+                False,           # IS_ACTIVE
+            )
+    
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        raw_data = kwargs.get("raw_data", "")
+        debug = kwargs.get("debug", False)
+        if not raw_data:
+            if debug:
+                print("[VrchMicLoaderNode] No raw_data provided to IS_CHANGED.")
+            return False
+        
+        m = hashlib.sha256()
+        m.update(raw_data.encode("utf-8"))
+        return m.hexdigest()

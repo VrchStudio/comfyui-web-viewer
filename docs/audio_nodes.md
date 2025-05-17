@@ -51,3 +51,36 @@
    - Use the `STRING` output to connect the genre predictions to nodes that require textual input or visualization.
 
 **Note:** Ensure that the input audio is properly preprocessed and normalized for accurate genre prediction. The node's output is influenced by the quality and clarity of the input audio.
+
+---
+
+### Node: `Microphone Loader @ vrch.ai` (vrch.ai/audio)
+
+1. **Add the `Microphone Loader @ vrch.ai` node to your ComfyUI workflow.**
+2. **Configure the Node:**
+   - **Sensitivity** (`sensitivity`): Adjust the microphone sensitivity level (0.0-1.0).
+   - **Frame Size** (`frame_size`): Select audio frame size (256, 512, or 1024 samples).
+   - **Sample Rate** (`sample_rate`): Choose sampling rate (16000, 24000, or 48000 Hz).
+   - **Debug Mode** (`debug`): Enable to show raw data and debugging information.
+3. **Connect to Microphone:**
+   - The node will automatically detect available microphones.
+   - Click "Refresh" to update the list of available devices.
+   - Select a microphone from the dropdown menu to connect to it.
+4. **Control the Microphone:**
+   - Use the "Mute" button to silence/unmute the microphone.
+   - The volume meter shows the current audio level.
+   - Real-time waveform and spectrum visualizations display the audio characteristics.
+5. **Outputs:**
+   - `RAW_DATA`: Complete raw microphone data in JSON format.
+   - `WAVEFORM`: Normalized audio waveform data as a float array.
+   - `SPECTRUM`: Frequency spectrum data as a float array.
+   - `VOLUME`: Current volume level (0.0-1.0).
+   - `IS_ACTIVE`: Boolean indicating whether active sound is detected.
+
+**Applications:**
+- Voice activity detection for triggering actions in ComfyUI workflows
+- Audio-reactive visual effects
+- Sound level monitoring
+- Signal processing and analysis chains
+
+**Note:** For optimal performance, adjust the sensitivity based on your microphone and ambient noise conditions.
