@@ -292,6 +292,9 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
                     ["bars", "circles", "matrix", "particles", "spiral", "waterball", "waveform"], 
                     {"default": "waveform"},
                 ),
+                "fade_in_duration": ("INT", {"default": 0, "min": 0, "max": 10000}),
+                "fade_out_duration": ("INT", {"default": 0, "min": 0, "max": 10000}),
+                "crossfade_duration": ("INT", {"default": 0, "min": 0, "max": 10000}),
                 "server_messages": ("STRING", {"default": "", "multiline": False}),
                 "save_settings": ("BOOLEAN", {"default": False}),
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
@@ -319,6 +322,9 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
                             ssl, 
                             refresh_interval,
                             visualizer_type,
+                            fade_in_duration,
+                            fade_out_duration,
+                            crossfade_duration,
                             server_messages, 
                             save_settings, 
                             window_width,
@@ -343,6 +349,9 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
             settings = {
                 "refreshInterval": refresh_interval,
                 "visualizerType": visualizer_type,
+                "fadeInDuration": fade_in_duration,
+                "fadeOutDuration": fade_out_duration,
+                "crossfadeDuration": crossfade_duration,
                 "serverMessages": server_messages,
             }
             VrchNodeUtils.save_channel_settings(output_path, channel, settings)

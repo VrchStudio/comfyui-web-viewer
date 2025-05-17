@@ -112,6 +112,10 @@
    - **SSL:** Choose whether the connection should use SSL. If checked (`True`), it will use `https`; otherwise, it will use `http`.
    - **Refresh Interval:** Time in milliseconds between refresh attempts (default is **`5000`**, range: 1-10000).
    - **Visualizer Type:** Choose from visualizer types: **"bars"**, **"circles"**, **"matrix"**, **"particles"**, **"spiral"**, **"waterball"**, or **"waveform"** (default is **"waveform"**).
+   - **Audio Transitions:**
+     - **`fade_in_duration`**: Duration in milliseconds for the audio fade-in effect (default is **`0`**, range: 0-10000). If set to 0, no fade-in effect will be applied.
+     - **`fade_out_duration`**: Duration in milliseconds for the audio fade-out effect (default is **`0`**, range: 0-10000). If set to 0, no fade-out effect will be applied.
+     - **`crossfade_duration`**: Duration in milliseconds for crossfade between audio tracks (default is **`0`**, range: 0-10000). If set to 0, crossfade will not be used.
    - **Server Messages:** Save and send server messages to its web page viewer.
    - **Save Settings:** Toggle whether to save the audio viewer settings to a JSON file. When enabled, creates `channel_{channel}_settings.json`.
    - **Window Dimensions:**
