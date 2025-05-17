@@ -267,13 +267,16 @@
         false,
         3000,
         "circles",
+        0,
+        0,
+        0,
         "",
         "",
         500,
         600,
         false,
         "",
-        "http://vrch.ai/viewer?mode=audio&server=127.0.0.1:8188&ssl=false&filename=channel_1.mp3&path=web_viewer&refreshInterval=3000&visualizerType=circles",
+        "http://vrch.ai/viewer?mode=audio&server=127.0.0.1:8188&ssl=false&filename=channel_1.mp3&path=web_viewer&refreshInterval=3000&visualizerType=circles&fadeInDuration=0&fadeOutDuration=0&crossfadeDuration=0",
         ""
       ]
     }
