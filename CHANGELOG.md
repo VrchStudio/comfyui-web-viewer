@@ -7,11 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- add new `VrchAudioChannelLoaderNode` node
+
 ### Updated
 
+- update `VrchAudioWebViewerNode` to support audio transition features (fade in/out and crossfade)
 - update `VrchImageWebSocketWebViewerNode` to support more server settings
 - update websocket_nodes.md
 - update websocet_nodes_extra_params.md
+- update web_viewer_nodes.md
+- update web_viewer_nodes_extra_params.md
 
 ## 1.0.32 - 2025-05-05
 
