@@ -308,14 +308,6 @@ class VrchMicLoaderNode:
                     if "is_active" in parsed_data:
                         is_active = bool(parsed_data["is_active"])
                     
-                    # Add other data to mic_data
-                    mic_data.update({
-                        "ts": parsed_data.get("ts", 0),
-                        "sr": parsed_data.get("sr", int(sample_rate)),
-                        "ch": parsed_data.get("ch", 1),
-                        "hop": parsed_data.get("hop", int(frame_size))
-                    })
-                    
                 except json.JSONDecodeError:
                     if debug:
                         print("[VrchMicLoaderNode] Failed to parse microphone data as JSON")
@@ -331,7 +323,7 @@ class VrchMicLoaderNode:
             
             # Return processed data
             return (
-                mic_data,
+                raw_data,  # RAW_DATA
                 waveform,
                 spectrum,
                 volume,
