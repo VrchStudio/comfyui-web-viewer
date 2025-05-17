@@ -264,13 +264,13 @@ class VrchMicLoaderNode:
     FUNCTION = "load_microphone"
     
     def load_microphone(self, 
-                       device_id: str, 
-                       name: str, 
-                       sensitivity: float = 0.5,
-                       frame_size: str = "512",
-                       sample_rate: str = "48000",
-                       debug: bool = False, 
-                       raw_data: str = ""):
+                        device_id: str, 
+                        name: str, 
+                        sensitivity: float = 0.5,
+                        frame_size: str = "512",
+                        sample_rate: str = "48000",
+                        debug: bool = False, 
+                        raw_data: str = ""):
         """
         Load and process microphone data.
         """
