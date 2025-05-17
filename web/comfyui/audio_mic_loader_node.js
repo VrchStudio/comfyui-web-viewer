@@ -172,7 +172,12 @@ app.registerExtension({
                         deviceIdWidget.value = "";
                     }
                     
-                    updateStatusIndicator("Ready");
+                    // Show correct status based on mute state if a device is selected
+                    if (deviceSelect.value) {
+                        updateStatusIndicator(isMuted ? "Muted" : "Ready");
+                    } else {
+                        updateStatusIndicator("Ready");
+                    }
                     return true; // Indicate successful completion
                     
                 } catch (error) {
@@ -237,7 +242,7 @@ app.registerExtension({
                     
                     // Start visualization and data collection
                     isCapturing = true;
-                    updateStatusIndicator("Ready");
+                    updateStatusIndicator(isMuted ? "Muted" : "Ready");
                     startVisualization();
                     
                 } catch (error) {
@@ -499,7 +504,14 @@ app.registerExtension({
                 muteButton.innerHTML = mute ? 
                     '<span class="vrch-mic-speaker-icon">🔇</span>' : 
                     '<span class="vrch-mic-speaker-icon">🔊</span>';
-                // muteButton.style.backgroundColor = mute ? "#F44336" : "#4CAF50";
+                
+                // Update button background color based on mute state
+                muteButton.style.backgroundColor = mute ? "#9e6a6a" : "#4f9cff";
+                
+                // Update status text if device is in Ready or Muted state
+                if (statusIndicator.textContent === "Status: Ready" || statusIndicator.textContent === "Status: Muted") {
+                    updateStatusIndicator(mute ? "Muted" : "Ready");
+                }
                 
                 if (mute) {
                     volumeMeterFill.style.width = "0%";
@@ -572,7 +584,7 @@ app.registerExtension({
                             }
                         }
                     } else {
-                        updateStatusIndicator("Ready");
+                        updateStatusIndicator("Ready"); // No device selected
                     }
                 }
             }, 1000);
@@ -637,9 +649,26 @@ style.textContent = `
         border-radius: 4px;
     }
     
-    .vrch-mic-reload-button,
-    .vrch-mic-mute-button {
+    .vrch-mic-reload-button {
         background-color: #4CAF50;
+        color: white;
+        height: 30px;
+        font-size: 14px;
+        font-weight: bold;
+        border: none;
+        border-radius: 4px;
+        padding: 5px 10px;
+        margin: 0 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        min-width: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .vrch-mic-mute-button {
+        background-color: #4f9cff;
         color: white;
         height: 30px;
         font-size: 14px;
@@ -658,7 +687,7 @@ style.textContent = `
 
     .vrch-mic-reload-button:hover,
     .vrch-mic-mute-button:hover {
-        background-color: #45a049;
+        filter: brightness(1.1); 
     }
 
     .vrch-mic-status-container {
