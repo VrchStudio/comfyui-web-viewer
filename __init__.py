@@ -13,6 +13,7 @@ __version__ = "1.0.32"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
+    "VrchAudioChannelLoaderNode": VrchAudioChannelLoaderNode,
     "VrchAudioGenresNode": VrchAudioGenresNode,
     "VrchAudioRecorderNode": VrchAudioRecorderNode,
     "VrchAudioSaverNode": VrchAudioSaverNode,
@@ -62,6 +63,7 @@ NODE_CLASS_MAPPINGS = {
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchAnyOSCControlNode": "ANY Value OSC Control @ vrch.ai",
+    "VrchAudioChannelLoaderNode": "AUDIO Web Viewer Channel Loader @ vrch.ai",
     "VrchAudioGenresNode": "Get Audio Genres @ vrch.ai",
     "VrchAudioRecorderNode": "Audio Recorder @ vrch.ai",
     "VrchAudioSaverNode": "Audio Saver @ vrch.ai",

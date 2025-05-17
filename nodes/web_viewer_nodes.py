@@ -4,6 +4,7 @@ import shutil
 import torch
 import hashlib
 import numpy as np
+import torchaudio
 from PIL import Image
 import folder_paths
 from .image_nodes import VrchImageSaverNode
@@ -361,6 +362,85 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
             audio_bytes = bytes()
         m.update(audio_bytes)
         return m.hexdigest()
+    
+class VrchAudioChannelLoaderNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "debug": ("BOOLEAN", {"default": False})
+            }
+        }
+
+    RETURN_TYPES = ("AUDIO",)
+    RETURN_NAMES = ("AUDIO",)
+    FUNCTION = "load_audio"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def __init__(self):
+        # Get the output directory
+        self.output_dir = folder_paths.output_directory
+
+    def load_audio(self, channel, debug):
+        # Construct the full path of the target file with .mp3 extension
+        file_path = os.path.join(self.output_dir, "web_viewer", f"channel_{channel}.mp3")
+        
+        if debug:
+            print(f"[VrchAudioChannelLoaderNode] Debug mode enabled for audio channel {channel}")
+            print(f"[VrchAudioChannelLoaderNode] Looking for audio file at: {file_path}")
+        
+        if os.path.exists(file_path):
+            try:
+                if debug:
+                    print(f"[VrchAudioChannelLoaderNode] File found: {file_path}, attempting to load")
+                
+                # Attempt to open and read the audio
+                waveform, sample_rate = torchaudio.load(file_path)
+                
+                # Check if the audio is mono (single channel)
+                if waveform.shape[0] == 1:
+                    # Convert mono to stereo by duplicating the channel
+                    waveform = waveform.repeat(2, 1)
+                
+                if debug:
+                    print(f"[VrchAudioChannelLoaderNode] Successfully loaded audio: shape={waveform.shape}, sample_rate={sample_rate}")
+                
+                audio = {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
+            except Exception as e:
+                if debug:
+                    print(f"[VrchAudioChannelLoaderNode] Error loading audio: {str(e)}")
+                # Generate silent audio as a fallback
+                audio = self._generate_silent_audio()
+                if debug:
+                    print("[VrchAudioChannelLoaderNode] Generated silent audio as fallback due to error")
+        else:
+            if debug:
+                print(f"[VrchAudioChannelLoaderNode] File not found: {file_path}, generating silent audio")
+            # Generate silent audio if the file doesn't exist
+            audio = self._generate_silent_audio()
+            
+        return (audio,)
+    
+    def _generate_silent_audio(self):
+        """Generate 5 seconds of silent audio at 44.1kHz"""
+        sample_rate = 44100
+        duration_sec = 5
+        num_samples = int(sample_rate * duration_sec)
+        
+        # Create stereo silent waveform (zeros)
+        waveform = torch.zeros(2, num_samples)
+        
+        # Package as audio dictionary
+        audio = {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
+        
+        return audio
+    
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        # Always changed by default to ensure fresh audio loading
+        return float("NaN")
     
 class VrchModelWebViewerNode():
 

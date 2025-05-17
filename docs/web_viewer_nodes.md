@@ -209,3 +209,28 @@
 - Ensure that the `web_viewer` directory under the ComfyUI output folder contains the expected image files named in the format `channel_[channel].jpeg`.
 
 ----
+
+### Node: `AUDIO Web Viewer Channel Loader @ vrch.ai` (vrch.ai/viewer)
+
+1. **Add the `AUDIO Web Viewer Channel Loader @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Channel:**
+     - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**). The node loads the corresponding audio file from the `web_viewer` subfolder in the output directory (e.g., `channel_1.mp3`).
+   - **Debug:**
+     - **`debug`**: Enable or disable debug logging (default is **`False`**). When enabled, the node will output detailed information about the loading process.
+
+3. **Load Audio:**
+   - The node attempts to load the specified audio file.
+   - If the file exists, it is loaded into a torch tensor and processed.
+   - If the audio is mono (single channel), it is converted to stereo by duplicating the channel.
+   - If the file does not exist or an error occurs during loading, a 5-second silent audio is generated as a fallback.
+
+4. **Caching Behavior:**
+   - The node's `IS_CHANGED` method always returns `NaN`, ensuring that the node is always considered changed and forces reloading of the audio.
+
+**Note:**
+- Ensure that the `web_viewer` directory under the ComfyUI output folder contains the expected audio files named in the format `channel_[channel].mp3`.
+- The debug option is useful for troubleshooting audio loading issues.
+
+----
