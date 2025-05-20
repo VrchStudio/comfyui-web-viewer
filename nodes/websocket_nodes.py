@@ -260,6 +260,7 @@ class VrchImageWebSocketWebViewerNode:
                                 "exclusion", "hue", "saturation", "color", "luminosity"], {"default": "none"}),
                 "loop_playback": ("BOOLEAN", {"default": True}),
                 "update_on_end": ("BOOLEAN", {"default": False}),
+                "background_colour_hex": ("STRING", {"default": "#222222", "multiline": False}),
                 "server_messages": ("STRING", {"default": "", "multiline": False}),
                 "save_settings": ("BOOLEAN", {"default": False}),
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
@@ -287,6 +288,7 @@ class VrchImageWebSocketWebViewerNode:
                     blend_mode,
                     loop_playback,
                     update_on_end,
+                    background_colour_hex,
                     server_messages,
                     save_settings,
                     window_width,
@@ -319,6 +321,7 @@ class VrchImageWebSocketWebViewerNode:
                     "mixBlendMode": blend_mode,
                     "enableLoop": loop_playback,
                     "enableUpdateOnEnd": update_on_end,
+                    "bgColourPicker": background_colour_hex,
                     "serverMessages": server_messages,
                 }
             }

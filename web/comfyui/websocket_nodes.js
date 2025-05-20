@@ -41,6 +41,7 @@ app.registerExtension({
             const blendModeWidget = node.widgets.find(w => w.name === "blend_mode");
             const loopPlaybackWidget = node.widgets.find(w => w.name === "loop_playback");
             const updateOnEndWidget = node.widgets.find(w => w.name === "update_on_end");
+            const backgroundColorWidget = node.widgets.find(w => w.name === "background_colour_hex");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
             const heightWidget = node.widgets.find(w => w.name === "window_height");
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
@@ -62,6 +63,7 @@ app.registerExtension({
                             mixBlendMode: blendModeWidget,
                             enableLoop: loopPlaybackWidget,
                             enableUpdateOnEnd: updateOnEndWidget,
+                            bgColourPicker: backgroundColorWidget,
                         }
                     });
                 }
@@ -83,6 +85,7 @@ app.registerExtension({
                     blendModeWidget,
                     loopPlaybackWidget,
                     updateOnEndWidget,
+                    backgroundColorWidget,
                 ],
                 "VrchImageWebSocketWebViewerNode"
             );
