@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - add a new `VrchAudioChannelLoaderNode` node
 - add a new `VrchMicLoaderNode` node
+- add a new `VrchAudioConcatNode` node
 
 ### Updated
 
@@ -20,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update websocet_nodes_extra_params.md
 - update web_viewer_nodes.md
 - update web_viewer_nodes_extra_params.md
+- update audio_nodes.md
 
 ## 1.0.32 - 2025-05-05
 
