@@ -15,6 +15,9 @@
      - **`number_of_images`**: Set the number of images to load (default is **`4`**, range: 1-99).
      - **`image_display_duration`**: Duration to display each image in milliseconds (default is **`1000`**, range: 1-10000).
      - **`fade_anim_duration`**: Duration of fade animation in milliseconds (default is **`200`**, range: 1-10000).
+     - **`mixBlendMode`**: Set the blend mode for image transitions (default is **`none`**). Options include **`normal`**, **`multiply`**, **`screen`**, etc.
+     - **`enableLoop`**: Toggle whether to loop playback of images (default is **`True`**).
+     - **`enableUpdateOnEnd`**: Toggle whether to update the image cache only at the end of playback (default is **`False`**).
    - **Server Messages:** Save and send server messages to its web page viewer.
    - **Save Settings:** Toggle whether to save the websocket settings to a JSON file. When enabled, sends settings via WebSocket.
    - **Window Dimensions:**

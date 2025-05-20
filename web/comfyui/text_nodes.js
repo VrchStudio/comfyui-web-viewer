@@ -192,11 +192,6 @@ app.registerExtension({
 
             // Create a container for widgets, with a fixed height
             const widgetContainer = document.createElement("div");
-            widgetContainer.style.setProperty("height", "120px", "important");
-            widgetContainer.style.display = "flex";
-            widgetContainer.style.flexDirection = "column";
-            widgetContainer.style.justifyContent = "center";
-            widgetContainer.style.alignItems = "center";
 
             // Create a container for buttons, arranged vertically and centered
             const buttonsContainer = document.createElement("div");

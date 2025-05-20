@@ -38,6 +38,10 @@ app.registerExtension({
             const numberOfImagesWidget = node.widgets.find(w => w.name === "number_of_images");
             const imageDisplayDurationWidget = node.widgets.find(w => w.name === "image_display_duration");
             const fadeAnimDurationWidget = node.widgets.find(w => w.name === "fade_anim_duration");
+            const blendModeWidget = node.widgets.find(w => w.name === "blend_mode");
+            const loopPlaybackWidget = node.widgets.find(w => w.name === "loop_playback");
+            const updateOnEndWidget = node.widgets.find(w => w.name === "update_on_end");
+            const backgroundColorWidget = node.widgets.find(w => w.name === "background_colour_hex");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
             const heightWidget = node.widgets.find(w => w.name === "window_height");
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
@@ -56,6 +60,10 @@ app.registerExtension({
                             numberOfImages: numberOfImagesWidget,
                             imageDisplayDuration: imageDisplayDurationWidget,
                             fadeAnimDuration: fadeAnimDurationWidget,
+                            mixBlendMode: blendModeWidget,
+                            enableLoop: loopPlaybackWidget,
+                            enableUpdateOnEnd: updateOnEndWidget,
+                            bgColourPicker: backgroundColorWidget,
                         }
                     });
                 }
@@ -74,7 +82,10 @@ app.registerExtension({
                     numberOfImagesWidget,
                     imageDisplayDurationWidget,
                     fadeAnimDurationWidget,
-                    extraParamsWidget,
+                    blendModeWidget,
+                    loopPlaybackWidget,
+                    updateOnEndWidget,
+                    backgroundColorWidget,
                 ],
                 "VrchImageWebSocketWebViewerNode"
             );

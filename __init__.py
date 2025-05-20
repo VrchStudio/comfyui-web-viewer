@@ -9,14 +9,17 @@ from .nodes.gamepad_nodes import *
 from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
 
-__version__ = "1.0.32"
+__version__ = "1.0.33"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
+    "VrchAudioChannelLoaderNode": VrchAudioChannelLoaderNode,
+    "VrchAudioConcatNode": VrchAudioConcatNode,
     "VrchAudioGenresNode": VrchAudioGenresNode,
     "VrchAudioRecorderNode": VrchAudioRecorderNode,
     "VrchAudioSaverNode": VrchAudioSaverNode,
     "VrchAudioWebViewerNode": VrchAudioWebViewerNode,
+    "VrchMicLoaderNode": VrchMicLoaderNode,
     "VrchBooleanKeyControlNode": VrchBooleanKeyControlNode,
     "VrchChannelOSCControlNode": VrchChannelOSCControlNode,
     "VrchChannelX4OSCControlNode": VrchChannelX4OSCControlNode,
@@ -62,10 +65,13 @@ NODE_CLASS_MAPPINGS = {
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchAnyOSCControlNode": "ANY Value OSC Control @ vrch.ai",
-    "VrchAudioGenresNode": "Get Audio Genres @ vrch.ai",
-    "VrchAudioRecorderNode": "Audio Recorder @ vrch.ai",
-    "VrchAudioSaverNode": "Audio Saver @ vrch.ai",
+    "VrchAudioChannelLoaderNode": "AUDIO Web Viewer Channel Loader @ vrch.ai",
+    "VrchAudioConcatNode": "AUDIO Concat @ vrch.ai",
+    "VrchAudioGenresNode": "AUDIO Get Genres @ vrch.ai",
+    "VrchAudioRecorderNode": "AUDIO Recorder @ vrch.ai",
+    "VrchAudioSaverNode": "AUDIO Saver @ vrch.ai",
     "VrchAudioWebViewerNode": "AUDIO Web Viewer @ vrch.ai",
+    "VrchMicLoaderNode": "Microphone Loader @ vrch.ai",
     "VrchBooleanKeyControlNode": "BOOLEAN Key Control @ vrch.ai",
     "VrchChannelOSCControlNode": "CHANNEL OSC Control @ vrch.ai",
     "VrchChannelX4OSCControlNode": "CHANNEL x4 OSC Control @ vrch.ai",

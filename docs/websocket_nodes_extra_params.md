@@ -12,3 +12,6 @@
 | Number Of Images        | numberOfImages      | Total number of images in the image cache sequence.                | Number  | 4       | Specifies how many images are cached and cycled through.                             |
 | Load Remote Settings    | loadRemoteSettings  | Load Remote Settings from the server side.                         | Boolean | false   | When true, the viewer loads settings from remote server.                             |
 | Show Server Messages    | showServerMessages  | Display messages sent from the server side.                        | Boolean | false   | When true, the viewer displays server messages on the screen.                        |
+| Blend Mode              | mixBlendMode        | Sets the blend mode for image transitions.                         | String  | none    | Options: none, normal, multiply, screen, overlay, darken, lighten, etc.              |
+| Loop Playback           | enableLoop          | Toggles whether to loop playback of images.                        | Boolean | true    | When true, the playback loops indefinitely.                                          |
+| Update on End           | enableUpdateOnEnd   | Updates the image cache only at the end of playback.               | Boolean | false   | When true, the cache is updated after the last image is displayed.                   |

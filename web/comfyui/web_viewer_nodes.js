@@ -267,6 +267,9 @@ app.registerExtension({
             const channelWidget = node.widgets.find(w => w.name === "channel");
             const refreshIntervalWidget = node.widgets.find(w => w.name === "refresh_interval");
             const visualizerTypeWidget = node.widgets.find(w => w.name === "visualizer_type");
+            const fadeInDurationWidget = node.widgets.find(w => w.name === "fade_in_duration");
+            const fadeOutDurationWidget = node.widgets.find(w => w.name === "fade_out_duration");
+            const crossfadeDurationWidget = node.widgets.find(w => w.name === "crossfade_duration");
             const widthWidget = node.widgets.find(w => w.name === "window_width");
             const heightWidget = node.widgets.find(w => w.name === "window_height");
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
@@ -288,6 +291,9 @@ app.registerExtension({
                         additionalParams: { 
                             refreshInterval: refreshIntervalWidget,
                             visualizerType: visualizerTypeWidget,
+                            fadeInDuration: fadeInDurationWidget,
+                            fadeOutDuration: fadeOutDurationWidget,
+                            crossfadeDuration: crossfadeDurationWidget,
                         }
                     });
                 }
@@ -304,6 +310,9 @@ app.registerExtension({
                     channelWidget,
                     refreshIntervalWidget,
                     visualizerTypeWidget,
+                    fadeInDurationWidget,
+                    fadeOutDurationWidget,
+                    crossfadeDurationWidget,
                     extraParamsWidget,
                 ],
                 "VrchAudioWebViewerNode"

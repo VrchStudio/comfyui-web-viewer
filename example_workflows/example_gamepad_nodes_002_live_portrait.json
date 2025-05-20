@@ -1,8 +1,8 @@
 {
   "id": "7f3e5753-83c8-4dfc-a548-8cf9a2059a21",
   "revision": 0,
-  "last_node_id": 218,
-  "last_link_id": 515,
+  "last_node_id": 220,
+  "last_link_id": 517,
   "nodes": [
     {
       "id": 119,
@@ -1407,8 +1407,8 @@
           "name": "image",
           "type": "IMAGE",
           "links": [
-            239,
-            467
+            516,
+            517
           ]
         },
         {
@@ -1475,7 +1475,8 @@
       ],
       "properties": {
         "Node name for S&R": "Show any to JSON [Crystools]"
-      }
+      },
+      "widgets_values": []
     },
     {
       "id": 188,
@@ -1692,55 +1693,6 @@
       },
       "widgets_values": [
         1
-      ]
-    },
-    {
-      "id": 87,
-      "type": "VrchImageWebSocketWebViewerNode",
-      "pos": [
-        3726.97607421875,
-        27.814760208129883
-      ],
-      "size": [
-        302.3999938964844,
-        445.47027587890625
-      ],
-      "flags": {},
-      "order": 42,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 239
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGES",
-          "type": "IMAGE",
-          "links": null
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VrchImageWebSocketWebViewerNode"
-      },
-      "widgets_values": [
-        "1",
-        "192.168.123.112:8001",
-        "JPEG",
-        1,
-        50,
-        10,
-        "",
-        true,
-        1280,
-        960,
-        false,
-        false,
-        "",
-        "http://vrch.ai/viewer?mode=image-websocket&server=192.168.123.112:8001&ssl=false&protocol=websocket&path=web_viewer&numberOfImages=1&imageDisplayDuration=50&fadeAnimDuration=10",
-        ""
       ]
     },
     {
@@ -2141,53 +2093,6 @@
       ]
     },
     {
-      "id": 207,
-      "type": "VrchImageWebViewerNode",
-      "pos": [
-        3727.029052734375,
-        587.9370727539062
-      ],
-      "size": [
-        311.58978271484375,
-        398.1365051269531
-      ],
-      "flags": {},
-      "order": 43,
-      "mode": 4,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 467
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGES",
-          "type": "IMAGE",
-          "links": null
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VrchImageWebViewerNode"
-      },
-      "widgets_values": [
-        "1",
-        "comfyui.ttzz.me",
-        true,
-        100,
-        100,
-        "",
-        true,
-        800,
-        600,
-        false,
-        "",
-        "https://vrch.ai/viewer?mode=image&server=comfyui.ttzz.me&ssl=true&filename=channel_1.jpeg&path=web_viewer&refreshInterval=100&fadeAnimDuration=100",
-        ""
-      ]
-    },
-    {
       "id": 211,
       "type": "Fast Groups Bypasser (rgthree)",
       "pos": [
@@ -2217,6 +2122,106 @@
         "customSortAlphabet": "",
         "toggleRestriction": "default"
       }
+    },
+    {
+      "id": 219,
+      "type": "VrchImageWebSocketWebViewerNode",
+      "pos": [
+        3726.97607421875,
+        27.814760208129883
+      ],
+      "size": [
+        302.3999938964844,
+        533.953125
+      ],
+      "flags": {},
+      "order": 42,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 516
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchImageWebSocketWebViewerNode"
+      },
+      "widgets_values": [
+        "1",
+        "192.168.123.112:8001",
+        "JPEG",
+        4,
+        1000,
+        200,
+        "none",
+        true,
+        false,
+        "#222222",
+        "",
+        false,
+        1280,
+        960,
+        false,
+        false,
+        "",
+        "http://vrch.ai/viewer?mode=image-websocket&server=192.168.123.112:8001&ssl=false&protocol=websocket&path=web_viewer&channel=1&numberOfImages=4&imageDisplayDuration=1000&fadeAnimDuration=200&mixBlendMode=none&enableLoop=true&enableUpdateOnEnd=false&bgColourPicker=#222222",
+        ""
+      ]
+    },
+    {
+      "id": 220,
+      "type": "VrchImageWebViewerNode",
+      "pos": [
+        3725.06982421875,
+        689.3521118164062
+      ],
+      "size": [
+        313.21875,
+        391.8203125
+      ],
+      "flags": {},
+      "order": 43,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 517
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VrchImageWebViewerNode"
+      },
+      "widgets_values": [
+        "1",
+        "127.0.0.1:8188",
+        false,
+        300,
+        200,
+        "",
+        false,
+        1280,
+        960,
+        false,
+        "",
+        "http://vrch.ai/viewer?mode=image&server=127.0.0.1:8188&ssl=false&filename=channel_1.jpeg&path=web_viewer&refreshInterval=300&fadeAnimDuration=200",
+        ""
+      ]
     }
   ],
   "links": [
@@ -2233,14 +2238,6 @@
       88,
       0,
       93,
-      0,
-      "IMAGE"
-    ],
-    [
-      239,
-      93,
-      0,
-      87,
       0,
       "IMAGE"
     ],
@@ -2533,14 +2530,6 @@
       "FLOAT"
     ],
     [
-      467,
-      93,
-      0,
-      207,
-      0,
-      "IMAGE"
-    ],
-    [
       470,
       85,
       0,
@@ -2803,6 +2792,22 @@
       213,
       0,
       "FLOAT"
+    ],
+    [
+      516,
+      93,
+      0,
+      219,
+      0,
+      "IMAGE"
+    ],
+    [
+      517,
+      93,
+      0,
+      220,
+      0,
+      "IMAGE"
     ]
   ],
   "groups": [
@@ -2903,8 +2908,8 @@
       "bounding": [
         3716.97607421875,
         -45.785240173339844,
-        322.39990234375,
-        529.0702514648438
+        323.57958984375,
+        632.7523193359375
       ],
       "color": "#b58b2a",
       "font_size": 24,
@@ -2914,8 +2919,8 @@
       "id": 16,
       "title": "Output - Web Viewer",
       "bounding": [
-        3717.029052734375,
-        514.3370361328125,
+        3715.33935546875,
+        613.1895751953125,
         331.58984375,
         481.7365417480469
       ],
@@ -2927,15 +2932,15 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.4594972986357493,
+      "scale": 0.5644739300537773,
       "offset": [
-        1069.9654076647028,
-        611.801875603589
+        -1480.818977276689,
+        331.02338683948096
       ]
     },
     "frontendVersion": "1.16.9",
     "node_versions": {
-      "comfyui-web-viewer": "f2b9ec9fa2c81baf7033a9e42fc6736e810f57de",
+      "comfyui-web-viewer": "d3ccec0504db4612301a28504235016f8a3fe19c",
       "ComfyUI-Logic": "fb8897351f715ea75eebf52e74515b6d07c693b8",
       "ComfyUI-Crystools": "ad2e9b8be8c601f17cf04d676a16afe538b89497",
       "ComfyUI-AdvancedLivePortrait": "3bba732915e22f18af0d221b9c5c282990181f1b",

@@ -4,8 +4,9 @@ import io
 import base64
 import ffmpeg
 from pathlib import Path
+import torch
 import torchaudio
-import folder_paths
+import folder_paths # type: ignore
 from ..utils.music_genres_classifier import *
 
 ASSETS_DIR = os.path.join(Path(__file__).parent.parent, "assets")
@@ -18,7 +19,7 @@ class VrchAudioSaverNode:
         self.output_dir = folder_paths.get_output_directory()
 
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
             "required": {
                 "audio": ("AUDIO",),
@@ -71,7 +72,7 @@ class VrchAudioSaverNode:
         
 class VrchAudioRecorderNode:
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
             "required": {
                 "base64_data": ("STRING", {"multiline": False}),
@@ -146,7 +147,7 @@ class VrchAudioRecorderNode:
         return (audio,)
     
     @classmethod
-    def IS_CHANGED(s, base64_data, record_mode, record_duration_max, 
+    def IS_CHANGED(cls, base64_data, record_mode, record_duration_max, 
                    loop, loop_interval, shortcut, shortcut_key, 
                    new_generation_after_recording):
         
@@ -171,7 +172,7 @@ class VrchAudioGenresNode:
         self.model = self.classfier.load_model(self.model_file)  # Load the model here
 
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
             "required": { 
                 "audio": ("AUDIO", ),
@@ -211,10 +212,266 @@ class VrchAudioGenresNode:
         
         result = ""
         if predicted_probabilities:
-            for genre, probability in predicted_probabilities.items():
+            for genre, probability in predicted_probabilities.items(): # type: ignore
                 result += f"{genre}: {probability:.4f}\n"
         else:
             result = "Error: Unable to process the audio input."
 
         return (audio, result,)
+
+class VrchMicLoaderNode:
+    """
+    Node for capturing and processing microphone input in real-time.
+    """
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "device_id": ("STRING", {"default": ""}),
+                "name": ("STRING", {"default": ""}),
+                "sensitivity": ("FLOAT", {"default": 0.5, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "frame_size": (["256", "512", "1024"], {"default": "512"}),
+                "sample_rate": (["16000", "24000", "48000"], {"default": "48000"}),
+                "debug": ("BOOLEAN", {"default": False}),
+                "raw_data": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
+            },
+        }
     
+    RETURN_TYPES = (
+        "JSON",     # RAW_DATA
+        "FLOAT",    # WAVEFORM
+        "FLOAT",    # SPECTRUM
+        "FLOAT",    # VOLUME
+        "BOOLEAN",  # IS_ACTIVE
+    )
+    
+    OUTPUT_IS_LIST = (
+        False,      # RAW_DATA
+        True,       # WAVEFORM
+        True,       # SPECTRUM
+        False,      # VOLUME
+        False,      # IS_ACTIVE
+    )
+    
+    RETURN_NAMES = (
+        "RAW_DATA",
+        "WAVEFORM",
+        "SPECTRUM",
+        "VOLUME",
+        "IS_ACTIVE",
+    )
+    
+    CATEGORY = CATEGORY
+    FUNCTION = "load_microphone"
+    
+    def load_microphone(self, 
+                        device_id: str, 
+                        name: str, 
+                        sensitivity: float = 0.5,
+                        frame_size: str = "512",
+                        sample_rate: str = "48000",
+                        debug: bool = False, 
+                        raw_data: str = ""):
+        """
+        Load and process microphone data.
+        """
+        try:
+            # Initialize default values
+            waveform = [0.0] * 128     # Default waveform data
+            spectrum = [0.0] * 128     # Default spectrum data
+            volume = 0.0               # Current volume level
+            is_active = False          # Whether microphone is active
+            
+            # Create base result data structure
+            mic_data = {
+                "device_id": device_id,
+                "name": name
+            }
+            
+            # Parse raw_data if available
+            if raw_data:
+                try:
+                    parsed_data = json.loads(raw_data)
+                    
+                    # Get pre-calculated waveform from JS
+                    if "waveform" in parsed_data and isinstance(parsed_data["waveform"], list):
+                        waveform = parsed_data["waveform"]
+                        
+                    # Get pre-calculated spectrum from JS
+                    if "spectrum" in parsed_data and isinstance(parsed_data["spectrum"], list):
+                        spectrum = parsed_data["spectrum"]
+                    
+                    # Get volume level
+                    if "volume" in parsed_data:
+                        volume = float(parsed_data["volume"])
+                    
+                    # Get activity state
+                    if "is_active" in parsed_data:
+                        is_active = bool(parsed_data["is_active"])
+                    
+                except json.JSONDecodeError:
+                    if debug:
+                        print("[VrchMicLoaderNode] Failed to parse microphone data as JSON")
+                except Exception as e:
+                    if debug:
+                        print(f"[VrchMicLoaderNode] Error processing microphone data: {str(e)}")
+                        
+            if debug:
+                print(f"[VrchMicLoaderNode] Device ID: {device_id}, Name: {name}")
+                print(f"[VrchMicLoaderNode] Volume: {volume}, Active: {is_active}")
+                print(f"[VrchMicLoaderNode] Waveform length: {len(waveform)}")
+                print(f"[VrchMicLoaderNode] Spectrum length: {len(spectrum)}")
+            
+            # Return processed data
+            return (
+                raw_data,  # RAW_DATA
+                waveform,
+                spectrum,
+                volume,
+                is_active,
+            )
+            
+        except Exception as e:
+            print(f"[VrchMicLoaderNode] Error loading microphone data: {str(e)}")
+            # Return default values
+            return (
+                {},              # RAW_DATA
+                [0.0] * 128,     # WAVEFORM
+                [0.0] * 128,     # SPECTRUM
+                0.0,             # VOLUME
+                False,           # IS_ACTIVE
+            )
+    
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        raw_data = kwargs.get("raw_data", "")
+        debug = kwargs.get("debug", False)
+        if not raw_data:
+            if debug:
+                print("[VrchMicLoaderNode] No raw_data provided to IS_CHANGED.")
+            return False
+        
+        m = hashlib.sha256()
+        m.update(raw_data.encode("utf-8"))
+        return m.hexdigest()
+
+class VrchAudioConcatNode:
+    """
+    Node for concatenating two audio inputs into a single audio output.
+    """
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "audio1": ("AUDIO",),
+                "audio2": ("AUDIO",),
+                "crossfade_duration_ms": ("INT", {
+                    "default": 0,
+                    "min": 0,
+                    "max": 10000,
+                    "step": 100,
+                }),
+            },
+        }
+    
+    RETURN_TYPES = ("AUDIO",)
+    RETURN_NAMES = ("AUDIO",)
+    FUNCTION = "concatenate_audio"
+    CATEGORY = CATEGORY
+    
+    def concatenate_audio(self, audio1, audio2, crossfade_duration_ms=0):
+        """
+        Concatenate two audio inputs with optional crossfade.
+        
+        Args:
+            audio1: First audio input
+            audio2: Second audio input
+            crossfade_duration_ms: Duration of crossfade in milliseconds (0 means no crossfade)
+            
+        Returns:
+            Concatenated audio
+        """
+        # Extract waveforms and sample rates
+        waveform1 = audio1["waveform"]
+        waveform2 = audio2["waveform"]
+        sample_rate1 = audio1["sample_rate"]
+        sample_rate2 = audio2["sample_rate"]
+        
+        # Check if sample rates match
+        if sample_rate1 != sample_rate2:
+            # Resample audio2 to match audio1's sample rate
+            if len(waveform2.shape) == 3:  # Batch of waveforms
+                resampled_waveforms = []
+                for wav in waveform2:
+                    resampler = torchaudio.transforms.Resample(sample_rate2, sample_rate1)
+                    resampled_waveforms.append(resampler(wav))
+                waveform2 = torch.stack(resampled_waveforms)
+            else:
+                resampler = torchaudio.transforms.Resample(sample_rate2, sample_rate1)
+                waveform2 = resampler(waveform2)
+            sample_rate = sample_rate1
+        else:
+            sample_rate = sample_rate1
+        
+        # Handle batched waveforms
+        if len(waveform1.shape) == 3 and len(waveform2.shape) == 3:
+            # Batch size might be different, we'll concatenate each waveform in the batch
+            batch_size1 = waveform1.shape[0]
+            batch_size2 = waveform2.shape[0]
+            
+            # Use the first waveform from each batch for demonstration
+            # More sophisticated batch handling could be implemented if needed
+            waveform1 = waveform1[0]
+            waveform2 = waveform2[0]
+        elif len(waveform1.shape) == 3:
+            waveform1 = waveform1[0]
+        elif len(waveform2.shape) == 3:
+            waveform2 = waveform2[0]
+        
+        # Ensure both waveforms have the same number of channels
+        num_channels1 = waveform1.shape[0]
+        num_channels2 = waveform2.shape[0]
+        
+        if num_channels1 > num_channels2:
+            # Duplicate channels to match waveform1
+            waveform2 = waveform2.repeat(num_channels1 // num_channels2, 1)
+        elif num_channels1 < num_channels2:
+            # Duplicate channels to match waveform2
+            waveform1 = waveform1.repeat(num_channels2 // num_channels1, 1)
+        
+        # Apply crossfade if duration > 0
+        if crossfade_duration_ms > 0:
+            # Convert milliseconds to seconds for sample rate calculation
+            crossfade_seconds = crossfade_duration_ms / 1000.0
+            crossfade_samples = int(crossfade_seconds * sample_rate)
+            
+            # Ensure crossfade_samples isn't larger than either audio
+            crossfade_samples = min(crossfade_samples, waveform1.shape[1], waveform2.shape[1])
+            
+            if crossfade_samples > 0:
+                # Create fade out and fade in curves
+                fade_out = torch.linspace(1, 0, crossfade_samples)
+                fade_in = torch.linspace(0, 1, crossfade_samples)
+                
+                # Apply fade out to the end of waveform1
+                for c in range(waveform1.shape[0]):
+                    waveform1[c, -crossfade_samples:] *= fade_out
+                
+                # Apply fade in to the beginning of waveform2
+                for c in range(waveform2.shape[0]):
+                    waveform2[c, :crossfade_samples] *= fade_in
+                
+                # Concatenate with overlap
+                result = torch.zeros(waveform1.shape[0], waveform1.shape[1] + waveform2.shape[1] - crossfade_samples, 
+                                  device=waveform1.device, dtype=waveform1.dtype)
+                result[:, :waveform1.shape[1]] += waveform1
+                result[:, waveform1.shape[1]-crossfade_samples:] += waveform2
+            else:
+                # Simple concatenation without crossfade
+                result = torch.cat([waveform1, waveform2], dim=1)
+        else:
+            # Simple concatenation without crossfade
+            result = torch.cat([waveform1, waveform2], dim=1)
+        
+        # Return the concatenated audio
+        return ({"waveform": result.unsqueeze(0), "sample_rate": sample_rate},)

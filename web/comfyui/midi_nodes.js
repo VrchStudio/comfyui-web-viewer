@@ -211,13 +211,25 @@ app.registerExtension({
                             // Otherwise connect to first available device  
                             connectToDevice(inputs[0].id);  
                             deviceIdWidget.value = inputs[0].id;  
-                        }  
+                        } else if (inputs.length === 0) {
+                            // If no devices are available, set device ID to empty
+                            deviceIdWidget.value = "";
+                            nameWidget.value = "";
+                            updateStatusLabel("No devices available");
+                        }
                           
                         // Set up MIDI connection state change listener  
                         midiAccess.onstatechange = (event) => {  
                             if (debugWidget && debugWidget.value) {  
                                 console.log("[VrchMidiDeviceLoaderNode] MIDI connection state change:", event);  
                             }  
+
+                            // If device is disconnected, clear device ID and name
+                            if (deviceIdWidget.value === event.port.id && event.port.state === "disconnected") {
+                                deviceIdWidget.value = "";
+                                nameWidget.value = "";
+                                updateStatusLabel("Device disconnected");
+                            }
                               
                             // If device reconnects, try to reconnect  
                             if (event.port.type === "input" && event.port.state === "connected") {  
@@ -234,37 +246,45 @@ app.registerExtension({
                 }  
             };  
               
-            // Connect to specific MIDI device  
-            const connectToDevice = (deviceId) => {  
-                try {  
-                    // Disconnect current connection  
-                    if (currentInput) {  
-                        currentInput.onmidimessage = null;  
-                    }  
-                      
-                    // Find and connect to new device  
-                    const device = midiAccess.inputs.get(deviceId);  
-                      
-                    if (device) {  
-                        device.onmidimessage = onMIDIMessage;  
-                        currentInput = device;  
-                        nameWidget.value = device.name || deviceId;  
-                        deviceIdWidget.value = deviceId;  
-                          
-                        if (debugWidget && debugWidget.value) {  
-                            console.log(`[VrchMidiDeviceLoaderNode] Connected to MIDI device: ${device.name || deviceId}`);  
-                        }  
-                    } else {  
-                        if (debugWidget && debugWidget.value) {  
-                            console.warn(`[VrchMidiDeviceLoaderNode] MIDI device not found: ${deviceId}`);  
-                        }  
-                        nameWidget.value = "Device not found";  
-                        currentInput = null;  
-                    }  
-                } catch (error) {  
-                    console.error("[VrchMidiDeviceLoaderNode] Error connecting to MIDI device:", error);  
-                }  
-            };  
+            // Modify connectToDevice to include status label updates directly
+            function connectToDevice(deviceId) {
+                try {
+                    // Disconnect current connection
+                    if (currentInput) {
+                        currentInput.onmidimessage = null;
+                    }
+
+                    // Find and connect to new device
+                    const device = midiAccess.inputs.get(deviceId);
+
+                    if (device) {
+                        device.onmidimessage = onMIDIMessage;
+                        currentInput = device;
+                        nameWidget.value = device.name || deviceId;
+                        deviceIdWidget.value = deviceId;
+
+                        if (debugWidget && debugWidget.value) {
+                            console.log(`[VrchMidiDeviceLoaderNode] Connected to MIDI device: ${device.name || deviceId}`);
+                        }
+
+                        // Update status label
+                        updateStatusLabel(`Connected to ${device.name || deviceId}`);
+                    } else {
+                        if (debugWidget && debugWidget.value) {
+                            console.warn(`[VrchMidiDeviceLoaderNode] MIDI device not found: ${deviceId}`);
+                        }
+                        nameWidget.value = "Device not found";
+                        currentInput = null;
+
+                        // Update status label
+                        updateStatusLabel("Device not found");
+                    }
+                } catch (error) {
+                    console.error("[VrchMidiDeviceLoaderNode] Error connecting to MIDI device:", error);
+                    // Update status label
+                    updateStatusLabel("Error connecting to device");
+                }
+            }
               
             // Device ID widget callback  
             if (deviceIdWidget) {  
@@ -274,15 +294,46 @@ app.registerExtension({
                     }  
                 };  
             }  
+
+            // Create a container for the Reload button and status label
+            const controlContainer = document.createElement("div");
+
+            // Create the Reload button
+            const reloadButton = document.createElement("button");
+            reloadButton.textContent = "Reload MIDI Devices";
+            reloadButton.classList.add("vrch-midi-reload-button");
+            reloadButton.onclick = () => {
+                console.log("Reloading MIDI devices...");
+                deviceIdWidget.value = "";
+                nameWidget.value = "";
+                initMIDI();
+            };
+
+            // Create the status label
+            const statusLabel = document.createElement("div");
+            statusLabel.classList.add("vrch-midi-status-label");
+            statusLabel.textContent = "Not connected";
+
+            // Update the status label based on connection state
+            const updateStatusLabel = (status) => {
+                statusLabel.textContent = `${status}`;
+            };
+
+            // Append the Reload button and status label to the control container
+            controlContainer.appendChild(reloadButton);
+            controlContainer.appendChild(statusLabel);
+
+            // Add the control container as a component to the node
+            node.addDOMWidget("midi_control_widget", "MIDI Control", controlContainer);
               
             // Initialize MIDI  
-            initMIDI();  
-              
+            initMIDI();   
+
             // Set delayed initialization for widget visibility  
             setTimeout(() => {  
                 updateWidgetVisibility();  
-            }, 1000);  
-              
+            }, 1000); 
+
             // Cleanup function, called when node is removed  
             const onRemoved = this.onRemoved;  
             this.onRemoved = function () {  
@@ -295,3 +346,38 @@ app.registerExtension({
         }  
     }  
 });
+
+// Inject stylesheet for MIDI nodes
+const midiStyle = document.createElement("style");
+midiStyle.textContent = `
+    .vrch-midi-reload-button {
+        background-color: #4CAF50;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        width: 100%;
+        height: 40px;
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s, transform 0.2s;
+        padding: 8px 16px;
+    }
+
+    .vrch-midi-reload-button:hover {
+        background-color: #45a049;
+    }
+
+    .vrch-midi-reload-button:active {
+        background-color: #3e8e41;
+    }
+
+    .vrch-midi-status-label {
+        font-size: 14px;
+        color: #666;
+        text-align: center;
+        margin-top: 10px;
+    }
+`;
+document.head.appendChild(midiStyle);

@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.33 - 2025-05-20
+
+### Added
+
+- add a new `VrchAudioChannelLoaderNode` node
+- add a new `VrchMicLoaderNode` node
+- add a new `VrchAudioConcatNode` node
+- add an example workflow for WebSocket Nodes
+
+### Updated
+
+- update `VrchAudioWebViewerNode` to support audio transition features (fade in/out and crossfade)
+- update `VrchImageWebSocketWebViewerNode` to support more server settings
+- update websocket_nodes.md
+- update websocet_nodes_extra_params.md
+- update web_viewer_nodes.md
+- update web_viewer_nodes_extra_params.md
+- update audio_nodes.md
+- update example workflows to match the nodes upgrade
+
 ## 1.0.32 - 2025-05-05
 
 ### Added

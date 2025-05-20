@@ -51,3 +51,64 @@
    - Use the `STRING` output to connect the genre predictions to nodes that require textual input or visualization.
 
 **Note:** Ensure that the input audio is properly preprocessed and normalized for accurate genre prediction. The node's output is influenced by the quality and clarity of the input audio.
+
+---
+
+### Node: `Microphone Loader @ vrch.ai` (vrch.ai/audio)
+
+1. **Add the `Microphone Loader @ vrch.ai` node to your ComfyUI workflow.**
+2. **Configure the Node:**
+   - **Sensitivity** (`sensitivity`): Adjust the microphone sensitivity level (0.0-1.0).
+   - **Frame Size** (`frame_size`): Select audio frame size (256, 512, or 1024 samples).
+   - **Sample Rate** (`sample_rate`): Choose sampling rate (16000, 24000, or 48000 Hz).
+   - **Debug Mode** (`debug`): Enable to show raw data and debugging information.
+3. **Connect to Microphone:**
+   - The node will automatically detect available microphones.
+   - Click "Refresh" to update the list of available devices.
+   - Select a microphone from the dropdown menu to connect to it.
+4. **Control the Microphone:**
+   - Use the "Mute" button to silence/unmute the microphone.
+   - The volume meter shows the current audio level.
+   - Real-time waveform and spectrum visualizations display the audio characteristics.
+5. **Outputs:**
+   - `RAW_DATA`: Complete raw microphone data in JSON format.
+   - `WAVEFORM`: Normalized audio waveform data as a float array.
+   - `SPECTRUM`: Frequency spectrum data as a float array.
+   - `VOLUME`: Current volume level (0.0-1.0).
+   - `IS_ACTIVE`: Boolean indicating whether active sound is detected.
+
+**Applications:**
+- Voice activity detection for triggering actions in ComfyUI workflows
+- Audio-reactive visual effects
+- Sound level monitoring
+- Signal processing and analysis chains
+
+**Note:** For optimal performance, adjust the sensitivity based on your microphone and ambient noise conditions.
+
+---
+
+### Node: `AUDIO Concat @ vrch.ai` (vrch.ai/audio)
+
+1. **Add the `AUDIO Concat @ vrch.ai` node to your ComfyUI workflow.**
+2. **Configure the Node:**
+   - **Audio Inputs:**
+     - `audio1`: The first audio input to be concatenated.
+     - `audio2`: The second audio input to be appended after the first.
+   - **Crossfade Configuration:**
+     - `crossfade_duration_ms`: The duration of the crossfade transition between audio1 and audio2, in milliseconds (0-10000).
+       - **0:** No crossfade, audio files are simply joined together.
+       - **> 0:** A gradual transition between the end of audio1 and the beginning of audio2.
+3. **Audio Processing Features:**
+   - **Sample Rate Handling:** Automatically resamples the second audio to match the first audio's sample rate if they differ.
+   - **Channel Matching:** Ensures both audio inputs have compatible channel configurations.
+   - **Crossfade:** Creates smooth transitions between audio segments when crossfade duration is set.
+4. **Output:**
+   - `AUDIO`: The concatenated audio that can be connected to other nodes in your workflow.
+
+**Applications:**
+- Creating continuous audio tracks from multiple recordings
+- Joining speech segments with background music
+- Building custom audio sequences for multimedia projects
+- Creating seamless loops by connecting the end of an audio clip to its beginning
+
+**Note:** For best results when using crossfade, ensure that both audio inputs have sufficient length for the crossfade duration. The crossfade will be limited to the shorter of the two audio segments if either is shorter than the specified crossfade duration. Remember that crossfade duration is specified in milliseconds (1000 milliseconds = 1 second).
