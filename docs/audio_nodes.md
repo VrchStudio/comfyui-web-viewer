@@ -84,3 +84,31 @@
 - Signal processing and analysis chains
 
 **Note:** For optimal performance, adjust the sensitivity based on your microphone and ambient noise conditions.
+
+---
+
+### Node: `AUDIO Concat @ vrch.ai` (vrch.ai/audio)
+
+1. **Add the `AUDIO Concat @ vrch.ai` node to your ComfyUI workflow.**
+2. **Configure the Node:**
+   - **Audio Inputs:**
+     - `audio1`: The first audio input to be concatenated.
+     - `audio2`: The second audio input to be appended after the first.
+   - **Crossfade Configuration:**
+     - `crossfade_duration_ms`: The duration of the crossfade transition between audio1 and audio2, in milliseconds (0-10000).
+       - **0:** No crossfade, audio files are simply joined together.
+       - **> 0:** A gradual transition between the end of audio1 and the beginning of audio2.
+3. **Audio Processing Features:**
+   - **Sample Rate Handling:** Automatically resamples the second audio to match the first audio's sample rate if they differ.
+   - **Channel Matching:** Ensures both audio inputs have compatible channel configurations.
+   - **Crossfade:** Creates smooth transitions between audio segments when crossfade duration is set.
+4. **Output:**
+   - `AUDIO`: The concatenated audio that can be connected to other nodes in your workflow.
+
+**Applications:**
+- Creating continuous audio tracks from multiple recordings
+- Joining speech segments with background music
+- Building custom audio sequences for multimedia projects
+- Creating seamless loops by connecting the end of an audio clip to its beginning
+
+**Note:** For best results when using crossfade, ensure that both audio inputs have sufficient length for the crossfade duration. The crossfade will be limited to the shorter of the two audio segments if either is shorter than the specified crossfade duration. Remember that crossfade duration is specified in milliseconds (1000 milliseconds = 1 second).
