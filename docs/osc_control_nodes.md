@@ -344,6 +344,7 @@
      - **`output_min`:** Minimum delay period in milliseconds (integer, default is `0`).
      - **`output_max`:** Maximum delay period in milliseconds (integer, default is `1000`).
      - **`output_invert`:** Invert the delay mapping if checked (default is `False`).
+     - **`output_default`:** Default delay period used when no OSC data is received (integer, default is `0`).
    - **Debug (`debug`):** Enable debug mode to print detailed logs (default is `False`).
 
 3. **Use the Node:**
@@ -351,6 +352,8 @@
      - Send OSC messages to the specified `path` with a single float value representing the desired delay factor.
    - **Data Mapping:**
      - The node maps the incoming OSC value from `[input_min, input_max]` to `[output_min, output_max]` milliseconds, optionally inverting the mapping.
+   - **Default Value:**
+     - If no OSC data is received or the server connection fails, the node will use the specified default value.
    - **Functionality:**
      - Upon receiving an OSC message, the node pauses the workflow for the mapped delay period and then outputs the `any_input` value.
 
@@ -361,6 +364,7 @@
 
 **Note:**
 - **Blocking Behavior:** The node uses `time.sleep` to synchronously pause the workflow. Use reasonable delay periods to avoid making the interface unresponsive.
+- **Default Value:** The default value provides a fallback when no OSC messages are received or when there are connection issues.
 - **Debugging:** Enable `debug` to view detailed logs of OSC message reception and delay processing.
 - **OSC Configuration:** Ensure your OSC client sends messages to the correct `server_ip`, `port`, and `path`.
 
