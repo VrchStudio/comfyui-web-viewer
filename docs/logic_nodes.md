@@ -123,3 +123,30 @@
 
 5. **Visual Indicators:**
    - Renders eight non‑clickable circular indicators in the UI, one per channel, showing each current state.
+
+---
+
+### Node: `Delay @ vrch.ai` (vrch.ai/logic)
+
+1. **Add the `Delay @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Input:**
+     - **`any_input`**: Connect any type of input that you want to delay.
+   - **Parameters:**
+     - **`delay_ms`**: Delay period in milliseconds (integer, default is `0`, range `0` to `10000`).
+     - **`debug`**: Enable debug mode to print detailed logs (default is `False`).
+
+3. **Delay Behavior:**
+   - The node delays the passing of its input by the specified `delay_ms` value.
+   - Uses `time.sleep()` to synchronously pause the workflow for the specified duration.
+   - After the delay completes, it passes the original input to the output.
+
+4. **Node Output:**
+   - **`ANY_OUTPUT`**: The delayed input (same type and value as `any_input`).
+
+**Note:**
+- **Blocking Behavior**: The node uses `time.sleep` to synchronously pause the workflow. Use reasonable delay periods to avoid making the interface unresponsive.
+- **Debug Mode**: When enabled, prints messages about the delay process.
+- **Error Handling**: If any exception occurs during the delay, the node will log the error if debug is enabled, but will still attempt to output the input value.
+- **Use Cases**: Useful for introducing timing delays in animations, creating sequential effects, or synchronizing operations that need specific timing.

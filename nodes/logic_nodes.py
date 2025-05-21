@@ -1,6 +1,9 @@
 import hashlib
 import json
+import time
 from .node_utils import VrchNodeUtils
+from .osc_control_nodes import AlwaysEqualProxy
+from .osc_control_nodes import AlwaysEqualProxy
 
 CATEGORY="vrch.ai/logic"
 
@@ -315,3 +318,53 @@ class VrchTriggerToggleX8Node:
     @classmethod
     def IS_CHANGED(cls, **kwargs):
         return float("NaN")
+
+
+class VrchDelayNode:
+    def __init__(self):
+        self.any_output = None  # To store the delayed output
+        self.delay_period = 0   # Delay in milliseconds
+        self.debug = False      # Debug flag
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "any_input": (AlwaysEqualProxy("*"), {}),
+                "delay_ms": ("INT", {"default": 0, "min": 0, "max": 10000, "step": 1}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+
+    RETURN_TYPES = (AlwaysEqualProxy("*"),)
+    RETURN_NAMES = ("ANY_OUTPUT",)
+    FUNCTION = "delay"
+    CATEGORY = CATEGORY
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return float("NaN")
+
+    def delay(self, any_input, delay_ms, debug):
+        self.debug = debug
+        self.delay_period = delay_ms
+        
+        # Process the any_input with the specified delay
+        if any_input is not None:
+            if self.debug:
+                print(f"[VrchDelayNode] Delaying input for {self.delay_period} ms")
+            
+            try:
+                # Sleep for the specified delay period
+                time.sleep(self.delay_period / 1000.0)  # Convert ms to seconds
+                
+                # Set the output after delay
+                self.any_output = any_input
+                
+                if self.debug:
+                    print(f"[VrchDelayNode] Output set after delay: {self.any_output}")
+            except Exception as e:
+                if self.debug:
+                    print(f"[VrchDelayNode] Error during delay: {e}")
+        
+        return (self.any_output,)
