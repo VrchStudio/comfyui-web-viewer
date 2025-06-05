@@ -368,21 +368,123 @@ class MusicGenresClassifier:
 
     def load_model(self, file_path, num_genres=10, enable_debug=False):
         """
-        Load a pre-trained model from a file.
+        Load a pre-trained PyTorch model from a file with proper error handling.
+        
+        This method handles the PyTorch 2.6+ changes where weights_only parameter
+        default changed from False to True for security reasons.
+        
+        Args:
+            file_path (str): Path to the saved model file (.pth format)
+            num_genres (int): Number of music genres the model was trained on (default: 10)
+            enable_debug (bool): Enable debug output for troubleshooting (default: False)
+            
+        Returns:
+            torch.nn.Module: The loaded and initialized model in evaluation mode
+            
+        Raises:
+            FileNotFoundError: If the model file doesn't exist
+            ValueError: If the model file is empty or corrupted
+            RuntimeError: If model loading fails for any other reason
         """
         if enable_debug:
-            print(f"Loading model from {file_path}...")
+            print(f"[DEBUG] Loading model from: {file_path}")
 
-        map_location = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-        self.model = MusicGenreCNN(num_genres=num_genres)
-        self.model.load_state_dict(torch.load(file_path, map_location=map_location, weights_only=False), strict=False)
-        self.model.eval()
-
+        # Step 1: Validate file existence and integrity
+        if not os.path.exists(file_path):
+            error_msg = f"Model file not found: {file_path}"
+            if enable_debug:
+                print(f"[ERROR] {error_msg}")
+            raise FileNotFoundError(error_msg)
+        
+        # Check if file is not empty (corrupted files often have 0 bytes)
+        file_size = os.path.getsize(file_path)
+        if file_size == 0:
+            error_msg = f"Model file is empty: {file_path}"
+            if enable_debug:
+                print(f"[ERROR] {error_msg}")
+            raise ValueError(error_msg)
+        
         if enable_debug:
-            print("Model loaded successfully")
+            print(f"[DEBUG] Model file size: {file_size} bytes")
 
-        return self.model
+        try:
+            # Step 2: Determine the appropriate device for model loading
+            # This ensures compatibility across different hardware configurations
+            map_location = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            if enable_debug:
+                print(f"[DEBUG] Loading model to device: {map_location}")
+
+            # Step 3: Initialize the model architecture
+            # Must be done before loading state dict
+            self.model = MusicGenreCNN(num_genres=num_genres)
+            if enable_debug:
+                print(f"[DEBUG] Initialized MusicGenreCNN with {num_genres} genres")
+            
+            # Step 4: Load the model state dictionary
+            # Handle PyTorch 2.6+ security changes with weights_only parameter
+            try:
+                # First attempt: Try with weights_only=True (safer, recommended)
+                state_dict = torch.load(file_path, map_location=map_location, weights_only=True)
+                if enable_debug:
+                    print("[DEBUG] Successfully loaded with weights_only=True (secure mode)")
+            except Exception as secure_load_error:
+                if enable_debug:
+                    print(f"[DEBUG] Secure loading failed: {secure_load_error}")
+                    print("[DEBUG] Attempting fallback to weights_only=False...")
+                
+                try:
+                    # Fallback: Use weights_only=False for older model files
+                    # Note: Only use this with trusted model files
+                    state_dict = torch.load(file_path, map_location=map_location, weights_only=False)
+                    if enable_debug:
+                        print("[DEBUG] Successfully loaded with weights_only=False (compatibility mode)")
+                except Exception as fallback_error:
+                    error_msg = (f"Failed to load model with both secure and compatibility modes. "
+                            f"Secure error: {secure_load_error}, "
+                            f"Fallback error: {fallback_error}")
+                    if enable_debug:
+                        print(f"[ERROR] {error_msg}")
+                    raise RuntimeError(error_msg)
+            
+            # Step 5: Load the state dictionary into the model
+            # strict=False allows loading even if some keys don't match (useful for transfer learning)
+            missing_keys, unexpected_keys = self.model.load_state_dict(state_dict, strict=False)
+            
+            if enable_debug and (missing_keys or unexpected_keys):
+                if missing_keys:
+                    print(f"[WARNING] Missing keys in state dict: {missing_keys}")
+                if unexpected_keys:
+                    print(f"[WARNING] Unexpected keys in state dict: {unexpected_keys}")
+            
+            # Step 6: Set model to evaluation mode
+            # This disables dropout and batch normalization training behavior
+            self.model.eval()
+            
+            if enable_debug:
+                print("[DEBUG] Model loaded successfully and set to evaluation mode")
+                print(f"[DEBUG] Model architecture: {type(self.model).__name__}")
+
+            return self.model
+            
+        except Exception as e:
+            # Comprehensive error handling with debugging information
+            error_msg = f"Error loading model from {file_path}: {str(e)}"
+            
+            if enable_debug:
+                print(f"[ERROR] {error_msg}")
+                print(f"[DEBUG] Exception type: {type(e).__name__}")
+                
+                # Additional debugging: inspect file header for corruption detection
+                try:
+                    with open(file_path, 'rb') as f:
+                        first_bytes = f.read(16)
+                        print(f"[DEBUG] First 16 bytes of file (hex): {first_bytes.hex()}")
+                        print(f"[DEBUG] First 16 bytes of file (repr): {repr(first_bytes)}")
+                except Exception as read_error:
+                    print(f"[DEBUG] Cannot read file for inspection: {read_error}")
+            
+            # Re-raise as RuntimeError with context
+            raise RuntimeError(error_msg) from e
 
 
 def main():
