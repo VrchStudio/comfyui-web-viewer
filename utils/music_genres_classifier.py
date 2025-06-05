@@ -376,7 +376,7 @@ class MusicGenresClassifier:
         map_location = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         self.model = MusicGenreCNN(num_genres=num_genres)
-        self.model.load_state_dict(torch.load(file_path, map_location=map_location), strict=False)
+        self.model.load_state_dict(torch.load(file_path, map_location=map_location, weights_only=False), strict=False)
         self.model.eval()
 
         if enable_debug:
