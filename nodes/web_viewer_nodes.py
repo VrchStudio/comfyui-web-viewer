@@ -29,6 +29,8 @@ class VrchWebViewerNode:
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url":("BOOLEAN", {"default": False}),
+                "show_qr_code": ("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             }
@@ -110,6 +112,8 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
+                "show_qr_code": ("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             }
@@ -136,8 +140,10 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
                              save_settings,
                              window_width, 
                              window_height, 
+                             show_url,
+                             show_qr_code,
+                             dev_mode,
                              extra_params, 
-                             show_url, 
                              url):
         # Save the image into "web_viewer" directory with filename "{channel}.jpeg"
         output_path = os.path.join(self.output_dir, "web_viewer")
@@ -201,6 +207,8 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
+                "show_qr_code": ("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             }
@@ -230,6 +238,8 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
                              window_width, 
                              window_height, 
                              show_url,
+                             show_qr_code,
+                             dev_mode,
                              extra_params, 
                              url):
         # Save the images into "web_viewer" directory with filename "channel_{channel}_{index:%02d}.jpeg"
@@ -300,6 +310,8 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
+                "show_qr_code": ("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             }
@@ -329,8 +341,10 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
                             save_settings, 
                             window_width,
                             window_height, 
+                            show_url,
+                            show_qr_code, 
+                            dev_mode,
                             extra_params, 
-                            show_url, 
                             url):
         # Save the audio into "web_viewer" directory with filename "{channel}.mp3"
         output_path = os.path.join(self.output_dir, "web_viewer")
@@ -467,6 +481,8 @@ class VrchModelWebViewerNode():
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
+                "show_qr_code": ("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             }
@@ -492,8 +508,10 @@ class VrchModelWebViewerNode():
                                save_settings,
                                window_width, 
                                window_height, 
+                               show_url,
+                               show_qr_code,
+                               dev_mode, 
                                extra_params, 
-                               show_url, 
                                url):
         # Save the 3d model into "web_viewer" directory with filename "channel_{channel}.glb"
         output_path = self.output_dir
@@ -561,6 +579,8 @@ class VrchVideoWebViewerNode:
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
+                "show_qr_code": ("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             },
@@ -593,8 +613,10 @@ class VrchVideoWebViewerNode:
                             save_settings,
                             window_width, 
                             window_height, 
+                            show_url,
+                            show_qr_code,
+                            dev_mode,
                             extra_params, 
-                            show_url, 
                             url):
         self.validate(filename)
         output_path = os.path.join(self.output_dir, "web_viewer")
@@ -613,7 +635,7 @@ class VrchVideoWebViewerNode:
         return ()
 
     @classmethod
-    def IS_CHANGED(cls, channel, server, ssl, window_width, window_height, extra_params, show_url, url, filename=None):
+    def IS_CHANGED(cls, channel, server, ssl, window_width, window_height, extra_params, show_url, show_qr_code, dev_mode, url, filename=None):
         if not filename or not os.path.isfile(filename):
             return False
         m = hashlib.sha256()
