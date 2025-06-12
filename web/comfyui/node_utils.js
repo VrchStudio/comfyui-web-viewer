@@ -196,7 +196,7 @@ export function createQRCodeWidget(node, urlWidget, showQrCodeWidget) {
                         height: 200,
                         colorDark: "#000000",
                         colorLight: "#ffffff",
-                        correctLevel: window.QRCode.CorrectLevel.H
+                        correctLevel: window.QRCode.CorrectLevel.L
                     });
                 } else {
                     console.error("QRCode library not available");
