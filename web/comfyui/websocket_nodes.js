@@ -49,6 +49,7 @@ app.registerExtension({
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
             const showQrCodeWidget = node.widgets.find(w => w.name === "show_qr_code");
+            const devModeWidget = node.widgets.find(w => w.name === "dev_mode");
 
             // Create QR code widget and get the update function - but don't add to node yet
             let qrCodeControl = null;
@@ -60,6 +61,7 @@ app.registerExtension({
                         extraParamsWidget: extraParamsWidget,
                         mode: "image-websocket",
                         protocol: "websocket",
+                        devMode: devModeWidget,
                         additionalParams: {
                             channel: channelWidget,
                             numberOfImages: numberOfImagesWidget,
@@ -95,6 +97,7 @@ app.registerExtension({
                     loopPlaybackWidget,
                     updateOnEndWidget,
                     backgroundColorWidget,
+                    devModeWidget,
                 ],
                 "VrchImageWebSocketWebViewerNode"
             );

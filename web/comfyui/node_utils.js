@@ -81,8 +81,12 @@ export function buildUrl(config) {
     if (config.channel) {
         channelStr = `&channel=${config.channel}`;
     }
+    // Check if dev mode is enabled
+    const devMode = config.devMode ? config.devMode.value : false;
+    const viewerPath = devMode ? "dev/viewer" : "viewer";
+    
     // Construct the URL using the provided parameters
-    const url = `${scheme}://vrch.ai/viewer?mode=${mode}&server=${server}&ssl=${sslStr}${protocolStr}${channelStr}${filenameStr}${pathStr}${extraParams}${additionalQuery}`;
+    const url = `${scheme}://vrch.ai/${viewerPath}?mode=${mode}&server=${server}&ssl=${sslStr}${protocolStr}${channelStr}${filenameStr}${pathStr}${extraParams}${additionalQuery}`;
 
     // Return the final URL
     return url;
