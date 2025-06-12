@@ -7,6 +7,7 @@ import {
     buildUrl,
     delayInit,
     createOpenWebViewerButton,
+    createQRCodeWidget,
     setupWidgetCallback,
 } from "./node_utils.js";
 
@@ -47,6 +48,10 @@ app.registerExtension({
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
+            const showQrCodeWidget = node.widgets.find(w => w.name === "show_qr_code");
+
+            // Create QR code widget and get the update function - but don't add to node yet
+            let qrCodeControl = null;
 
             function updateUrl() {
                 if (urlWidget) {
@@ -66,6 +71,10 @@ app.registerExtension({
                             bgColourPicker: backgroundColorWidget,
                         }
                     });
+                    // Update QR code when URL changes - pass the new URL value
+                    if (qrCodeControl && qrCodeControl.updateQRCode) {
+                        qrCodeControl.updateQRCode(urlWidget.value);
+                    }
                 }
             }
 
@@ -92,7 +101,10 @@ app.registerExtension({
 
             hideWidget(node, urlWidget);
             createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
-            delayInit(node, showUrlWidget, urlWidget, updateUrl);
+            // Create QR code widget
+            qrCodeControl = createQRCodeWidget(node, urlWidget, showQrCodeWidget);
+            
+            delayInit(node, showUrlWidget, urlWidget, updateUrl, showQrCodeWidget, qrCodeControl);
         }
     }
 });
@@ -149,6 +161,16 @@ app.registerExtension({
 // Add custom styles for the button and indicator
 const style = document.createElement("style");
 style.textContent = `
+    /* Button container style */
+    .vrch-button-container {
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        height: 48px !important; /* Ensure the container has a fixed height */
+        align-items: center; /* Center vertically */
+        justify-content: center; /* Center horizontally */
+    }
+    
     .vrch-big-button {
         background-color: #4CAF50;
         color: white;
@@ -159,6 +181,8 @@ style.textContent = `
         cursor: pointer;
         text-align: center;
         transition: background-color 0.3s, transform 0.2s;
+        width: 100%;
+        height: 100%; 
     }
 
     .vrch-big-button:hover {
@@ -198,6 +222,33 @@ style.textContent = `
     .vrch-server-indicator.on {
         background-color: #4CAF50; /* Green */
         color: #fff;
+    }
+
+    /* Styles for QR Code Widget */
+    .vrch-qr-widget-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 8px;
+        height: 240px !important; 
+    }
+    .vrch-qr-container {
+        text-align: center;
+        width: 100%;
+    }
+    .vrch-qr-code {
+        display: inline-block;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 8px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Add subtle shadow */
+    }
+    .vrch-qr-code canvas,
+    .vrch-qr-code svg,
+    .vrch-qr-code table {
+        margin: 0 auto;
+        display: block;
     }
 `;
 document.head.appendChild(style);

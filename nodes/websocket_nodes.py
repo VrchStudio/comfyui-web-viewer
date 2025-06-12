@@ -266,6 +266,7 @@ class VrchImageWebSocketWebViewerNode:
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url":("BOOLEAN", {"default": False}),
+                "show_qr_code": ("BOOLEAN", {"default": False}),
                 "debug": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
@@ -294,6 +295,7 @@ class VrchImageWebSocketWebViewerNode:
                     window_width,
                     window_height,
                     show_url,
+                    show_qr_code,
                     debug,
                     extra_params,
                     url):
