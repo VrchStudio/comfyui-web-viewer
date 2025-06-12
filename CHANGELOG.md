@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update `VrchDelayOSCControlNode` to have default value
 - update osc_nodes.md
 - update logic_nodes.md
+- update `VrchImageWebSocketWebViewerNode` with QR Code option
+- Add `show_qr_code` and `dev_mode` options to web viewer nodes
+
+### Fixed
+
+- fixed node sizing issue for microphone, xbox controller, QR Code and SRT player nodes
 
 ## 1.0.33 - 2025-05-20
 
