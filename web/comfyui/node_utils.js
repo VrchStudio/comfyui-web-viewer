@@ -145,7 +145,12 @@ export function createOpenWebViewerButton(node, urlWidget, widthWidget, heightWi
     container.appendChild(button);
     
     // Add the container (with button inside) as widget
-    node.addDOMWidget("button_widget", "Open Web Viewer", container);
+    const widget = node.addDOMWidget("button_widget", "Open Web Viewer", container);
+    
+    // Override the computeSize method to force correct sizing
+    widget.computeSize = function(width) {
+        return [width, 60]; // Force height to be 48px
+    };
 }
 
 /**
@@ -224,7 +229,12 @@ export function createQRCodeWidget(node, urlWidget, showQrCodeWidget) {
     }
 
     // Add the container to the node
-    node.addDOMWidget("qr_code_widget", "QR Code", container);
+    const widget = node.addDOMWidget("qr_code_widget", "QR Code", container);
+    
+    // Override the computeSize method to force correct sizing
+    widget.computeSize = function(width) {
+        return [width, 0];
+    };
     
     // Return the control object with all methods
     return { updateQRCode, showQrCode, hideQrCode };

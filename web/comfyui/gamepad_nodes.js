@@ -210,7 +210,11 @@ app.registerExtension({
             node.svgContainer.style.height = "250px";
             node.svgContainer.style.overflow = "hidden";
             node.svgContainer.innerHTML = svgTemplate;
-            node.addDOMWidget("svg_container", "Controller", node.svgContainer);
+            const widget = node.addDOMWidget("svg_container", "Controller", node.svgContainer);
+            // Override the computeSize method to force correct sizing
+            widget.computeSize = function(width) {
+                return [width, 250]; // Force height to be 48px
+            };
               
             // Function to update SVG elements based on controller state  
             node.updateControllerVisual = function(buttonsBoolean, buttonsFloat, leftStick, rightStick) {  

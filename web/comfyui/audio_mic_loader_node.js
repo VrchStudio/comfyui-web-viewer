@@ -121,8 +121,12 @@ app.registerExtension({
             visualizerContainer.appendChild(statusContainer);
             
             // Add the visualizer container as a DOM widget
-            node.addDOMWidget("mic_visualizer_widget", "Microphone", visualizerContainer);
-            
+            const widget = node.addDOMWidget("mic_visualizer_widget", "Microphone", visualizerContainer);
+            // Override the computeSize method to force correct sizing
+            widget.computeSize = function(width) {
+                return [width, 320];
+            };
+
             // Function to enumerate and list available audio devices
             const listAudioDevices = async () => {
                 try {
