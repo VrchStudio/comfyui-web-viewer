@@ -17,7 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update `VrchDelayOSCControlNode` to have default value
 - update osc_nodes.md
 - update logic_nodes.md
-- update `VrchImageWebSocketWebViewerNode` with URL value return
+- update `VrchImageWebSocketWebViewerNode` with URL output
+- update web viewer nodes with URL output
+- update web_viewer_nodes.md
+- update websocket_nodes.md
 
 ### Fixed
 
