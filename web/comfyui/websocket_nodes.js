@@ -7,7 +7,6 @@ import {
     buildUrl,
     delayInit,
     createOpenWebViewerButton,
-    createQRCodeWidget,
     setupWidgetCallback,
 } from "./node_utils.js";
 

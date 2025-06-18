@@ -1,12 +1,6 @@
 // Enable debug logging
 export const ENABLE_DEBUG = false;
 
-// Load QRCode library immediately when this utility module loads
-// This is better than loading it in websocket_nodes.js since it's only used here
-const script = document.createElement('script');
-script.src = new URL('./lib/qrcode.js', import.meta.url).href;
-document.head.appendChild(script);
-
 // Helper functions to hide and show widgets
 export function hideWidget(node, widget) {
     // If widget is already hidden, do nothing
@@ -99,22 +93,14 @@ export function buildUrl(config) {
  * @param {Object} showUrlWidget - The widget controlling URL visibility.
  * @param {Object} urlWidget - The URL widget.
  * @param {Function} updateUrl - The updateUrl callback.
- * @param {Object} showQrCodeWidget - The widget controlling QR code visibility.
- * @param {Object} qrCodeControl - The QR code control object with updateQRCode method.
  */
-export function delayInit(node, showUrlWidget, urlWidget, updateUrl, showQrCodeWidget = null, qrCodeControl = null) {
+export function delayInit(node, showUrlWidget, urlWidget, updateUrl) {
     setTimeout(() => {
         // Handle URL widget visibility
         if (showUrlWidget) {
             showUrlWidget.value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
         }
-
-        // Handle QR code widget visibility
-        if (showQrCodeWidget && qrCodeControl) {
-            showQrCodeWidget.value ? qrCodeControl.showQrCode() : qrCodeControl.hideQrCode();
-        }
-        
-        // Update URL (which will also update QR code if needed)
+        // Update URL
         updateUrl();
     }, 1000);
 }
@@ -155,93 +141,6 @@ export function createOpenWebViewerButton(node, urlWidget, widthWidget, heightWi
     widget.computeSize = function(width) {
         return [width, 60]; // Force height to be 48px
     };
-}
-
-/**
- * Helper function to create the QR Code display widget.
- *
- * @param {Object} node - The current node.
- * @param {Object} urlWidget - The widget containing the URL to encode (used as fallback).
- * @param {Object} showQrCodeWidget - The widget controlling QR code visibility.
- * @returns {Object} Object with updateQRCode(text) method for external updates.
- */
-export function createQRCodeWidget(node, urlWidget, showQrCodeWidget) {
-    const container = document.createElement("div");
-    container.classList.add("vrch-qr-widget-container");
-    container.style.display = "none"; // Initially hidden
-    
-    const qrContainer = document.createElement("div");
-    qrContainer.classList.add("vrch-qr-container");
-    
-    const qrDiv = document.createElement("div");
-    qrDiv.classList.add("vrch-qr-code");
-    qrContainer.appendChild(qrDiv);
-    container.appendChild(qrContainer);
-
-    // Function to update QR code content based on provided text
-    const updateQRCode = (text = null) => {
-        // Use provided text or fallback to urlWidget value
-        const qrText = text || (urlWidget && urlWidget.value) || "";
-        
-        if (qrText) {
-            try {
-                qrDiv.innerHTML = ""; // Clear previous QR code
-                
-                // Check if QRCode class is available - simple check like official example
-                if (typeof window.QRCode !== 'undefined') {
-                    // Generate new QR code - just like the official example: var qrcode = new QRCode(document.getElementById("qrcode"))
-                    new window.QRCode(qrDiv, {
-                        text: qrText,
-                        width: 200,
-                        height: 200,
-                        colorDark: "#000000",
-                        colorLight: "#ffffff",
-                        correctLevel: window.QRCode.CorrectLevel.L
-                    });
-                } else {
-                    console.error("QRCode library not available");
-                    qrDiv.textContent = "QR code library not available";
-                }
-            } catch (error) {
-                console.error("Failed to generate QR code:", error);
-                qrDiv.textContent = "QR code generation failed: " + error.message;
-            }
-        } else {
-            qrDiv.textContent = "No text to display";
-        }
-    };
-    
-    const showQrCode = () => {
-        container.style.display = "block";
-        // When showing, always update with the current URL from urlWidget as fallback
-        updateQRCode(); 
-    };
-
-    const hideQrCode = () => {
-        container.style.display = "none";
-    };
-    
-    // Setup visibility control using the new methods
-    if (showQrCodeWidget) {
-        showQrCodeWidget.callback = (value) => {
-            if (value) {
-                showQrCode();
-            } else {
-                hideQrCode();
-            }
-        };
-    }
-
-    // Add the container to the node
-    const widget = node.addDOMWidget("qr_code_widget", "QR Code", container);
-    
-    // Override the computeSize method to force correct sizing
-    widget.computeSize = function(width) {
-        return [width, 0];
-    };
-    
-    // Return the control object with all methods
-    return { updateQRCode, showQrCode, hideQrCode };
 }
 
 /**
