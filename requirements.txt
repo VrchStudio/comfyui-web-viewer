@@ -3,6 +3,7 @@ ffmpeg-python
 matplotlib
 pydub
 python-osc
+qrcode[pil]
 scikit-learn
 srt
 websockets
