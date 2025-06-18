@@ -35,6 +35,10 @@
 3. **Open Web Viewer:**
    - Click the **"Open Web Viewer"** button to launch the generated URL in a new browser window, where your image will be displayed in real time via the WebSocket connection.
 
+4. **Outputs:**
+   - **`IMAGES`**: The input images are passed through as output.
+   - **`URL`**: The constructed URL for the web viewer.
+
 **Notes:**
 - Make sure that the server address and configuration are correct and that the server is accessible.
 - This node uses the WebSocket protocol to transmit image data in real time to the specified channel; ensure your client browser supports WebSocket connections.

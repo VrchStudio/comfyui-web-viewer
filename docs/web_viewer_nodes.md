@@ -22,6 +22,10 @@
 3. **Open Web Viewer:**
    - Click the **"Open Web Viewer"** button to launch the specified URL in a new browser window, displaying your image based on the input parameters.
 
+4. **Outputs:**
+   - **`IMAGES`**: The input images are passed through as output.
+   - **`URL`**: The constructed URL for the web viewer.
+
 **Note**:
 - Ensure that the server address and settings are correct and that the server is accessible.
 - The image is saved in the `web_viewer` directory under the ComfyUI output folder with the filename `channel_{channel}.jpeg` (e.g., `channel_1.jpeg`).
@@ -57,6 +61,10 @@
 3. **Open Web Viewer:**
    - Click the **"Open Web Viewer"** button to launch the specified URL in a new browser window, displaying your images based on the input parameters.
 
+4. **Outputs:**
+   - **`IMAGES`**: The input images are passed through as output.
+   - **`URL`**: The constructed URL for the web viewer.
+
 **Note**:
 - Ensure that the server address and settings are correct and that the server is accessible.
 - Images are saved in the `web_viewer` directory under the ComfyUI output folder with filenames like `channel_{channel}_{index}.jpeg`.
@@ -89,6 +97,9 @@
 
 3. **Open Web Viewer:**
    - After providing a valid video file and configuring the node, a **"Play Video"** or **"Open Web Viewer"** button (as implemented in your UI) can be used to launch the specified URL in a new browser window, playing your video based on the input parameters.
+
+4. **Outputs:**
+   - **`URL`**: The constructed URL for the web viewer.
 
 **Note**:
 - Ensure that the server address and settings are correct and that the server is accessible.
@@ -129,6 +140,10 @@
    - After connecting your audio and configuring the node, you can open the web viewer (often via a button or link in your ComfyUI interface) to listen to the audio in a new browser window.
    - The audio is saved in the `web_viewer` directory under the ComfyUI output folder with the filename `channel_{channel}.mp3` (e.g., `channel_1.mp3`).
 
+4. **Outputs:**
+   - **`AUDIO`**: The input audio is passed through as output.
+   - **`URL`**: The constructed URL for the web viewer.
+
 **Notes**:
 - Only `.mp3` format is currently used when saving the audio file.
 - Make sure the **`server`** address and **`ssl`** settings are correct so that the web viewer can access the generated audio file.
@@ -162,6 +177,10 @@
    - After executing the node, the 3D model is saved in the `web_viewer` directory under the ComfyUI output folder with a filename such as `channel_1.glb`.
    - Open the web viewer (typically via a button or link in the interface) to load and interact with the 3D model in your browser.
 
+4. **Outputs:**
+   - **`MODEL_FILE`**: The path to the saved 3D model file (e.g., `web_viewer/channel_1.glb`).
+   - **`URL`**: The constructed URL for the web viewer.
+
 **Notes:**
 - Currently only `.glb` files are supported.
 - Ensure the **`server`** address and **`ssl`** settings are correctly configured so that the web viewer can access the generated file.
@@ -186,6 +205,9 @@
    - **Extra Params**: The extra parameters for Web Viewer pages, see [web_viewer_nodes_extra_params.md](./web_viewer_nodes_extra_params.md)
 3. **Open Web Viewer:**
    - Click the "Open Web Viewer" button to launch the specified URL in a new browser window based on the input parameters.
+
+4. **Outputs:**
+   - **`URL`**: The constructed URL for the web viewer.
 
 **Note**:
 - Ensure that the URL entered or constructed is valid and accessible. The web viewer window will open based on the specified dimensions.
