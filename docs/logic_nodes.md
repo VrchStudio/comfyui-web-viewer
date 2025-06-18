@@ -150,3 +150,34 @@
 - **Debug Mode**: When enabled, prints messages about the delay process.
 - **Error Handling**: If any exception occurs during the delay, the node will log the error if debug is enabled, but will still attempt to output the input value.
 - **Use Cases**: Useful for introducing timing delays in animations, creating sequential effects, or synchronizing operations that need specific timing.
+
+---
+
+### Node: `QR Code Generator @ vrch.ai` (vrch.ai/logic)
+
+1. **Add the `QR Code Generator @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Required Parameters:**
+     - **`text`**: The text string to encode into a QR code (default: "Hello, World!"). Supports multiline text input.
+     - **`size`**: The size of the generated QR code image in pixels (default: 256, range: 64-1024, step: 32).
+     - **`error_correction`**: Error correction level - "L", "M", "Q", "H" (default: "M").
+     - **`border`**: White border size around the QR code (default: 4, range: 0-20).
+     - **`debug`**: Enable debug logging (default: False).
+
+3. **QR Code Generation:**
+   - Uses Python's `qrcode` library for backend generation.
+   - Automatically regenerates when any parameter changes.
+   - Converts output to ComfyUI IMAGE tensor format.
+
+4. **Node Output:**
+   - **QR_CODE (IMAGE):** The generated QR code as a ComfyUI IMAGE tensor.
+
+5. **Library Dependency:**
+   - Requires `qrcode[pil]` Python package: `pip install qrcode[pil]`
+   - Creates placeholder image with warning message if library is missing.
+
+**Note:**
+- **Error Correction Levels**: L (~7%), M (~15%), Q (~25%), H (~30%) - higher levels provide better reliability.
+- **Debug Mode**: When enabled, prints generation details to Python console.
+- **Use Cases**: Generate QR codes for URLs, contact info, or text messages that can be integrated with other image processing workflows.

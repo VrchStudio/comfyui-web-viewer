@@ -1,8 +1,12 @@
 import hashlib
 import json
 import time
+import numpy as np
+import torch
+import qrcode
+from qrcode.image.pil import PilImage
+from PIL import Image
 from .node_utils import VrchNodeUtils
-from .osc_control_nodes import AlwaysEqualProxy
 from .osc_control_nodes import AlwaysEqualProxy
 
 CATEGORY="vrch.ai/logic"
@@ -368,3 +372,88 @@ class VrchDelayNode:
                     print(f"[VrchDelayNode] Error during delay: {e}")
         
         return (self.any_output,)
+
+class VrchQRCodeNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "text": ("STRING", {"default": "Hello, World!", "multiline": True}),
+                "size": ("INT", {"default": 256, "min": 64, "max": 1024, "step": 32}),
+                "error_correction": (["L", "M", "Q", "H"], {"default": "M"}),
+                "border": ("INT", {"default": 2, "min": 0, "max": 20}),
+                "debug": ("BOOLEAN", {"default": False}),
+            },
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("QR_CODE",)
+    FUNCTION = "generate_qr_code"
+    CATEGORY = CATEGORY
+
+    def generate_qr_code(self, text, size, error_correction="M", border=4, debug=False):
+        if debug:
+            print(f"[VrchQRCodeNode] Input text: {text}")
+            print(f"[VrchQRCodeNode] Size: {size}")
+            print(f"[VrchQRCodeNode] Error correction: {error_correction}")
+            print(f"[VrchQRCodeNode] Border: {border}")
+
+        try:
+            
+            if debug:
+                print("[VrchQRCodeNode] Generating QR code using Python qrcode library")
+            
+            # Map error correction levels
+            error_correction_map = {
+                "L": 1,  # qrcode.constants.ERROR_CORRECT_L
+                "M": 0,  # qrcode.constants.ERROR_CORRECT_M
+                "Q": 3,  # qrcode.constants.ERROR_CORRECT_Q
+                "H": 2,  # qrcode.constants.ERROR_CORRECT_H
+            }
+            
+            # Create QR code instance
+            qr = qrcode.QRCode(
+                version=1,  # Let it auto-determine the version
+                error_correction=error_correction_map[error_correction],
+                box_size=10,  # Will be resized later
+                border=border,
+            )
+            
+            # Add data and optimize
+            qr.add_data(text)
+            qr.make(fit=True)
+            
+            # Create image
+            pil_image = qr.make_image(fill_color="black", back_color="white", image_factory=PilImage)
+            
+            # Convert to RGB if needed
+            if pil_image.mode != "RGB":
+                pil_image = pil_image.convert("RGB")
+            
+            # Resize to requested size
+            pil_image = pil_image.resize((size, size), Image.Resampling.LANCZOS)
+                
+            # Convert PIL image to ComfyUI IMAGE format (tensor)
+            image_array = np.array(pil_image).astype(np.float32) / 255.0
+            image_tensor = torch.from_numpy(image_array)[None,]  # Add batch dimension
+            
+            if debug:
+                print(f"[VrchQRCodeNode] Output tensor shape: {image_tensor.shape}")
+            
+            return (image_tensor,)
+            
+        except Exception as e:
+            if debug:
+                print(f"[VrchQRCodeNode] Error: {e}")
+            
+            # Return a white square as fallback
+            white_image = np.ones((size, size, 3), dtype=np.float32)
+            white_tensor = torch.from_numpy(white_image)[None,]
+            return (white_tensor,)
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        m = hashlib.sha256()
+        for k in ("text", "size", "error_correction", "border"):
+            m.update(str(kwargs.get(k, "")).encode("utf-8"))
+        return m.hexdigest()

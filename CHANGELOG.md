@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - add a new `VrchDelayNode` logic node
+- add a new `VrchQRCodeNode` for generating QR codes
 
 ### Updated
 
