@@ -8,7 +8,6 @@ import {
     delayInit, 
     createOpenWebViewerButton, 
     setupWidgetCallback,
-    createQRCodeWidget,
 } from "./node_utils.js";
 
 // =====================================================================
@@ -29,7 +28,6 @@ app.registerExtension({
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
-            const showQrCodeWidget = node.widgets.find(w => w.name === "show_qr_code");
             const devModeWidget = node.widgets.find(w => w.name === "dev_mode");
 
             // Function to update the URL using the buildUrl helper
@@ -45,11 +43,6 @@ app.registerExtension({
                         fileGenerator: (cfg) =>
                             filenameWidget ? filenameWidget.value : "web_viewer_image.jpeg"
                     });
-                }
-                
-                // Update QR code when URL changes
-                if (qrCodeControl && qrCodeControl.updateQRCode) {
-                    qrCodeControl.updateQRCode(urlWidget.value);
                 }
             }
 
@@ -69,10 +62,7 @@ app.registerExtension({
             // Create the button and initialize after a delay
             createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
             
-            // Create QR code widget
-            let qrCodeControl = createQRCodeWidget(node, urlWidget, showQrCodeWidget);
-            
-            delayInit(node, showUrlWidget, urlWidget, updateUrl, showQrCodeWidget, qrCodeControl);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
@@ -95,7 +85,6 @@ app.registerExtension({
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
-            const showQrCodeWidget = node.widgets.find(w => w.name === "show_qr_code");
             const devModeWidget = node.widgets.find(w => w.name === "dev_mode");
 
             function updateUrl() {
@@ -116,11 +105,6 @@ app.registerExtension({
                             fadeAnimDuration: fadeAnimDurationWidget,
                         }
                     });
-                }
-                
-                // Update QR code when URL changes
-                if (qrCodeControl && qrCodeControl.updateQRCode) {
-                    qrCodeControl.updateQRCode(urlWidget.value);
                 }
             }
 
@@ -145,10 +129,7 @@ app.registerExtension({
             hideWidget(node, urlWidget);
             createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
             
-            // Create QR code widget
-            let qrCodeControl = createQRCodeWidget(node, urlWidget, showQrCodeWidget);
-            
-            delayInit(node, showUrlWidget, urlWidget, updateUrl, showQrCodeWidget, qrCodeControl);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
@@ -173,7 +154,6 @@ app.registerExtension({
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
-            const showQrCodeWidget = node.widgets.find(w => w.name === "show_qr_code");
             const devModeWidget = node.widgets.find(w => w.name === "dev_mode");
 
             function updateUrl() {
@@ -196,11 +176,6 @@ app.registerExtension({
                             fadeAnimDuration: fadeAnimDurationWidget,
                         }
                     });
-                }
-                
-                // Update QR code when URL changes
-                if (qrCodeControl && qrCodeControl.updateQRCode) {
-                    qrCodeControl.updateQRCode(urlWidget.value);
                 }
             }
 
@@ -226,10 +201,7 @@ app.registerExtension({
             hideWidget(node, urlWidget);
             createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
             
-            // Create QR code widget
-            let qrCodeControl = createQRCodeWidget(node, urlWidget, showQrCodeWidget);
-            
-            delayInit(node, showUrlWidget, urlWidget, updateUrl, showQrCodeWidget, qrCodeControl);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
@@ -251,7 +223,6 @@ app.registerExtension({
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
-            const showQrCodeWidget = node.widgets.find(w => w.name === "show_qr_code");
             const devModeWidget = node.widgets.find(w => w.name === "dev_mode");
 
             function updateUrl() {
@@ -271,11 +242,6 @@ app.registerExtension({
                             refreshInterval: refreshIntervalWidget,
                         }
                     });
-                }
-                
-                // Update QR code when URL changes
-                if (qrCodeControl && qrCodeControl.updateQRCode) {
-                    qrCodeControl.updateQRCode(urlWidget.value);
                 }
             }
 
@@ -298,10 +264,7 @@ app.registerExtension({
             hideWidget(node, urlWidget);
             createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
             
-            // Create QR code widget
-            let qrCodeControl = createQRCodeWidget(node, urlWidget, showQrCodeWidget);
-            
-            delayInit(node, showUrlWidget, urlWidget, updateUrl, showQrCodeWidget, qrCodeControl);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
@@ -327,7 +290,6 @@ app.registerExtension({
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
-            const showQrCodeWidget = node.widgets.find(w => w.name === "show_qr_code");
             const devModeWidget = node.widgets.find(w => w.name === "dev_mode");
 
             function updateUrl() {
@@ -351,11 +313,6 @@ app.registerExtension({
                             crossfadeDuration: crossfadeDurationWidget,
                         }
                     });
-                }
-                
-                // Update QR code when URL changes
-                if (qrCodeControl && qrCodeControl.updateQRCode) {
-                    qrCodeControl.updateQRCode(urlWidget.value);
                 }
             }
 
@@ -382,10 +339,7 @@ app.registerExtension({
             hideWidget(node, urlWidget);
             createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
             
-            // Create QR code widget
-            let qrCodeControl = createQRCodeWidget(node, urlWidget, showQrCodeWidget);
-            
-            delayInit(node, showUrlWidget, urlWidget, updateUrl, showQrCodeWidget, qrCodeControl);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
@@ -407,7 +361,6 @@ app.registerExtension({
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
-            const showQrCodeWidget = node.widgets.find(w => w.name === "show_qr_code");
             const devModeWidget = node.widgets.find(w => w.name === "dev_mode");
 
             function updateUrl() {
@@ -428,14 +381,7 @@ app.registerExtension({
                         }
                     });
                 }
-                
-                // Update QR code when URL changes
-                if (qrCodeControl && qrCodeControl.updateQRCode) {
-                    qrCodeControl.updateQRCode(urlWidget.value);
-                }
-            }
-
-            setupWidgetCallback(
+            }            setupWidgetCallback(
                 node,
                 updateUrl,
                 urlWidget,
@@ -443,7 +389,7 @@ app.registerExtension({
                 [
                     serverWidget, 
                     sslWidget, 
-                    channelWidget, 
+                    channelWidget,
                     refreshIntervalWidget,
                     extraParamsWidget,
                     devModeWidget,
@@ -454,10 +400,7 @@ app.registerExtension({
             hideWidget(node, urlWidget);
             createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
             
-            // Create QR code widget
-            let qrCodeControl = createQRCodeWidget(node, urlWidget, showQrCodeWidget);
-            
-            delayInit(node, showUrlWidget, urlWidget, updateUrl, showQrCodeWidget, qrCodeControl);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });

@@ -17,8 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update `VrchDelayOSCControlNode` to have default value
 - update osc_nodes.md
 - update logic_nodes.md
-- update `VrchImageWebSocketWebViewerNode` with QR Code option
-- Add `show_qr_code` and `dev_mode` options to web viewer nodes
+- update `VrchImageWebSocketWebViewerNode` with URL value return
 
 ### Fixed
 

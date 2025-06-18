@@ -266,15 +266,14 @@ class VrchImageWebSocketWebViewerNode:
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url":("BOOLEAN", {"default": False}),
-                "show_qr_code": ("BOOLEAN", {"default": False}),
                 "dev_mode": ("BOOLEAN", {"default": False}),
                 "debug": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             }
         }
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("IMAGES",)
+    RETURN_TYPES = ("IMAGE", "STRING")
+    RETURN_NAMES = ("IMAGES", "URL")
     FUNCTION = "send_images"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
@@ -296,7 +295,6 @@ class VrchImageWebSocketWebViewerNode:
                     window_width,
                     window_height,
                     show_url,
-                    show_qr_code,
                     dev_mode,
                     debug,
                     extra_params,
@@ -336,7 +334,7 @@ class VrchImageWebSocketWebViewerNode:
             
         if debug:
             print(f"[VrchImageWebSocketWebViewerNode] Sent {len(images)} images to channel {ch} via global server on {host}:{port} with path '/image'")
-        return (images,)
+        return (images, url)
 
 # Dictionary to keep track of WebSocket client instances
 _websocket_clients = {}

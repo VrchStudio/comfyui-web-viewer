@@ -378,7 +378,7 @@ class VrchQRCodeNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "text": ("STRING", {"default": "Hello, World!", "multiline": True}),
+                "text": ("STRING", {"default": "", "multiline": True}),
                 "size": ("INT", {"default": 256, "min": 64, "max": 1024, "step": 32}),
                 "error_correction": (["L", "M", "Q", "H"], {"default": "M"}),
                 "border": ("INT", {"default": 2, "min": 0, "max": 20}),

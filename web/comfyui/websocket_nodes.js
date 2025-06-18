@@ -48,11 +48,7 @@ app.registerExtension({
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
-            const showQrCodeWidget = node.widgets.find(w => w.name === "show_qr_code");
             const devModeWidget = node.widgets.find(w => w.name === "dev_mode");
-
-            // Create QR code widget and get the update function - but don't add to node yet
-            let qrCodeControl = null;
 
             function updateUrl() {
                 if (urlWidget) {
@@ -73,10 +69,6 @@ app.registerExtension({
                             bgColourPicker: backgroundColorWidget,
                         }
                     });
-                    // Update QR code when URL changes - pass the new URL value
-                    if (qrCodeControl && qrCodeControl.updateQRCode) {
-                        qrCodeControl.updateQRCode(urlWidget.value);
-                    }
                 }
             }
 
@@ -104,10 +96,8 @@ app.registerExtension({
 
             hideWidget(node, urlWidget);
             createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
-            // Create QR code widget
-            qrCodeControl = createQRCodeWidget(node, urlWidget, showQrCodeWidget);
             
-            delayInit(node, showUrlWidget, urlWidget, updateUrl, showQrCodeWidget, qrCodeControl);
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
 });
@@ -225,33 +215,6 @@ style.textContent = `
     .vrch-server-indicator.on {
         background-color: #4CAF50; /* Green */
         color: #fff;
-    }
-
-    /* Styles for QR Code Widget */
-    .vrch-qr-widget-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 8px;
-        height: 240px !important; 
-    }
-    .vrch-qr-container {
-        text-align: center;
-        width: 100%;
-    }
-    .vrch-qr-code {
-        display: inline-block;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        padding: 8px;
-        background-color: #fff;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Add subtle shadow */
-    }
-    .vrch-qr-code canvas,
-    .vrch-qr-code svg,
-    .vrch-qr-code table {
-        margin: 0 auto;
-        display: block;
     }
 `;
 document.head.appendChild(style);
