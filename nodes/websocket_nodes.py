@@ -252,7 +252,7 @@ class VrchImageWebSocketWebViewerNode:
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
                 "format": (["PNG", "JPEG"], {"default": "JPEG"}),
-                "number_of_images": ("INT", {"default": 4, "min": 1, "max": 99}),
+                "number_of_images": ("INT", {"default": 1, "min": 1, "max": 99}),
                 "image_display_duration":("INT", {"default": 1000, "min": 1, "max": 10000}),
                 "fade_anim_duration": ("INT", {"default": 200, "min": 1, "max": 10000}),
                 "blend_mode": (["none", "normal", "multiply", "screen", "overlay", "darken", "lighten", 
