@@ -73,7 +73,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchAudioRecorderNode": "AUDIO Recorder @ vrch.ai",
     "VrchAudioSaverNode": "AUDIO Saver @ vrch.ai",
     "VrchAudioWebViewerNode": "AUDIO Web Viewer @ vrch.ai",
-    "VrchMicLoaderNode": "Microphone Loader @ vrch.ai",
+    "VrchMicLoaderNode": "AUDIO Microphone Loader @ vrch.ai",
     "VrchBooleanKeyControlNode": "BOOLEAN Key Control @ vrch.ai",
     "VrchChannelOSCControlNode": "CHANNEL OSC Control @ vrch.ai",
     "VrchChannelX4OSCControlNode": "CHANNEL x4 OSC Control @ vrch.ai",
