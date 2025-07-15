@@ -11,16 +11,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - add a new `VrchDelayNode` logic node
 - add a new `VrchQRCodeNode` for generating QR codes
+- add a new `VrchBPMDetectorNode` audio node
 
 ### Updated
 
 - update `VrchDelayOSCControlNode` to have default value
-- update osc_nodes.md
-- update logic_nodes.md
 - update `VrchImageWebSocketWebViewerNode` with URL output
 - update web viewer nodes with URL output
+- update Key Control nodes to add F13 - F24 as shortcut keys
+- update `VrchMicLoaderNode` display name to be `AUDIO Micphone Loader @ vrch.ai`
+- update `VrchImageWebSocketWebViewerNode` set `number_of_images` default value to be 1
+- update osc_nodes.md
+- update logic_nodes.md
 - update web_viewer_nodes.md
 - update websocket_nodes.md
+- update audio_nodes.md
 
 ### Fixed
 
