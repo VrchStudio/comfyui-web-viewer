@@ -2,6 +2,7 @@ import hashlib
 import os
 import io
 import base64
+import json
 import ffmpeg
 from pathlib import Path
 import torch
@@ -232,6 +233,8 @@ class VrchMicLoaderNode:
                 "sensitivity": ("FLOAT", {"default": 0.5, "min": 0.0, "max": 1.0, "step": 0.01}),
                 "frame_size": (["256", "512", "1024"], {"default": "512"}),
                 "sample_rate": (["16000", "24000", "48000"], {"default": "48000"}),
+                "low_freq_max": ("INT", {"default": 200, "min": 50, "max": 1000, "step": 50}),
+                "mid_freq_max": ("INT", {"default": 5000, "min": 1000, "max": 10000, "step": 100}),
                 "debug": ("BOOLEAN", {"default": False}),
                 "raw_data": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
             },
@@ -242,6 +245,9 @@ class VrchMicLoaderNode:
         "FLOAT",    # WAVEFORM
         "FLOAT",    # SPECTRUM
         "FLOAT",    # VOLUME
+        "FLOAT",    # LOW_FREQ_VOLUME
+        "FLOAT",    # MID_FREQ_VOLUME
+        "FLOAT",    # HIGH_FREQ_VOLUME
         "BOOLEAN",  # IS_ACTIVE
     )
     
@@ -250,6 +256,9 @@ class VrchMicLoaderNode:
         True,       # WAVEFORM
         True,       # SPECTRUM
         False,      # VOLUME
+        False,      # LOW_FREQ_VOLUME
+        False,      # MID_FREQ_VOLUME
+        False,      # HIGH_FREQ_VOLUME
         False,      # IS_ACTIVE
     )
     
@@ -258,11 +267,59 @@ class VrchMicLoaderNode:
         "WAVEFORM",
         "SPECTRUM",
         "VOLUME",
+        "LOW_FREQ_VOLUME",
+        "MID_FREQ_VOLUME",
+        "HIGH_FREQ_VOLUME",
         "IS_ACTIVE",
     )
     
     CATEGORY = CATEGORY
     FUNCTION = "load_microphone"
+    
+    def analyze_frequency_bands(self, spectrum, sample_rate, low_freq_max, mid_freq_max):
+        """
+        Analyze spectrum data to extract low/mid/high frequency volume values.
+        
+        Args:
+            spectrum: FFT spectrum data (list or array)
+            sample_rate: Audio sample rate in Hz
+            low_freq_max: Maximum frequency for low band (Hz)
+            mid_freq_max: Maximum frequency for mid band (Hz)
+            
+        Returns:
+            list: [low_volume, mid_volume, high_volume]
+        """
+        try:
+            if not spectrum or len(spectrum) == 0:
+                return [0.0, 0.0, 0.0]
+            
+            # Convert to float list if needed
+            if not isinstance(spectrum, list):
+                spectrum = list(spectrum)
+            
+            # Calculate frequency resolution
+            nyquist = sample_rate / 2
+            freq_bins = len(spectrum)
+            freq_per_bin = nyquist / freq_bins
+            
+            # Calculate frequency band boundaries in bins
+            low_end = max(1, int(low_freq_max / freq_per_bin))
+            mid_end = max(low_end + 1, int(mid_freq_max / freq_per_bin))
+            
+            # Ensure boundaries don't exceed spectrum length
+            low_end = min(low_end, freq_bins)
+            mid_end = min(mid_end, freq_bins)
+            
+            # Calculate average volume for each frequency band
+            low_volume = sum(spectrum[:low_end]) / low_end if low_end > 0 else 0.0
+            mid_volume = sum(spectrum[low_end:mid_end]) / (mid_end - low_end) if mid_end > low_end else 0.0
+            high_volume = sum(spectrum[mid_end:]) / (freq_bins - mid_end) if freq_bins > mid_end else 0.0
+            
+            return [float(low_volume), float(mid_volume), float(high_volume)]
+            
+        except Exception as e:
+            print(f"[VrchMicLoaderNode] Error analyzing frequency bands: {str(e)}")
+            return [0.0, 0.0, 0.0]
     
     def load_microphone(self, 
                         device_id: str, 
@@ -270,17 +327,22 @@ class VrchMicLoaderNode:
                         sensitivity: float = 0.5,
                         frame_size: str = "512",
                         sample_rate: str = "48000",
+                        low_freq_max: int = 200,
+                        mid_freq_max: int = 5000,
                         debug: bool = False, 
                         raw_data: str = ""):
         """
-        Load and process microphone data.
+        Load and process microphone data with frequency band analysis.
         """
         try:
             # Initialize default values
-            waveform = [0.0] * 128     # Default waveform data
-            spectrum = [0.0] * 128     # Default spectrum data
-            volume = 0.0               # Current volume level
-            is_active = False          # Whether microphone is active
+            waveform = [0.0] * 128
+            spectrum = [0.0] * 128
+            volume = 0.0
+            low_freq_volume = 0.0
+            mid_freq_volume = 0.0
+            high_freq_volume = 0.0
+            is_active = False
             
             # Create base result data structure
             mic_data = {
@@ -292,6 +354,9 @@ class VrchMicLoaderNode:
             if raw_data:
                 try:
                     parsed_data = json.loads(raw_data)
+                    
+                    # Merge parsed data into mic_data
+                    mic_data.update(parsed_data)
                     
                     # Get pre-calculated waveform from JS
                     if "waveform" in parsed_data and isinstance(parsed_data["waveform"], list):
@@ -315,31 +380,64 @@ class VrchMicLoaderNode:
                 except Exception as e:
                     if debug:
                         print(f"[VrchMicLoaderNode] Error processing microphone data: {str(e)}")
+            
+            # Perform frequency analysis if spectrum data is available
+            if spectrum:
+                freq_volumes = self.analyze_frequency_bands(
+                    spectrum, 
+                    int(sample_rate), 
+                    low_freq_max, 
+                    mid_freq_max
+                )
+                low_freq_volume = freq_volumes[0]
+                mid_freq_volume = freq_volumes[1]
+                high_freq_volume = freq_volumes[2]
+                
+                # Add frequency analysis results to mic_data
+                mic_data.update({
+                    "low_freq_volume": low_freq_volume,
+                    "mid_freq_volume": mid_freq_volume,
+                    "high_freq_volume": high_freq_volume,
+                    "low_freq_max": low_freq_max,
+                    "mid_freq_max": mid_freq_max
+                })
                         
             if debug:
                 print(f"[VrchMicLoaderNode] Device ID: {device_id}, Name: {name}")
                 print(f"[VrchMicLoaderNode] Volume: {volume}, Active: {is_active}")
                 print(f"[VrchMicLoaderNode] Waveform length: {len(waveform)}")
                 print(f"[VrchMicLoaderNode] Spectrum length: {len(spectrum)}")
+                print(f"[VrchMicLoaderNode] Frequency volumes - Low: {low_freq_volume:.4f}, Mid: {mid_freq_volume:.4f}, High: {high_freq_volume:.4f}")
             
             # Return processed data
             return (
-                raw_data,  # RAW_DATA
-                waveform,
-                spectrum,
-                volume,
-                is_active,
+                json.dumps(mic_data),   # RAW_DATA - complete mic data as JSON
+                waveform,               # WAVEFORM
+                spectrum,               # SPECTRUM
+                volume,                 # VOLUME
+                low_freq_volume,        # LOW_FREQ_VOLUME
+                mid_freq_volume,        # MID_FREQ_VOLUME
+                high_freq_volume,       # HIGH_FREQ_VOLUME
+                is_active,              # IS_ACTIVE
             )
             
         except Exception as e:
             print(f"[VrchMicLoaderNode] Error loading microphone data: {str(e)}")
             # Return default values
+            default_mic_data = {
+                "device_id": device_id,
+                "name": name,
+                "error": str(e)
+            }
             return (
-                {},              # RAW_DATA
-                [0.0] * 128,     # WAVEFORM
-                [0.0] * 128,     # SPECTRUM
-                0.0,             # VOLUME
-                False,           # IS_ACTIVE
+                json.dumps(default_mic_data),  # RAW_DATA
+                [0.0] * 128,                   # WAVEFORM
+                [0.0] * 128,                   # SPECTRUM
+                0.0,                           # VOLUME
+                0.0,                           # LOW_FREQ_VOLUME
+                0.0,                           # MID_FREQ_VOLUME
+                0.0,                           # HIGH_FREQ_VOLUME
+                False,                         # IS_ACTIVE
             )
     
     @classmethod
