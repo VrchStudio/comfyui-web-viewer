@@ -9,6 +9,10 @@ import torch
 import torchaudio
 import folder_paths # type: ignore
 from ..utils.music_genres_classifier import *
+import time
+import numpy as np
+from collections import deque
+from scipy.signal import find_peaks
 
 ASSETS_DIR = os.path.join(Path(__file__).parent.parent, "assets")
 UTILS_DIR = os.path.join(Path(__file__).parent.parent, "utils")
@@ -573,3 +577,523 @@ class VrchAudioConcatNode:
         
         # Return the concatenated audio
         return ({"waveform": result.unsqueeze(0), "sample_rate": sample_rate},)
+
+class VrchBPMDetectorNode:
+    """
+    Node for detecting BPM (beats per minute) from audio waveform and spectrum data.
+    """
+    
+    def __init__(self):
+        # Initialize buffers for temporal analysis
+        self.waveform_buffer = deque(maxlen=500)  # Reduced buffer size for better performance
+        self.spectrum_buffer = deque(maxlen=500)
+        self.beat_times = deque(maxlen=30)  # Increased for better BPM calculation
+        self.last_update_time = 0
+        self.bpm_history = deque(maxlen=8)  # Increased for better smoothing
+        self.debug_counter = 0
+        
+        # Persistent BPM state variables
+        self.current_bpm = 0.0
+        self.current_confidence = 0.0
+        self.last_valid_bpm_time = 0
+        
+    def clean_old_beats(self, current_time, max_age=10.0):
+        """
+        Remove beat times older than max_age seconds.
+        
+        Args:
+            current_time: Current timestamp
+            max_age: Maximum age in seconds to keep beats
+        """
+        cutoff_time = current_time - max_age
+        while self.beat_times and self.beat_times[0] < cutoff_time:
+            self.beat_times.popleft()
+            
+    def clean_old_bpm_history(self, current_time, max_age=30.0):
+        """
+        Clean old BPM history entries that are too old.
+        
+        Args:
+            current_time: Current timestamp
+            max_age: Maximum age in seconds to keep BPM history
+        """
+        # For now, we rely on the deque maxlen to limit size
+        # In the future, we could implement time-based cleanup here
+        pass
+    
+    def get_adaptive_min_interval(self):
+        """
+        Calculate adaptive minimum interval between beats based on recent BPM history.
+        
+        Returns:
+            float: Minimum interval in seconds
+        """
+        if len(self.bpm_history) > 0:
+            avg_bpm = np.mean(list(self.bpm_history))
+            if avg_bpm > 0:
+                # Allow slightly faster than detected BPM (up to 20% faster)
+                return max(0.15, 60.0 / (avg_bpm * 1.2))
+        
+        # Default minimum interval (300 BPM max)
+        return 0.2
+        
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "raw_data": ("JSON",),
+                "sample_rate": (["16000", "24000", "48000"], {"default": "48000"}),
+                "analysis_window": ("FLOAT", {"default": 4.0, "min": 1.0, "max": 10.0, "step": 0.1}),
+                "update_interval": ("FLOAT", {"default": 0.2, "min": 0.1, "max": 2.0, "step": 0.1}),
+                "confidence_threshold": ("FLOAT", {"default": 0.3, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "bpm_range_min": ("INT", {"default": 60, "min": 30, "max": 200, "step": 1}),
+                "bpm_range_max": ("INT", {"default": 200, "min": 60, "max": 300, "step": 1}),
+                "debug": ("BOOLEAN", {"default": False}),
+            },
+        }
+    
+    RETURN_TYPES = (
+        "JSON",     # BPM_DATA
+        "FLOAT",    # BPM_VALUE
+        "FLOAT",    # BPM_CONFIDENCE
+        "BOOLEAN",  # BEAT_DETECTED
+        "FLOAT",    # RHYTHM_STRENGTH
+    )
+    
+    RETURN_NAMES = (
+        "BPM_DATA",
+        "BPM_VALUE",
+        "BPM_CONFIDENCE",
+        "BEAT_DETECTED",
+        "RHYTHM_STRENGTH",
+    )
+    
+    CATEGORY = CATEGORY
+    FUNCTION = "detect_bpm"
+    
+    def detect_beat(self, waveform, spectrum, sample_rate, debug=False):
+        """
+        Detect if a beat occurs in the current frame.
+        
+        Args:
+            waveform: Current waveform data
+            spectrum: Current spectrum data
+            sample_rate: Audio sample rate
+            debug: Whether to print debug information
+            
+        Returns:
+            tuple: (beat_detected, beat_strength)
+        """
+        try:
+            if not waveform or not spectrum:
+                return False, 0.0
+                
+            # Convert to numpy arrays for analysis
+            waveform_np = np.array(waveform) if isinstance(waveform, list) else waveform
+            spectrum_np = np.array(spectrum) if isinstance(spectrum, list) else spectrum
+            
+            # Validate input arrays
+            if len(waveform_np) == 0 or len(spectrum_np) == 0:
+                return False, 0.0
+            
+            # Focus on low-frequency content for beat detection (20-250 Hz)
+            freq_per_bin = (sample_rate / 2) / len(spectrum_np)
+            low_freq_end = min(int(250 / freq_per_bin), len(spectrum_np))
+            # Ensure we have at least 10 bins for low frequency analysis
+            low_freq_end = max(low_freq_end, min(10, len(spectrum_np)))
+            beat_spectrum = spectrum_np[:low_freq_end]
+            
+            # Calculate energy in beat-relevant frequencies
+            beat_energy = np.sum(np.abs(beat_spectrum))  # Use absolute values for energy
+            
+            # Initialize debug counter if not exists
+            if not hasattr(self, 'debug_counter'):
+                self.debug_counter = 0
+            
+            # Simple onset detection using energy increase
+            if len(self.spectrum_buffer) > 0:
+                prev_spectrum = np.array(self.spectrum_buffer[-1])
+                if len(prev_spectrum) >= low_freq_end:
+                    prev_beat_energy = np.sum(np.abs(prev_spectrum[:low_freq_end]))
+                    energy_increase = beat_energy - prev_beat_energy
+                    
+                    # Debug: Print energy analysis (controlled by debug parameter)
+                    if debug:
+                        self.debug_counter += 1
+                        if self.debug_counter % 10 == 0:
+                            total_energy = np.sum(np.abs(spectrum_np))
+                            max_spectrum_val = np.max(spectrum_np)
+                            mean_spectrum_val = np.mean(spectrum_np)
+                            print(f"[DEBUG] Beat Energy: {beat_energy:.6f}, Prev: {prev_beat_energy:.6f}")
+                            print(f"[DEBUG] Energy Increase: {energy_increase:.6f}")
+                            print(f"[DEBUG] Total Spectrum Energy: {total_energy:.6f}")
+                            print(f"[DEBUG] Max Spectrum: {max_spectrum_val:.6f}, Mean: {mean_spectrum_val:.6f}")
+                            print(f"[DEBUG] Low freq bins: {low_freq_end}/{len(spectrum_np)}")
+                    
+                    # Check if we have enough variation in the spectrum
+                    spectrum_variation = np.std(spectrum_np)
+                    
+                    # Normalize by previous energy to get relative increase
+                    if prev_beat_energy > 0:
+                        energy_ratio = energy_increase / prev_beat_energy
+                        
+                        # Calculate RMS energy variation
+                        current_rms = np.sqrt(np.mean(waveform_np**2))
+                        
+                        # Check if we have previous waveform for RMS comparison
+                        rms_based_beat = False
+                        rms_ratio = 0.0
+                        if len(self.waveform_buffer) > 0:
+                            prev_waveform = np.array(self.waveform_buffer[-1])
+                            if len(prev_waveform) > 0:
+                                prev_rms = np.sqrt(np.mean(prev_waveform**2))
+                                if prev_rms > 0:
+                                    rms_ratio = (current_rms - prev_rms) / prev_rms
+                                    rms_based_beat = abs(rms_ratio) > 0.15  # Lower threshold for RMS change
+                        
+                        # Alternative detection: Use spectral flux for onset detection
+                        spectral_flux = 0.0
+                        if len(self.spectrum_buffer) >= 2:
+                            prev2_spectrum = np.array(self.spectrum_buffer[-2]) if len(self.spectrum_buffer) >= 2 else prev_spectrum
+                            if len(prev2_spectrum) >= low_freq_end:
+                                # Calculate spectral flux (positive differences)
+                                flux_diff = beat_spectrum - prev2_spectrum[:low_freq_end]
+                                spectral_flux = np.sum(np.maximum(flux_diff, 0))
+                        
+                        # Improved beat detection logic with multiple criteria
+                        energy_threshold = 0.03  # Lowered threshold
+                        absolute_energy_threshold = 0.015  # Lowered threshold
+                        flux_threshold = 0.1  # Spectral flux threshold
+                        
+                        # Multiple detection criteria
+                        energy_beat = energy_ratio > energy_threshold and beat_energy > absolute_energy_threshold
+                        flux_beat = spectral_flux > flux_threshold
+                        variation_beat = spectrum_variation > 0.1 and current_rms > 0.05  # Minimum activity
+                        
+                        beat_detected = energy_beat or rms_based_beat or flux_beat or variation_beat
+                        
+                        # Calculate strength based on multiple factors
+                        energy_strength = min(1.0, max(0.0, energy_ratio * 6))
+                        rms_strength = min(1.0, abs(rms_ratio) * 3) if rms_based_beat else 0.0
+                        flux_strength = min(1.0, spectral_flux * 2) if flux_beat else 0.0
+                        variation_strength = min(1.0, spectrum_variation * 2) if variation_beat else 0.0
+                        
+                        beat_strength = max(energy_strength, rms_strength, flux_strength, variation_strength)
+                        
+                        # Debug: Print beat detection details
+                        if debug and self.debug_counter % 10 == 0:
+                            print(f"[DEBUG] Energy Ratio: {energy_ratio:.6f}, RMS: {current_rms:.6f}")
+                            print(f"[DEBUG] RMS Ratio: {rms_ratio:.6f}, Spectral Flux: {spectral_flux:.6f}")
+                            print(f"[DEBUG] Spectrum Variation: {spectrum_variation:.6f}")
+                            print(f"[DEBUG] Beat Detected: {beat_detected} (energy: {energy_beat}, rms: {rms_based_beat}, flux: {flux_beat}, variation: {variation_beat})")
+                            print(f"[DEBUG] Beat Strength: {beat_strength:.6f}")
+                            
+                        return beat_detected, beat_strength
+                    else:
+                        # If previous energy is 0, use alternative detection methods
+                        current_rms = np.sqrt(np.mean(waveform_np**2))
+                        spectrum_variation = np.std(spectrum_np)
+                        
+                        # Detect based on absolute thresholds
+                        if beat_energy > 0.02 or current_rms > 0.05 or spectrum_variation > 0.1:
+                            if debug and self.debug_counter % 10 == 0:
+                                print(f"[DEBUG] Previous energy was 0, using alternative detection")
+                                print(f"[DEBUG] Current energy: {beat_energy:.6f}, RMS: {current_rms:.6f}, Variation: {spectrum_variation:.6f}")
+                            
+                            strength = max(
+                                min(1.0, beat_energy * 25),
+                                min(1.0, current_rms * 10),
+                                min(1.0, spectrum_variation * 5)
+                            )
+                            return True, strength
+            
+            # If no previous spectrum, check for significant activity in current frame
+            current_rms = np.sqrt(np.mean(waveform_np**2))
+            spectrum_variation = np.std(spectrum_np)
+            
+            if beat_energy > 0.03 or current_rms > 0.05 or spectrum_variation > 0.1:
+                strength = max(
+                    min(1.0, beat_energy * 20),
+                    min(1.0, current_rms * 8),
+                    min(1.0, spectrum_variation * 4)
+                )
+                return True, strength
+            
+            return False, 0.0
+            
+        except Exception as e:
+            if debug:
+                print(f"[ERROR] detect_beat error: {str(e)}")
+            return False, 0.0
+    
+    def calculate_bpm(self, beat_times):
+        """
+        Calculate BPM from beat timestamps.
+        
+        Args:
+            beat_times: List of beat timestamps
+            
+        Returns:
+            tuple: (bpm_value, confidence)
+        """
+        try:
+            if len(beat_times) < 2:  # Need at least 2 beats for one interval
+                return 0.0, 0.0
+                
+            # Calculate intervals between beats
+            intervals = []
+            for i in range(1, len(beat_times)):
+                interval = beat_times[i] - beat_times[i-1]
+                # Filter intervals to reasonable BPM range (24-300 BPM)
+                if 0.2 < interval < 2.5:  # 24-300 BPM range
+                    intervals.append(interval)
+            
+            if len(intervals) < 1:
+                return 0.0, 0.0
+            
+            # Remove outliers using median filtering for more robust estimation
+            if len(intervals) >= 3:
+                median_interval = np.median(intervals)
+                # Keep intervals within 30% of median
+                filtered_intervals = [
+                    interval for interval in intervals 
+                    if abs(interval - median_interval) < 0.3 * median_interval
+                ]
+                if len(filtered_intervals) >= 2:
+                    intervals = filtered_intervals
+            
+            # Calculate BPM from average interval
+            avg_interval = np.mean(intervals)
+            bpm = 60.0 / avg_interval
+            
+            # Calculate confidence based on interval consistency
+            if len(intervals) > 1:
+                interval_std = np.std(intervals)
+                # Confidence decreases with higher standard deviation
+                confidence = max(0.0, 1.0 - (interval_std / avg_interval))
+                
+                # Boost confidence for more intervals
+                interval_count_boost = min(1.0, len(intervals) / 5.0)
+                confidence = confidence * 0.7 + interval_count_boost * 0.3
+            else:
+                confidence = 0.1  # Low confidence with only one interval
+            
+            return float(bpm), float(confidence)
+            
+        except Exception as e:
+            return 0.0, 0.0
+    
+    def detect_bpm(self, 
+                   raw_data, 
+                   sample_rate="48000", 
+                   analysis_window=3.0,
+                   update_interval=0.5,
+                   confidence_threshold=0.3,
+                   bpm_range_min=60,
+                   bpm_range_max=200,
+                   debug=False):
+        """
+        Detect BPM from audio raw data containing waveform and spectrum.
+        """
+        try:
+            current_time = time.time()
+            
+            # Initialize with previous values to maintain stability
+            bpm_value = self.current_bpm
+            bpm_confidence = self.current_confidence
+            beat_detected = False
+            rhythm_strength = 0.0
+            waveform = []
+            spectrum = []
+            
+            # Extract waveform and spectrum from raw_data
+            if raw_data:
+                try:
+                    # Parse raw_data if it's a JSON string
+                    if isinstance(raw_data, str):
+                        parsed_data = json.loads(raw_data)
+                    else:
+                        parsed_data = raw_data
+                    
+                    # Extract waveform and spectrum data
+                    if "waveform" in parsed_data and isinstance(parsed_data["waveform"], list):
+                        waveform = parsed_data["waveform"]
+                    if "spectrum" in parsed_data and isinstance(parsed_data["spectrum"], list):
+                        spectrum = parsed_data["spectrum"]
+                        
+                    if debug:
+                        print(f"[VrchBPMDetectorNode] Extracted waveform length: {len(waveform)}")
+                        print(f"[VrchBPMDetectorNode] Extracted spectrum length: {len(spectrum)}")
+                        
+                        # Debug: Print data ranges
+                        if waveform:
+                            waveform_np = np.array(waveform)
+                            print(f"[VrchBPMDetectorNode] Waveform range: [{np.min(waveform_np):.6f}, {np.max(waveform_np):.6f}]")
+                            print(f"[VrchBPMDetectorNode] Waveform RMS: {np.sqrt(np.mean(waveform_np**2)):.6f}")
+                        
+                        if spectrum:
+                            spectrum_np = np.array(spectrum)
+                            print(f"[VrchBPMDetectorNode] Spectrum range: [{np.min(spectrum_np):.6f}, {np.max(spectrum_np):.6f}]")
+                            print(f"[VrchBPMDetectorNode] Spectrum sum: {np.sum(spectrum_np):.6f}")
+                            
+                            # Show non-zero spectrum values
+                            non_zero_count = np.count_nonzero(spectrum_np)
+                            print(f"[VrchBPMDetectorNode] Non-zero spectrum bins: {non_zero_count}/{len(spectrum_np)}")
+                        
+                except (json.JSONDecodeError, TypeError) as e:
+                    if debug:
+                        print(f"[VrchBPMDetectorNode] Error parsing raw_data: {str(e)}")
+                    waveform = []
+                    spectrum = []
+            
+            # Add current data to buffers
+            self.waveform_buffer.append(waveform)
+            self.spectrum_buffer.append(spectrum)
+            
+            # Clean old beat times
+            self.clean_old_beats(current_time)
+            
+            # Detect beat in current frame using primary method
+            beat_detected, beat_strength = self.detect_beat(
+                waveform, spectrum, int(sample_rate), debug=debug
+            )
+            
+            # Record beat time if detected, but check for minimum interval
+            if beat_detected:
+                # Get adaptive minimum interval
+                min_interval = self.get_adaptive_min_interval()
+                
+                # Check if enough time has passed since last beat
+                if not self.beat_times or (current_time - self.beat_times[-1]) >= min_interval:
+                    self.beat_times.append(current_time)
+                    if debug:
+                        print(f"[VrchBPMDetectorNode] Beat recorded at time: {current_time:.3f}")
+                        print(f"[VrchBPMDetectorNode] Total beats recorded: {len(self.beat_times)}")
+                else:
+                    # Too soon since last beat - reduce strength but don't completely ignore
+                    beat_strength *= 0.3
+                    if debug:
+                        print(f"[VrchBPMDetectorNode] Beat too soon, reduced strength: {current_time:.3f}")
+                        print(f"[VrchBPMDetectorNode] Min interval: {min_interval:.3f}s")
+                
+            # Update BPM calculation periodically
+            if current_time - self.last_update_time >= update_interval:
+                self.last_update_time = current_time
+                
+                # Calculate BPM from recent beats
+                recent_beats = [t for t in self.beat_times if current_time - t <= analysis_window]
+                if len(recent_beats) >= 2:  # Need at least 2 beats for BPM calculation
+                    calculated_bpm, calculated_confidence = self.calculate_bpm(recent_beats)
+                    
+                    # Filter BPM to valid range
+                    if bpm_range_min <= calculated_bpm <= bpm_range_max:
+                        # Apply confidence threshold with adaptive scaling
+                        min_confidence = max(0.15, confidence_threshold * 0.5)
+                        if calculated_confidence >= min_confidence:
+                            self.bpm_history.append(calculated_bpm)
+                            
+                            # Smooth BPM using recent history with weighted average
+                            if len(self.bpm_history) > 1:
+                                weights = np.exp(np.linspace(-1, 0, len(self.bpm_history)))
+                                weights /= np.sum(weights)
+                                bpm_value = np.average(list(self.bpm_history), weights=weights)
+                                bpm_confidence = calculated_confidence
+                            else:
+                                bpm_value = calculated_bpm
+                                bpm_confidence = calculated_confidence
+                        else:
+                            # Keep calculated value but with reduced confidence
+                            bpm_value = calculated_bpm
+                            bpm_confidence = calculated_confidence * 0.5
+                    else:
+                        # Out of range - use history if available
+                        if len(self.bpm_history) > 0:
+                            bpm_value = np.mean(list(self.bpm_history))
+                            bpm_confidence = 0.1  # Low confidence
+                        # Don't set to 0 if we have no history - keep previous value
+                elif len(self.bpm_history) > 0:
+                    # Not enough recent beats but we have history - use smoothed history
+                    bpm_value = np.mean(list(self.bpm_history))
+                    bpm_confidence = max(0.1, bpm_confidence * 0.9)  # Gradually reduce confidence
+            else:
+                # Not time to update yet - keep previous values if we have history
+                if len(self.bpm_history) > 0 and bpm_value == 0.0:
+                    bpm_value = np.mean(list(self.bpm_history))
+                    bpm_confidence = max(0.1, bpm_confidence * 0.95)  # Slowly decay confidence
+            
+            # Calculate rhythm strength based on beat consistency
+            if len(self.beat_times) >= 2:
+                recent_beats = [t for t in self.beat_times if current_time - t <= analysis_window]
+                if len(recent_beats) >= 3:
+                    intervals = [recent_beats[i] - recent_beats[i-1] for i in range(1, len(recent_beats))]
+                    if intervals:
+                        rhythm_strength = max(0.0, 1.0 - (np.std(intervals) / np.mean(intervals)))
+            
+            # Enhance rhythm strength with current beat
+            if beat_detected:
+                rhythm_strength = max(rhythm_strength, beat_strength)
+            
+            if debug:
+                print(f"[VrchBPMDetectorNode] BPM: {bpm_value:.1f}, Confidence: {bpm_confidence:.3f}")
+                print(f"[VrchBPMDetectorNode] Beat detected: {beat_detected}, Strength: {beat_strength:.3f}")
+                print(f"[VrchBPMDetectorNode] Rhythm strength: {rhythm_strength:.3f}")
+                print(f"[VrchBPMDetectorNode] Recent beats: {len([t for t in self.beat_times if current_time - t <= analysis_window])}")
+            
+            # Update persistent BPM state
+            if bpm_value > 0:
+                self.current_bpm = bpm_value
+                self.current_confidence = bpm_confidence
+                self.last_valid_bpm_time = current_time
+            else:
+                # If no valid BPM but we have a recent valid one, use it with decaying confidence
+                if current_time - self.last_valid_bpm_time < 10.0:  # Keep for 10 seconds
+                    decay_factor = 1.0 - (current_time - self.last_valid_bpm_time) / 10.0
+                    bpm_value = self.current_bpm
+                    bpm_confidence = self.current_confidence * decay_factor
+            
+            # Create comprehensive BPM data
+            bpm_data = {
+                "bpm_value": float(bpm_value),
+                "bpm_confidence": float(bpm_confidence),
+                "beat_detected": bool(beat_detected),
+                "rhythm_strength": float(rhythm_strength),
+                "analysis_window": analysis_window,
+                "update_interval": update_interval,
+                "confidence_threshold": confidence_threshold,
+                "bpm_range": [bpm_range_min, bpm_range_max],
+                "beat_count": len(self.beat_times),
+                "timestamp": current_time
+            }
+            
+            return (
+                json.dumps(bpm_data),
+                float(bpm_value),
+                float(bpm_confidence),
+                bool(beat_detected),
+                float(rhythm_strength),
+            )
+            
+        except Exception as e:
+            if debug:
+                print(f"[VrchBPMDetectorNode] Error detecting BPM: {str(e)}")
+            
+            # Return default values on error
+            error_data = {
+                "bpm_value": 0.0,
+                "bpm_confidence": 0.0,
+                "beat_detected": False,
+                "rhythm_strength": 0.0,
+                "error": str(e)
+            }
+            return (
+                json.dumps(error_data),
+                0.0,
+                0.0,
+                False,
+                0.0,
+            )
+    
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        # Always update for real-time BPM detection
+        return float("NaN")
