@@ -13,6 +13,8 @@ import time
 import numpy as np
 from collections import deque
 from scipy.signal import find_peaks
+from PIL import Image, ImageDraw
+import colorsys
 
 ASSETS_DIR = os.path.join(Path(__file__).parent.parent, "assets")
 UTILS_DIR = os.path.join(Path(__file__).parent.parent, "utils")
@@ -1097,3 +1099,243 @@ class VrchBPMDetectorNode:
     def IS_CHANGED(cls, **kwargs):
         # Always update for real-time BPM detection
         return float("NaN")
+
+class VrchAudioVisualizerNode:
+    """
+    Node for generating visualization images from audio waveform and spectrum data.
+    """
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "raw_data": ("JSON",),
+                "image_width": ("INT", {"default": 512, "min": 256, "max": 2048, "step": 32}),
+                "image_height": ("INT", {"default": 256, "min": 128, "max": 1024, "step": 32}),
+                "color_scheme": (["colorful", "monochrome", "neon", "plasma"], {"default": "colorful"}),
+                "background_color": ("STRING", {"default": "#111111"}),
+                "waveform_color": ("STRING", {"default": "#CCCCCC"}),
+                "waveform_amplification": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 10.0, "step": 0.1}),
+                "line_width": ("INT", {"default": 2, "min": 1, "max": 10}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+    
+    RETURN_TYPES = ("IMAGE", "IMAGE")
+    RETURN_NAMES = ("WAVEFORM_IMAGE", "SPECTRUM_IMAGE")
+    FUNCTION = "generate_visualization"
+    CATEGORY = CATEGORY
+    
+    def hex_to_rgb(self, hex_color):
+        """Convert hex color to RGB tuple."""
+        try:
+            hex_color = hex_color.lstrip('#')
+            if len(hex_color) == 6:
+                return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+            elif len(hex_color) == 3:
+                return tuple(int(hex_color[i]*2, 16) for i in range(3))
+            else:
+                return (17, 17, 17)  # Default dark gray
+        except ValueError:
+            return (17, 17, 17)  # Default dark gray
+    
+    def get_spectrum_color(self, index, total_bars, color_scheme):
+        """Get color for spectrum bar based on color scheme."""
+        if color_scheme == "colorful":
+            # Rainbow colors from red to green
+            hue = index / max(1, total_bars) * 120  # 0-120 degrees
+            # Convert HSV to RGB
+            r, g, b = colorsys.hsv_to_rgb(hue/360, 1.0, 1.0)
+            return (int(r * 255), int(g * 255), int(b * 255))
+        elif color_scheme == "neon":
+            # Neon colors
+            if index < total_bars * 0.3:
+                return (255, 0, 255)  # Magenta
+            elif index < total_bars * 0.6:
+                return (0, 255, 255)  # Cyan
+            else:
+                return (255, 255, 0)  # Yellow
+        elif color_scheme == "plasma":
+            # Plasma-like colors
+            ratio = index / max(1, total_bars)
+            r = int(255 * (0.5 + 0.5 * ratio))
+            g = int(255 * (0.2 + 0.3 * ratio))
+            b = int(255 * (0.8 - 0.3 * ratio))
+            return (r, g, b)
+        else:  # monochrome
+            intensity = 128 + int(127 * (index / max(1, total_bars)))
+            return (intensity, intensity, intensity)
+    
+    def draw_waveform(self, draw, waveform, canvas_width, canvas_height, 
+                     waveform_color, line_width, amplification=1.0, debug=False):
+        """Draw waveform on the canvas."""
+        try:
+            if not waveform or len(waveform) == 0:
+                return
+            
+            # Convert waveform data to numpy array
+            waveform_np = np.array(waveform)
+            
+            if debug:
+                print(f"[VrchAudioVisualizerNode] Drawing waveform with {len(waveform)} points")
+                print(f"[VrchAudioVisualizerNode] Waveform range: [{np.min(waveform_np):.3f}, {np.max(waveform_np):.3f}]")
+                print(f"[VrchAudioVisualizerNode] Amplification factor: {amplification}")
+            
+            # Draw center line
+            center_y = canvas_height // 2
+            draw.line([(0, center_y), (canvas_width, center_y)], 
+                     fill=(64, 64, 64), width=1)
+            
+            # Calculate step size for waveform
+            step_size = canvas_width / len(waveform)
+            
+            # Draw waveform
+            points = []
+            for i, value in enumerate(waveform):
+                x = int(i * step_size)
+                # Apply amplification and clamp value to [-1, 1]
+                amplified_value = value * amplification
+                clamped_value = max(-1.0, min(1.0, amplified_value))
+                y = center_y - int(clamped_value * (canvas_height // 2 - 10))
+                points.append((x, y))
+            
+            # Draw the waveform line
+            if len(points) > 1:
+                draw.line(points, fill=waveform_color, width=line_width)
+                
+        except Exception as e:
+            if debug:
+                print(f"[VrchAudioVisualizerNode] Error drawing waveform: {str(e)}")
+    
+    def draw_spectrum(self, draw, spectrum, canvas_width, canvas_height, 
+                     color_scheme, debug=False):
+        """Draw frequency spectrum on the canvas."""
+        try:
+            if not spectrum or len(spectrum) == 0:
+                return
+            
+            # Convert spectrum data to numpy array
+            spectrum_np = np.array(spectrum)
+            
+            if debug:
+                print(f"[VrchAudioVisualizerNode] Drawing spectrum with {len(spectrum)} bars")
+                print(f"[VrchAudioVisualizerNode] Spectrum range: [{np.min(spectrum_np):.3f}, {np.max(spectrum_np):.3f}]")
+            
+            # Calculate bar width
+            bar_count = min(128, len(spectrum))
+            bar_width = max(1, canvas_width // bar_count)
+            
+            # Draw spectrum bars
+            for i in range(bar_count):
+                # Get spectrum value (0.0 to 1.0)
+                data_index = int(i * len(spectrum) / bar_count)
+                value = max(0.0, min(1.0, spectrum[data_index]))
+                
+                # Calculate bar dimensions
+                bar_height = int(value * (canvas_height - 4))  # Leave some margin
+                x = i * bar_width
+                y = canvas_height - bar_height
+                
+                # Get color for this bar
+                bar_color = self.get_spectrum_color(i, bar_count, color_scheme)
+                
+                # Draw the bar
+                if bar_height > 0:
+                    draw.rectangle([x, y, x + bar_width - 1, canvas_height - 1], 
+                                 fill=bar_color)
+                
+        except Exception as e:
+            if debug:
+                print(f"[VrchAudioVisualizerNode] Error drawing spectrum: {str(e)}")
+    
+    def generate_visualization(self, raw_data, image_width=512, image_height=256,
+                              color_scheme="colorful", background_color="#111111", 
+                              waveform_color="#CCCCCC", waveform_amplification=1.0,
+                              line_width=2, debug=False):
+        """
+        Generate visualization images from audio raw data.
+        """
+        try:
+            # Initialize default values
+            waveform = [0.0] * 128
+            spectrum = [0.0] * 128
+            
+            # Extract waveform and spectrum from raw_data
+            if raw_data:
+                try:
+                    # Parse raw_data if it's a JSON string
+                    if isinstance(raw_data, str):
+                        parsed_data = json.loads(raw_data)
+                    else:
+                        parsed_data = raw_data
+                    
+                    # Extract waveform and spectrum data
+                    if "waveform" in parsed_data and isinstance(parsed_data["waveform"], list):
+                        waveform = parsed_data["waveform"]
+                    if "spectrum" in parsed_data and isinstance(parsed_data["spectrum"], list):
+                        spectrum = parsed_data["spectrum"]
+                        
+                    if debug:
+                        print(f"[VrchAudioVisualizerNode] Extracted waveform length: {len(waveform)}")
+                        print(f"[VrchAudioVisualizerNode] Extracted spectrum length: {len(spectrum)}")
+                        
+                except (json.JSONDecodeError, TypeError) as e:
+                    if debug:
+                        print(f"[VrchAudioVisualizerNode] Error parsing raw_data: {str(e)}")
+                    # Use default values
+            
+            # Convert color strings to RGB tuples
+            bg_color = self.hex_to_rgb(background_color)
+            wave_color = self.hex_to_rgb(waveform_color)
+            
+            # Generate waveform image
+            waveform_image = Image.new('RGB', (image_width, image_height))
+            waveform_image.paste(bg_color, (0, 0, image_width, image_height))
+            waveform_draw = ImageDraw.Draw(waveform_image)
+            self.draw_waveform(waveform_draw, waveform, image_width, image_height, 
+                             wave_color, line_width, waveform_amplification, debug)
+            
+            # Generate spectrum image
+            spectrum_image = Image.new('RGB', (image_width, image_height))
+            spectrum_image.paste(bg_color, (0, 0, image_width, image_height))
+            spectrum_draw = ImageDraw.Draw(spectrum_image)
+            self.draw_spectrum(spectrum_draw, spectrum, image_width, image_height, 
+                             color_scheme, debug)
+            
+            # Convert PIL images to ComfyUI IMAGE format (tensors)
+            waveform_array = np.array(waveform_image).astype(np.float32) / 255.0
+            waveform_tensor = torch.from_numpy(waveform_array)[None,]  # Add batch dimension
+            
+            spectrum_array = np.array(spectrum_image).astype(np.float32) / 255.0
+            spectrum_tensor = torch.from_numpy(spectrum_array)[None,]  # Add batch dimension
+            
+            if debug:
+                print(f"[VrchAudioVisualizerNode] Generated waveform tensor shape: {waveform_tensor.shape}")
+                print(f"[VrchAudioVisualizerNode] Generated spectrum tensor shape: {spectrum_tensor.shape}")
+                print(f"[VrchAudioVisualizerNode] Tensors range: [{waveform_tensor.min():.3f}, {waveform_tensor.max():.3f}]")
+            
+            return (waveform_tensor, spectrum_tensor)
+            
+        except Exception as e:
+            if debug:
+                print(f"[VrchAudioVisualizerNode] Error generating visualization: {str(e)}")
+            
+            # Return black images as fallback
+            black_image = np.zeros((image_height, image_width, 3), dtype=np.float32)
+            black_tensor = torch.from_numpy(black_image)[None,]
+            return (black_tensor, black_tensor)
+    
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        """Always update for real-time visualization."""
+        raw_data = kwargs.get("raw_data", "")
+        if not raw_data:
+            return False
+        
+        # Create hash from raw_data to detect changes
+        m = hashlib.sha256()
+        if isinstance(raw_data, str):
+            m.update(raw_data.encode("utf-8"))
+        else:
+            m.update(str(raw_data).encode("utf-8"))
+        
+        return m.hexdigest()

@@ -179,3 +179,32 @@
 - **Chain Setup:** Connect directly after `AUDIO Microphone Loader @ vrch.ai` using the `RAW_DATA` output for real-time detection.
 
 **Note:** BPM detection requires consistent audio input with discernible rhythmic patterns. The algorithm performs best with music containing clear beats and may struggle with highly ambient or arhythmic audio content.
+
+---
+
+### Node: `AUDIO Visualizer @ vrch.ai` (vrch.ai/audio)
+
+1. **Add the `AUDIO Visualizer @ vrch.ai` node to your ComfyUI workflow.**
+2. **Connect Audio Data:**
+   - Connect `raw_data` input to the `RAW_DATA` output from an `AUDIO Microphone Loader @ vrch.ai` node.
+3. **Configure the Node:**
+   - **Image Size:** Set `image_width` (256-2048) and `image_height` (128-1024) for output images.
+   - **Color Scheme:** Choose from `colorful` (rainbow), `monochrome` (grayscale), `neon` (bright colors), or `plasma` (red-purple-blue).
+   - **Colors:** Set `background_color` and `waveform_color` in hex format (e.g., "#111111").
+   - **Waveform:** Adjust `waveform_amplification` (0.1-10.0) to enhance quiet signals or reduce loud ones.
+   - **Style:** Set `line_width` (1-10) for waveform thickness.
+4. **Outputs:**
+   - `WAVEFORM_IMAGE`: Time-domain audio signal visualization with center reference line.
+   - `SPECTRUM_IMAGE`: Frequency-domain visualization with color-coded intensity bars.
+
+**Usage Tips:**
+- Use amplification 2.0-5.0 for quiet audio, 0.3-0.8 for loud audio.
+- Choose contrasting colors for better visibility.
+- Larger images provide more detail but may impact performance.
+
+**Applications:**
+- Real-time audio monitoring and music visualization
+- Audio debugging and educational demonstrations
+- Creative visual effects synchronized with audio
+
+**Note:** Connect directly after the microphone loader for optimal real-time performance.
