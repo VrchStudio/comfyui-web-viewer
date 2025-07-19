@@ -472,6 +472,46 @@ class TestWebSocketServerIntegration(unittest.TestCase):
         self.assertIn("/path2", server1.paths)
         
         print("✓ Global server functionality test passed")
+    
+    def test_12_port_sharing_across_processes(self):
+        """Test port sharing scenario where another process tries to use same port"""
+        port = self.base_port + 6
+        
+        # First process creates a server
+        server1 = SimpleWebSocketServer(self.test_host, port, debug=True)
+        self.servers.append(server1)
+        server1.register_path("/shared")
+        
+        time.sleep(2.0)  # Wait for server to start
+        self.assertTrue(server1.is_running())
+        
+        # Simulate second process trying to use same port
+        # This should detect existing server and create client proxy
+        shared_server = get_global_server(self.test_host, port, "/shared", debug=True)
+        
+        # Should be able to send data through shared connection
+        async def test_shared_communication():
+            # Set up a client to receive messages
+            uri = f"ws://{self.test_host}:{port}/shared?channel=1"
+            client = await websockets.connect(uri)
+            self.clients.append(client)
+            
+            # Give time for connection
+            await asyncio.sleep(0.5)
+            
+            # Send message through shared server interface
+            shared_server.send_to_channel("/shared", 1, "shared message")
+            
+            # Receive message
+            message = await asyncio.wait_for(client.recv(), timeout=3.0)
+            self.assertEqual(message, "shared message")
+            
+            await client.close()
+        
+        # Test the shared communication
+        asyncio.run(test_shared_communication())
+        
+        print("✓ Port sharing across processes test passed")
 
 
 def run_all_tests():
