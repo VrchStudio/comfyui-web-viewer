@@ -8,7 +8,7 @@ from pathlib import Path
 import torch
 import torchaudio
 import folder_paths # type: ignore
-from ..utils.music_genres_classifier import *
+from .utils.music_genres_classifier import *
 import time
 import numpy as np
 from collections import deque
@@ -17,7 +17,7 @@ from PIL import Image, ImageDraw
 import colorsys
 
 ASSETS_DIR = os.path.join(Path(__file__).parent.parent, "assets")
-UTILS_DIR = os.path.join(Path(__file__).parent.parent, "utils")
+UTILS_DIR = os.path.join(Path(__file__).parent, "utils")
 
 CATEGORY = "vrch.ai/audio"
 
