@@ -46,8 +46,11 @@ class SimpleWebSocketServer:
 
     async def _start_server(self):
         try:
-            # Simple single-server approach
-            self.server = await websockets.serve(self._handler, self.host, self.port)
+            # Create a wrapper handler that is compatible with different websockets library versions
+            async def handler_wrapper(websocket, path=None):
+                await self._handler(websocket, path)
+            
+            self.server = await websockets.serve(handler_wrapper, self.host, self.port)
             print(f"Server listening on {self.host}:{self.port}")
             
             self._is_running = True
@@ -58,10 +61,20 @@ class SimpleWebSocketServer:
             print(f"[SimpleWebSocketServer] Failed to start server: {e}")
 
     async def _handler(self, websocket, path=None):
-        # Get resource path from websocket.request
-        resource_path = websocket.request.path if hasattr(websocket, "request") and websocket.request else ""
+        # Get resource path - try multiple ways to get the correct path
+        resource_path = ""
+        if hasattr(websocket, "request") and websocket.request:
+            resource_path = websocket.request.path
+        elif path is not None:
+            resource_path = path
+        else:
+            resource_path = "/"
+            
         # Remove query parameters from resource path
         resource_path = resource_path.split("?")[0]
+        
+        if self.debug:
+            print(f"[SimpleWebSocketServer] Processing connection with path: '{resource_path}', registered paths: {list(self.paths)}")
         
         # Check if this path is registered with this server
         if resource_path not in self.paths:
@@ -70,8 +83,16 @@ class SimpleWebSocketServer:
             await websocket.close()
             return
         
-        # Parse channel parameter
-        parsed = urllib.parse.urlparse(websocket.request.path)
+        # Parse channel parameter from the original path (including query string)
+        full_path = ""
+        if hasattr(websocket, "request") and websocket.request:
+            full_path = websocket.request.path
+        elif path is not None:
+            full_path = path
+        else:
+            full_path = "/"
+            
+        parsed = urllib.parse.urlparse(full_path)
         params = urllib.parse.parse_qs(parsed.query)
         channel_str = params.get("channel", [None])[0]
         
@@ -93,8 +114,27 @@ class SimpleWebSocketServer:
         print(f"Connection open on {resource_path} channel {channel}")
         
         try:
-            async for _ in websocket:
+            # Keep connection alive by waiting for it to close
+            # Also handle any incoming messages
+            async def message_handler():
+                async for message in websocket:
+                    if self.debug:
+                        print(f"[SimpleWebSocketServer] Received message on {resource_path} channel {channel}: {message}")
+                    # Could process incoming messages here if needed
+                    pass
+            
+            # Run message handler in background and wait for connection to close
+            message_task = asyncio.create_task(message_handler())
+            try:
+                await websocket.wait_closed()
+            except:
                 pass
+            finally:
+                if not message_task.done():
+                    message_task.cancel()
+        except websockets.exceptions.ConnectionClosed:
+            # Normal connection close
+            pass
         except Exception as e:
             if self.debug:
                 print(f"[SimpleWebSocketServer] Exception on {resource_path} channel {channel}: {e}")
@@ -107,14 +147,31 @@ class SimpleWebSocketServer:
     def send_to_channel(self, path, channel, data):
         """Send data to all clients on a specific path and channel"""
         if path not in self.paths or channel not in self.clients[path]:
+            if self.debug:
+                print(f"[SimpleWebSocketServer] Cannot send: path '{path}' not registered or channel {channel} not found")
             return
             
+        clients = self.clients[path][channel]
         if self.debug:
-            client_count = len(self.clients[path][channel])
-            print(f"[SimpleWebSocketServer] Sending {len(data)} bytes to {path} channel {channel} with {client_count} client(s)")
+            client_count = len(clients)
+            print(f"[SimpleWebSocketServer] Sending {len(str(data))} bytes to {path} channel {channel} with {client_count} client(s)")
             
-        for ws in list(self.clients[path][channel]):
-            asyncio.run_coroutine_threadsafe(ws.send(data), self.loop)
+        # Send to all clients, removing any that fail
+        failed_clients = []
+        for ws in list(clients):
+            try:
+                future = asyncio.run_coroutine_threadsafe(ws.send(data), self.loop)
+                # Wait briefly for the send to complete
+                future.result(timeout=1.0)
+            except Exception as e:
+                if self.debug:
+                    print(f"[SimpleWebSocketServer] Failed to send to client: {e}")
+                failed_clients.append(ws)
+        
+        # Remove failed clients
+        for ws in failed_clients:
+            if ws in clients:
+                clients.remove(ws)
 
     def start(self):
         """Public method to start the server if it's not already running."""
@@ -130,18 +187,28 @@ class SimpleWebSocketServer:
         """Stop the server and close all connections."""
         if self.debug:
             print("[SimpleWebSocketServer] Stopping server")
-        if self.server:
-             self.server.close()
-             self.loop.call_soon_threadsafe(asyncio.ensure_future, self.server.wait_closed())
-        if self.loop and self.loop.is_running():
-            self.loop.call_soon_threadsafe(self.loop.stop)
-        if self.thread.is_alive():
-            self.thread.join(timeout=1)
+        
         self._is_running = False
+        
+        if self.server:
+            self.server.close()
+        
+        # Stop the event loop more safely
+        if self.loop and self.loop.is_running():
+            try:
+                self.loop.call_soon_threadsafe(self.loop.stop)
+            except RuntimeError:
+                # Loop might already be closed
+                pass
+        
+        # Don't wait for thread with blocking join since it's a daemon thread
+        # Just mark as not running and let the daemon thread clean up naturally
+        if self.debug:
+            print("[SimpleWebSocketServer] Server stopped")
 
     def is_running(self):
         """Check if the server is running."""
-        return self.server is not None and self._is_running
+        return self._is_running and self.server is not None
 
 
 def get_global_server(host, port, path="", debug=False) -> SimpleWebSocketServer:
