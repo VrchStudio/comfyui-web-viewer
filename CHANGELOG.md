@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add a new `VrchQRCodeNode` for generating QR codes
 - add a new `VrchBPMDetectorNode` audio node
 - add a new `VrchAudioVisualizerNode` audio node
+- add safe unit test suite for WebSocket server functionality in `./nodes/tests/`
 
 ### Updated
 
@@ -27,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update web_viewer_nodes.md
 - update websocket_nodes.md
 - update audio_nodes.md
+- refactor WebSocket server code by moving `SimpleWebSocketServer` to `./nodes/utils/websocket_server.py`
+- refactor utils directory structure by moving `./utils` to `./nodes/utils`
 
 ### Fixed
 
