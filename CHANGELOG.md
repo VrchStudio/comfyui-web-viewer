@@ -14,15 +14,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add a new `VrchBPMDetectorNode` audio node
 - add a new `VrchAudioVisualizerNode` audio node
 - add safe unit test suite for WebSocket server functionality in `./nodes/tests/`
+- add new WebSocket nodes:
+  - `VrchImageWebSocketSimpleWebViewerNode` - simplified image viewer without advanced settings
+  - `VrchImageWebSocketSettingsNode` - dedicated settings management node
 
 ### Updated
 
 - update `VrchDelayOSCControlNode` to have default value
-- update `VrchImageWebSocketWebViewerNode` with URL output
+- update `VrchImageWebSocketWebViewerNode` with URL output and renamed to Legacy version
 - update web viewer nodes with URL output
 - update Key Control nodes to add F13 - F24 as shortcut keys
 - update `VrchMicLoaderNode` display name to be `AUDIO Micphone Loader @ vrch.ai`
 - update `VrchImageWebSocketWebViewerNode` set `number_of_images` default value to be 1
+- update `VrchImageWebSocketSimpleWebViewerNode` to include basic animation parameters
+- update WebSocket server with port sharing mechanism for multi-process deployments
+- update WebSocket server with smart binary message logging
 - update osc_nodes.md
 - update logic_nodes.md
 - update web_viewer_nodes.md
@@ -30,10 +36,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update audio_nodes.md
 - refactor WebSocket server code by moving `SimpleWebSocketServer` to `./nodes/utils/websocket_server.py`
 - refactor utils directory structure by moving `./utils` to `./nodes/utils`
+- refactor WebSocket nodes architecture for better separation of concerns
 
 ### Fixed
 
 - fixed node sizing issue for microphone, xbox controller, QR Code and SRT player nodes
+- fixed WebSocket compatibility issues with websockets
 
 ## 1.0.33 - 2025-05-20
 
