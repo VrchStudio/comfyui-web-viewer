@@ -63,8 +63,11 @@ class SimpleWebSocketServer:
     async def _handler(self, websocket, path=None):
         # Get resource path - try multiple ways to get the correct path
         resource_path = ""
+        
         if hasattr(websocket, "request") and websocket.request:
             resource_path = websocket.request.path
+        elif hasattr(websocket, "path") and websocket.path:
+            resource_path = websocket.path
         elif path is not None:
             resource_path = path
         else:
@@ -87,6 +90,8 @@ class SimpleWebSocketServer:
         full_path = ""
         if hasattr(websocket, "request") and websocket.request:
             full_path = websocket.request.path
+        elif hasattr(websocket, "path") and websocket.path:
+            full_path = websocket.path
         elif path is not None:
             full_path = path
         else:
