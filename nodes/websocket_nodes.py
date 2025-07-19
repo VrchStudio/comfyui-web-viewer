@@ -11,7 +11,7 @@ import torch
 import urllib.parse
 from PIL import Image
 from .node_utils import VrchNodeUtils
-from .utils.websocket_server import SimpleWebSocketServer, get_global_server
+from .utils.websocket_server import get_global_server
 
 # Category for organizational purposes
 CATEGORY = "vrch.ai/viewer/websocket"
@@ -161,6 +161,132 @@ class VrchImageWebSocketWebViewerNode:
         if debug:
             print(f"[VrchImageWebSocketWebViewerNode] Sent {len(images)} images to channel {ch} via global server on {host}:{port} with path '/image'")
         return (images, url)
+
+
+class VrchImageWebSocketSimpleWebViewerNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "images": ("IMAGE",),
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "format": (["PNG", "JPEG"], {"default": "JPEG"}),
+                "number_of_images": ("INT", {"default": 1, "min": 1, "max": 99}),
+                "image_display_duration":("INT", {"default": 1000, "min": 1, "max": 10000}),
+                "fade_anim_duration": ("INT", {"default": 200, "min": 1, "max": 10000}),
+                "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
+                "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
+                "show_url":("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
+                "debug": ("BOOLEAN", {"default": False}),
+                "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
+                "url": ("STRING", {"default": "", "multiline": True}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE", "STRING")
+    RETURN_NAMES = ("IMAGES", "URL")
+    FUNCTION = "send_images"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def send_images(self,
+                    images,
+                    channel,
+                    server,
+                    format,
+                    number_of_images,
+                    image_display_duration,
+                    fade_anim_duration,
+                    window_width,
+                    window_height,
+                    show_url,
+                    dev_mode,
+                    debug,
+                    extra_params,
+                    url):
+        results = []
+        host, port = server.split(":")
+        server = get_global_server(host, port, path="/image", debug=debug) # Ensure path is set correctly for viewer
+        ch = int(channel)
+        for tensor in images:
+            arr = 255.0 * tensor.cpu().numpy()
+            img = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
+            buf = io.BytesIO()
+            img.save(buf, format=format)
+            binary_data = buf.getvalue()
+            header = struct.pack(">II", 1, 2)
+            data = header + binary_data
+            server.send_to_channel("/image", ch, data)
+            
+        if debug:
+            print(f"[VrchImageWebSocketSimpleWebViewerNode] Sent {len(images)} images to channel {ch} via global server on {host}:{port} with path '/image'")
+        return (images, url)
+
+
+class VrchImageWebSocketSettingsNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "number_of_images": ("INT", {"default": 1, "min": 1, "max": 99}),
+                "image_display_duration":("INT", {"default": 1000, "min": 1, "max": 10000}),
+                "fade_anim_duration": ("INT", {"default": 200, "min": 1, "max": 10000}),
+                "blend_mode": (["none", "normal", "multiply", "screen", "overlay", "darken", "lighten", 
+                                "color-dodge", "color-burn", "hard-light", "soft-light", "difference", 
+                                "exclusion", "hue", "saturation", "color", "luminosity"], {"default": "none"}),
+                "loop_playback": ("BOOLEAN", {"default": True}),
+                "update_on_end": ("BOOLEAN", {"default": False}),
+                "background_colour_hex": ("STRING", {"default": "#222222", "multiline": False}),
+                "server_messages": ("STRING", {"default": "", "multiline": False}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+
+    RETURN_TYPES = ()
+    RETURN_NAMES = ()
+    FUNCTION = "send_settings"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def send_settings(self,
+                      channel,
+                      server,
+                      number_of_images,
+                      image_display_duration,
+                      fade_anim_duration,
+                      blend_mode,
+                      loop_playback,
+                      update_on_end,
+                      background_colour_hex,
+                      server_messages,
+                      debug):
+        host, port = server.split(":")
+        server = get_global_server(host, port, path="/image", debug=debug) # Ensure path is set correctly for viewer
+        ch = int(channel)
+        
+        # Send server settings
+        settings = {
+            "settings": {
+                "numberOfImages": number_of_images,
+                "imageDisplayDuration": image_display_duration,
+                "fadeAnimDuration": fade_anim_duration,
+                "mixBlendMode": blend_mode,
+                "enableLoop": loop_playback,
+                "enableUpdateOnEnd": update_on_end,
+                "bgColourPicker": background_colour_hex,
+                "serverMessages": server_messages,
+            }
+        }
+        settings_json = json.dumps(settings)
+        server.send_to_channel("/image", ch, settings_json)
+        if debug:
+            print(f"[VrchImageWebSocketSettingsNode] Sending settings to channel {ch} via global server on {host}:{port} with path '/image': {settings_json}")
+            
+        return ()
 
 # Dictionary to keep track of WebSocket client instances
 _websocket_clients = {}
