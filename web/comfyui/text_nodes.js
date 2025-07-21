@@ -260,7 +260,12 @@ app.registerExtension({
             widgetContainer.appendChild(timeDisplay);
 
             // Add the main container as a component to the node
-            node.addDOMWidget("srt_control_widget", "SRT Control", widgetContainer);
+            const widget = node.addDOMWidget("srt_control_widget", "SRT Control", widgetContainer);
+
+            // Override the computeSize method to force correct sizing
+            widget.computeSize = function(width) {
+                return [width, 240];
+            };
 
             // Listen for changes to the loop widget
             if (loopWidget) {

@@ -1563,7 +1563,7 @@ class VrchChannelX4OSCControlNode:
                 print(f"[VrchChannelX4OSCControlNode] Channel {index+1} is {'ON' if self.channel_states[index] else 'OFF'}")
         return handler
 
-class VrchDelayOscControlNode:
+class VrchDelayOSCControlNode:
 
     def __init__(self):
         self.delay_period = 0  # Delay in milliseconds
@@ -1572,6 +1572,9 @@ class VrchDelayOscControlNode:
         self.path = None
         self.debug = False
         self.any_output = None  # To store the delayed output
+        self.default_value = 0  # Default delay period
+        self.server_connected = False  # Server connection status
+        self.server_data_received = False  # Flag to track if data was received
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -1585,6 +1588,7 @@ class VrchDelayOscControlNode:
             "output_min": ("INT", {"default": 0, "min": 0, "max": 9999}),
             "output_max": ("INT", {"default": 1000, "min": 0, "max": 9999}),
             "output_invert": ("BOOLEAN", {"default": False}),
+            "output_default": ("INT", {"default": 0, "min": 0, "max": 9999}),
             "debug": ("BOOLEAN", {"default": False}),
         }}
 
@@ -1598,13 +1602,18 @@ class VrchDelayOscControlNode:
         return float("NaN")
 
     def load_delay_osc(self, any_input, server_ip, port, path,
-                       input_min, input_max, output_min, output_max, output_invert, debug):
+                       input_min, input_max, output_min, output_max, output_invert, output_default, debug):
 
         if output_min > output_max:
             raise ValueError("[VrchDelayOscControlNode] Output min value cannot be greater than max value.")
         if input_min > input_max:
             raise ValueError("[VrchDelayOscControlNode] Input min value cannot be greater than max value.")
+        if output_default < output_min or output_default > output_max:
+            raise ValueError("[VrchDelayOscControlNode] Default value must be within the output range.")
 
+        # Set default value
+        self.default_value = output_default
+        
         # Check if server parameters have changed
         server_params_changed = (
             self.server_manager is None 
@@ -1619,26 +1628,43 @@ class VrchDelayOscControlNode:
             if self.server_manager and self.path:
                 self.server_manager.unregister_handler(f"{self.path}*", self.handle_osc_message)
             # Get or create the server manager
-            self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
-            self.debug = debug
-            # Register new handler
-            self.path = path
-            self.server_manager.register_handler(f"{self.path}*", self.handle_osc_message)
-            if debug:
-                print(f"[VrchDelayOscControlNode] Registered handler at path {self.path}*")
+            try:
+                self.server_manager = VrchOSCServerManager.get_instance(server_ip, port, debug)
+                self.debug = debug
+                # Register new handler
+                self.path = path
+                self.server_manager.register_handler(f"{self.path}*", self.handle_osc_message)
+                self.server_connected = True
+                self.server_data_received = False
+                self.raw_value = 0.0
+                if debug:
+                    print(f"[VrchDelayOscControlNode] Registered handler at path {self.path}*")
+            except Exception as e:
+                self.server_connected = False
+                if debug:
+                    print(f"[VrchDelayOscControlNode] Failed to connect to OSC server: {e}")
 
         # Select remap function based on invert option
         remap_func = VrchNodeUtils.select_remap_func(output_invert)
 
-        # Remap the raw OSC value to delay_period in milliseconds
-        mapped_delay = remap_func(
-            float(self.raw_value),
-            float(input_min),
-            float(input_max),
-            float(output_min),
-            float(output_max),
-        )
-        self.delay_period = int(mapped_delay)
+        # Use raw values only if server is connected and data was received
+        # Otherwise use default value
+        if not self.server_connected or not self.server_data_received:
+            self.delay_period = int(output_default)
+            if debug:
+                print(f"[VrchDelayOscControlNode] Using default delay value: {output_default} ms")
+        else:
+            # Remap the raw OSC value to delay_period in milliseconds
+            mapped_delay = remap_func(
+                float(self.raw_value),
+                float(input_min),
+                float(input_max),
+                float(output_min),
+                float(output_max),
+            )
+            self.delay_period = int(mapped_delay)
+            if debug:
+                print(f"[VrchDelayOscControlNode] Using OSC delay value: {self.delay_period} ms")
 
         # Process the any_input with the specified delay
         if any_input is not None:
@@ -1660,14 +1686,18 @@ class VrchDelayOscControlNode:
                 value = float(args[0])
                 # Update raw_value based on the received value
                 self.raw_value = value
+                self.server_data_received = True
                 if self.debug:
                     print(f"[VrchDelayOscControlNode] Updated raw_value to: {self.raw_value}")
             except (ValueError, TypeError):
                 if self.debug:
                     print(f"[VrchDelayOscControlNode] Received non-float value: {args[0]}")
+                # Mark as data not received when value is invalid
+                self.server_data_received = False
         else:
             if self.debug:
                 print(f"[VrchDelayOscControlNode] handle_osc_message() call with invalid args: {args}")
+            self.server_data_received = False
 
 class VrchOSCControlSettingsNode:
 

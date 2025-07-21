@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.34 - 2025-07-21
+
+### Added
+
+- add a new `VrchDelayNode` logic node
+- add a new `VrchQRCodeNode` for generating QR codes
+- add a new `VrchBPMDetectorNode` audio node
+- add a new `VrchAudioVisualizerNode` audio node
+- add safe unit test suite for WebSocket server functionality in `./nodes/tests/`
+- add new WebSocket nodes:
+  - `VrchImageWebSocketSimpleWebViewerNode` - simplified image viewer without advanced settings
+  - `VrchImageWebSocketSettingsNode` - dedicated settings management node
+- add `new_generation_after_pressing` parameter to Key Control nodes for automatic queue triggering
+
+### Updated
+
+- update `VrchDelayOSCControlNode` to have default value
+- update `VrchImageWebSocketWebViewerNode` with URL output and renamed to Legacy version
+- update web viewer nodes with URL output
+- update Key Control nodes to add F13 - F24 as shortcut keys
+- update `VrchMicLoaderNode` display name to be `AUDIO Micphone Loader @ vrch.ai`
+- update `VrchImageWebSocketWebViewerNode` set `number_of_images` default value to be 1
+- update `VrchImageWebSocketSimpleWebViewerNode` to include basic animation parameters
+- update WebSocket server with port sharing mechanism for multi-process deployments
+- update WebSocket server with smart binary message logging
+- update osc_nodes.md
+- update logic_nodes.md
+- update web_viewer_nodes.md
+- update websocket_nodes.md
+- update audio_nodes.md
+- update key_control_nodes.md
+- refactor WebSocket server code by moving `SimpleWebSocketServer` to `./nodes/utils/websocket_server.py`
+- refactor utils directory structure by moving `./utils` to `./nodes/utils`
+- refactor WebSocket nodes architecture for better separation of concerns
+
+### Fixed
+
+- fix node sizing issue for microphone, xbox controller, QR Code and SRT player nodes
+- fix WebSocket compatibility issues with websockets
+- fix `VrchInstantQueueKeyControlNode` node doesn't work issue
+- fix `VrchAudioRecorderNode` node incorrect init behaviour
+
 ## 1.0.33 - 2025-05-20
 
 ### Added

@@ -1,6 +1,25 @@
 // Enable debug logging
 export const ENABLE_DEBUG = false;
 
+/**
+ * Helper function to trigger a new queue generation.
+ * This function finds the queue button and clicks it to start a new generation.
+ */
+export function triggerNewGeneration() {
+    const buttonContainer = document.querySelector('div[data-testid="queue-button"]');
+    if (buttonContainer) {
+        const queueButton = buttonContainer.querySelector('button[data-pc-name="pcbutton"]');
+        if (queueButton) {
+            queueButton.click();
+            console.log('New queue generation triggered.');
+        } else {
+            console.warn("Queue button not found inside container.");
+        }
+    } else {
+        console.warn("Queue button container not found.");
+    }
+}
+
 // Helper functions to hide and show widgets
 export function hideWidget(node, widget) {
     // If widget is already hidden, do nothing
@@ -75,8 +94,12 @@ export function buildUrl(config) {
     if (config.channel) {
         channelStr = `&channel=${config.channel}`;
     }
+    // Check if dev mode is enabled
+    const devMode = config.devMode ? config.devMode.value : false;
+    const viewerPath = devMode ? "dev/viewer" : "viewer";
+    
     // Construct the URL using the provided parameters
-    const url = `${scheme}://vrch.ai/viewer?mode=${mode}&server=${server}&ssl=${sslStr}${protocolStr}${channelStr}${filenameStr}${pathStr}${extraParams}${additionalQuery}`;
+    const url = `${scheme}://vrch.ai/${viewerPath}?mode=${mode}&server=${server}&ssl=${sslStr}${protocolStr}${channelStr}${filenameStr}${pathStr}${extraParams}${additionalQuery}`;
 
     // Return the final URL
     return url;
@@ -92,9 +115,11 @@ export function buildUrl(config) {
  */
 export function delayInit(node, showUrlWidget, urlWidget, updateUrl) {
     setTimeout(() => {
+        // Handle URL widget visibility
         if (showUrlWidget) {
             showUrlWidget.value ? showWidget(node, urlWidget) : hideWidget(node, urlWidget);
         }
+        // Update URL
         updateUrl();
     }, 1000);
 }
@@ -108,6 +133,10 @@ export function delayInit(node, showUrlWidget, urlWidget, updateUrl) {
  * @param {Object} heightWidget - The widget for window height.
  */
 export function createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget) {
+    // Create a container with fixed height for the button
+    const container = document.createElement("div");
+    container.classList.add("vrch-button-container");
+    
     const button = document.createElement("button");
     button.textContent = "Open Web Viewer";
     button.classList.add("vrch-big-button");
@@ -120,7 +149,17 @@ export function createOpenWebViewerButton(node, urlWidget, widthWidget, heightWi
             console.error("URL widget not found or empty");
         }
     };
-    node.addDOMWidget("button_widget", "Open Web Viewer", button);
+    
+    // Add button to container
+    container.appendChild(button);
+    
+    // Add the container (with button inside) as widget
+    const widget = node.addDOMWidget("button_widget", "Open Web Viewer", container);
+    
+    // Override the computeSize method to force correct sizing
+    widget.computeSize = function(width) {
+        return [width, 60]; // Force height to be 48px
+    };
 }
 
 /**

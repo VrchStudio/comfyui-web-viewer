@@ -1,5 +1,6 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
+import { triggerNewGeneration } from "./node_utils.js";
 
 app.registerExtension({
     name: "vrch.AudioSaverNode",
@@ -80,7 +81,7 @@ app.registerExtension({
 
                 // Default shortcut settings
                 let enableShortcut = false;
-                let selectedShortcut = 'F1';
+                let selectedShortcut = 'F2';
 
                 // Retrieve settings from widgets
                 const enableShortcutWidget = currentNode.widgets.find(w => w.name === 'shortcut');
@@ -221,21 +222,7 @@ app.registerExtension({
 
                                     // Trigger a new queue job if `new_generation_after_recording` is enabled
                                     if (newGenerationWidget && newGenerationWidget.value === true) {
-                                        // Locate the div container that holds the activation button
-                                        const buttonContainer = document.querySelector('div[data-testid="queue-button"]');
-
-                                        if (buttonContainer) {
-                                            
-                                            const queueButton = buttonContainer.querySelector('button[data-pc-name="pcbutton"]');
-                                            if (queueButton) {
-                                                queueButton.click();
-                                                console.log('New queue generation triggered.');
-                                            } else {
-                                                console.warn("Queue button not found inside container.");
-                                            }
-                                        } else {
-                                            console.warn("Queue button container not found.");
-                                        }
+                                        triggerNewGeneration();
                                     }
 
                                 };
@@ -336,6 +323,23 @@ app.registerExtension({
                     recordModeWidget.value = savedRecordMode;
                 }
                 switchButtonMode(recordModeWidget.value);
+
+                // Initialize function to ensure widget values are properly loaded
+                function init() {
+                    if (enableShortcutWidget) {
+                        enableShortcut = enableShortcutWidget.value;
+                    }
+                    if (shortcutOptionWidget) {
+                        selectedShortcut = shortcutOptionWidget.value;
+                    }
+                    console.log("[VrchAudioRecorderNode] init() - shortcut enabled:", enableShortcut, "key:", selectedShortcut);
+                }
+
+                // Initialize display after ensuring all widgets are loaded
+                function delayedInit() {
+                    init();
+                }
+                setTimeout(delayedInit, 1000);
 
                 const onRemoved = this.onRemoved;
                 this.onRemoved = function () {

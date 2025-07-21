@@ -47,6 +47,7 @@ app.registerExtension({
             const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
             const urlWidget = node.widgets.find(w => w.name === "url");
             const showUrlWidget = node.widgets.find(w => w.name === "show_url");
+            const devModeWidget = node.widgets.find(w => w.name === "dev_mode");
 
             function updateUrl() {
                 if (urlWidget) {
@@ -55,6 +56,7 @@ app.registerExtension({
                         extraParamsWidget: extraParamsWidget,
                         mode: "image-websocket",
                         protocol: "websocket",
+                        devMode: devModeWidget,
                         additionalParams: {
                             channel: channelWidget,
                             numberOfImages: numberOfImagesWidget,
@@ -86,12 +88,78 @@ app.registerExtension({
                     loopPlaybackWidget,
                     updateOnEndWidget,
                     backgroundColorWidget,
+                    devModeWidget,
                 ],
                 "VrchImageWebSocketWebViewerNode"
             );
 
             hideWidget(node, urlWidget);
             createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
+            
+            delayInit(node, showUrlWidget, urlWidget, updateUrl);
+        }
+    }
+});
+
+// =====================================================================
+// Extension: vrch.ImageWebSocketSimpleWebViewer
+// =====================================================================
+app.registerExtension({
+    name: "vrch.ImageWebSocketSimpleWebViewer",
+    async nodeCreated(node) {
+        if (node.comfyClass === "VrchImageWebSocketSimpleWebViewerNode") {
+            // Find existing widgets
+            const serverWidget = node.widgets.find(w => w.name === "server");
+            const channelWidget = node.widgets.find(w => w.name === "channel");
+            const numberOfImagesWidget = node.widgets.find(w => w.name === "number_of_images");
+            const imageDisplayDurationWidget = node.widgets.find(w => w.name === "image_display_duration");
+            const fadeAnimDurationWidget = node.widgets.find(w => w.name === "fade_anim_duration");
+            const widthWidget = node.widgets.find(w => w.name === "window_width");
+            const heightWidget = node.widgets.find(w => w.name === "window_height");
+            const extraParamsWidget = node.widgets.find(w => w.name === "extra_params");
+            const urlWidget = node.widgets.find(w => w.name === "url");
+            const showUrlWidget = node.widgets.find(w => w.name === "show_url");
+            const devModeWidget = node.widgets.find(w => w.name === "dev_mode");
+
+            function updateUrl() {
+                if (urlWidget) {
+                    urlWidget.value = buildUrl({
+                        serverWidget: serverWidget,
+                        extraParamsWidget: extraParamsWidget,
+                        mode: "image-websocket",
+                        protocol: "websocket",
+                        devMode: devModeWidget,
+                        additionalParams: {
+                            channel: channelWidget,
+                            numberOfImages: numberOfImagesWidget,
+                            imageDisplayDuration: imageDisplayDurationWidget,
+                            fadeAnimDuration: fadeAnimDurationWidget,
+                        }
+                    });
+                }
+            }
+
+            // Use setupWidgetCallback() with a custom log prefix if desired
+            setupWidgetCallback(
+                node,
+                updateUrl,
+                urlWidget,
+                showUrlWidget,
+                [
+                    serverWidget,
+                    channelWidget,
+                    numberOfImagesWidget,
+                    imageDisplayDurationWidget,
+                    fadeAnimDurationWidget,
+                    extraParamsWidget,
+                    devModeWidget,
+                ],
+                "VrchImageWebSocketSimpleWebViewerNode"
+            );
+
+            hideWidget(node, urlWidget);
+            createOpenWebViewerButton(node, urlWidget, widthWidget, heightWidget);
+            
             delayInit(node, showUrlWidget, urlWidget, updateUrl);
         }
     }
@@ -149,6 +217,16 @@ app.registerExtension({
 // Add custom styles for the button and indicator
 const style = document.createElement("style");
 style.textContent = `
+    /* Button container style */
+    .vrch-button-container {
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        height: 48px !important; /* Ensure the container has a fixed height */
+        align-items: center; /* Center vertically */
+        justify-content: center; /* Center horizontally */
+    }
+    
     .vrch-big-button {
         background-color: #4CAF50;
         color: white;
@@ -159,6 +237,8 @@ style.textContent = `
         cursor: pointer;
         text-align: center;
         transition: background-color 0.3s, transform 0.2s;
+        width: 100%;
+        height: 100%; 
     }
 
     .vrch-big-button:hover {

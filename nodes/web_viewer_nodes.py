@@ -29,12 +29,14 @@ class VrchWebViewerNode:
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url":("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             }
         }
     
-    RETURN_TYPES = ()
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("URL",)
     FUNCTION = "dummy_function"
     CATEGORY = CATEGORY
     
@@ -43,7 +45,7 @@ class VrchWebViewerNode:
     DESCRIPTION = "Opens the specified Web Viewer URL in a new browser tab when button is clicked."
 
     def dummy_function(self, **kwargs):
-        return ()
+        return (kwargs.get('url', ''),)
 
     @classmethod
     def IS_CHANGED(s, **kwargs):
@@ -110,13 +112,14 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             }
         }
 
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("IMAGES",)
+    RETURN_TYPES = ("IMAGE", "STRING")
+    RETURN_NAMES = ("IMAGES", "URL")
     FUNCTION = "save_and_view_images"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
@@ -136,8 +139,9 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
                              save_settings,
                              window_width, 
                              window_height, 
+                             show_url,
+                             dev_mode,
                              extra_params, 
-                             show_url, 
                              url):
         # Save the image into "web_viewer" directory with filename "{channel}.jpeg"
         output_path = os.path.join(self.output_dir, "web_viewer")
@@ -161,7 +165,7 @@ class VrchImageWebViewerNode(VrchImageSaverNode):
             }
             VrchNodeUtils.save_channel_settings(output_path, channel, settings)
 
-        return (images,)
+        return (images, url)
 
     @classmethod
     def IS_CHANGED(cls, images, **kwargs):
@@ -201,13 +205,14 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             }
         }
 
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("IMAGES",)
+    RETURN_TYPES = ("IMAGE", "STRING")
+    RETURN_NAMES = ("IMAGES", "URL")
     FUNCTION = "save_and_view_images"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
@@ -230,6 +235,7 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
                              window_width, 
                              window_height, 
                              show_url,
+                             dev_mode,
                              extra_params, 
                              url):
         # Save the images into "web_viewer" directory with filename "channel_{channel}_{index:%02d}.jpeg"
@@ -256,7 +262,7 @@ class VrchImageFlipBookWebViewerNode(VrchImageSaverNode):
             }
             VrchNodeUtils.save_channel_settings(output_path, channel, settings)
         
-        return (images,)
+        return (images, url)
 
     @classmethod
     def IS_CHANGED(cls, images, **kwargs):
@@ -300,13 +306,14 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             }
         }
 
-    RETURN_TYPES = ("AUDIO",)
-    RETURN_NAMES = ("AUDIO",)
+    RETURN_TYPES = ("AUDIO", "STRING")
+    RETURN_NAMES = ("AUDIO", "URL")
     FUNCTION = "save_and_view_audio"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
@@ -329,8 +336,9 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
                             save_settings, 
                             window_width,
                             window_height, 
+                            show_url,
+                            dev_mode,
                             extra_params, 
-                            show_url, 
                             url):
         # Save the audio into "web_viewer" directory with filename "{channel}.mp3"
         output_path = os.path.join(self.output_dir, "web_viewer")
@@ -356,7 +364,7 @@ class VrchAudioWebViewerNode(VrchAudioSaverNode):
             }
             VrchNodeUtils.save_channel_settings(output_path, channel, settings)
 
-        return (audio,)
+        return (audio, url)
 
     @classmethod
     def IS_CHANGED(cls, audio, **kwargs):
@@ -467,13 +475,14 @@ class VrchModelWebViewerNode():
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             }
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("MODEL_FILE",)
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("MODEL_FILE", "URL")
     FUNCTION = "save_and_view_3d_model"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
@@ -492,8 +501,9 @@ class VrchModelWebViewerNode():
                                save_settings,
                                window_width, 
                                window_height, 
+                               show_url,
+                               dev_mode, 
                                extra_params, 
-                               show_url, 
                                url):
         # Save the 3d model into "web_viewer" directory with filename "channel_{channel}.glb"
         output_path = self.output_dir
@@ -530,7 +540,7 @@ class VrchModelWebViewerNode():
             VrchNodeUtils.save_channel_settings(os.path.join(output_path, web_viewer_folder), channel, settings)
         
         # Return the new path relative to the output directory
-        return (os.path.join(web_viewer_folder, new_filename),)
+        return (os.path.join(web_viewer_folder, new_filename), url)
 
     @classmethod
     def IS_CHANGED(cls, model_file, **kwargs):
@@ -561,12 +571,14 @@ class VrchVideoWebViewerNode:
                 "window_width": ("INT", {"default": 1280, "min": 100, "max": 10240}),
                 "window_height": ("INT", {"default": 960, "min": 100, "max": 10240}),
                 "show_url": ("BOOLEAN", {"default": False}),
+                "dev_mode": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
             },
         }
 
-    RETURN_TYPES = ()
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("URL",)
     FUNCTION = "save_and_view_video"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
@@ -593,8 +605,9 @@ class VrchVideoWebViewerNode:
                             save_settings,
                             window_width, 
                             window_height, 
+                            show_url,
+                            dev_mode,
                             extra_params, 
-                            show_url, 
                             url):
         self.validate(filename)
         output_path = os.path.join(self.output_dir, "web_viewer")
@@ -610,10 +623,10 @@ class VrchVideoWebViewerNode:
             }
             VrchNodeUtils.save_channel_settings(output_path, channel, settings)
         
-        return ()
+        return (url,)
 
     @classmethod
-    def IS_CHANGED(cls, channel, server, ssl, window_width, window_height, extra_params, show_url, url, filename=None):
+    def IS_CHANGED(cls, channel, server, ssl, window_width, window_height, extra_params, show_url, dev_mode, url, filename=None):
         if not filename or not os.path.isfile(filename):
             return False
         m = hashlib.sha256()

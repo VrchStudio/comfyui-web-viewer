@@ -1,6 +1,6 @@
-### Node: `IMAGE WebSocket Web Viewer @ vrch.ai` (vrch.ai/viewer)
+### Node: `IMAGE WebSocket Web Viewer (Lagecy) @ vrch.ai` (vrch.ai/viewer)
 
-1. **Add the `IMAGE WebSocket Web Viewer @ vrch.ai` node to your ComfyUI workflow.**
+1. **Add the `IMAGE WebSocket Web Viewer (Lagecy) @ vrch.ai` node to your ComfyUI workflow.**
 
 2. **Configure the Node:**
    - **Image Input:**
@@ -35,11 +35,106 @@
 3. **Open Web Viewer:**
    - Click the **"Open Web Viewer"** button to launch the generated URL in a new browser window, where your image will be displayed in real time via the WebSocket connection.
 
+4. **Outputs:**
+   - **`IMAGES`**: The input images are passed through as output.
+   - **`URL`**: The constructed URL for the web viewer.
+
 **Notes:**
 - Make sure that the server address and configuration are correct and that the server is accessible.
 - This node uses the WebSocket protocol to transmit image data in real time to the specified channel; ensure your client browser supports WebSocket connections.
 - When **`save_settings`** is enabled, a JSON with your websocket parameters is sent via the same WebSocket connection.
 - When debug mode is enabled, the node outputs detailed logs to the console, which can help you track the image transmission process and troubleshoot any issues.
+
+---
+
+### Node: `IMAGE WebSocket Web Viewer @ vrch.ai` (vrch.ai/viewer)
+
+A simplified version of the main WebSocket image viewer node that focuses purely on image transmission without settings management.
+
+1. **Add the `IMAGE WebSocket Web Viewer @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Image Input:**
+     - **`images`**: Connect the image(s) you wish to display in the WebSocket-based web viewer.
+   - **Channel:**
+     - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**) to differentiate WebSocket connections.
+   - **Server:**
+     - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
+   - **Image Format:**
+     - **`format`**: Choose the image format for transmission, supporting **PNG** and **JPEG** (default is **JPEG**).
+   - **Image Settings:**
+     - **`number_of_images`**: Set the number of images to load (default is **1**, range: 1-99).
+     - **`image_display_duration`**: Duration to display each image in milliseconds (default is **1000**, range: 1-10000).
+     - **`fade_anim_duration`**: Duration of fade animation in milliseconds (default is **200**, range: 1-10000).
+   - **Window Dimensions:**
+     - **`window_width`**: Set the width of the web viewer window (default is **1280**, range: 100-10240).
+     - **`window_height`**: Set the height of the web viewer window (default is **960**, range: 100-10240).
+   - **Show URL:**
+     - **`show_url`**: Toggle the display of the constructed URL in the interface. When enabled, the **`url`** field becomes visible (default is **False**).
+   - **Development Mode:**
+     - **`dev_mode`**: Enable development mode for additional features (default is **False**).
+   - **Debug Mode:**
+     - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting (default is **False**).
+   - **Extra Parameters:**
+     - **`extra_params`**: Additional parameters for the web viewer in string format (multiline text field).
+   - **URL Input:**
+     - **`url`**: This field is automatically updated with a constructed URL based on your inputs (server, channel, extra parameters, etc.). You can control its visibility with the **`show_url`** option.
+
+3. **Open Web Viewer:**
+   - Click the **"Open Web Viewer"** button to launch the generated URL in a new browser window, where your image will be displayed in real time via the WebSocket connection.
+
+4. **Outputs:**
+   - **`IMAGES`**: The input images are passed through as output.
+   - **`URL`**: The constructed URL for the web viewer.
+
+**Notes:**
+- This simplified node focuses purely on image transmission and does not include advanced WebSocket parameters or settings management.
+- For workflows requiring custom WebSocket settings, use the **`IMAGE WebSocket Settings @ vrch.ai`** node in combination with this node.
+- Make sure that the server address and configuration are correct and that the server is accessible.
+- The `extra_params` field allows for additional customization of the web viewer behavior.
+
+---
+
+### Node: `IMAGE WebSocket Settings @ vrch.ai` (vrch.ai/viewer)
+
+A dedicated node for managing and transmitting WebSocket settings parameters separately from image data.
+
+1. **Add the `IMAGE WebSocket Settings @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Channel:**
+     - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**) to differentiate WebSocket connections.
+   - **Server:**
+     - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
+   - **Websocket Parameters:**
+     - **`number_of_images`**: Set the number of images to load (default is **1**, range: 1-99).
+     - **`image_display_duration`**: Duration to display each image in milliseconds (default is **1000**, range: 1-10000).
+     - **`fade_anim_duration`**: Duration of fade animation in milliseconds (default is **200**, range: 1-10000).
+     - **`blend_mode`**: Set the blend mode for image transitions (default is **"none"**). Options include **"normal"**, **"multiply"**, **"screen"**, **"overlay"**, **"darken"**, **"lighten"**, **"color-dodge"**, **"color-burn"**, **"hard-light"**, **"soft-light"**, **"difference"**, **"exclusion"**, **"hue"**, **"saturation"**, **"color"**, **"luminosity"**.
+     - **`loop_playback`**: Toggle whether to loop playback of images (default is **True**).
+     - **`update_on_end`**: Toggle whether to update the image cache only at the end of playback (default is **False**).
+   - **Background Settings:**
+     - **`background_colour_hex`**: Set the background color in hexadecimal format (default is **"#222222"**).
+   - **Server Messages:**
+     - **`server_messages`**: Server messages to send to the web page viewer (default is empty string).
+   - **Debug Mode:**
+     - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting (default is **False**).
+
+3. **Settings Transmission:**
+   - This node automatically saves the WebSocket settings to a JSON format and sends them via the WebSocket connection.
+   - Settings are transmitted to the specified channel and can be received by web viewers or other WebSocket clients.
+   - The settings JSON includes: numberOfImages, imageDisplayDuration, fadeAnimDuration, mixBlendMode, enableLoop, enableUpdateOnEnd, bgColourPicker, and serverMessages.
+
+4. **Outputs:**
+   - This node has no outputs and functions as a pure execution node for settings transmission.
+
+**Notes:**
+- This node is designed to work alongside the **`IMAGE WebSocket Web Viewer @ vrch.ai`** node for clean separation of concerns.
+- Settings are automatically transmitted when the node executes, eliminating the need for manual save_settings toggles.
+- Use this node when you need fine-grained control over WebSocket parameters without cluttering your image transmission workflow.
+- When debug mode is enabled, the node outputs detailed logs to the console about settings transmission.
+- The blend mode parameter provides extensive options for controlling how images are composited in the web viewer.
+- As this node has no outputs, it can be placed anywhere in your workflow without affecting data flow.
 
 ---
 
