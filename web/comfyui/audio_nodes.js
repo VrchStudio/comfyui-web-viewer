@@ -81,7 +81,7 @@ app.registerExtension({
 
                 // Default shortcut settings
                 let enableShortcut = false;
-                let selectedShortcut = 'F1';
+                let selectedShortcut = 'F2';
 
                 // Retrieve settings from widgets
                 const enableShortcutWidget = currentNode.widgets.find(w => w.name === 'shortcut');
@@ -323,6 +323,23 @@ app.registerExtension({
                     recordModeWidget.value = savedRecordMode;
                 }
                 switchButtonMode(recordModeWidget.value);
+
+                // Initialize function to ensure widget values are properly loaded
+                function init() {
+                    if (enableShortcutWidget) {
+                        enableShortcut = enableShortcutWidget.value;
+                    }
+                    if (shortcutOptionWidget) {
+                        selectedShortcut = shortcutOptionWidget.value;
+                    }
+                    console.log("[VrchAudioRecorderNode] init() - shortcut enabled:", enableShortcut, "key:", selectedShortcut);
+                }
+
+                // Initialize display after ensuring all widgets are loaded
+                function delayedInit() {
+                    init();
+                }
+                setTimeout(delayedInit, 1000);
 
                 const onRemoved = this.onRemoved;
                 this.onRemoved = function () {
