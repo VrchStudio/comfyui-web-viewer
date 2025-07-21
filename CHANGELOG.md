@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix node sizing issue for microphone, xbox controller, QR Code and SRT player nodes
 - fix WebSocket compatibility issues with websockets
 - fix `VrchInstantQueueKeyControlNode` node doesn't work issue
+- fix `VrchAudioRecorderNode` node incorrect init behaviour
 
 ## 1.0.33 - 2025-05-20
 
