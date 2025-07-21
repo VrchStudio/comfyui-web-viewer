@@ -9,7 +9,7 @@ from .nodes.gamepad_nodes import *
 from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
 
-__version__ = "1.0.33"
+__version__ = "1.0.34"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
