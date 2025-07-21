@@ -2,11 +2,16 @@
 
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
+import { triggerNewGeneration } from "./node_utils.js";
 
 // Debug flag to control log outputs
 const ENABLE_DEBUG = false;
 
-const fxKeys = ["F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12"];
+// List of function keys to be used in the key control nodes
+const fxKeys = [
+    "F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12",
+    "F13","F14","F15","F16","F17","F18","F19","F20", "F21","F22","F23","F24"
+];
 
 /**
  * VrchIntKeyControlNode allows users to control an integer output value within
@@ -30,6 +35,7 @@ app.registerExtension({
             let minValueWidget = node.widgets.find(w => w.name === "min_value");
             let maxValueWidget = node.widgets.find(w => w.name === "max_value");
             let stepSizeWidget = node.widgets.find(w => w.name === "step_size");
+            let newGenerationWidget = node.widgets.find(w => w.name === "new_generation_after_pressing");
 
             // Retrieve values from the node's inputs
             let currentValue = parseInt(currentValueWidget ? currentValueWidget.value : 50);
@@ -217,6 +223,12 @@ app.registerExtension({
                                 if (newValue !== currentValue) {
                                     currentValue = newValue;
                                     updateDisplay();
+                                    
+                                    // Trigger new generation if enabled
+                                    if (newGenerationWidget && newGenerationWidget.value === true) {
+                                        triggerNewGeneration();
+                                    }
+                                    
                                     if (ENABLE_DEBUG) {
                                         console.log(`[VrchIntKeyControlNode] Value incremented to: ${currentValue}`);
                                     }
@@ -231,6 +243,12 @@ app.registerExtension({
                                 if (newValue !== currentValue) {
                                     currentValue = newValue;
                                     updateDisplay();
+                                    
+                                    // Trigger new generation if enabled
+                                    if (newGenerationWidget && newGenerationWidget.value === true) {
+                                        triggerNewGeneration();
+                                    }
+                                    
                                     if (ENABLE_DEBUG) {
                                         console.log(`[VrchIntKeyControlNode] Value decremented to: ${currentValue}`);
                                     }
@@ -297,6 +315,7 @@ app.registerExtension({
         if (node.comfyClass === "VrchFloatKeyControlNode") {
             // Initialize node state from inputs
             let currentValueWidget = node.widgets.find(w => w.name === "current_value");
+            let newGenerationWidget = node.widgets.find(w => w.name === "new_generation_after_pressing");
             let currentValue = parseFloat(currentValueWidget ? currentValueWidget.value : 0.50) || 0.50; // Default value
 
             // Create a display element for the current value
@@ -362,6 +381,12 @@ app.registerExtension({
                                     if (currentValueWidget) {
                                         currentValueWidget.value = currentValue.toFixed(2);
                                     }
+                                    
+                                    // Trigger new generation if enabled
+                                    if (newGenerationWidget && newGenerationWidget.value === true) {
+                                        triggerNewGeneration();
+                                    }
+                                    
                                     if (ENABLE_DEBUG) {
                                         console.log(`[VrchFloatKeyControlNode] Value incremented to: ${currentValue.toFixed(2)}`);
                                     }
@@ -377,6 +402,12 @@ app.registerExtension({
                                     if (currentValueWidget) {
                                         currentValueWidget.value = currentValue.toFixed(2);
                                     }
+                                    
+                                    // Trigger new generation if enabled
+                                    if (newGenerationWidget && newGenerationWidget.value === true) {
+                                        triggerNewGeneration();
+                                    }
+                                    
                                     if (ENABLE_DEBUG) {
                                         console.log(`[VrchFloatKeyControlNode] Value decremented to: ${currentValue.toFixed(2)}`);
                                     }
@@ -440,6 +471,7 @@ app.registerExtension({
         if (node.comfyClass === "VrchBooleanKeyControlNode") {
             // Initialize node state from inputs
             let currentValueWidget = node.widgets.find(w => w.name === "current_value");
+            let newGenerationWidget = node.widgets.find(w => w.name === "new_generation_after_pressing");
             let currentValue = currentValueWidget ? (currentValueWidget.value === "True" || currentValueWidget.value === true) : false; // Default value
 
             // Create a display element for the current value
@@ -483,6 +515,11 @@ app.registerExtension({
                     valueDisplay.textContent = `Value: ${currentValue}`;
                     if (currentValueWidget) {
                         currentValueWidget.value = currentValue;
+                    }
+
+                    // Trigger new generation if enabled
+                    if (newGenerationWidget && newGenerationWidget.value === true) {
+                        triggerNewGeneration();
                     }
 
                     if (ENABLE_DEBUG) {

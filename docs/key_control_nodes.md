@@ -8,6 +8,7 @@
    - **Shortcut Key 1 (`shortcut_key1`):** Select a key from `F1` to `F12` to serve as the primary shortcut key. Default is `F2`.
    - **Shortcut Key 2 (`shortcut_key2`):** Choose between `"Down/Up"` or `"Left/Right"` to determine the direction keys. Default is `"Down/Up"`.
    - **Current Value (`current_value`):** Set the initial integer value within the specified range (integer between `-9999` and `9999`). Default is `50`.
+   - **New Generation After Pressing (`new_generation_after_pressing`):** Enable automatic queue generation when key is pressed. Default is `False`.
 3. **Control Integer Value:**
    - **Incrementing:**
      - Press and hold the selected `shortcut_key1` (e.g., `F2`).
@@ -26,6 +27,7 @@
 - Prevent browser-specific shortcuts from interfering with the node's functionality.
 - Modified `min_value`, `max_value`, and `step_size` values persist across page reloads.
 - The `current_value` will always stay within the defined `min_value` and `max_value` boundaries, regardless of user interactions.
+- When `new_generation_after_pressing` is enabled, the queue will automatically trigger after value changes.
 
 ---
 
@@ -37,6 +39,7 @@
    - **Shortcut Key 1 (`shortcut_key1`):** Select a key from `F1` to `F12` to serve as the primary shortcut key. Default is `F1`.
    - **Shortcut Key 2 (`shortcut_key2`):** Choose between `"Down/Up"` or `"Left/Right"` to determine the direction keys. Default is `"Down/Up"`.
    - **Current Value (`current_value`):** Set the initial floating-point value (between `0.0-1.0`). Default is `0.50`.
+   - **New Generation After Pressing (`new_generation_after_pressing`):** Enable automatic queue generation when key is pressed. Default is `False`.
 3. **Control Floating-Point Value:**
    - **Incrementing:**
      - Press and hold the selected `shortcut_key1` (e.g., `F1`).
@@ -54,7 +57,7 @@
    - The current floating-point value is displayed within the node's UI.
    - Use the `FLOAT` output to connect the floating-point value to other nodes in your workflow.
 
-**Note:** Ensure that the ComfyUI window/tab is focused when using keyboard shortcuts. Prevent browser-specific shortcuts from interfering with the node's functionality.
+**Note:** Ensure that the ComfyUI window/tab is focused when using keyboard shortcuts. Prevent browser-specific shortcuts from interfering with the node's functionality. When `new_generation_after_pressing` is enabled, the queue will automatically trigger after value changes.
 
 ---
 
@@ -64,6 +67,7 @@
 2. **Configure the Node:**
    - **Shortcut Key (`shortcut_key`):** Select a key from `F1` to `F12` to serve as the toggle shortcut. Default is `F1`.
    - **Current Value (`current_value`):** Set the initial boolean value (`True`/`False`). Default is `False`.
+   - **New Generation After Pressing (`new_generation_after_pressing`):** Enable automatic queue generation when key is pressed. Default is `False`.
 3. **Toggle Boolean Value:**
    - **Using Shortcut Key:**
      - Press the selected `shortcut_key` (e.g., `F1`) to toggle the `current_value` between `True` and `False`.
@@ -72,7 +76,7 @@
    - The current boolean value is displayed within the node's UI.
    - Use the `BOOL` output to connect the boolean value to other nodes in your workflow.
 
-**Note:** Ensure that the ComfyUI window/tab is focused when using the shortcut key. Prevent browser-specific shortcuts from interfering with the node's functionality.
+**Note:** Ensure that the ComfyUI window/tab is focused when using the shortcut key. Prevent browser-specific shortcuts from interfering with the node's functionality. When `new_generation_after_pressing` is enabled, the queue will automatically trigger after value changes.
 
 ---
 

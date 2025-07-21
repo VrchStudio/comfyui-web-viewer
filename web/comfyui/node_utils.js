@@ -1,6 +1,25 @@
 // Enable debug logging
 export const ENABLE_DEBUG = false;
 
+/**
+ * Helper function to trigger a new queue generation.
+ * This function finds the queue button and clicks it to start a new generation.
+ */
+export function triggerNewGeneration() {
+    const buttonContainer = document.querySelector('div[data-testid="queue-button"]');
+    if (buttonContainer) {
+        const queueButton = buttonContainer.querySelector('button[data-pc-name="pcbutton"]');
+        if (queueButton) {
+            queueButton.click();
+            console.log('New queue generation triggered.');
+        } else {
+            console.warn("Queue button not found inside container.");
+        }
+    } else {
+        console.warn("Queue button container not found.");
+    }
+}
+
 // Helper functions to hide and show widgets
 export function hideWidget(node, widget) {
     // If widget is already hidden, do nothing

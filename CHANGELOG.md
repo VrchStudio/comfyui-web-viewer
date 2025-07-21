@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add new WebSocket nodes:
   - `VrchImageWebSocketSimpleWebViewerNode` - simplified image viewer without advanced settings
   - `VrchImageWebSocketSettingsNode` - dedicated settings management node
+- add `new_generation_after_pressing` parameter to Key Control nodes for automatic queue triggering
 
 ### Updated
 
@@ -34,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update web_viewer_nodes.md
 - update websocket_nodes.md
 - update audio_nodes.md
+- update key_control_nodes.md
 - refactor WebSocket server code by moving `SimpleWebSocketServer` to `./nodes/utils/websocket_server.py`
 - refactor utils directory structure by moving `./utils` to `./nodes/utils`
 - refactor WebSocket nodes architecture for better separation of concerns

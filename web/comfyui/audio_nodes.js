@@ -1,5 +1,6 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
+import { triggerNewGeneration } from "./node_utils.js";
 
 app.registerExtension({
     name: "vrch.AudioSaverNode",
@@ -221,21 +222,7 @@ app.registerExtension({
 
                                     // Trigger a new queue job if `new_generation_after_recording` is enabled
                                     if (newGenerationWidget && newGenerationWidget.value === true) {
-                                        // Locate the div container that holds the activation button
-                                        const buttonContainer = document.querySelector('div[data-testid="queue-button"]');
-
-                                        if (buttonContainer) {
-                                            
-                                            const queueButton = buttonContainer.querySelector('button[data-pc-name="pcbutton"]');
-                                            if (queueButton) {
-                                                queueButton.click();
-                                                console.log('New queue generation triggered.');
-                                            } else {
-                                                console.warn("Queue button not found inside container.");
-                                            }
-                                        } else {
-                                            console.warn("Queue button container not found.");
-                                        }
+                                        triggerNewGeneration();
                                     }
 
                                 };
