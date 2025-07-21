@@ -944,38 +944,38 @@ app.registerExtension({
                 setTimeout(() => {
                     const menuContainer = document.querySelector('div[data-pc-name="pcmenu"]');
                     // Select the two option buttons within the menu list items (li elements)
-                    const queueButton = menuContainer.querySelector('li[aria-label="Queue"] button');
-                    const queueInstantButton = menuContainer.querySelector('li[aria-label="Queue (Instant)"] button');
-                    const queueChangeButton = menuContainer.querySelector('li[aria-label="Queue (Change)"] button');
-                    
-                    // Check if 'isInstant' is true; if so, click Queue (Instant), otherwise click Queue
+                    const queueButton = menuContainer.querySelector('li[aria-label="Run"] button');
+                    const queueInstantButton = menuContainer.querySelector('li[aria-label="Run (Instant)"] button');
+                    const queueChangeButton = menuContainer.querySelector('li[aria-label="Run (On Change)"] button');
+
+                    // Check if 'isInstant' is true; if so, click Run (Instant), otherwise click Run
                     switch (queueOption) {
                         case "once":
                             if (queueButton) {
-                                // Click the Queue button
+                                // Click the Run button
                                 queueButton.click();
                             } else {
-                                console.warn("Queue button not found");
+                                console.warn("Run button not found");
                             }
                             break;
                         case "instant":
                             if (queueInstantButton) {
-                                // Click the Queue (Instant) button
+                                // Click the Run (Instant) button
                                 queueInstantButton.click();
                             } else {
-                                console.warn("Queue (Instant) button not found");
+                                console.warn("Run (Instant) button not found");
                             }
                             break;
                         case "change":
                             if (queueChangeButton) {
-                                // Click the Queue (Instant) button
+                                // Click the Run (On Change) button
                                 queueChangeButton.click();
                             } else {
-                                console.warn("Queue (Queue) button not found");
+                                console.warn("Run (On Change) button not found");
                             }
                             break;
                         default:
-                            console.error(`Invalide Queue Option: ${queueOption}`);
+                            console.error(`Invalid Queue Option: ${queueOption}`);
                             break;
                     }
                 }, 300); // Delay of 300 milliseconds, adjust as needed
