@@ -7,3 +7,23 @@ qrcode[pil]
 scikit-learn
 srt
 websockets
+# Music2Emotion dependencies
+chordparser==0.4.2
+fire==0.7.0
+gradio==5.15.0
+huggingface_hub==0.28.1
+hydra-core==1.3.2
+librosa==0.10.2.post1
+mir_eval==0.8.2
+music21==9.3.0
+numba==0.61.2
+llvmlite==0.44.0
+nnAudio==0.3.1
+omegaconf==2.3.0
+pandas==2.2.3
+pretty_midi==0.2.10
+pytorch_lightning==2.4.0
+PyYAML==6.0.1
+Requests==2.32.3
+spotipy==2.24.0
+soundfile

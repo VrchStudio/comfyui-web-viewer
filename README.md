@@ -1,8 +1,8 @@
 # ComfyUI Web Viewer
 
-The **ComfyUI Web Viewer** by [vrch.ai](https://vrch.ai) is a custom node collection offering a real-time AI-generated interactive art framework. This utility integrates realtime streaming into ComfyUI workflows, supporting keyboard control nodes, OSC control nodes, sound input nodes, and more. Accessible from any device with a web browser, it enables real time interaction with AI-generated content, making it ideal for interactive visual projects and enhancing ComfyUI workflows with efficient content management and display.
-
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/VrchStudio/comfyui-web-viewer)
+
+The **ComfyUI Web Viewer** by [vrch.ai](https://vrch.ai) is a custom node collection offering a real-time AI-generated interactive art framework. This utility integrates realtime streaming into ComfyUI workflows, supporting keyboard control nodes, OSC control nodes, sound input nodes, and more. Accessible from any device with a web browser, it enables real time interaction with AI-generated content, making it ideal for interactive visual projects and enhancing ComfyUI workflows with efficient content management and display.
 
 **✨ Features:**
 
@@ -27,11 +27,13 @@ see [CHANGELOG](CHANGELOG.md)
 
 ## Installation
 
-### Method 1: Auto Installation (Recommended)
+### Install ComfyUI Web Viewer Custom Node
+
+#### Method 1: Auto Installation (Recommended)
 
 Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directly.
 
-### Method 2: Manual Installation
+#### Method 2: Manual Installation
 
 1. Clone this repo into the `custom_nodes` directory of ComfyUI
    ```
@@ -46,6 +48,35 @@ Simply search for `ComfyUI Web Viewer` in ComfyUI Manager and install it directl
    python_embeded\python.exe -m pip install -r ComfyUI\custom_nodes\comfyui-web-viewer\requirements.txt
    ```
 3. Restart ComfyUI
+
+### Install Music2Emotion Plugin (Optional)
+
+To use the `AUDIO Music to Emotion Detector @ vrch.ai` node, you'll need to install the Music2Emotion third-party module:
+
+1. **Navigate to the ComfyUI Web Viewer directory:**
+   ```bash
+   cd path/to/ComfyUI/custom_nodes/comfyui-web-viewer
+   ```
+
+2. **Initialize and download the Music2Emotion submodule:**
+   ```bash
+   git submodule update --init --recursive
+   ```
+
+3. **Install dependencies using the main project's requirements.txt:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+   or for Windows portable install:
+   ```bash
+   python_embeded\python.exe -m pip install -r ComfyUI\custom_nodes\comfyui-web-viewer\requirements.txt
+   ```
+   
+   > ⚠️ **Important:** Always use the main project's `requirements.txt` instead of the third-party module's requirements file to avoid dependency conflicts. The ComfyUI Web Viewer's requirements.txt already includes all necessary Music2Emotion dependencies with compatible versions.
+
+4. **Restart ComfyUI**
+
+> **Note:** If the Music2Emotion module is not installed, the emotion detection node will show a warning message but remain functional for workflow compilation. Other audio nodes will work normally without this optional dependency.
 
 ## How to Use
 

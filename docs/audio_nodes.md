@@ -182,6 +182,67 @@
 
 ---
 
+### Node: `AUDIO Music to Emotion Detector @ vrch.ai` (vrch.ai/audio)
+
+1. **Add the `AUDIO Music to Emotion Detector @ vrch.ai` node to your ComfyUI workflow.**
+2. **Configure the Node:**
+   - **Audio Input (`audio`):** Connect an `AUDIO` input from a previous node in the workflow, such as an audio recorder, file loader, or microphone loader.
+   - **Analysis Parameters:**
+     - `threshold`: Set the probability threshold for mood detection (0.0-1.0, default: 0.5). Only moods with probabilities above this threshold will be included in the output.
+     - `debug`: Enable debug logging to show detailed processing information and intermediate results.
+3. **Music Emotion Analysis:**
+   - The node uses advanced Music2Emotion deep learning models to analyze audio for emotional content.
+   - **Emotion Recognition:** Predicts multiple mood categories with confidence scores.
+   - **Valence & Arousal:** Provides dimensional emotion analysis on a 1-9 scale:
+     - **Valence:** Measures positive vs. negative emotional content (1=very negative, 9=very positive).
+     - **Arousal:** Measures energy and activation level (1=very calm, 9=very energetic).
+4. **Outputs:**
+   - `AUDIO`: Passthrough of the original audio for further processing.
+   - `RAW_DATA`: Complete analysis results in JSON format containing all detected moods, probabilities, and metadata.
+   - `MOODS`: Formatted text output showing detected moods with their probabilities, displayed as:
+     ```
+     children: 0.9540
+     fun: 0.9500
+     funny: 0.9300
+     happy: 0.8980
+     upbeat: 0.8890
+     ```
+   - `VALENCE`: Emotional valence value (1.0-9.0) representing positive/negative sentiment.
+   - `AROUSAL`: Emotional arousal value (1.0-9.0) representing energy/activation level.
+5. **Mood Categories:**
+   - The system can detect various musical moods including: happy, sad, energetic, calm, dramatic, romantic, epic, dark, upbeat, melancholic, aggressive, peaceful, triumphant, mysterious, and many others.
+   - Each mood is assigned a probability score (0.0-1.0) indicating the confidence of detection.
+
+**Technical Features:**
+- **Multi-Modal Analysis:** Combines spectral, harmonic, and temporal audio features for comprehensive emotion detection.
+- **Real-Time Processing:** Optimized for real-time analysis of audio streams.
+- **Threshold Filtering:** Customizable probability thresholds to focus on high-confidence predictions.
+- **Comprehensive Output:** Provides both human-readable formatted output and machine-readable JSON data.
+
+**Applications:**
+- Music recommendation systems based on emotional content
+- Automatic playlist generation and categorization
+- Audio-reactive visual effects synchronized with emotional content
+- Content analysis for media production and post-production
+- Therapeutic and wellness applications using music emotion
+- Interactive installations responding to musical mood
+- Educational tools for music theory and emotion studies
+
+**Usage Tips:**
+- **Audio Quality:** Works best with clear, well-recorded audio. Background noise may affect accuracy.
+- **Threshold Setting:** 
+  - Lower thresholds (0.2-0.4): Show more mood predictions, including less confident ones.
+  - Higher thresholds (0.5-0.8): Focus on strong, confident mood predictions.
+- **Audio Length:** Optimal results with audio segments of 10-30 seconds. Very short clips may have limited emotional context.
+- **Music Types:** Performs well across various genres including pop, rock, classical, electronic, and acoustic music.
+
+**Installation Requirements:**
+- This node requires the Music2Emotion third-party module to be installed.
+- If the module is not available, the node will display a warning message but remain functional for workflow compilation.
+- Follow the installation instructions to download and set up the Music2emotion GitHub repository.
+
+---
+
 ### Node: `AUDIO Visualizer @ vrch.ai` (vrch.ai/audio)
 
 1. **Add the `AUDIO Visualizer @ vrch.ai` node to your ComfyUI workflow.**
