@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- add a new `VrchAudioMusic2EmotionNode` audio node for music emotion detection
+- add Music2Emotion Plugin integration with smart import detection mechanism
+- add comprehensive installation guide for Music2Emotion third-party plugin in README.md
+- add detailed documentation for AUDIO Music to Emotion Detector node in audio_nodes.md
+
+### Updated
+
+- update third_party module with automatic sys.path management for git submodules
+- update Music2Emotion integration to use VrchStudio/Music2Emotion fork with custom modifications
+- update audio emotion detection to output 5 data types: AUDIO, RAW_DATA, MOODS, VALENCE, AROUSAL
+- update mood probability display format to newline-separated with 4-decimal precision
+- update all emotion detection output names to uppercase convention
+- update requirements.txt with Music2Emotion dependencies (mir_eval, NumPy 2.0+ compatibility)
+
+### Fixed
+
+- fix import path conflicts in Music2Emotion module with relative import conversion
+- fix NumPy version compatibility issues by upgrading to NumPy 2.0.2 and Numba 0.61.2
+- fix graceful degradation when Music2Emotion dependencies are unavailable
+
 ## 1.0.34 - 2025-07-21
 
 ### Added
