@@ -8,6 +8,7 @@ from .nodes.websocket_nodes import *
 from .nodes.gamepad_nodes import *
 from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
+from .nodes.audio_music2emo_node import *
 
 __version__ = "1.0.34"
 
@@ -16,6 +17,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchAudioChannelLoaderNode": VrchAudioChannelLoaderNode,
     "VrchAudioConcatNode": VrchAudioConcatNode,
     "VrchAudioGenresNode": VrchAudioGenresNode,
+    "VrchAudioMusic2EmotionNode": VrchAudioMusic2EmotionNode,
     "VrchAudioRecorderNode": VrchAudioRecorderNode,
     "VrchAudioSaverNode": VrchAudioSaverNode,
     "VrchAudioVisualizerNode": VrchAudioVisualizerNode,
@@ -74,6 +76,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchAudioChannelLoaderNode": "AUDIO Web Viewer Channel Loader @ vrch.ai",
     "VrchAudioConcatNode": "AUDIO Concat @ vrch.ai",
     "VrchAudioGenresNode": "AUDIO Get Genres @ vrch.ai",
+    "VrchAudioMusic2EmotionNode": "AUDIO Music to Emotion Detector @ vrch.ai",
     "VrchAudioRecorderNode": "AUDIO Recorder @ vrch.ai",
     "VrchAudioSaverNode": "AUDIO Saver @ vrch.ai",
     "VrchAudioVisualizerNode": "AUDIO Visualizer @ vrch.ai",
