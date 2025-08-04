@@ -269,3 +269,60 @@
 - Creative visual effects synchronized with audio
 
 **Note:** Connect directly after the microphone loader for optimal real-time performance.
+
+---
+
+### Node: `AUDIO Frequency Band Analyzer @ vrch.ai` (vrch.ai/audio)
+
+1. **Add the `AUDIO Frequency Band Analyzer @ vrch.ai` node to your ComfyUI workflow.**
+2. **Connect Audio Data:**
+   - **Raw Data Input (`raw_data`):** Connect to the `RAW_DATA` output from an `AUDIO Microphone Loader @ vrch.ai` node.
+3. **Configure the Node:**
+   - **Frequency Band Parameters:**
+     - `freq_min`: Set the minimum frequency of the analysis band (20-20000 Hz, default: 200 Hz).
+     - `freq_max`: Set the maximum frequency of the analysis band (20-20000 Hz, default: 500 Hz).
+   - **Audio Parameters:**
+     - `sample_rate`: Match the sample rate from your microphone loader (16000, 24000, or 48000 Hz).
+   - **Debug Mode (`debug`):** Enable to show detailed frequency band analysis information.
+4. **Frequency Band Analysis:**
+   - The node analyzes the specified frequency range from the input spectrum data.
+   - Calculates the average volume level within the defined frequency window.
+   - Automatically handles frequency bin mapping based on sample rate and spectrum resolution.
+5. **Outputs:**
+   - `BAND_VOLUME`: The calculated average volume for the specified frequency band (0.0-1.0).
+   - `ANALYSIS_DATA`: Complete analysis data in JSON format including band parameters and statistics.
+
+**Frequency Band Configuration:**
+- **Custom Range:** Define any frequency range between 20 Hz and 20,000 Hz for targeted analysis.
+- **Automatic Validation:** The node automatically swaps min/max values if they are reversed.
+- **Bin Mapping:** Converts frequency ranges to spectrum bins based on sample rate and FFT size.
+
+**Applications:**
+- **Targeted Audio Analysis:** Monitor specific frequency ranges for particular instruments or sounds.
+- **Voice Detection:** Analyze speech frequency ranges (300-3400 Hz) for voice activity detection.
+- **Bass Monitoring:** Focus on low-frequency content (20-250 Hz) for bass and kick drum detection.
+- **Presence Detection:** Monitor mid-high frequencies (2000-8000 Hz) for clarity and presence.
+- **Noise Analysis:** Isolate specific frequency bands to detect and monitor unwanted noise.
+- **Musical Analysis:** Track harmonic content in specific frequency ranges for music analysis.
+- **Environmental Monitoring:** Detect specific frequency signatures in environmental audio.
+
+**Usage Tips:**
+- **Optimal Ranges:** Choose frequency ranges that match your specific application needs:
+  - Sub-bass: 20-60 Hz
+  - Bass: 60-250 Hz  
+  - Low midrange: 250-500 Hz
+  - Midrange: 500-2000 Hz
+  - Upper midrange: 2000-4000 Hz
+  - Presence: 4000-6000 Hz
+  - Brilliance: 6000-20000 Hz
+- **Resolution:** Narrower frequency bands provide more precise analysis but may have lower signal levels.
+- **Chain Setup:** Connect directly after `AUDIO Microphone Loader @ vrch.ai` using the `RAW_DATA` output for real-time analysis.
+- **Multiple Bands:** Use multiple instances to analyze different frequency ranges simultaneously.
+
+**Technical Details:**
+- **FFT Analysis:** Uses Fast Fourier Transform spectrum data for frequency domain analysis.
+- **Bin Calculation:** Automatically maps frequency ranges to appropriate spectrum bins.
+- **Average Calculation:** Computes the mean amplitude across all bins in the specified range.
+- **Real-time Processing:** Optimized for continuous real-time frequency band monitoring.
+
+**Note:** The accuracy of frequency band analysis depends on the FFT resolution and sample rate. Higher sample rates and larger FFT sizes provide better frequency resolution for precise band analysis.
