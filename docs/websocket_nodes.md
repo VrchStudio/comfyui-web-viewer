@@ -106,6 +106,8 @@ A dedicated node for managing and transmitting WebSocket settings parameters sep
      - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**) to differentiate WebSocket connections.
    - **Server:**
      - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
+   - **Send Settings Control:**
+     - **`send_settings`**: Toggle whether to actually send the settings to the WebSocket channel (default is **True**). When disabled, the node will skip settings transmission entirely, allowing you to prepare settings without broadcasting them.
    - **Websocket Parameters:**
      - **`number_of_images`**: Set the number of images to load (default is **1**, range: 1-99).
      - **`image_display_duration`**: Duration to display each image in milliseconds (default is **1000**, range: 1-10000).
@@ -121,7 +123,8 @@ A dedicated node for managing and transmitting WebSocket settings parameters sep
      - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting (default is **False**).
 
 3. **Settings Transmission:**
-   - This node automatically saves the WebSocket settings to a JSON format and sends them via the WebSocket connection.
+   - When **`send_settings`** is enabled (default), this node saves the WebSocket settings to a JSON format and sends them via the WebSocket connection.
+   - When **`send_settings`** is disabled, the node will skip transmission and output a debug message (if debug mode is enabled) indicating that settings sending is disabled.
    - Settings are transmitted to the specified channel and can be received by web viewers or other WebSocket clients.
    - The settings JSON includes: numberOfImages, imageDisplayDuration, fadeAnimDuration, mixBlendMode, enableLoop, enableUpdateOnEnd, bgColourPicker, and serverMessages.
 
@@ -130,11 +133,12 @@ A dedicated node for managing and transmitting WebSocket settings parameters sep
 
 **Notes:**
 - This node is designed to work alongside the **`IMAGE WebSocket Web Viewer @ vrch.ai`** node for clean separation of concerns.
-- Settings are automatically transmitted when the node executes, eliminating the need for manual save_settings toggles.
+- The **`send_settings`** toggle provides manual control over when settings are actually transmitted, useful for conditional workflows or testing scenarios.
 - Use this node when you need fine-grained control over WebSocket parameters without cluttering your image transmission workflow.
-- When debug mode is enabled, the node outputs detailed logs to the console about settings transmission.
+- When debug mode is enabled, the node outputs detailed logs to the console about settings transmission status.
 - The blend mode parameter provides extensive options for controlling how images are composited in the web viewer.
 - As this node has no outputs, it can be placed anywhere in your workflow without affecting data flow.
+- The **`send_settings`** parameter allows you to prepare and validate settings without immediately broadcasting them to connected clients.
 
 ---
 

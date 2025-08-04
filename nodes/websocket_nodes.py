@@ -232,6 +232,7 @@ class VrchImageWebSocketSettingsNode:
             "required": {
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "send_settings": ("BOOLEAN", {"default": True}),
                 "number_of_images": ("INT", {"default": 1, "min": 1, "max": 99}),
                 "image_display_duration":("INT", {"default": 1000, "min": 1, "max": 10000}),
                 "fade_anim_duration": ("INT", {"default": 200, "min": 1, "max": 10000}),
@@ -255,6 +256,7 @@ class VrchImageWebSocketSettingsNode:
     def send_settings(self,
                       channel,
                       server,
+                      send_settings,
                       number_of_images,
                       image_display_duration,
                       fade_anim_duration,
@@ -264,6 +266,12 @@ class VrchImageWebSocketSettingsNode:
                       background_colour_hex,
                       server_messages,
                       debug):
+        # Check if settings should be sent
+        if not send_settings:
+            if debug:
+                print(f"[VrchImageWebSocketSettingsNode] Settings sending is disabled, skipping")
+            return ()
+            
         host, port = server.split(":")
         server = get_global_server(host, port, path="/image", debug=debug) # Ensure path is set correctly for viewer
         ch = int(channel)
