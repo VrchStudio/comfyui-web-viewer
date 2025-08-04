@@ -46,7 +46,7 @@ class VrchWebSocketServerNode:
         ws_server = get_global_server(host, port, debug=debug)
         # Register default paths on first init or server change
         if server_changed or not getattr(self, '_initialized', False):
-            for p in ["/image", "/json", "/audio", "/video", "/text"]:
+            for p in ["/image", "/json", "/latent", "/audio", "/video", "/text"]:
                 ws_server.register_path(p)
             self._initialized = True
             self._last_server = server
@@ -406,6 +406,26 @@ def json_data_handler(message):
         # If it's not valid JSON, return None
         return None
 
+def latent_data_handler(message):
+    """Default handler for processing latent messages"""
+    try:
+        # Parse the JSON string to get latent data
+        latent_data = json.loads(message)
+        
+        # Convert back to tensor format expected by ComfyUI
+        if "samples" in latent_data:
+            samples_list = latent_data["samples"]
+            # Convert list back to numpy array then to tensor
+            samples_np = np.array(samples_list, dtype=np.float32)
+            samples_tensor = torch.from_numpy(samples_np)
+            
+            latent = {"samples": samples_tensor}
+            return latent
+        return None
+    except (json.JSONDecodeError, KeyError, ValueError):
+        # If parsing fails, return None
+        return None
+
 class VrchJsonWebSocketSenderNode:
     @classmethod
     def INPUT_TYPES(cls):
@@ -448,6 +468,56 @@ class VrchJsonWebSocketSenderNode:
             
         except json.JSONDecodeError as e:
             raise ValueError(f"[VrchJsonWebSocketSenderNode] Invalid JSON format: {str(e)}")
+
+class VrchLatentWebSocketSenderNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "latent": ("LATENT",),
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+    
+    RETURN_TYPES = ("LATENT",)
+    RETURN_NAMES = ("LATENT",)
+    FUNCTION = "send_latent"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+    
+    def send_latent(self, latent, channel, server, debug):
+        host, port = server.split(":")
+        server = get_global_server(host, port, path="/latent", debug=debug)
+        ch = int(channel)
+        
+        # Validate the latent data
+        if not latent or "samples" not in latent:
+            raise ValueError("[VrchLatentWebSocketSenderNode] Invalid latent data provided")
+            
+        try:
+            # Convert latent tensor to JSON-serializable format
+            samples_tensor = latent["samples"]
+            samples_list = samples_tensor.cpu().numpy().tolist()
+            
+            latent_data = {
+                "samples": samples_list,
+                "shape": list(samples_tensor.shape)
+            }
+            latent_json = json.dumps(latent_data)
+            
+            # Send the latent data to WebSocket clients
+            server.send_to_channel("/latent", ch, latent_json)
+            
+            if debug:
+                print(f"[VrchLatentWebSocketSenderNode] Sent latent to channel {ch} via server on {host}:{port} with path '/latent'")
+                print(f"[VrchLatentWebSocketSenderNode] Latent shape: {latent_data['shape']}")
+            
+            return (latent,)
+            
+        except Exception as e:
+            raise ValueError(f"[VrchLatentWebSocketSenderNode] Error processing latent data: {str(e)}")
 
 class VrchJsonWebSocketChannelLoaderNode:
     @classmethod
@@ -499,6 +569,60 @@ class VrchJsonWebSocketChannelLoaderNode:
         if debug:
             print(f"[VrchJsonWebSocketChannelLoaderNode] No JSON data received and no default provided, returning empty object")
         return ({},)
+    
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        # Always trigger evaluation to check for new data
+        return float("NaN")
+
+class VrchLatentWebSocketChannelLoaderNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "debug": ("BOOLEAN", {"default": False}),
+            },
+            "optional": {
+                 "default_latent": ("LATENT",),
+            }
+        }
+    
+    RETURN_TYPES = ("LATENT",)
+    RETURN_NAMES = ("LATENT",)
+    FUNCTION = "receive_latent"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+    
+    def receive_latent(self, channel=1, server="", debug=False, default_latent=None):
+        host, port = server.split(":")
+        client = get_websocket_client(host, port, "/latent", channel, data_handler=latent_data_handler, debug=debug)
+        
+        # Get latent data from WebSocket client
+        latent_data = client.get_latest_data()
+        
+        # If we received data from WebSocket, return it
+        if latent_data is not None:
+            if debug:
+                print(f"[VrchLatentWebSocketChannelLoaderNode] Received latent data on channel {channel}")
+                if "samples" in latent_data:
+                    print(f"[VrchLatentWebSocketChannelLoaderNode] Latent shape: {latent_data['samples'].shape}")
+            return (latent_data,)
+        
+        # If we didn't receive data, use the default latent (if provided)
+        if default_latent is not None:
+            if debug:
+                print(f"[VrchLatentWebSocketChannelLoaderNode] No latent data received, using default latent")
+            return (default_latent,)
+        
+        # If no default provided, create empty latent
+        if debug:
+            print(f"[VrchLatentWebSocketChannelLoaderNode] No latent data received and no default provided, creating empty latent")
+        
+        # Create a minimal empty latent with proper shape
+        empty_latent = {"samples": torch.zeros((1, 4, 64, 64), dtype=torch.float32)}
+        return (empty_latent,)
     
     @classmethod
     def IS_CHANGED(cls, **kwargs):
