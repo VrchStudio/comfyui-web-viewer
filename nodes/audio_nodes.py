@@ -225,6 +225,7 @@ class VrchMicLoaderNode:
                 "sample_rate": (["16000", "24000", "48000"], {"default": "48000"}),
                 "low_freq_max": ("INT", {"default": 200, "min": 50, "max": 1000, "step": 50}),
                 "mid_freq_max": ("INT", {"default": 5000, "min": 1000, "max": 10000, "step": 100}),
+                "enable_preview": ("BOOLEAN", {"default": True}),
                 "debug": ("BOOLEAN", {"default": False}),
                 "raw_data": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
             },
@@ -319,6 +320,7 @@ class VrchMicLoaderNode:
                         sample_rate: str = "48000",
                         low_freq_max: int = 200,
                         mid_freq_max: int = 5000,
+                        enable_preview: bool = True,
                         debug: bool = False, 
                         raw_data: str = ""):
         """

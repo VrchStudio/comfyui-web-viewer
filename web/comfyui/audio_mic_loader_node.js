@@ -16,6 +16,7 @@ app.registerExtension({
             const sensitivityWidget = node.widgets.find(w => w.name === "sensitivity");
             const frameSizeWidget = node.widgets.find(w => w.name === "frame_size");
             const sampleRateWidget = node.widgets.find(w => w.name === "sample_rate");
+            const enablePreviewWidget = node.widgets.find(w => w.name === "enable_preview");
             const rawDataWidget = node.widgets.find(w => w.name === "raw_data");
             const debugWidget = node.widgets.find(w => w.name === "debug");
             
@@ -51,6 +52,12 @@ app.registerExtension({
                 };
             }
             
+            if (enablePreviewWidget) {
+                enablePreviewWidget.callback = (value) => {
+                    updateVisualizerVisibility();
+                };
+            }
+            
             // Create visualizer elements
             const visualizerContainer = document.createElement("div");
             visualizerContainer.classList.add("mic-visualizer-container");
@@ -80,6 +87,10 @@ app.registerExtension({
             const controlsContainer = document.createElement("div");
             controlsContainer.classList.add("mic-controls-container");
             
+            // First row: Device dropdown
+            const deviceRow = document.createElement("div");
+            deviceRow.classList.add("mic-device-row");
+            
             // Device dropdown
             const deviceSelect = document.createElement("select");
             deviceSelect.classList.add("mic-device-select");
@@ -89,6 +100,12 @@ app.registerExtension({
             defaultOption.value = "";
             defaultOption.textContent = "Select Microphone...";
             deviceSelect.appendChild(defaultOption);
+            
+            deviceRow.appendChild(deviceSelect);
+            
+            // Second row: Buttons
+            const buttonRow = document.createElement("div");
+            buttonRow.classList.add("mic-button-row");
             
             // Reload button
             const reloadButton = document.createElement("button");
@@ -100,31 +117,52 @@ app.registerExtension({
             muteButton.innerHTML = '<span class="vrch-mic-speaker-icon">🔊</span>';
             muteButton.classList.add("vrch-mic-mute-button");
             
+            buttonRow.appendChild(reloadButton);
+            buttonRow.appendChild(muteButton);
+            
+            // Add rows to controls container
+            controlsContainer.appendChild(deviceRow);
+            controlsContainer.appendChild(buttonRow);
+            
             // Status indicator - now text-based on its own line
             const statusIndicator = document.createElement("div");
             statusIndicator.classList.add("vrch-mic-status-label");
-            
-            // Add elements to their containers
-            controlsContainer.appendChild(deviceSelect);
-            controlsContainer.appendChild(reloadButton);
-            controlsContainer.appendChild(muteButton);
             
             // Create a separate container for the status label to put it on its own line
             const statusContainer = document.createElement("div");
             statusContainer.classList.add("vrch-mic-status-container");
             statusContainer.appendChild(statusIndicator);
             
+            // Set initial status
             visualizerContainer.appendChild(waveformCanvas);
             visualizerContainer.appendChild(spectrumCanvas);
             visualizerContainer.appendChild(volumeMeterContainer);
             visualizerContainer.appendChild(controlsContainer);
             visualizerContainer.appendChild(statusContainer);
             
+            // Function to update visualizer visibility (only visual elements)
+            const updateVisualizerVisibility = () => {
+                if (enablePreviewWidget) {
+                    // Only hide/show the canvas elements and volume meter, keep controls visible
+                    const displayValue = enablePreviewWidget.value ? "block" : "none";
+                    waveformCanvas.style.display = displayValue;
+                    spectrumCanvas.style.display = displayValue;
+                    volumeMeterContainer.style.display = displayValue;
+                }
+            };
+            
             // Add the visualizer container as a DOM widget
             const widget = node.addDOMWidget("mic_visualizer_widget", "Microphone", visualizerContainer);
-            // Override the computeSize method to force correct sizing
+            // Override the computeSize method to dynamically adjust height based on enable_preview
             widget.computeSize = function(width) {
-                return [width, 320];
+                const baseHeight = 100;
+                const visualizerHeight = 280;
+                
+                // Check if preview is enabled
+                const isPreviewEnabled = enablePreviewWidget ? enablePreviewWidget.value : true;
+                const totalHeight = baseHeight + (isPreviewEnabled ? visualizerHeight : 0);
+                
+                return [width, totalHeight];
             };
 
             // Function to enumerate and list available audio devices
@@ -558,6 +596,7 @@ app.registerExtension({
             setTimeout(async () => {
                 // Initial setup
                 updateWidgetVisibility();
+                updateVisualizerVisibility();
                 
                 // Store the previously selected deviceId for recovery
                 const savedDeviceId = deviceIdWidget.value;
@@ -614,6 +653,8 @@ style.textContent = `
         flex-direction: column;
         gap: 10px;
         margin-top: 10px;
+        min-width: 0;
+        box-sizing: border-box;
     }
     
     .mic-canvas {
@@ -621,15 +662,20 @@ style.textContent = `
         height: 100px;
         background-color: #111;
         border-radius: 4px;
+        flex-shrink: 0;
+        min-width: 0;
+        box-sizing: border-box;
     }
     
     .mic-volume-meter-container {
         width: 100%;
         height: 20px;
-        background-color: #333;
+        background-color: #111;
         border-radius: 4px;
         position: relative;
         overflow: hidden;
+        flex-shrink: 0;
+        min-width: 0;
     }
     
     .mic-volume-meter-fill {
@@ -641,14 +687,25 @@ style.textContent = `
     
     .mic-controls-container {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        gap: 8px;
         margin-top: 10px;
     }
     
+    .mic-device-row {
+        display: flex;
+        width: 100%;
+    }
+    
+    .mic-button-row {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 5px;
+    }
+    
     .mic-device-select {
-        flex: 1;
-        margin-right: 10px;
+        width: 100%;
         padding: 5px;
         border-radius: 4px;
     }
@@ -698,7 +755,7 @@ style.textContent = `
         width: 100%;
         display: flex;
         justify-content: center;
-        margin-top: 10px;
+        margin-top: 0px;
     }
     
     .vrch-mic-status-label {
