@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- add new latent WebSocket nodes:
+  - `VrchLatentWebSocketSenderNode` - send latent data over WebSocket
+  - `VrchLatentWebSocketChannelLoaderNode` - receive latent data from WebSocket channel
+- add new audio analysis node:
+  - `VrchAudioFrequencyBandAnalyzerNode` - analyze specific frequency band volume from audio spectrum data
+
+### Updated
+
+- update `VrchImageWebSocketSettingsNode` to add `send_settings` parameter for manual control of settings transmission
+- update `VrchWebSocketServerNode` to register `/latent` path for latent data transmission
+- update `VrchMicLoaderNode` to add `enable_preview` parameter for controlling audio visualization display and improve UI layout with two-row controls design
+- update websocket_nodes.md with documentation for new latent WebSocket nodes
+- update audio_nodes.md with documentation for new audio frequency band analyzer node
+
+### Fixed
+
+- update `gradio` and `spotipy` version to fix vulnerable dependencies warning
+
 ## 1.1.0 - 2025-08-02
 
 ### Added
