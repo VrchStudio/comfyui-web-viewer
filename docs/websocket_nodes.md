@@ -106,6 +106,8 @@ A dedicated node for managing and transmitting WebSocket settings parameters sep
      - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**) to differentiate WebSocket connections.
    - **Server:**
      - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
+   - **Send Settings Control:**
+     - **`send_settings`**: Toggle whether to actually send the settings to the WebSocket channel (default is **True**). When disabled, the node will skip settings transmission entirely, allowing you to prepare settings without broadcasting them.
    - **Websocket Parameters:**
      - **`number_of_images`**: Set the number of images to load (default is **1**, range: 1-99).
      - **`image_display_duration`**: Duration to display each image in milliseconds (default is **1000**, range: 1-10000).
@@ -121,7 +123,8 @@ A dedicated node for managing and transmitting WebSocket settings parameters sep
      - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting (default is **False**).
 
 3. **Settings Transmission:**
-   - This node automatically saves the WebSocket settings to a JSON format and sends them via the WebSocket connection.
+   - When **`send_settings`** is enabled (default), this node saves the WebSocket settings to a JSON format and sends them via the WebSocket connection.
+   - When **`send_settings`** is disabled, the node will skip transmission and output a debug message (if debug mode is enabled) indicating that settings sending is disabled.
    - Settings are transmitted to the specified channel and can be received by web viewers or other WebSocket clients.
    - The settings JSON includes: numberOfImages, imageDisplayDuration, fadeAnimDuration, mixBlendMode, enableLoop, enableUpdateOnEnd, bgColourPicker, and serverMessages.
 
@@ -130,11 +133,12 @@ A dedicated node for managing and transmitting WebSocket settings parameters sep
 
 **Notes:**
 - This node is designed to work alongside the **`IMAGE WebSocket Web Viewer @ vrch.ai`** node for clean separation of concerns.
-- Settings are automatically transmitted when the node executes, eliminating the need for manual save_settings toggles.
+- The **`send_settings`** toggle provides manual control over when settings are actually transmitted, useful for conditional workflows or testing scenarios.
 - Use this node when you need fine-grained control over WebSocket parameters without cluttering your image transmission workflow.
-- When debug mode is enabled, the node outputs detailed logs to the console about settings transmission.
+- When debug mode is enabled, the node outputs detailed logs to the console about settings transmission status.
 - The blend mode parameter provides extensive options for controlling how images are composited in the web viewer.
 - As this node has no outputs, it can be placed anywhere in your workflow without affecting data flow.
+- The **`send_settings`** parameter allows you to prepare and validate settings without immediately broadcasting them to connected clients.
 
 ---
 
@@ -155,8 +159,8 @@ A dedicated node for managing and transmitting WebSocket settings parameters sep
 
 4. **Usage:**
    - This node must be executed in your workflow to start the WebSocket server
-   - Once running, it handles communication for all WebSocket nodes (Image and JSON)
-   - The server maintains separate connection paths for different data types (/image and /json)
+   - Once running, it handles communication for all WebSocket nodes (Image, JSON, and Latent)
+   - The server maintains separate connection paths for different data types (/image, /json, /latent, /audio, /video, /text)
    - Multiple clients can connect simultaneously to the same server
 
 **Notes:**
@@ -225,6 +229,89 @@ A dedicated node for managing and transmitting WebSocket settings parameters sep
 - Ensure your JSON string is properly formatted to avoid validation errors.
 - The JSON data is sent through the WebSocket as a raw string.
 - When debug mode is enabled, the node outputs detailed logs to the console, including the content of the sent JSON data.
+
+---
+
+### Node: `JSON WebSocket Channel Loader @ vrch.ai` (vrch.ai/viewer/websocket)
+
+1. **Add the `JSON WebSocket Channel Loader @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Channel:**
+     - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**) to specify which WebSocket channel to listen on.
+   - **Server:**
+     - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
+   - **Debug Mode:**
+     - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
+   - **Default JSON:**
+     - **`default_json_string`**: (Optional) Enter a default JSON string to use when no data is received. This should be a properly formatted JSON string.
+
+3. **Receiving JSON Data:**
+   - This node automatically connects to the specified WebSocket channel and listens for incoming JSON data.
+   - When JSON data is received, it will be parsed and made available as an output that can be connected to other nodes in your workflow.
+   - If no JSON data has been received yet, the default JSON string will be used (if provided), otherwise an empty object `{}` is returned.
+   - If the provided default JSON string is not valid JSON, the node will raise a ValueError.
+
+**Notes:**
+- This node is designed to work with the `JSON WebSocket Sender @ vrch.ai` node, receiving the JSON data it broadcasts.
+- The node automatically establishes and maintains WebSocket connections, reconnecting if the connection is lost.
+- The node continuously monitors for new JSON data, allowing your workflow to react to data sent from any source that connects to the same WebSocket channel.
+- When debug mode is enabled, the node outputs detailed logs to the console, which can help you track the JSON data reception process.
+
+---
+
+### Node: `LATENT WebSocket Sender @ vrch.ai` (vrch.ai/viewer/websocket)
+
+1. **Add the `LATENT WebSocket Sender @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Latent Input:**
+     - **`latent`**: Connect the latent data you want to send over WebSocket. This should be a properly formatted latent tensor.
+   - **Channel:**
+     - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**) to differentiate WebSocket connections.
+   - **Server:**
+     - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
+   - **Debug Mode:**
+     - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
+
+3. **Sending Latent Data:**
+   - The node validates the latent data before sending. If the latent data is invalid, the node will raise a ValueError.
+   - The latent tensor is converted to JSON format (including shape information) and sent to the specified WebSocket channel and path (/latent).
+   - The original latent data is also available as an output that can be connected to other nodes.
+
+**Notes:**
+- This node works with the `WebSocket Server @ vrch.ai` node, which must be running to establish connections.
+- Ensure your latent data contains valid samples to avoid validation errors.
+- The latent data is converted to JSON format for transmission and includes shape information for proper reconstruction.
+- When debug mode is enabled, the node outputs detailed logs to the console, including the shape of the sent latent data.
+
+---
+
+### Node: `LATENT WebSocket Channel Loader @ vrch.ai` (vrch.ai/viewer/websocket)
+
+1. **Add the `LATENT WebSocket Channel Loader @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Channel:**
+     - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**) to specify which WebSocket channel to listen on.
+   - **Server:**
+     - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
+   - **Debug Mode:**
+     - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
+   - **Default Latent:**
+     - **`default_latent`**: (Optional) Latent data to use when no data is received from the WebSocket channel.
+
+3. **Receiving Latent Data:**
+   - This node automatically connects to the specified WebSocket channel and listens for incoming latent data.
+   - When latent data is received, it will be parsed and reconstructed into the proper tensor format for use in your workflow.
+   - If no latent data has been received yet, the default latent will be used (if provided), otherwise an empty latent tensor is created.
+   - The empty latent has dimensions (1, 4, 64, 64) suitable for most diffusion model workflows.
+
+**Notes:**
+- This node is designed to work with the `LATENT WebSocket Sender @ vrch.ai` node, receiving the latent data it broadcasts.
+- The node automatically establishes and maintains WebSocket connections, reconnecting if the connection is lost.
+- The node continuously monitors for new latent data, allowing your workflow to react to latent data sent from any source that connects to the same WebSocket channel.
+- When debug mode is enabled, the node outputs detailed logs to the console, which can help you track the latent data reception process and show tensor shapes.
 
 ---
 

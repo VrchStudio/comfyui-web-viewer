@@ -10,12 +10,13 @@ from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
     "VrchAudioChannelLoaderNode": VrchAudioChannelLoaderNode,
     "VrchAudioConcatNode": VrchAudioConcatNode,
+    "VrchAudioFrequencyBandAnalyzerNode": VrchAudioFrequencyBandAnalyzerNode,
     "VrchAudioGenresNode": VrchAudioGenresNode,
     "VrchAudioMusic2EmotionNode": VrchAudioMusic2EmotionNode,
     "VrchAudioRecorderNode": VrchAudioRecorderNode,
@@ -50,6 +51,8 @@ NODE_CLASS_MAPPINGS = {
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
     "VrchJsonWebSocketChannelLoaderNode": VrchJsonWebSocketChannelLoaderNode,
     "VrchJsonWebSocketSenderNode": VrchJsonWebSocketSenderNode,
+    "VrchLatentWebSocketChannelLoaderNode": VrchLatentWebSocketChannelLoaderNode,
+    "VrchLatentWebSocketSenderNode": VrchLatentWebSocketSenderNode,
     "VrchMicLoaderNode": VrchMicLoaderNode,
     "VrchMidiDeviceLoaderNode": VrchMidiDeviceLoaderNode,
     "VrchModelWebViewerNode": VrchModelWebViewerNode,
@@ -75,6 +78,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchAnyOSCControlNode": "ANY Value OSC Control @ vrch.ai",
     "VrchAudioChannelLoaderNode": "AUDIO Web Viewer Channel Loader @ vrch.ai",
     "VrchAudioConcatNode": "AUDIO Concat @ vrch.ai",
+    "VrchAudioFrequencyBandAnalyzerNode": "AUDIO Frequency Band Analyzer @ vrch.ai",
     "VrchAudioGenresNode": "AUDIO Get Genres @ vrch.ai",
     "VrchAudioMusic2EmotionNode": "AUDIO Music to Emotion Detector @ vrch.ai",
     "VrchAudioRecorderNode": "AUDIO Recorder @ vrch.ai",
@@ -109,6 +113,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchJsonUrlLoaderNode": "JSON URL Loader @ vrch.ai",
     "VrchJsonWebSocketChannelLoaderNode": "JSON WebSocket Channel Loader @ vrch.ai",
     "VrchJsonWebSocketSenderNode": "JSON WebSocket Sender @ vrch.ai",
+    "VrchLatentWebSocketChannelLoaderNode": "LATENT WebSocket Channel Loader @ vrch.ai",
+    "VrchLatentWebSocketSenderNode": "LATENT WebSocket Sender @ vrch.ai",
     "VrchMicLoaderNode": "AUDIO Microphone Loader @ vrch.ai",
     "VrchMidiDeviceLoaderNode": "MIDI Device Loader @ vrch.ai",
     "VrchModelWebViewerNode": "3D MODEL Web Viewer @ vrch.ai",

@@ -225,6 +225,7 @@ class VrchMicLoaderNode:
                 "sample_rate": (["16000", "24000", "48000"], {"default": "48000"}),
                 "low_freq_max": ("INT", {"default": 200, "min": 50, "max": 1000, "step": 50}),
                 "mid_freq_max": ("INT", {"default": 5000, "min": 1000, "max": 10000, "step": 100}),
+                "enable_preview": ("BOOLEAN", {"default": True}),
                 "debug": ("BOOLEAN", {"default": False}),
                 "raw_data": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
             },
@@ -319,6 +320,7 @@ class VrchMicLoaderNode:
                         sample_rate: str = "48000",
                         low_freq_max: int = 200,
                         mid_freq_max: int = 5000,
+                        enable_preview: bool = True,
                         debug: bool = False, 
                         raw_data: str = ""):
         """
@@ -441,6 +443,164 @@ class VrchMicLoaderNode:
         
         m = hashlib.sha256()
         m.update(raw_data.encode("utf-8"))
+        return m.hexdigest()
+
+class VrchAudioFrequencyBandAnalyzerNode:
+    """
+    Node for analyzing specific frequency band volume from audio raw data.
+    """
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "raw_data": ("JSON",),
+                "freq_min": ("INT", {"default": 200, "min": 20, "max": 20000, "step": 10}),
+                "freq_max": ("INT", {"default": 500, "min": 20, "max": 20000, "step": 10}),
+                "sample_rate": (["16000", "24000", "48000"], {"default": "48000"}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+    
+    RETURN_TYPES = ("JSON", "FLOAT")
+    RETURN_NAMES = ("ANALYSIS_DATA", "BAND_VOLUME")
+    FUNCTION = "analyze_frequency_band"
+    CATEGORY = CATEGORY
+    
+    def analyze_frequency_band(self, raw_data, freq_min, freq_max, sample_rate="48000", debug=False):
+        """
+        Analyze the volume of a specific frequency band from audio raw data.
+        
+        Args:
+            raw_data: JSON string containing spectrum data
+            freq_min: Minimum frequency of the band (Hz)
+            freq_max: Maximum frequency of the band (Hz)
+            sample_rate: Audio sample rate
+            debug: Enable debug output
+            
+        Returns:
+            tuple: (band_volume, analysis_data)
+        """
+        try:
+            # Initialize default values
+            band_volume = 0.0
+            spectrum = []
+            
+            # Parse raw_data if available
+            if raw_data:
+                try:
+                    # Handle JSON input - raw_data is already parsed if it's JSON type
+                    if isinstance(raw_data, str):
+                        parsed_data = json.loads(raw_data)
+                    else:
+                        parsed_data = raw_data
+                    
+                    # Get spectrum data
+                    if "spectrum" in parsed_data and isinstance(parsed_data["spectrum"], list):
+                        spectrum = parsed_data["spectrum"]
+                    
+                except (json.JSONDecodeError, TypeError):
+                    if debug:
+                        print("[VrchAudioFrequencyBandAnalyzerNode] Failed to parse raw_data as JSON")
+                except Exception as e:
+                    if debug:
+                        print(f"[VrchAudioFrequencyBandAnalyzerNode] Error processing raw_data: {str(e)}")
+            
+            # Calculate frequency band volume if spectrum data is available
+            if spectrum:
+                band_volume = self.calculate_band_volume(
+                    spectrum, 
+                    int(sample_rate), 
+                    freq_min, 
+                    freq_max
+                )
+            
+            # Create analysis data
+            analysis_data = {
+                "band_volume": band_volume,
+                "freq_min": freq_min,
+                "freq_max": freq_max,
+                "sample_rate": int(sample_rate),
+                "spectrum_length": len(spectrum),
+                "has_spectrum_data": len(spectrum) > 0
+            }
+            
+            if debug:
+                print(f"[VrchAudioFrequencyBandAnalyzerNode] Frequency band {freq_min}-{freq_max}Hz volume: {band_volume:.4f}")
+                print(f"[VrchAudioFrequencyBandAnalyzerNode] Spectrum length: {len(spectrum)}")
+            
+            return (analysis_data, band_volume)
+            
+        except Exception as e:
+            if debug:
+                print(f"[VrchAudioFrequencyBandAnalyzerNode] Error: {str(e)}")
+            
+            # Return default values on error
+            error_data = {
+                "band_volume": 0.0,
+                "freq_min": freq_min,
+                "freq_max": freq_max,
+                "sample_rate": int(sample_rate),
+                "error": str(e)
+            }
+            return (error_data, 0.0)
+    
+    def calculate_band_volume(self, spectrum, sample_rate, freq_min, freq_max):
+        """
+        Calculate the average volume for a specific frequency band.
+        
+        Args:
+            spectrum: FFT spectrum data (list)
+            sample_rate: Audio sample rate in Hz
+            freq_min: Minimum frequency of the band (Hz)
+            freq_max: Maximum frequency of the band (Hz)
+            
+        Returns:
+            float: Average volume in the specified frequency band
+        """
+        try:
+            if not spectrum or len(spectrum) == 0:
+                return 0.0
+            
+            # Ensure freq_min <= freq_max
+            if freq_min > freq_max:
+                freq_min, freq_max = freq_max, freq_min
+            
+            # Calculate frequency resolution
+            nyquist = sample_rate / 2
+            freq_bins = len(spectrum)
+            freq_per_bin = nyquist / freq_bins
+            
+            # Calculate frequency band boundaries in bins
+            bin_min = max(0, int(freq_min / freq_per_bin))
+            bin_max = min(freq_bins - 1, int(freq_max / freq_per_bin))
+            
+            # Ensure we have a valid range
+            if bin_min >= bin_max:
+                return 0.0
+            
+            # Calculate average volume for the frequency band
+            band_spectrum = spectrum[bin_min:bin_max + 1]
+            band_volume = sum(band_spectrum) / len(band_spectrum) if band_spectrum else 0.0
+            
+            return float(band_volume)
+            
+        except Exception as e:
+            print(f"[VrchAudioFrequencyBandAnalyzerNode] Error calculating band volume: {str(e)}")
+            return 0.0
+    
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        raw_data = kwargs.get("raw_data", "")
+        if not raw_data:
+            return False
+        
+        m = hashlib.sha256()
+        # Handle JSON input properly
+        if isinstance(raw_data, str):
+            m.update(raw_data.encode("utf-8"))
+        else:
+            # Convert JSON to string for hashing
+            m.update(json.dumps(raw_data, sort_keys=True).encode("utf-8"))
         return m.hexdigest()
 
 class VrchAudioConcatNode:
