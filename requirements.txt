@@ -7,11 +7,11 @@ qrcode[pil]
 scikit-learn
 srt
 websockets
+huggingface_hub
 # Music2Emotion dependencies
 chordparser==0.4.2
 fire==0.7.0
 gradio==5.40.0
-huggingface_hub==0.28.1
 hydra-core==1.3.2
 librosa==0.10.2.post1
 mir_eval==0.8.2
