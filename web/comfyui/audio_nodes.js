@@ -61,7 +61,8 @@ app.registerExtension({
                 let isStopping = false; // prevent re-entrant stop
                 let recordingTimer;
                 let loopIntervalTimer;
-                let shortcutKeyPressed = false; // Flag to handle shortcut key status
+                let shortcutKeyPressed = false; // Flag to handle shortcut key status (keyboard)
+                let holdPressed = false; // Flag for mouse press-and-hold on the button
                 let currentSession = null; // holds the latest recording session object
                 let cooldownUntil = 0; // timestamp ms for short cooldown after stop
                 const COOL_DOWN_MS = 300; // minimal cooldown to debounce rapid toggles
@@ -155,9 +156,9 @@ app.registerExtension({
 
                     if (mode === 'press_and_hold') {
                         startBtn.innerText = isRecording ? 'Recording...' : 'Press and Hold to Record';
-                        startBtn.onmousedown = startRecording;
-                        startBtn.onmouseup = () => stopRecording(true); // manual stop
-                        startBtn.onmouseleave = () => stopRecording(true); // manual stop
+                        startBtn.onmousedown = () => { holdPressed = true; startRecording(); };
+                        startBtn.onmouseup = () => { holdPressed = false; stopRecording(true); }; // manual stop
+                        startBtn.onmouseleave = () => { holdPressed = false; stopRecording(true); }; // manual stop
                         startBtn.onclick = null;
                     } else if (mode === 'start_and_stop') {
                         if (isRecording) {
@@ -203,7 +204,8 @@ app.registerExtension({
                         .then((stream) => {
                             // If recording was cancelled before permissions resolved, abort cleanly
                             const isPressAndHold = recordModeWidget && recordModeWidget.value === 'press_and_hold';
-                            if (!isRecording || isStopping || (isPressAndHold && !shortcutKeyPressed)) {
+                            const stillHolding = shortcutKeyPressed || holdPressed;
+                            if (!isRecording || isStopping || (isPressAndHold && !stillHolding)) {
                                 try { stream.getTracks().forEach(t => t.stop()); } catch (e) {}
                                 // Ensure state is consistent and UI reflects idle
                                 isRecording = false;
