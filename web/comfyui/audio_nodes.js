@@ -201,6 +201,15 @@ app.registerExtension({
 
                     navigator.mediaDevices.getUserMedia({ audio: true })
                         .then((stream) => {
+                            // If recording was cancelled before permissions resolved, abort cleanly
+                            const isPressAndHold = recordModeWidget && recordModeWidget.value === 'press_and_hold';
+                            if (!isRecording || isStopping || (isPressAndHold && !shortcutKeyPressed)) {
+                                try { stream.getTracks().forEach(t => t.stop()); } catch (e) {}
+                                // Ensure state is consistent and UI reflects idle
+                                isRecording = false;
+                                switchButtonMode(recordModeWidget.value);
+                                return; // do not start a recorder anymore
+                            }
                             mediaRecorder = new MediaRecorder(stream, {
                                 mimeType: 'audio/webm'
                             });
