@@ -55,11 +55,16 @@ app.registerExtension({
                 const currentNode = this;
 
                 let mediaRecorder;
-                let audioChunks = [];
+                // NOTE: Avoid shared mutable chunks across sessions; use session-scoped chunks instead.
+                // let audioChunks = [];
                 let isRecording = false;
+                let isStopping = false; // prevent re-entrant stop
                 let recordingTimer;
                 let loopIntervalTimer;
                 let shortcutKeyPressed = false; // Flag to handle shortcut key status
+                let currentSession = null; // holds the latest recording session object
+                let cooldownUntil = 0; // timestamp ms for short cooldown after stop
+                const COOL_DOWN_MS = 300; // minimal cooldown to debounce rapid toggles
 
                 // Hide the base64_data widget
                 const base64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
@@ -173,9 +178,12 @@ app.registerExtension({
                     }
                 };
 
+                const inCooldown = () => Date.now() < cooldownUntil;
+
                 const startRecording = () => {
-                    if (isRecording) {
-                        return; // Don't start a new recording if we're not supposed to continue the loop
+                    // Prevent starting while already recording, stopping, or during cooldown
+                    if (isRecording || isStopping || inCooldown()) {
+                        return;
                     }
 
                     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -188,21 +196,43 @@ app.registerExtension({
                         loopIntervalTimer = null;
                     }
 
-                    audioChunks = [];
                     isRecording = true;
+                    isStopping = false;
 
                     navigator.mediaDevices.getUserMedia({ audio: true })
                         .then((stream) => {
                             mediaRecorder = new MediaRecorder(stream, {
                                 mimeType: 'audio/webm'
                             });
+                            // Create a session scoped container to avoid races between rapid start/stop
+                            const session = {
+                                id: Symbol('rec'),
+                                chunks: [],
+                                stream,
+                                recorder: mediaRecorder,
+                                active: true,
+                            };
+                            currentSession = session;
                             mediaRecorder.ondataavailable = (event) => {
-                                if (event.data.size > 0) {
-                                    audioChunks.push(event.data);
+                                // Only accept data for current active session
+                                if (session.active && currentSession === session && event.data && event.data.size > 0) {
+                                    session.chunks.push(event.data);
                                 }
                             };
                             mediaRecorder.onstop = () => {
-                                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                                // Guard: stop may fire after a new session started
+                                session.active = false;
+                                try { session.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
+
+                                // Drop stale session callback work
+                                if (currentSession !== session) {
+                                    // ensure state flags progress, but skip UI/trigger
+                                    isStopping = false;
+                                    cooldownUntil = Date.now() + COOL_DOWN_MS;
+                                    return;
+                                }
+
+                                const audioBlob = new Blob(session.chunks || [], { type: 'audio/webm' });
                                 const reader = new FileReader();
 
                                 reader.onloadend = () => {
@@ -225,6 +255,10 @@ app.registerExtension({
                                         triggerNewGeneration();
                                     }
 
+                                    // finalize stop state and start cooldown
+                                    isStopping = false;
+                                    cooldownUntil = Date.now() + COOL_DOWN_MS;
+
                                 };
                                 reader.readAsDataURL(audioBlob);
                             };
@@ -242,18 +276,22 @@ app.registerExtension({
                             const startCountdown = Math.min(10, maxDuration);
 
                             const updateCountdown = () => {
-                                if (remainingTime <= startCountdown) {
-                                    countdownDisplay.textContent = `Recording will stop in ${remainingTime} seconds`;
+                                const showTime = Math.max(remainingTime, 0);
+                                if (showTime <= startCountdown) {
+                                    countdownDisplay.textContent = `Recording will stop in ${showTime} seconds`;
                                 } else {
                                     countdownDisplay.textContent = 'Recording...';
                                 }
-                                
+
                                 if (remainingTime <= 0) {
-                                    clearInterval(recordingTimer);
-                                    remainingTime = 0;
-                                    if (isRecording) {
-                                        stopRecording(false); //auto stop
+                                    if (recordingTimer) {
+                                        clearInterval(recordingTimer);
+                                        recordingTimer = null;
                                     }
+                                    if (isRecording) {
+                                        stopRecording(false); // auto stop (not manual)
+                                    }
+                                    return; // do not decrement further
                                 }
                                 remainingTime--;
                             };
@@ -263,57 +301,66 @@ app.registerExtension({
                             // start timer
                             recordingTimer = setInterval(updateCountdown, 1000);
                         })
-                        .catch(error => console.error('Error accessing audio devices.', error));
+                        .catch(error => {
+                            console.error('Error accessing audio devices.', error);
+                            // reset state if we failed to start
+                            isRecording = false;
+                            isStopping = false;
+                            countdownDisplay.textContent = '';
+                            switchButtonMode(recordModeWidget.value);
+                        });
                 };
 
                 const stopRecording = (isManualStop = false, delay = 300) => {
+                    if (isStopping) {
+                        return; // already stopping
+                    }
+                    isStopping = true;
+
+                    // Always clear countdown and loop timers (idempotent cleanup)
+                    if (recordingTimer) {
+                        clearInterval(recordingTimer);
+                        recordingTimer = null;
+                    }
+                    if (loopIntervalTimer) {
+                        clearTimeout(loopIntervalTimer);
+                        loopIntervalTimer = null;
+                    }
+                    countdownDisplay.textContent = '';
+
+                    const loopWidget = currentNode.widgets.find(w => w.name === 'loop');
+                    if (isManualStop) {
+                        // Manual stop cancels loop immediately
+                        if (loopWidget) {
+                            loopWidget.value = false;
+                            if (loopWidget.callback) {
+                                loopWidget.callback(loopWidget.value);
+                            }
+                        }
+                        console.log('Recording stopped manually');
+                    } else if (loopWidget && loopWidget.value === true && recordModeWidget.value === 'start_and_stop') {
+                        // Auto-stop: schedule restart after interval
+                        const loopIntervalWidget = currentNode.widgets.find(w => w.name === 'loop_interval');
+                        const loopInterval = (loopIntervalWidget && loopIntervalWidget.value) ? loopIntervalWidget.value : 0.5;
+                        loopIntervalTimer = setTimeout(() => {
+                            startRecording();
+                        }, loopInterval * 1000);
+                        console.log('Recording is restarted in a loop');
+                    }
+
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
                         setTimeout(() => {
-                            if (mediaRecorder) {
-                                mediaRecorder.stop();
-                            }
+                            try { mediaRecorder.stop(); } catch (e) {}
                             mediaRecorder = null;
                         }, delay);
-                        isRecording = false;
-
-                        if (recordingTimer) {
-                            clearInterval(recordingTimer);
-                            recordingTimer = null;
-                        }
-
-                        countdownDisplay.textContent = ''; // Clear countdown display
-
-                        const loopWidget = currentNode.widgets.find(w => w.name === 'loop');
-
-                        if (isManualStop) {
-                            // If it's a manual stop, always stop the loop and update the button
-                            if (loopWidget) {
-                                loopWidget.value = false;
-                                if (loopWidget.callback) {
-                                    loopWidget.callback(loopWidget.value);
-                                }
-                            }
-
-                            if (loopIntervalTimer) {
-                                clearInterval(loopIntervalTimer);
-                                loopIntervalTimer = null;
-                            }
-
-                            console.log('Recording stopped manually');
-
-                        } else if (loopWidget.value === true && recordModeWidget.value === 'start_and_stop') {
-                            // If it's an automatic stop and loop is enabled, restart recording after the interval
-                            const loopIntervalWidget = currentNode.widgets.find(w => w.name === 'loop_interval');
-                            const loopInterval = (loopIntervalWidget && loopIntervalWidget.value) ? loopIntervalWidget.value : 0.5;
-                            loopIntervalTimer = setTimeout(() => {
-                                startRecording();
-                            }, loopInterval * 1000);
-
-                            console.log('Recording is restarted in a loop');
-                        }
-
-                        switchButtonMode(recordModeWidget.value);
+                    } else {
+                        // Not actually recording (e.g., rapid double stop), finalize flags
+                        isStopping = false;
+                        cooldownUntil = Date.now() + COOL_DOWN_MS;
                     }
+
+                    isRecording = false;
+                    switchButtonMode(recordModeWidget.value);
                 };
 
                 // Initialize button mode based on the record mode
