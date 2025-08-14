@@ -112,25 +112,52 @@ class VrchAudioRecorderNode:
                       loop, loop_interval, shortcut, shortcut_key, 
                       new_generation_after_recording):
         
-        audio_data = base64.b64decode(base64_data)
+        def _silent_audio(duration_sec: float = 0.5, sample_rate: int = 44100):
+            """Return a short silent stereo audio as a safe fallback."""
+            num_samples = max(int(sample_rate * duration_sec), 1)
+            waveform = torch.zeros(2, num_samples)
+            return {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
+
+        # Validate base64 content early to avoid decoder/ffmpeg crashes
+        if not base64_data or not isinstance(base64_data, str) or not base64_data.strip():
+            return (_silent_audio(),)
+
+        try:
+            audio_data = base64.b64decode(base64_data)
+        except Exception:
+            # Bad/partial base64 -> return silence
+            return (_silent_audio(),)
+
+        if not audio_data:
+            return (_silent_audio(),)
+
         input_buffer = io.BytesIO(audio_data)
 
-        output_buffer = io.BytesIO()
-        process = (
-            ffmpeg
-            .input('pipe:0', format='webm')
-            .output('pipe:1', format='wav')
-            .run_async(pipe_stdin=True, pipe_stdout=True, pipe_stderr=True)
-        )
-        output, _ = process.communicate(input=input_buffer.read())
-        output_buffer.write(output)
-        output_buffer.seek(0)
+        # Decode webm -> wav via ffmpeg with error handling
+        try:
+            output_buffer = io.BytesIO()
+            process = (
+                ffmpeg
+                .input('pipe:0', format='webm')
+                .output('pipe:1', format='wav')
+                .run_async(pipe_stdin=True, pipe_stdout=True, pipe_stderr=True)
+            )
+            output, _ = process.communicate(input=input_buffer.read())
+            if not output:
+                return (_silent_audio(),)
+            output_buffer.write(output)
+            output_buffer.seek(0)
+        except Exception:
+            return (_silent_audio(),)
 
-        waveform, sample_rate = torchaudio.load(output_buffer)
+        # Load wav bytes with torchaudio
+        try:
+            waveform, sample_rate = torchaudio.load(output_buffer)
+        except Exception:
+            return (_silent_audio(),)
         
-        # Check if the audio is mono (single channel)
+        # Ensure stereo output for downstream consistency
         if waveform.shape[0] == 1:
-            # Convert mono to stereo by duplicating the channel
             waveform = waveform.repeat(2, 1)
         
         audio = {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
