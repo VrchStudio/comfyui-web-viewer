@@ -10,7 +10,7 @@ from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
 
-__version__ = "1.1.2"
+__version__ = "1.1.3"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -40,6 +40,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchImageSaverNode": VrchImageSaverNode,
     "VrchImageSwitchOSCControlNode": VrchImageSwitchOSCControlNode,
     "VrchImageWebSocketChannelLoaderNode": VrchImageWebSocketChannelLoaderNode,
+    "VrchImageWebSocketFilterSettingsNode": VrchImageWebSocketFilterSettingsNode,
     "VrchImageWebSocketSettingsNode": VrchImageWebSocketSettingsNode,
     "VrchImageWebSocketSimpleWebViewerNode": VrchImageWebSocketSimpleWebViewerNode,
     "VrchImageWebSocketWebViewerNode": VrchImageWebSocketWebViewerNode,
@@ -102,6 +103,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchImageSaverNode": "IMAGE Saver @ vrch.ai",
     "VrchImageSwitchOSCControlNode": "IMAGE Switch OSC Control @ vrch.ai",
     "VrchImageWebSocketChannelLoaderNode": "IMAGE WebSocket Channel Loader @ vrch.ai",
+    "VrchImageWebSocketFilterSettingsNode": "IMAGE Filter Settings @ vrch.ai",
     "VrchImageWebSocketSettingsNode": "IMAGE WebSocket Settings @ vrch.ai",
     "VrchImageWebSocketSimpleWebViewerNode": "IMAGE WebSocket Web Viewer @ vrch.ai",
     "VrchImageWebSocketWebViewerNode": "IMAGE WebSocket Web Viewer (Legacy) @ vrch.ai",

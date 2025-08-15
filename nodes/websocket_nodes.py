@@ -244,11 +244,14 @@ class VrchImageWebSocketSettingsNode:
                 "background_colour_hex": ("STRING", {"default": "#222222", "multiline": False}),
                 "server_messages": ("STRING", {"default": "", "multiline": False}),
                 "debug": ("BOOLEAN", {"default": False}),
+            },
+            "optional": {
+                "image_filters_json": ("JSON",),
             }
         }
 
-    RETURN_TYPES = ()
-    RETURN_NAMES = ()
+    RETURN_TYPES = ("JSON",)
+    RETURN_NAMES = ("IMAGE_SETTINGS_JSON",)
     FUNCTION = "send_settings"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
@@ -265,7 +268,8 @@ class VrchImageWebSocketSettingsNode:
                       update_on_end,
                       background_colour_hex,
                       server_messages,
-                      debug):
+                      debug,
+                      image_filters_json=None):
         # Check if settings should be sent
         if not send_settings:
             if debug:
@@ -289,12 +293,74 @@ class VrchImageWebSocketSettingsNode:
                 "serverMessages": server_messages,
             }
         }
+
+        # Merge filters if provided (supports either {"filters": {...}} or direct mapping {...})
+        if image_filters_json is not None:
+            try:
+                if isinstance(image_filters_json, dict):
+                    if "filters" in image_filters_json and isinstance(image_filters_json["filters"], dict):
+                        settings["settings"]["filters"] = image_filters_json["filters"]
+                    else:
+                        settings["settings"]["filters"] = image_filters_json
+                else:
+                    if debug:
+                        print("[VrchImageWebSocketSettingsNode] image_filters_json provided but not a dict; ignoring")
+            except Exception as e:
+                if debug:
+                    print(f"[VrchImageWebSocketSettingsNode] Failed to merge image_filters_json: {e}")
         settings_json = json.dumps(settings)
         server.send_to_channel("/image", ch, settings_json)
         if debug:
             print(f"[VrchImageWebSocketSettingsNode] Sending settings to channel {ch} via global server on {host}:{port} with path '/image': {settings_json}")
-            
-        return ()
+        # Return the Python dict (already merged) so downstream nodes can reuse/augment
+        return (settings,)
+
+class VrchImageWebSocketFilterSettingsNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                # Pure parameter node (no channel/server). Ranges mirror applyRemoteFilters().
+                "blur": ("INT", {"default": 0, "min": 0, "max": 50}),
+                "brightness": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 3.0, "step": 0.01}),
+                "contrast": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 3.0, "step": 0.01}),
+                "grayscale": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "hue_rotate": ("INT", {"default": 0, "min": 0, "max": 360}),
+                "invert": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "saturate": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 3.0, "step": 0.01}),
+                "sepia": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+            }
+        }
+
+    RETURN_TYPES = ("JSON",)
+    RETURN_NAMES = ("IMAGE_FILTERS_JSON",)
+    FUNCTION = "build_filters_json"
+    OUTPUT_NODE = False
+    CATEGORY = CATEGORY
+
+    def build_filters_json(self,
+                           blur,
+                           brightness,
+                           contrast,
+                           grayscale,
+                           hue_rotate,
+                           invert,
+                           saturate,
+                           sepia):
+        # Produce object matching previous spec {"filters": {...}} for backward compatibility
+        payload = {
+            "filters": {
+                "blur": int(blur),
+                "brightness": float(brightness),
+                "contrast": float(contrast),
+                "grayscale": float(grayscale),
+                "hueRotate": int(hue_rotate),
+                "invert": float(invert),
+                "saturate": float(saturate),
+                "sepia": float(sepia),
+            }
+        }
+        return (payload,)
 
 # Dictionary to keep track of WebSocket client instances
 _websocket_clients = {}
