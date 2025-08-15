@@ -214,6 +214,65 @@ app.registerExtension({
     }
 });
 
+// =====================================================================
+// Extension: vrch.ImageWebSocketFilterSettings (add Reset Filters button)
+// =====================================================================
+app.registerExtension({
+    name: "vrch.ImageWebSocketFilterSettings",
+    async nodeCreated(node) {
+        if (node.comfyClass === "VrchImageWebSocketFilterSettingsNode") {
+            const widgetNames = [
+                "blur",
+                "brightness",
+                "contrast",
+                "grayscale",
+                "hue_rotate",
+                "invert",
+                "saturate",
+                "sepia"
+            ];
+            const defaults = {
+                blur: 0,
+                brightness: 1.0,
+                contrast: 1.0,
+                grayscale: 0.0,
+                hue_rotate: 0,
+                invert: 0.0,
+                saturate: 1.0,
+                sepia: 0.0,
+            };
+
+            // Create button container
+            const container = document.createElement("div");
+            // Use a smaller dedicated container so it isn't as tall as the big viewer buttons
+            container.classList.add("vrch-filter-reset-container");
+            const btn = document.createElement("button");
+            btn.textContent = "Reset Filters";
+            btn.classList.add("vrch-filter-reset-btn");
+            container.appendChild(btn);
+            node.addDOMWidget("filter_reset_btn", "Reset", container);
+
+            function setWidgetValue(widget, value) {
+                if (!widget) return;
+                widget.value = value;
+                if (widget.callback) {
+                    try { widget.callback(widget.value, node, widget); } catch(e) { /* ignore */ }
+                }
+            }
+
+            btn.addEventListener("click", () => {
+                widgetNames.forEach(name => {
+                    const w = node.widgets.find(w => w.name === name);
+                    if (w) setWidgetValue(w, defaults[name]);
+                });
+                // Force UI refresh
+                app.graph.setDirtyCanvas(true, true);
+                console.log("[VrchImageWebSocketFilterSettingsNode] Filters reset to defaults", defaults);
+            });
+        }
+    }
+});
+
 // Add custom styles for the button and indicator
 const style = document.createElement("style");
 style.textContent = `
@@ -243,7 +302,7 @@ style.textContent = `
 
     .vrch-big-button:hover {
         background-color: #45a049;
-        transform: scale(1.05); 
+        transform: scale(1.01); 
     }
 
     .vrch-big-button:active {
@@ -279,5 +338,29 @@ style.textContent = `
         background-color: #4CAF50; /* Green */
         color: #fff;
     }
+    .vrch-filter-reset-container {
+        width: 100%;
+        box-sizing: border-box;
+        display: flex;
+        height: 32px; /* smaller than big buttons */
+        align-items: center;
+        justify-content: center;
+    }
+    .vrch-filter-reset-btn {
+        background-color: #4CAF50;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 90%;
+        height: 32px;
+        line-height: 1;
+        transition: background-color 0.25s, transform 0.2s;
+        padding: 4px 8px;
+    }
+    .vrch-filter-reset-btn:hover { background-color: #45a049; transform: scale(1.01); }
+    .vrch-filter-reset-btn:active { background-color: #3e8e41; transform: scale(1); }
 `;
 document.head.appendChild(style);
