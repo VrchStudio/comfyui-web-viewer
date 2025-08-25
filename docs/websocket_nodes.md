@@ -176,12 +176,12 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
 
 2. **Configure Filter Parameters (inputs):**
   - **`blur`**: Integer pixels (0–50) – matches `blur(px)`.
-  - **`brightness`**: Float (0.0–3.0) – 1.0 is neutral.
-  - **`contrast`**: Float (0.0–3.0) – 1.0 is neutral.
+  - **`brightness`**: Float (0.0–2.0) – 1.0 is neutral.
+  - **`contrast`**: Float (0.0–2.0) – 1.0 is neutral.
   - **`grayscale`**: Float (0.0–1.0) – 0 is color, 1 is fully grayscale.
   - **`hue_rotate`**: Integer degrees (0–360) – applied as CSS `hue-rotate()`.
   - **`invert`**: Float (0.0–1.0) – 0 no invert, 1 full invert.
-  - **`saturate`**: Float (0.0–3.0) – 1.0 is neutral.
+  - **`saturate`**: Float (0.0–2.0) – 1.0 is neutral.
   - **`sepia`**: Float (0.0–1.0) – 0 none, 1 full sepia.
 
 3. **UI Convenience:**
