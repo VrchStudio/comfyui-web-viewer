@@ -326,3 +326,39 @@
 - **Real-time Processing:** Optimized for continuous real-time frequency band monitoring.
 
 **Note:** The accuracy of frequency band analysis depends on the FFT resolution and sample rate. Higher sample rates and larger FFT sizes provide better frequency resolution for precise band analysis.
+---
+
+### Node: `AUDIO Emotion Visualizer @ vrch.ai` (vrch.ai/audio)
+
+1. Add the `AUDIO Emotion Visualizer @ vrch.ai` node to your ComfyUI workflow.
+2. Connect inputs:
+   - `raw_data` (JSON): From `AUDIO Music to Emotion Detector @ vrch.ai` (`VrchAudioMusic2EmotionNode`) RAW_DATA output.
+3. Configure parameters (minimal overview):
+   - Shared
+     - `image_width` / `image_height`: Output image size (default: 640x480).
+     - `background_color`: Background color (hex string; default: `#111111`).
+     - `font_color`: Text color (hex string; default: `#EFEFEF`).
+     - `font_size`: One of `extra small / small / medium / large / extra large` (default: `medium`).
+   - Radar (moods top-k radar)
+     - `radar_theme`: `pastel / ocean / sunset / forest / neon / mono-blue / mono-gray`.
+     - `radar_top_k`: How many moods to plot (default: 6; range 3–12).
+     - `radar_normalize`: Normalize polygon to the max mood value (boolean).
+     - `radar_show_labels`: Show mood names around the radar (boolean).
+     - `radar_show_values`: Show numeric values near radar vertices (boolean).
+   - Valence/Arousal (quadrant plot)
+     - `va_theme`: `no_background` (default) or themed quadrant backgrounds.
+     - `va_show_minor_gridlines`: Show 0.5-step minor gridlines; when off, the outer border is hidden (only axes remain).
+     - `va_show_axis_labels`: Show semantic axis labels (Negative/Positive, Low/High, (Neutral), VALENCE/AROUSAL).
+     - `va_show_value_labels`: Show the current (V/A) value label near the point (with semi-transparent black background).
+     - `va_show_mood_labels`: Show the circular mood layer with 12 fixed labels (HAPPY/DELIGHTED/EXCITED ... CALM/RELAXED/CONTENT) and a thin ring (the ring interior is filled with very low-opacity black, independent of theme).
+     - `va_point_color`: Color of the V/A point.
+     - Notes:
+       - The VA plot stays square and centered inside the image area.
+       - Axis arrows extend beyond the square for clarity.
+4. Outputs:
+   - `MOODS_RADAR_IMAGE` (IMAGE): Radar visualization.
+   - `VALENCE_AROUSAL_IMAGE` (IMAGE): Valence/Arousal quadrant visualization.
+
+Tips
+- For the VA mood layer, labels sit near a circular ring and are semi-transparent to keep the focus on the current V/A point.
+- If `radar_normalize` is enabled, vertex values shift slightly inward to reduce overlap with outer labels.
