@@ -282,29 +282,25 @@ class VrchAudioEmotionVisualizerNode:
                 "image_width": ("INT", {"default": 512, "min": 256, "max": 2048, "step": 32}),
                 "image_height": ("INT", {"default": 512, "min": 256, "max": 2048, "step": 32}),
                 "background_color": ("STRING", {"default": "#111111"}),
+                "font_color": ("STRING", {"default": "#DDDDDD"}),
+                "font_size": ("INT", {"default": 20, "min": 8, "max": 128, "step": 1}),
 
-                # radar-specific
+                # radar-specific (theme manages colors)
                 "radar_top_k": ("INT", {"default": 6, "min": 3, "max": 12, "step": 1}),
                 "radar_normalize": ("BOOLEAN", {"default": False}),
                 "radar_show_labels": ("BOOLEAN", {"default": True}),
                 "radar_theme": ([
-                    "custom", "pastel", "ocean", "sunset", "forest", "neon", "mono-blue", "mono-gray"
-                ], {"default": "custom"}),
-                "radar_fill_color": ("STRING", {"default": "#3FA9F5"}),
-                "radar_outline_color": ("STRING", {"default": "#7FD1FF"}),
-                "radar_grid_color": ("STRING", {"default": "#444444"}),
-                "radar_label_color": ("STRING", {"default": "#CCCCCC"}),
-
-                # valence/arousal-specific
-                "va_show_background": ("BOOLEAN", {"default": False}),
-                "va_background_theme": ([
                     "pastel", "ocean", "sunset", "forest", "neon", "mono-blue", "mono-gray"
                 ], {"default": "pastel"}),
-                "va_background_opacity": ("FLOAT", {"default": 0.15, "min": 0.0, "max": 0.5, "step": 0.01}),
-                "va_grid_color": ("STRING", {"default": "#444444"}),
-                "va_label_color": ("STRING", {"default": "#CCCCCC"}),
-                "va_point_color": ("STRING", {"default": "#FFCC00"}),
+
+                # valence/arousal-specific (theme manages background & grid)
+                "va_show_sublines": ("BOOLEAN", {"default": True}),
+                "va_show_axis_labels": ("BOOLEAN", {"default": True}),
                 "va_show_value_labels": ("BOOLEAN", {"default": True}),
+                "va_point_color": ("STRING", {"default": "#FFCC00"}),
+                "va_theme": ([
+                    "no_background", "pastel", "ocean", "sunset", "forest", "neon", "mono-blue", "mono-gray"
+                ], {"default": "no_background"}),
 
                 # keep debug as the last option always
                 "debug": ("BOOLEAN", {"default": False}),
@@ -324,21 +320,23 @@ class VrchAudioEmotionVisualizerNode:
         return (17, 17, 17)
 
     def _apply_radar_theme(self, theme: str):
-        """Return a dict of colors for radar when theme != custom."""
+        """Return a dict of colors for radar."""
         presets = {
-            "pastel": {"fill": "#7FD1FF", "outline": "#3FA9F5", "grid": "#444444", "label": "#CCCCCC"},
-            "ocean": {"fill": "#5FD1C9", "outline": "#2BA6B9", "grid": "#4A4F59", "label": "#BFD9E6"},
-            "sunset": {"fill": "#FFB385", "outline": "#FF7F50", "grid": "#54433A", "label": "#FFD8C2"},
-            "forest": {"fill": "#8CCB9B", "outline": "#5E8D6A", "grid": "#3F4A42", "label": "#CFE6D5"},
-            "neon": {"fill": "#39FF14", "outline": "#00E5FF", "grid": "#404040", "label": "#EAEAEA"},
-            "mono-blue": {"fill": "#6EC1FF", "outline": "#1E90FF", "grid": "#404E5A", "label": "#C8D9EA"},
-            "mono-gray": {"fill": "#BDBDBD", "outline": "#E0E0E0", "grid": "#4A4A4A", "label": "#DDDDDD"},
+            "pastel": {"fill": "#7FD1FF", "outline": "#3FA9F5", "grid": "#444444"},
+            "ocean": {"fill": "#5FD1C9", "outline": "#2BA6B9", "grid": "#4A4F59"},
+            "sunset": {"fill": "#FFB385", "outline": "#FF7F50", "grid": "#54433A"},
+            "forest": {"fill": "#8CCB9B", "outline": "#5E8D6A", "grid": "#3F4A42"},
+            "neon": {"fill": "#39FF14", "outline": "#00E5FF", "grid": "#404040"},
+            "mono-blue": {"fill": "#6EC1FF", "outline": "#1E90FF", "grid": "#404E5A"},
+            "mono-gray": {"fill": "#BDBDBD", "outline": "#E0E0E0", "grid": "#4A4A4A"},
         }
-        return presets.get(theme, presets["pastel"]) if theme != "custom" else None
+        return presets.get(theme, presets["pastel"])  # default to pastel
 
-    def _va_theme_colors(self, theme: str):
-        """Return 4 RGB tuples for quadrants background colors."""
-        themes = {
+    def _va_theme_config(self, theme: str):
+        """Return VA theme config: (quadrant_colors or None, grid_hex)."""
+        if theme == "no_background":
+            return None, "#444444"
+        quadrant_hex = {
             "pastel": ("#FFC9DE", "#C9E8FF", "#CFF6D6", "#FFF2B3"),
             "ocean": ("#A7D8FF", "#9EE0E8", "#A8F0D1", "#B8C9FF"),
             "sunset": ("#FFB085", "#FF9AA2", "#FFD1A6", "#FFE29A"),
@@ -346,9 +344,8 @@ class VrchAudioEmotionVisualizerNode:
             "neon": ("#FF6EFF", "#39FF14", "#00FFFF", "#FFFF00"),
             "mono-blue": ("#6EC1FF", "#6EC1FF", "#6EC1FF", "#6EC1FF"),
             "mono-gray": ("#CCCCCC", "#CCCCCC", "#CCCCCC", "#CCCCCC"),
-        }
-        hexes = themes.get(theme, themes["pastel"])
-        return tuple(self.hex_to_rgb(h) for h in hexes)  # type: ignore
+        }.get(theme, ("#FFC9DE", "#C9E8FF", "#CFF6D6", "#FFF2B3"))
+        return tuple(self.hex_to_rgb(h) for h in quadrant_hex), "#444444"
 
     # --- Drawing helpers ---
     def _get_font(self, size:int):
@@ -377,7 +374,7 @@ class VrchAudioEmotionVisualizerNode:
 
     def _draw_radar_chart(self, draw: ImageDraw.ImageDraw, size, bg_rgb, 
                            moods: list, normalize: bool,
-                           show_labels: bool, colors: dict, label_font, value_font, debug=False):
+                           show_labels: bool, colors: dict, label_font, value_font, font_color_rgb, debug=False):
         w, h = size
         cx, cy = w // 2, h // 2
         radius = int(min(w, h) * 0.40)
@@ -393,7 +390,7 @@ class VrchAudioEmotionVisualizerNode:
         n = max(1, len(values))
 
         grid_color = self.hex_to_rgb(colors["grid"])  # type: ignore
-        label_color = self.hex_to_rgb(colors["label"])  # type: ignore
+        label_color = font_color_rgb
         outline_color = self.hex_to_rgb(colors["outline"])  # type: ignore
         fill_color = self.hex_to_rgb(colors["fill"])  # type: ignore
 
@@ -445,23 +442,34 @@ class VrchAudioEmotionVisualizerNode:
         return points, (outline_color, fill_color)
 
     def _draw_va_plot(self, base_img: Image.Image, draw: ImageDraw.ImageDraw, size,
-                      bg_rgb, valence, arousal, show_bg, theme, opacity,
-                      grid_color_hex, label_color_hex, point_color_hex,
-                      show_value_labels, label_font, tick_font, debug=False):
+                      bg_rgb, valence, arousal,
+                      show_sublines, show_axis_labels, show_value_labels,
+                      va_theme: str, point_color_hex: str,
+                      label_font, tick_font, font_color_rgb, debug=False):
         w, h = size
         # Plot margins
         margin = int(min(w, h) * 0.10)
-        left, top = margin, margin
-        right, bottom = w - margin, h - margin
-        plot_w = right - left
-        plot_h = bottom - top
+        avail_left, avail_top = margin, margin
+        avail_right, avail_bottom = w - margin, h - margin
+        avail_w = avail_right - avail_left
+        avail_h = avail_bottom - avail_top
+        # Keep square plot inside available rectangle
+        plot_size = min(avail_w, avail_h)
+        # center square
+        left = avail_left + (avail_w - plot_size) // 2
+        top = avail_top + (avail_h - plot_size) // 2
+        right = left + plot_size
+        bottom = top + plot_size
+        plot_w = plot_size
+        plot_h = plot_size
 
-        # Optional themed quadrant backgrounds
-        if show_bg:
+        # Optional themed quadrant backgrounds from theme
+        q_colors_and_grid = self._va_theme_config(va_theme)
+        q_colors, grid_hex = q_colors_and_grid if isinstance(q_colors_and_grid, tuple) else (None, "#444444")
+        if q_colors is not None:
             overlay = Image.new('RGBA', (w, h), (0, 0, 0, 0))
             o = ImageDraw.Draw(overlay)
-            q_colors = self._va_theme_colors(theme)
-            alpha = int(max(0.0, min(1.0, opacity)) * 255)
+            alpha = 40  # light transparency for subtle background
             # Quadrants: 
             # Q1 (top-right), Q2 (top-left), Q3 (bottom-left), Q4 (bottom-right)
             mid_x = left + plot_w // 2
@@ -477,33 +485,44 @@ class VrchAudioEmotionVisualizerNode:
             base_img.paste(overlay, (0, 0), overlay)
 
         # Grid and axes
-        grid_color = self.hex_to_rgb(grid_color_hex)
-        label_color = self.hex_to_rgb(label_color_hex)
+        grid_color = self.hex_to_rgb(grid_hex)
+        label_color = font_color_rgb
         # Border
         draw.rectangle([left, top, right, bottom], outline=grid_color, width=1)
-        # Mid axes at 4.5
+        # Mid axes at 4.5 with arrows
         mid_val = left + int((4.5 / 9.0) * plot_w)
         mid_aro = bottom - int((4.5 / 9.0) * plot_h)
-        draw.line([(mid_val, top), (mid_val, bottom)], fill=grid_color, width=1)
-        draw.line([(left, mid_aro), (right, mid_aro)], fill=grid_color, width=1)
-        # Additional grid lines at 0, 3, 6, 9 (0 and 9 coincide with border)
-        for t in [3.0, 6.0]:
-            x = left + int((t / 9.0) * plot_w)
-            y = bottom - int((t / 9.0) * plot_h)
-            draw.line([(x, top), (x, bottom)], fill=grid_color, width=1)
-            draw.line([(left, y), (right, y)], fill=grid_color, width=1)
+        # X axis + arrow
+        draw.line([(left, mid_aro), (right, mid_aro)], fill=grid_color, width=2)
+        draw.polygon([(right, mid_aro), (right - 10, mid_aro - 5), (right - 10, mid_aro + 5)], fill=grid_color)
+        # Y axis + arrow
+        draw.line([(mid_val, bottom), (mid_val, top)], fill=grid_color, width=2)
+        draw.polygon([(mid_val, top), (mid_val - 5, top + 10), (mid_val + 5, top + 10)], fill=grid_color)
+        # Sub grid lines at every integer from 1..8
+        if show_sublines:
+            for t in range(1, 9):
+                x = left + int((t / 9.0) * plot_w)
+                y = bottom - int((t / 9.0) * plot_h)
+                draw.line([(x, top), (x, bottom)], fill=grid_color, width=1)
+                draw.line([(left, y), (right, y)], fill=grid_color, width=1)
 
-        # Axis labels (ticks and titles)
-        def txt(xy, t, f):
-            self._text_with_outline(draw, xy, t, label_color, f)
-
-        txt((left, bottom + 2), "0", tick_font)
-        txt((left + plot_w - 10, bottom + 2), "9", tick_font)
-        txt((left - 10, top), "9", tick_font)
-        txt((left - 10, bottom - 10), "0", tick_font)
-        # titles
-        txt((left + plot_w // 2 - 30, bottom + 6), "VALENCE", label_font)
-        txt((left - 60, top + plot_h // 2 - 12), "AROUSAL", label_font)
+        # Axis semantic labels
+        if show_axis_labels:
+            def txt(xy, t, f):
+                self._text_with_outline(draw, xy, t, label_color, f)
+            # Extremes and origin labels
+            txt((left + 4, mid_aro + 6), "Negative", tick_font)
+            tw, th = self._text_size(draw, "Positive", tick_font)
+            txt((right - tw - 4, mid_aro + 6), "Positive", tick_font)
+            txt((mid_val + 6, top - 18), "High", tick_font)
+            txt((mid_val + 6, bottom + 2), "Low", tick_font)
+            on_tw, on_th = self._text_size(draw, "(Neutral)", tick_font)
+            txt((mid_val - on_tw // 2, mid_aro + 6), "(Neutral)", tick_font)
+            # Axis names near arrows
+            v_tw, v_th = self._text_size(draw, "VALENCE", label_font)
+            txt((right - v_tw - 14, mid_aro - v_th - 6), "VALENCE", label_font)
+            a_tw, a_th = self._text_size(draw, "AROUSAL", label_font)
+            txt((mid_val + 10, top + 6), "AROUSAL", label_font)
 
         # Plot point
         try:
@@ -527,15 +546,11 @@ class VrchAudioEmotionVisualizerNode:
 
     def visualize_emotion(self, raw_data,
                           image_width=512, image_height=512,
-                          background_color="#111111",
+                          background_color="#111111", font_color="#DDDDDD", font_size=20,
                           radar_top_k=6, radar_normalize=False, radar_show_labels=True,
-                          radar_theme="custom",
-                          radar_fill_color="#3FA9F5", radar_outline_color="#7FD1FF",
-                          radar_grid_color="#444444", radar_label_color="#CCCCCC",
-                          va_show_background=False, va_background_theme="pastel",
-                          va_background_opacity=0.15,
-                          va_grid_color="#444444", va_label_color="#CCCCCC", va_point_color="#FFCC00",
-                          va_show_value_labels=True,
+                          radar_theme="pastel",
+                          va_show_sublines=True, va_show_axis_labels=True, va_show_value_labels=True,
+                          va_point_color="#FFCC00", va_theme="no_background",
                           debug=False):
         """Generate radar and VA images from emotion RAW_DATA."""
 
@@ -555,28 +570,18 @@ class VrchAudioEmotionVisualizerNode:
 
         # Prepare base images
         bg_rgb = self.hex_to_rgb(background_color)
-
-        # Font sizes
-        base = min(image_width, image_height)
-        radar_label_font = self._get_font(max(12, int(base * 0.045)))
-        radar_value_font = self._get_font(max(12, int(base * 0.035)))
-        va_label_font = self._get_font(max(12, int(base * 0.045)))
-        va_tick_font = self._get_font(max(12, int(base * 0.035)))
+        radar_label_font = self._get_font(int(font_size))
+        radar_value_font = self._get_font(max(10, int(font_size * 0.9)))
+        va_label_font = self._get_font(int(font_size))
+        va_tick_font = self._get_font(max(10, int(font_size * 0.9)))
+        font_color_rgb = self.hex_to_rgb(font_color)
 
         # Radar image
         radar_img = Image.new('RGB', (image_width, image_height), bg_rgb)
         r_draw = ImageDraw.Draw(radar_img)
 
-        # Resolve radar theme colors
-        theme_colors = self._apply_radar_theme(radar_theme)
-        radar_colors = {
-            "fill": radar_fill_color,
-            "outline": radar_outline_color,
-            "grid": radar_grid_color,
-            "label": radar_label_color,
-        }
-        if theme_colors:
-            radar_colors = theme_colors
+        # Resolve radar theme colors (managed by theme)
+        radar_colors = self._apply_radar_theme(radar_theme)
 
         # Build mood list sorted by prob desc
         moods_sorted = []
@@ -593,7 +598,7 @@ class VrchAudioEmotionVisualizerNode:
         polygon_points, of_colors = self._draw_radar_chart(
             r_draw, (image_width, image_height), bg_rgb,
             moods_sel, radar_normalize, radar_show_labels, radar_colors,
-            radar_label_font, radar_value_font, debug
+            radar_label_font, radar_value_font, font_color_rgb, debug
         )
         # Composite overlay for polygon (created inside helper)
         if polygon_points and len(polygon_points) >= 3:
@@ -607,16 +612,17 @@ class VrchAudioEmotionVisualizerNode:
 
         # Fallback text when no mood data
         if not moods_sel:
-            self._text_with_outline(r_draw, (10, 10), "No mood data".upper(), self.hex_to_rgb(radar_colors["label"]), radar_label_font)
+            self._text_with_outline(r_draw, (10, 10), "NO MOOD DATA", font_color_rgb, radar_label_font)
 
         # VA image
         va_img = Image.new('RGB', (image_width, image_height), bg_rgb)
         v_draw = ImageDraw.Draw(va_img)
         self._draw_va_plot(
             va_img, v_draw, (image_width, image_height), bg_rgb,
-            valence, arousal, va_show_background, va_background_theme, va_background_opacity,
-            va_grid_color, va_label_color, va_point_color,
-            va_show_value_labels, va_label_font, va_tick_font, debug
+            valence, arousal,
+            va_show_sublines, va_show_axis_labels, va_show_value_labels,
+            va_theme, va_point_color,
+            va_label_font, va_tick_font, font_color_rgb, debug
         )
 
         # Convert to tensors (ComfyUI IMAGE)
@@ -638,11 +644,9 @@ class VrchAudioEmotionVisualizerNode:
                 m.update(json.dumps(raw_data, sort_keys=True).encode("utf-8"))
 
             keys = [
-                "image_width", "image_height", "background_color",
+                "image_width", "image_height", "background_color", "font_color", "font_size",
                 "radar_top_k", "radar_normalize", "radar_show_labels", "radar_theme",
-                "radar_fill_color", "radar_outline_color", "radar_grid_color", "radar_label_color",
-                "va_show_background", "va_background_theme", "va_background_opacity",
-                "va_grid_color", "va_label_color", "va_point_color", "va_show_value_labels",
+                "va_show_sublines", "va_show_axis_labels", "va_show_value_labels", "va_point_color", "va_theme",
             ]
             for k in keys:
                 if k in kwargs and kwargs[k] is not None:
