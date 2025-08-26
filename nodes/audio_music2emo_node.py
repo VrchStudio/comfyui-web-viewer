@@ -294,12 +294,14 @@ class VrchAudioEmotionVisualizerNode:
                 "radar_top_k": ("INT", {"default": 6, "min": 3, "max": 12, "step": 1}),
                 "radar_normalize": ("BOOLEAN", {"default": False}),
                 "radar_show_labels": ("BOOLEAN", {"default": True}),
+                "radar_show_values": ("BOOLEAN", {"default": True}),
 
                 # valence/arousal settings (theme first)
                 "va_theme": ([
                     "no_background", "pastel", "ocean", "sunset", "forest", "neon", "mono-blue", "mono-gray"
                 ], {"default": "no_background"}),
                 "va_show_minor_gridlines": ("BOOLEAN", {"default": True}),
+                "va_show_mood_labels": ("BOOLEAN", {"default": False}),
                 "va_show_axis_labels": ("BOOLEAN", {"default": True}),
                 "va_show_value_labels": ("BOOLEAN", {"default": True}),
                 "va_point_color": ("STRING", {"default": "#FFCC00"}),
@@ -376,7 +378,8 @@ class VrchAudioEmotionVisualizerNode:
 
     def _draw_radar_chart(self, draw: ImageDraw.ImageDraw, size, bg_rgb, 
                            moods: list, normalize: bool,
-                           show_labels: bool, colors: dict, label_font, value_font, font_color_rgb, debug=False):
+                           show_labels: bool, show_values: bool,
+                           colors: dict, label_font, value_font, font_color_rgb, debug=False):
         w, h = size
         cx, cy = w // 2, h // 2
         radius = int(min(w, h) * 0.40)
@@ -421,8 +424,8 @@ class VrchAudioEmotionVisualizerNode:
             y = cy + int(r * np.sin(angle))
             points.append((x, y))
 
-        # Labels & numeric values with smart placement
-        if show_labels and n > 0:
+        # Labels & numeric values with smart placement (independently controlled)
+        if n > 0 and (show_labels or show_values):
             base_unit = min(w, h)
             outside_offset = int(base_unit * 0.06)
             inside_offset = int(base_unit * 0.04)
@@ -430,48 +433,51 @@ class VrchAudioEmotionVisualizerNode:
             value_offset_in = int(base_unit * 0.02)
             for i, lab in enumerate(labels):
                 angle = 2 * np.pi * i / max(1, n) - np.pi / 2
-                # Try to place label outside the circle if it fits entirely within the image bounds
-                text = lab.upper()
-                tw, th = self._text_size(draw, text, label_font)
-                # Candidate outside position
-                lx_out = cx + int((radius + outside_offset) * np.cos(angle))
-                ly_out = cy + int((radius + outside_offset) * np.sin(angle))
-                # Compute top-left of text box for outside
-                x_out = lx_out - tw // 2
-                y_out = ly_out - th // 2
-                fits_outside = (x_out >= 2 and y_out >= 2 and x_out + tw <= w - 2 and y_out + th <= h - 2)
-                if fits_outside:
-                    self._text_with_outline(draw, (x_out, y_out), text, label_color, label_font)
-                else:
-                    # Fallback: place slightly inside the circle
-                    lx_in = cx + int((radius - inside_offset) * np.cos(angle))
-                    ly_in = cy + int((radius - inside_offset) * np.sin(angle))
-                    x_in = lx_in - tw // 2
-                    y_in = ly_in - th // 2
-                    self._text_with_outline(draw, (x_in, y_in), text, label_color, label_font)
+                if show_labels:
+                    # Try to place label outside the circle if it fits entirely within the image bounds
+                    text = lab.upper()
+                    tw, th = self._text_size(draw, text, label_font)
+                    # Candidate outside position
+                    lx_out = cx + int((radius + outside_offset) * np.cos(angle))
+                    ly_out = cy + int((radius + outside_offset) * np.sin(angle))
+                    # Compute top-left of text box for outside
+                    x_out = lx_out - tw // 2
+                    y_out = ly_out - th // 2
+                    fits_outside = (x_out >= 2 and y_out >= 2 and x_out + tw <= w - 2 and y_out + th <= h - 2)
+                    if fits_outside:
+                        self._text_with_outline(draw, (x_out, y_out), text, label_color, label_font)
+                    else:
+                        # Fallback: place slightly inside the circle
+                        lx_in = cx + int((radius - inside_offset) * np.cos(angle))
+                        ly_in = cy + int((radius - inside_offset) * np.sin(angle))
+                        x_in = lx_in - tw // 2
+                        y_in = ly_in - th // 2
+                        self._text_with_outline(draw, (x_in, y_in), text, label_color, label_font)
 
-                # numeric value near vertex point (use raw probability, not normalized)
-                vx, vy = points[i]
-                if normalize:
-                    # move value slightly inward to avoid overlap with labels at outer side
-                    vx += int(-value_offset_in * np.cos(angle))
-                    vy += int(-value_offset_in * np.sin(angle))
-                else:
-                    # move slightly outward
-                    vx += int(value_offset_out * np.cos(angle))
-                    vy += int(value_offset_out * np.sin(angle))
-                v_text = f"{raw_values[i]:.2f}"
-                v_tw, v_th = self._text_size(draw, v_text, value_font)
-                # Clamp to image bounds
-                vx_clamped = max(2 + v_tw // 2, min(w - 2 - v_tw // 2, vx))
-                vy_clamped = max(2 + v_th // 2, min(h - 2 - v_th // 2, vy))
-                self._text_with_outline(draw, (vx_clamped - v_tw // 2, vy_clamped - v_th // 2), v_text, label_color, value_font)
+                if show_values:
+                    # numeric value near vertex point (use raw probability, not normalized)
+                    vx, vy = points[i]
+                    if normalize:
+                        # move value slightly inward to avoid overlap with labels at outer side
+                        vx += int(-value_offset_in * np.cos(angle))
+                        vy += int(-value_offset_in * np.sin(angle))
+                    else:
+                        # move slightly outward
+                        vx += int(value_offset_out * np.cos(angle))
+                        vy += int(value_offset_out * np.sin(angle))
+                    v_text = f"{raw_values[i]:.2f}"
+                    v_tw, v_th = self._text_size(draw, v_text, value_font)
+                    # Clamp to image bounds
+                    vx_clamped = max(2 + v_tw // 2, min(w - 2 - v_tw // 2, vx))
+                    vy_clamped = max(2 + v_th // 2, min(h - 2 - v_th // 2, vy))
+                    self._text_with_outline(draw, (vx_clamped - v_tw // 2, vy_clamped - v_th // 2), v_text, label_color, value_font)
 
         return points, (outline_color, fill_color)
 
     def _draw_va_plot(self, base_img: Image.Image, draw: ImageDraw.ImageDraw, size,
                       bg_rgb, valence, arousal,
                       show_minor_gridlines, show_axis_labels, show_value_labels,
+                      show_mood_labels,
                       va_theme: str, point_color_hex: str,
                       label_font, tick_font, font_color_rgb, debug=False):
         w, h = size
@@ -607,6 +613,68 @@ class VrchAudioEmotionVisualizerNode:
                 a_y = y_high + h_th + margin_lbl
             txt((mid_val - a_tw // 2, a_y), a_text, label_font)
 
+        # Mood labels ring overlay (above grid and axes)
+        if show_mood_labels:
+            cx = left + plot_w // 2
+            cy = top + plot_h // 2
+            square_radius = plot_w // 2
+            ring_r = int(square_radius * 0.82)
+            # Draw translucent black-filled ring with semi-transparent outline
+            overlay = Image.new('RGBA', (size[0], size[1]), (0, 0, 0, 0))
+            od = ImageDraw.Draw(overlay)
+            # Ring fill
+            od.ellipse([cx - ring_r, cy - ring_r, cx + ring_r, cy + ring_r], fill=(0, 0, 0, 24))
+            # Ring outline
+            od.ellipse([cx - ring_r, cy - ring_r, cx + ring_r, cy + ring_r], outline=(grid_color[0], grid_color[1], grid_color[2], 80), width=1)
+            base_img.paste(overlay, (0, 0), overlay)
+
+            # Define 12 labels with fixed angles
+            labels_angles = [
+                (15, "HAPPY"), (45, "DELIGHTED"), (75, "EXCITED"),
+                (105, "TENSE"), (135, "ANGRY"), (165, "FRUSTRATED"),
+                (195, "DEPRESSED"), (225, "BORED"), (255, "TIRED"),
+                (285, "CALM"), (315, "RELAXED"), (345, "CONTENT"),
+            ]
+            # Offsets
+            outer_offset = 0  # per request: 0% outer offset
+            inner_offset = int(plot_w * 0.02)
+            for deg, word in labels_angles:
+                ang = np.deg2rad(deg)
+                # Preferred outer position relative to plot square (not entire image)
+                rx_out = cx + int((ring_r + outer_offset) * np.cos(ang))
+                ry_out = cy + int((ring_r + outer_offset) * np.sin(ang))
+                text = word
+                tw, th = self._text_size(draw, text, tick_font)
+                x_out = rx_out - tw // 2
+                y_out = ry_out - th // 2
+                # Check against square bounds
+                fits = (x_out >= left + 2 and y_out >= top + 2 and x_out + tw <= right - 2 and y_out + th <= bottom - 2)
+                if fits:
+                    # draw semi-transparent text via overlay with outline
+                    txt_overlay = Image.new('RGBA', (size[0], size[1]), (0, 0, 0, 0))
+                    td = ImageDraw.Draw(txt_overlay)
+                    # outline (slightly stronger alpha)
+                    for dx, dy in [(-1,0),(1,0),(0,-1),(0,1)]:
+                        td.text((x_out+dx, y_out+dy), text, fill=(0,0,0,200), font=tick_font)
+                    # fill semi-transparent
+                    td.text((x_out, y_out), text, fill=(label_color[0], label_color[1], label_color[2], 160), font=tick_font)
+                    base_img.paste(txt_overlay, (0, 0), txt_overlay)
+                else:
+                    # Fallback inner position (slightly inside ring)
+                    rx_in = cx + int((ring_r - inner_offset) * np.cos(ang))
+                    ry_in = cy + int((ring_r - inner_offset) * np.sin(ang))
+                    x_in = rx_in - tw // 2
+                    y_in = ry_in - th // 2
+                    # Clamp to square bounds
+                    x_in = max(left + 2, min(right - 2 - tw, x_in))
+                    y_in = max(top + 2, min(bottom - 2 - th, y_in))
+                    txt_overlay = Image.new('RGBA', (size[0], size[1]), (0, 0, 0, 0))
+                    td = ImageDraw.Draw(txt_overlay)
+                    for dx, dy in [(-1,0),(1,0),(0,-1),(0,1)]:
+                        td.text((x_in+dx, y_in+dy), text, fill=(0,0,0,200), font=tick_font)
+                    td.text((x_in, y_in), text, fill=(label_color[0], label_color[1], label_color[2], 160), font=tick_font)
+                    base_img.paste(txt_overlay, (0, 0), txt_overlay)
+
         # Plot point
         try:
             vx = float(valence)
@@ -619,10 +687,19 @@ class VrchAudioEmotionVisualizerNode:
             point_color = self.hex_to_rgb(point_color_hex)
             draw.ellipse([px - pr, py - pr, px + pr, py + pr], fill=point_color, outline=(255, 255, 255))
             if show_value_labels:
-                val_text = f"V: {vx:.2f}  A: {vy:.2f}"
+                val_text = f"V:{vx:.2f} A:{vy:.2f}"
                 tw, th = self._text_size(draw, val_text, tick_font)
                 off = int(min(w, h) * 0.02)
-                self._text_with_outline(draw, (px + off, py - th - off), val_text, label_color, tick_font)
+                tx = px + off
+                ty = py - th - off
+                # draw semi-transparent black rect as background (padding)
+                pad_x, pad_y = 4, 2
+                bg_overlay = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+                bd = ImageDraw.Draw(bg_overlay)
+                bd.rectangle([tx - pad_x, ty - pad_y, tx + tw + pad_x, ty + th + pad_y], fill=(0,0,0,160))
+                base_img.paste(bg_overlay, (0, 0), bg_overlay)
+                # then draw opaque text for readability
+                self._text_with_outline(draw, (tx, ty), val_text, label_color, tick_font)
         except Exception:
             # If invalid, write N/A
             self._text_with_outline(draw, (left + 6, top + 6), "N/A", label_color, tick_font)
@@ -630,9 +707,9 @@ class VrchAudioEmotionVisualizerNode:
     def visualize_emotion(self, raw_data,
                           image_width=640, image_height=480,
                           background_color="#111111", font_color="#EFEFEF", font_size="medium",
-                          radar_top_k=6, radar_normalize=False, radar_show_labels=True,
+                          radar_top_k=6, radar_normalize=False, radar_show_labels=True, radar_show_values=True,
                           radar_theme="pastel",
-                          va_show_minor_gridlines=True, va_show_axis_labels=True, va_show_value_labels=True,
+                          va_show_minor_gridlines=True, va_show_mood_labels=False, va_show_axis_labels=True, va_show_value_labels=True,
                           va_point_color="#FFCC00", va_theme="no_background",
                           debug=False):
         """Generate radar and VA images from emotion RAW_DATA."""
@@ -689,7 +766,7 @@ class VrchAudioEmotionVisualizerNode:
         # Draw radar
         polygon_points, of_colors = self._draw_radar_chart(
             r_draw, (image_width, image_height), bg_rgb,
-            moods_sel, radar_normalize, radar_show_labels, radar_colors,
+            moods_sel, radar_normalize, radar_show_labels, radar_show_values, radar_colors,
             radar_label_font, radar_value_font, font_color_rgb, debug
         )
         # Composite overlay for polygon (created inside helper)
@@ -713,6 +790,7 @@ class VrchAudioEmotionVisualizerNode:
             va_img, v_draw, (image_width, image_height), bg_rgb,
             valence, arousal,
             va_show_minor_gridlines, va_show_axis_labels, va_show_value_labels,
+            va_show_mood_labels,
             va_theme, va_point_color,
             va_label_font, va_tick_font, font_color_rgb, debug
         )
@@ -737,8 +815,8 @@ class VrchAudioEmotionVisualizerNode:
 
             keys = [
                 "image_width", "image_height", "background_color", "font_color", "font_size",
-                "radar_theme", "radar_top_k", "radar_normalize", "radar_show_labels",
-                "va_theme", "va_show_minor_gridlines", "va_show_axis_labels", "va_show_value_labels", "va_point_color",
+                "radar_theme", "radar_top_k", "radar_normalize", "radar_show_labels", "radar_show_values",
+                "va_theme", "va_show_minor_gridlines", "va_show_mood_labels", "va_show_axis_labels", "va_show_value_labels", "va_point_color",
             ]
             for k in keys:
                 if k in kwargs and kwargs[k] is not None:
