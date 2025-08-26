@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- add new `VrchAudioEmotionVisualizerNode` node (display name: `AUDIO Emotion Visualizer @ vrch.ai`)
+- VA plot: add `va_show_mood_labels` circular mood overlay (12 fixed labels + thin ring with low-opacity black fill)
+- Radar: split label/value toggles into `radar_show_labels` and `radar_show_values`
+
+### Updated
+
+- update `VrchImageWebSocketFilterSettingsNode` to adjust `brightness`, `contrast` and `saturate` range
+- VA plot UX: square-centered area, longer bidirectional axis arrows, 0.5-step minor gridlines, hide outer border when minor gridlines are off, improved axis/mood label placement, semi-transparent background for point value label
+- docs: add `AUDIO Emotion Visualizer @ vrch.ai` node section in `docs/audio_nodes.md`
+
 ## 1.1.3 - 2025-08-15
 
 ### Added
