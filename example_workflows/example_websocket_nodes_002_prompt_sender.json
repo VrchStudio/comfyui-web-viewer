@@ -1,0 +1,1606 @@
+{
+  "id": "52163392-6b95-4cb9-9585-cd6b19f7b8ab",
+  "revision": 0,
+  "last_node_id": 52,
+  "last_link_id": 67,
+  "nodes": [
+    {
+      "id": 8,
+      "type": "VAEDecode",
+      "pos": [
+        964.4334106445312,
+        483.92083740234375
+      ],
+      "size": [
+        210,
+        46
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 7
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 41
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            15
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 10,
+      "type": "VrchJsonWebSocketChannelLoaderNode",
+      "pos": [
+        91.23316192626953,
+        -233.31979370117188
+      ],
+      "size": [
+        319.2095642089844,
+        160
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "server",
+          "type": "STRING",
+          "widget": {
+            "name": "server"
+          },
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "JSON",
+          "type": "JSON",
+          "links": [
+            12
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-web-viewer",
+        "ver": "68e2d4b546963736b2f91797c2687cdb60a2989a",
+        "Node name for S&R": "VrchJsonWebSocketChannelLoaderNode"
+      },
+      "widgets_values": [
+        "1",
+        "192.168.123.112:8001",
+        false,
+        "{}"
+      ]
+    },
+    {
+      "id": 14,
+      "type": "Textbox",
+      "pos": [
+        466.0127868652344,
+        -110.78813171386719
+      ],
+      "size": [
+        270.5205078125,
+        129.50099182128906
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "passthrough",
+          "shape": 7,
+          "type": "STRING",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            14
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI-Chibi-Nodes",
+        "ver": "424d5fc68bd3b82fe3c491f27b0c37bb3de1d123",
+        "Node name for S&R": "Textbox"
+      },
+      "widgets_values": [
+        "Impressionist Monet style water lily pond at sunrise, soft pastel colors with pale greens, blush pinks, warm golds, floating pink and white lilies, gentle rippling water reflections, diffused morning light, glowing pink sun orb near horizon, delicate mist and translucent layers, willow trees with soft green leaves, painterly brushstrokes, silk-like petals, dreamy and serene atmosphere, natural awakening, harmonious color blending, no humans, no animals"
+      ]
+    },
+    {
+      "id": 13,
+      "type": "GetTextFromJson",
+      "pos": [
+        458.42633056640625,
+        -229.2722625732422
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "json",
+          "type": "JSON",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            13
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-art-venture",
+        "ver": "1.1.1",
+        "Node name for S&R": "GetTextFromJson"
+      },
+      "widgets_values": [
+        "prompt"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "PreviewImage",
+      "pos": [
+        -726.816650390625,
+        216.7612762451172
+      ],
+      "size": [
+        276.24835205078125,
+        270.1209411621094
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 21
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 21,
+      "type": "CR Text Replace",
+      "pos": [
+        -1027.3134765625,
+        172.95091247558594
+      ],
+      "size": [
+        270.4537353515625,
+        198
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 22
+        },
+        {
+          "name": "replace1",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "replace1"
+          },
+          "link": 23
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "*",
+          "links": [
+            24
+          ]
+        },
+        {
+          "name": "show_help",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI_Comfyroll_CustomNodes",
+        "ver": "d78b780ae43fcf8c6b7c6505e6ffb4584281ceca",
+        "Node name for S&R": "CR Text Replace"
+      },
+      "widgets_values": [
+        "{server}",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 16,
+      "type": "VrchImageWebSocketSettingsNode",
+      "pos": [
+        -382.84149169921875,
+        4.155515670776367
+      ],
+      "size": [
+        345.744140625,
+        322
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_filters_json",
+          "shape": 7,
+          "type": "JSON",
+          "link": 17
+        },
+        {
+          "name": "server",
+          "type": "STRING",
+          "widget": {
+            "name": "server"
+          },
+          "link": 18
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE_SETTINGS_JSON",
+          "type": "JSON",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-web-viewer",
+        "ver": "68e2d4b546963736b2f91797c2687cdb60a2989a",
+        "Node name for S&R": "VrchImageWebSocketSettingsNode"
+      },
+      "widgets_values": [
+        "1",
+        "192.168.123.112:8001",
+        true,
+        1,
+        1000,
+        200,
+        "none",
+        true,
+        false,
+        "#222222",
+        "",
+        false
+      ]
+    },
+    {
+      "id": 17,
+      "type": "VrchImageWebSocketFilterSettingsNode",
+      "pos": [
+        -364.6117858886719,
+        -347.3862609863281
+      ],
+      "size": [
+        297.7183532714844,
+        280
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE_FILTERS_JSON",
+          "type": "JSON",
+          "links": [
+            17
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-web-viewer",
+        "ver": "68e2d4b546963736b2f91797c2687cdb60a2989a",
+        "Node name for S&R": "VrchImageWebSocketFilterSettingsNode"
+      },
+      "widgets_values": [
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        ""
+      ]
+    },
+    {
+      "id": 19,
+      "type": "VrchQRCodeNode",
+      "pos": [
+        -721.5233154296875,
+        -15.89502239227295
+      ],
+      "size": [
+        262.66082763671875,
+        184
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 24
+        }
+      ],
+      "outputs": [
+        {
+          "name": "QR_CODE",
+          "type": "IMAGE",
+          "links": [
+            21
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-web-viewer",
+        "ver": "68e2d4b546963736b2f91797c2687cdb60a2989a",
+        "Node name for S&R": "VrchQRCodeNode"
+      },
+      "widgets_values": [
+        "",
+        256,
+        "M",
+        2,
+        false
+      ]
+    },
+    {
+      "id": 11,
+      "type": "VrchWebSocketServerNode",
+      "pos": [
+        -712.2493286132812,
+        -385.2420654296875
+      ],
+      "size": [
+        279.5826110839844,
+        136
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SERVER",
+          "type": "STRING",
+          "links": [
+            10,
+            16,
+            18,
+            23,
+            27
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-web-viewer",
+        "ver": "68e2d4b546963736b2f91797c2687cdb60a2989a",
+        "Node name for S&R": "VrchWebSocketServerNode"
+      },
+      "widgets_values": [
+        "192.168.123.112:8001",
+        false,
+        ""
+      ]
+    },
+    {
+      "id": 15,
+      "type": "VrchImageWebSocketSimpleWebViewerNode",
+      "pos": [
+        1332.582763671875,
+        202.6782684326172
+      ],
+      "size": [
+        400,
+        440
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 15
+        },
+        {
+          "name": "server",
+          "type": "STRING",
+          "widget": {
+            "name": "server"
+          },
+          "link": 16
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGES",
+          "type": "IMAGE",
+          "links": null
+        },
+        {
+          "name": "URL",
+          "type": "STRING",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-web-viewer",
+        "ver": "68e2d4b546963736b2f91797c2687cdb60a2989a",
+        "Node name for S&R": "VrchImageWebSocketSimpleWebViewerNode"
+      },
+      "widgets_values": [
+        "1",
+        "192.168.123.112:8001",
+        "JPEG",
+        1,
+        1000,
+        200,
+        1280,
+        960,
+        false,
+        false,
+        false,
+        "",
+        "http://vrch.ai/viewer?mode=image-websocket&server=192.168.123.112:8001&ssl=false&protocol=websocket&path=web_viewer&channel=1&numberOfImages=1&imageDisplayDuration=1000&fadeAnimDuration=200",
+        ""
+      ]
+    },
+    {
+      "id": 4,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        75.17569732666016,
+        457.6888427734375
+      ],
+      "size": [
+        315,
+        98
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "slot_index": 0,
+          "links": [
+            1
+          ]
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "slot_index": 1,
+          "links": [
+            3,
+            5
+          ]
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "slot_index": 2,
+          "links": [
+            33,
+            41
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "CheckpointLoaderSimple",
+        "models": [
+          {
+            "name": "v1-5-pruned-emaonly-fp16.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/stable-diffusion-v1-5-archive/resolve/main/v1-5-pruned-emaonly-fp16.safetensors?download=true",
+            "directory": "checkpoints"
+          }
+        ]
+      },
+      "widgets_values": [
+        "sdxl/sd_xl_turbo_1.0_fp16.safetensors"
+      ]
+    },
+    {
+      "id": 23,
+      "type": "VrchImageWebSocketChannelLoaderNode",
+      "pos": [
+        101.92659759521484,
+        -714.1766967773438
+      ],
+      "size": [
+        326.9888610839844,
+        150
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "default_image",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "server",
+          "type": "STRING",
+          "widget": {
+            "name": "server"
+          },
+          "link": 27
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            26,
+            57
+          ]
+        },
+        {
+          "name": "IS_DEFAULT_IMAGE",
+          "type": "BOOLEAN",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-web-viewer",
+        "ver": "68e2d4b546963736b2f91797c2687cdb60a2989a",
+        "Node name for S&R": "VrchImageWebSocketChannelLoaderNode"
+      },
+      "widgets_values": [
+        "2",
+        "192.168.123.112:8001",
+        "black",
+        false
+      ]
+    },
+    {
+      "id": 27,
+      "type": "ControlNetApplyAdvanced",
+      "pos": [
+        1272.156494140625,
+        -252.35165405273438
+      ],
+      "size": [
+        270,
+        186
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 29
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 30
+        },
+        {
+          "name": "control_net",
+          "type": "CONTROL_NET",
+          "link": 28
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 58
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": 33
+        },
+        {
+          "name": "strength",
+          "type": "FLOAT",
+          "widget": {
+            "name": "strength"
+          },
+          "link": 66
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            31
+          ]
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "links": [
+            32
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "ControlNetApplyAdvanced"
+      },
+      "widgets_values": [
+        0.65,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 42,
+      "type": "ImageResize",
+      "pos": [
+        972.051513671875,
+        -462.2051696777344
+      ],
+      "size": [
+        270,
+        246
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 57
+        },
+        {
+          "name": "mask_optional",
+          "shape": 7,
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            58
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "image-resize-comfyui",
+        "ver": "ae5888637742ff1668b6cd32954ba48d81dbd39d",
+        "Node name for S&R": "ImageResize"
+      },
+      "widgets_values": [
+        "resize only",
+        0,
+        512,
+        0,
+        "reduce size only",
+        "4:3",
+        0.5,
+        20
+      ]
+    },
+    {
+      "id": 6,
+      "type": "CLIPTextEncode",
+      "pos": [
+        460.300048828125,
+        160.2543182373047
+      ],
+      "size": [
+        342.8113708496094,
+        158.25076293945312
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 3
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 14
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": [
+            29,
+            30
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "beautiful scenery nature glass bottle landscape, , purple galaxy bottle,"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "CLIPTextEncode",
+      "pos": [
+        457.7181091308594,
+        359.40386962890625
+      ],
+      "size": [
+        338.2841796875,
+        141.05250549316406
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "text, watermark,embedding:EasyNegative, "
+      ]
+    },
+    {
+      "id": 24,
+      "type": "PreviewImage",
+      "pos": [
+        458.512939453125,
+        -633.1599731445312
+      ],
+      "size": [
+        210,
+        258
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 26
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 26,
+      "type": "ControlNetLoader",
+      "pos": [
+        1278.169189453125,
+        -373.1842956542969
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CONTROL_NET",
+          "type": "CONTROL_NET",
+          "links": [
+            28
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "ControlNetLoader"
+      },
+      "widgets_values": [
+        "sdxl/xinsir-controlnet-depth-sdxl-1.0.safetensors"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "KSampler",
+      "pos": [
+        908.2996215820312,
+        160.55209350585938
+      ],
+      "size": [
+        315,
+        262
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 31
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 32
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 64
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": 65
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            7
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        1110937308338553,
+        "fixed",
+        1,
+        1,
+        "euler_ancestral",
+        "simple",
+        1
+      ]
+    },
+    {
+      "id": 5,
+      "type": "EmptyLatentImage",
+      "pos": [
+        188.77987670898438,
+        624.42236328125
+      ],
+      "size": [
+        315,
+        106
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            63
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "EmptyLatentImage"
+      },
+      "widgets_values": [
+        512,
+        320,
+        1
+      ]
+    },
+    {
+      "id": 25,
+      "type": "Fast Groups Bypasser (rgthree)",
+      "pos": [
+        -1054.7801513671875,
+        -382.5647277832031
+      ],
+      "size": [
+        317.88702392578125,
+        226
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "OPT_CONNECTION",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "matchColors": "",
+        "matchTitle": "",
+        "showNav": true,
+        "sort": "position",
+        "customSortAlphabet": "",
+        "toggleRestriction": "default"
+      }
+    },
+    {
+      "id": 48,
+      "type": "InjectLatentNoise+",
+      "pos": [
+        601.8067016601562,
+        604.0486450195312
+      ],
+      "size": [
+        270,
+        106
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "link": 63
+        },
+        {
+          "name": "noise_strength",
+          "type": "FLOAT",
+          "widget": {
+            "name": "noise_strength"
+          },
+          "link": 67
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            64
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui_essentials",
+        "ver": "1.1.0",
+        "Node name for S&R": "InjectLatentNoise+"
+      },
+      "widgets_values": [
+        846669489314914,
+        "randomize",
+        10.18
+      ]
+    },
+    {
+      "id": 49,
+      "type": "Seed (rgthree)",
+      "pos": [
+        -374.771484375,
+        376.3956298828125
+      ],
+      "size": [
+        315,
+        130
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "dir": 4,
+          "name": "SEED",
+          "shape": 3,
+          "type": "INT",
+          "links": [
+            65
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "rgthree-comfy",
+        "ver": "1.0.2507112302"
+      },
+      "widgets_values": [
+        364607645291759,
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 51,
+      "type": "PrimitiveFloat",
+      "pos": [
+        -365.032470703125,
+        560.117919921875
+      ],
+      "size": [
+        296.58477783203125,
+        58
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            66
+          ]
+        }
+      ],
+      "title": "ControlNet Strength (0.0 - 1.0)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "PrimitiveFloat"
+      },
+      "widgets_values": [
+        0.6
+      ]
+    },
+    {
+      "id": 18,
+      "type": "Textbox",
+      "pos": [
+        -1027.62939453125,
+        -4.421883583068848
+      ],
+      "size": [
+        262.9496765136719,
+        106.29026794433594
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "passthrough",
+          "shape": 7,
+          "type": "STRING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            22
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI-Chibi-Nodes",
+        "ver": "424d5fc68bd3b82fe3c491f27b0c37bb3de1d123",
+        "Node name for S&R": "Textbox"
+      },
+      "widgets_values": [
+        "http://vrch.ai/viewer?mode=prompt-websocket-sender&server={server}&ssl=false&protocol=websocket&channel=1"
+      ]
+    },
+    {
+      "id": 52,
+      "type": "PrimitiveFloat",
+      "pos": [
+        -368.9863586425781,
+        671.5078125
+      ],
+      "size": [
+        304.79608154296875,
+        60.09687423706055
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            67
+          ]
+        }
+      ],
+      "title": "Noice Strength (0.0 - 20.0)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "PrimitiveFloat"
+      },
+      "widgets_values": [
+        3.9
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      4,
+      0,
+      3,
+      0,
+      "MODEL"
+    ],
+    [
+      3,
+      4,
+      1,
+      6,
+      0,
+      "CLIP"
+    ],
+    [
+      5,
+      4,
+      1,
+      7,
+      0,
+      "CLIP"
+    ],
+    [
+      7,
+      3,
+      0,
+      8,
+      0,
+      "LATENT"
+    ],
+    [
+      10,
+      11,
+      0,
+      10,
+      0,
+      "STRING"
+    ],
+    [
+      12,
+      10,
+      0,
+      13,
+      0,
+      "JSON"
+    ],
+    [
+      13,
+      13,
+      0,
+      14,
+      0,
+      "STRING"
+    ],
+    [
+      14,
+      14,
+      0,
+      6,
+      1,
+      "STRING"
+    ],
+    [
+      15,
+      8,
+      0,
+      15,
+      0,
+      "IMAGE"
+    ],
+    [
+      16,
+      11,
+      0,
+      15,
+      1,
+      "STRING"
+    ],
+    [
+      17,
+      17,
+      0,
+      16,
+      0,
+      "JSON"
+    ],
+    [
+      18,
+      11,
+      0,
+      16,
+      1,
+      "STRING"
+    ],
+    [
+      21,
+      19,
+      0,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      22,
+      18,
+      0,
+      21,
+      0,
+      "STRING"
+    ],
+    [
+      23,
+      11,
+      0,
+      21,
+      1,
+      "STRING"
+    ],
+    [
+      24,
+      21,
+      0,
+      19,
+      0,
+      "STRING"
+    ],
+    [
+      26,
+      23,
+      0,
+      24,
+      0,
+      "IMAGE"
+    ],
+    [
+      27,
+      11,
+      0,
+      23,
+      1,
+      "STRING"
+    ],
+    [
+      28,
+      26,
+      0,
+      27,
+      2,
+      "CONTROL_NET"
+    ],
+    [
+      29,
+      6,
+      0,
+      27,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      30,
+      6,
+      0,
+      27,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      31,
+      27,
+      0,
+      3,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      32,
+      27,
+      1,
+      3,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      33,
+      4,
+      2,
+      27,
+      4,
+      "VAE"
+    ],
+    [
+      41,
+      4,
+      2,
+      8,
+      1,
+      "VAE"
+    ],
+    [
+      57,
+      23,
+      0,
+      42,
+      0,
+      "IMAGE"
+    ],
+    [
+      58,
+      42,
+      0,
+      27,
+      3,
+      "IMAGE"
+    ],
+    [
+      63,
+      5,
+      0,
+      48,
+      0,
+      "LATENT"
+    ],
+    [
+      64,
+      48,
+      0,
+      3,
+      3,
+      "LATENT"
+    ],
+    [
+      65,
+      49,
+      0,
+      3,
+      4,
+      "INT"
+    ],
+    [
+      66,
+      51,
+      0,
+      27,
+      5,
+      "FLOAT"
+    ],
+    [
+      67,
+      52,
+      0,
+      48,
+      1,
+      "FLOAT"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "Json WebSocket Receiver",
+      "bounding": [
+        64.44886016845703,
+        -323.3591003417969,
+        761.2357177734375,
+        380.3446960449219
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "Image Generator",
+      "bounding": [
+        65.1756591796875,
+        86.65422058105469,
+        1173.2784423828125,
+        676.9241943359375
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "Control Panel",
+      "bounding": [
+        -1064.7801513671875,
+        -458.8420104980469,
+        1071.4971923828125,
+        1223.7327880859375
+      ],
+      "color": "#A88",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "Output",
+      "bounding": [
+        1287.398193359375,
+        89.95374298095703,
+        480.58856201171875,
+        602.7300415039062
+      ],
+      "color": "#a1309b",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "QR Code for WebSocket Prompt Sender",
+      "bounding": [
+        -1037.629150390625,
+        -89.49508666992188,
+        597.0623168945312,
+        586.3773803710938
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 6,
+      "title": "Image WebSocket Receiver",
+      "bounding": [
+        65.17843627929688,
+        -806.8916015625,
+        754.9896240234375,
+        449.8460998535156
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 7,
+      "title": "ControlNet Control Panel",
+      "bounding": [
+        896.0045166015625,
+        -592.0037841796875,
+        827.0262451171875,
+        628.595458984375
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6042188890154613,
+      "offset": [
+        1098.4884299960427,
+        746.4469771476433
+      ]
+    },
+    "frontendVersion": "1.24.1",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}
