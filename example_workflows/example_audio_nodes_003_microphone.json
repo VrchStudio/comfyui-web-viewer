@@ -1,0 +1,356 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "revision": 0,
+  "last_node_id": 26,
+  "last_link_id": 39,
+  "nodes": [
+    {
+      "id": 23,
+      "type": "PreviewImage",
+      "pos": [
+        1324.455078125,
+        -1129.00390625
+      ],
+      "size": [
+        385.8203125,
+        246
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 36
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 21,
+      "type": "VrchMicLoaderNode",
+      "pos": [
+        404.9081726074219,
+        -1070.3671875
+      ],
+      "size": [
+        400,
+        766
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "RAW_DATA",
+          "type": "JSON",
+          "links": [
+            35,
+            38
+          ]
+        },
+        {
+          "name": "WAVEFORM",
+          "shape": 6,
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "SPECTRUM",
+          "shape": 6,
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "VOLUME",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "LOW_FREQ_VOLUME",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "MID_FREQ_VOLUME",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "HIGH_FREQ_VOLUME",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "IS_ACTIVE",
+          "type": "BOOLEAN",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-web-viewer",
+        "ver": "ff132fe54be1fd6d7eef41c7f4e0098c2711ad1d",
+        "Node name for S&R": "VrchMicLoaderNode"
+      },
+      "widgets_values": [
+        "70098d81171dd6818eb5f3b8ded0f5d33b090a2fd55374c93d13d9f4c9896f6e",
+        "Insta360 Link 2 (2e1a:4c04)",
+        0.5,
+        "512",
+        "48000",
+        200,
+        5000,
+        true,
+        false,
+        "{\"device_id\":\"70098d81171dd6818eb5f3b8ded0f5d33b090a2fd55374c93d13d9f4c9896f6e\",\"name\":\"Insta360 Link 2 (2e1a:4c04)\",\"sr\":48000,\"ch\":1,\"hop\":512,\"waveform\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"spectrum\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],\"volume\":0,\"is_active\":false,\"rms\":0,\"zcr\":0,\"peak\":0}",
+        ""
+      ]
+    },
+    {
+      "id": 25,
+      "type": "VrchBPMDetectorNode",
+      "pos": [
+        872.654296875,
+        -621.703125
+      ],
+      "size": [
+        393.4078063964844,
+        282
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "raw_data",
+          "type": "JSON",
+          "link": 38
+        }
+      ],
+      "outputs": [
+        {
+          "name": "BPM_DATA",
+          "type": "JSON",
+          "links": null
+        },
+        {
+          "name": "BPM_VALUE",
+          "type": "FLOAT",
+          "links": [
+            39
+          ]
+        },
+        {
+          "name": "BPM_CONFIDENCE",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
+          "name": "BEAT_DETECTED",
+          "type": "BOOLEAN",
+          "links": null
+        },
+        {
+          "name": "RHYTHM_STRENGTH",
+          "type": "FLOAT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-web-viewer",
+        "ver": "ff132fe54be1fd6d7eef41c7f4e0098c2711ad1d",
+        "Node name for S&R": "VrchBPMDetectorNode"
+      },
+      "widgets_values": [
+        "48000",
+        4,
+        0.2,
+        0.3,
+        60,
+        200,
+        false
+      ]
+    },
+    {
+      "id": 24,
+      "type": "PreviewImage",
+      "pos": [
+        1328.248046875,
+        -818.8828125
+      ],
+      "size": [
+        385.7421875,
+        246
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 37
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 26,
+      "type": "Display Any (rgthree)",
+      "pos": [
+        1334.947265625,
+        -492.8633117675781
+      ],
+      "size": [
+        319.2798767089844,
+        124.50390625
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "dir": 3,
+          "name": "source",
+          "type": "*",
+          "link": 39
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "rgthree-comfy",
+        "ver": "1.0.2507112302",
+        "Node name for S&R": "Display Any (rgthree)"
+      },
+      "widgets_values": [
+        "108.04925933119569"
+      ]
+    },
+    {
+      "id": 22,
+      "type": "VrchAudioVisualizerNode",
+      "pos": [
+        877.9120483398438,
+        -975.3515625
+      ],
+      "size": [
+        379.416015625,
+        246
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "raw_data",
+          "type": "JSON",
+          "link": 35
+        }
+      ],
+      "outputs": [
+        {
+          "name": "WAVEFORM_IMAGE",
+          "type": "IMAGE",
+          "links": [
+            36
+          ]
+        },
+        {
+          "name": "SPECTRUM_IMAGE",
+          "type": "IMAGE",
+          "links": [
+            37
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-web-viewer",
+        "ver": "ff132fe54be1fd6d7eef41c7f4e0098c2711ad1d",
+        "Node name for S&R": "VrchAudioVisualizerNode"
+      },
+      "widgets_values": [
+        512,
+        256,
+        "colorful",
+        "#111111",
+        "#CCCCCC",
+        1,
+        2,
+        false
+      ]
+    }
+  ],
+  "links": [
+    [
+      35,
+      21,
+      0,
+      22,
+      0,
+      "JSON"
+    ],
+    [
+      36,
+      22,
+      0,
+      23,
+      0,
+      "IMAGE"
+    ],
+    [
+      37,
+      22,
+      1,
+      24,
+      0,
+      "IMAGE"
+    ],
+    [
+      38,
+      21,
+      0,
+      25,
+      0,
+      "JSON"
+    ],
+    [
+      39,
+      25,
+      1,
+      26,
+      0,
+      "*"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1,
+      "offset": [
+        5.126993389730586,
+        1203.8867374340703
+      ]
+    },
+    "frontendVersion": "1.24.1",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

@@ -10,12 +10,13 @@ from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
 
-__version__ = "1.1.3"
+__version__ = "1.1.4"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
     "VrchAudioChannelLoaderNode": VrchAudioChannelLoaderNode,
     "VrchAudioConcatNode": VrchAudioConcatNode,
+    "VrchAudioEmotionVisualizerNode": VrchAudioEmotionVisualizerNode,
     "VrchAudioFrequencyBandAnalyzerNode": VrchAudioFrequencyBandAnalyzerNode,
     "VrchAudioGenresNode": VrchAudioGenresNode,
     "VrchAudioMusic2EmotionNode": VrchAudioMusic2EmotionNode,
@@ -79,6 +80,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchAnyOSCControlNode": "ANY Value OSC Control @ vrch.ai",
     "VrchAudioChannelLoaderNode": "AUDIO Web Viewer Channel Loader @ vrch.ai",
     "VrchAudioConcatNode": "AUDIO Concat @ vrch.ai",
+    "VrchAudioEmotionVisualizerNode": "AUDIO Emotion Visualizer @ vrch.ai",
     "VrchAudioFrequencyBandAnalyzerNode": "AUDIO Frequency Band Analyzer @ vrch.ai",
     "VrchAudioGenresNode": "AUDIO Get Genres @ vrch.ai",
     "VrchAudioMusic2EmotionNode": "AUDIO Music to Emotion Detector @ vrch.ai",
