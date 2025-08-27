@@ -642,7 +642,8 @@ class VrchAudioEmotionVisualizerNode:
                 ang = np.deg2rad(deg)
                 # Preferred outer position relative to plot square (not entire image)
                 rx_out = cx + int((ring_r + outer_offset) * np.cos(ang))
-                ry_out = cy + int((ring_r + outer_offset) * np.sin(ang))
+                # Use image coordinate system: y axis grows downward, so invert sin to make 90° point up
+                ry_out = cy - int((ring_r + outer_offset) * np.sin(ang))
                 text = word
                 tw, th = self._text_size(draw, text, tick_font)
                 x_out = rx_out - tw // 2
@@ -662,7 +663,7 @@ class VrchAudioEmotionVisualizerNode:
                 else:
                     # Fallback inner position (slightly inside ring)
                     rx_in = cx + int((ring_r - inner_offset) * np.cos(ang))
-                    ry_in = cy + int((ring_r - inner_offset) * np.sin(ang))
+                    ry_in = cy - int((ring_r - inner_offset) * np.sin(ang))
                     x_in = rx_in - tw // 2
                     y_in = ry_in - th // 2
                     # Clamp to square bounds
