@@ -220,15 +220,18 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
 1. **Add the `WebSocket Server @ vrch.ai` node to your ComfyUI workflow.**
 
 2. **Configure the Node:**
-   - **Server:**
-     - **`server`**: Enter the server's address and port in the format `IP:PORT`. The default is typically your local IP address and port **8001** (e.g., **`127.0.0.1:8001`**).
+   - **Server Host:**
+     - **`server`**: Choose from `127.0.0.1` / `0.0.0.0` / your resolved default IP (from `VrchNodeUtils.get_default_ip_address(...)`).
+   - **Port:**
+     - **`port`**: TCP port for the server (default: **8001**).
    - **Debug Mode:**
      - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
 
-3. **Server Status Indicator:**
+3. **Server Status & Full Address:**
    - The node displays a status indicator that shows whether the server is running:
      - **Grey "Stopped"**: The WebSocket server is not running
      - **Green "Running"**: The WebSocket server is active and accepting connections
+   - Under the status, a centered full address label shows `HOST:PORT` and can be clicked to copy to clipboard. A small "copied" indicator briefly appears near the top‑right when the copy succeeds.
 
 4. **Usage:**
    - This node must be executed in your workflow to start the WebSocket server
@@ -413,4 +416,3 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
 - The node automatically establishes and maintains WebSocket connections, reconnecting if the connection is lost.
 - The node continuously monitors for new JSON data, allowing your workflow to react to data sent from any source that connects to the same WebSocket channel.
 - When debug mode is enabled, the node outputs detailed logs to the console, which can help you track the JSON data reception process.
-
