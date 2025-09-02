@@ -5,13 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Updated
+
+- update `VrchAudioMusic2EmotionNode` node to adjust `raw_data` output values
+- update `VrchAudioEmotionVisualizerNode` node to add mood word cloud visuals
+- update `VrchWebSocketServerNode` node to support server address dropdown list
+- update `example_workflows/example_audio_nodes_002_audio_emotion_visualizer` workflow
+- update `docs/audio_nodes.md`
+- update `docs/websocket_nodes.md`
+
 ## 1.1.4 - 2025-08-27
 
 ### Added
 
 - add new `VrchAudioEmotionVisualizerNode` node (display name: `AUDIO Emotion Visualizer @ vrch.ai`)
 - add some example workflows for the newly added nodes
-
 
 ### Updated
 
