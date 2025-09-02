@@ -139,6 +139,8 @@ To use the `AUDIO Music to Emotion Detector @ vrch.ai` node, you'll need to inst
 - Documentation: [Usage of Audio nodes](./docs/audio_nodes.md)
 - Example workflows:
   - [Workflow Example: Audio Recorder Node](./example_workflows/example_audio_nodes_001_audio_recorder.json)
+  - [Workflow Example: Music Emotion and Visualizer](./example_workflows/example_audio_nodes_002_audio_emotion_visualizer.json)
+  - [Workflow Example: Microphone and Visualizer](./example_workflows/example_audio_nodes_003_microphone.json)
 
 ### `Image Nodes`
 

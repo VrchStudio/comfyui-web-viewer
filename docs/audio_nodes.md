@@ -198,7 +198,13 @@
      - **Arousal:** Measures energy and activation level (1=very calm, 9=very energetic).
 4. **Outputs:**
    - `AUDIO`: Passthrough of the original audio for further processing.
-   - `RAW_DATA`: Complete analysis results in JSON format containing all detected moods, probabilities, and metadata.
+   - `RAW_DATA`: JSON with fields (threshold-filtered and sorted):
+     - `predicted_moods` (list[str]): Threshold-filtered mood names sorted by probability (high → low).
+     - `mood_probs` (dict[str, float]): Threshold-filtered mood→probability map sorted by probability (high → low), rounded to 4 decimals.
+     - `valence` (float): 0.0–9.0 (clamped).
+     - `arousal` (float): 0.0–9.0 (clamped).
+     - `threshold_used` (float): The threshold used for filtering.
+     - `analysis_success` (bool): Whether analysis completed successfully.
    - `MOODS`: Formatted text output showing detected moods with their probabilities, displayed as:
      ```
      children: 0.9540
@@ -326,6 +332,7 @@
 - **Real-time Processing:** Optimized for continuous real-time frequency band monitoring.
 
 **Note:** The accuracy of frequency band analysis depends on the FFT resolution and sample rate. Higher sample rates and larger FFT sizes provide better frequency resolution for precise band analysis.
+
 ---
 
 ### Node: `AUDIO Emotion Visualizer @ vrch.ai` (vrch.ai/audio)
@@ -345,6 +352,17 @@
      - `radar_normalize`: Normalize polygon to the max mood value (boolean).
      - `radar_show_labels`: Show mood names around the radar (boolean).
      - `radar_show_values`: Show numeric values near radar vertices (boolean).
+   - Wordcloud (moods word cloud)
+     - `wordcloud_theme`: `pastel / ocean / sunset / forest / neon / mono-blue / mono-gray`.
+     - `wordcloud_layout`: `center_spiral` (default) / `archimedean_spiral_desc` / `concentric_rings` / `sequential_flow`.
+       - Non-sequential layouts use collision avoidance to minimize overlaps.
+       - `center_spiral`: Highest-probability word at center; others expand out via golden-angle spiral.
+       - `archimedean_spiral_desc`: Place words along an Archimedean spiral from center outwards.
+       - `concentric_rings`: Distribute words on rings; inner rings contain higher probability words.
+       - `sequential_flow`: Left-to-right line flow; simple and overlap-free by construction.
+     - `wordcloud_top_k`: How many moods to include (default: 12; range 3–64).
+     - `wordcloud_use_opacity`: If on, opacity scales with probability (higher = more opaque).
+     - `wordcloud_size_scale`: Font scaling intensity for probability mapping: `low / medium / high` (default: `medium`).
    - Valence/Arousal (quadrant plot)
      - `va_theme`: `no_background` (default) or themed quadrant backgrounds.
      - `va_show_minor_gridlines`: Show 0.5-step minor gridlines; when off, the outer border is hidden (only axes remain).
@@ -357,8 +375,10 @@
        - Axis arrows extend beyond the square for clarity.
 4. Outputs:
    - `MOODS_RADAR_IMAGE` (IMAGE): Radar visualization.
+   - `MOODS_WORDCLOUD_IMAGE` (IMAGE): Word cloud visualization.
    - `VALENCE_AROUSAL_IMAGE` (IMAGE): Valence/Arousal quadrant visualization.
 
 Tips
 - For the VA mood layer, labels sit near a circular ring and are semi-transparent to keep the focus on the current V/A point.
 - If `radar_normalize` is enabled, vertex values shift slightly inward to reduce overlap with outer labels.
+- The word cloud uses `RAW_DATA.mood_probs` as its source, which already applies threshold filtering from the detector node.

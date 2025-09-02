@@ -172,22 +172,86 @@ app.registerExtension({
     name: "vrch.WebSocketServer",
     async nodeCreated(node) {
         if (node.comfyClass === "VrchWebSocketServerNode") {
-            // Find the debug widget to access its current value
-            const debugWidget = node.widgets.find(w => w.name === "debug");
+            try {
+                // Find widgets
+                const debugWidget = node.widgets.find(w => w.name === "debug");
+                const serverWidget = node.widgets.find(w => w.name === "server");
+                const portWidget = node.widgets.find(w => w.name === "port");
             
-            // Create a container for the indicator
-            const container = document.createElement("div");
-            container.classList.add("vrch-server-indicator-container");
-            node.addDOMWidget("indicator_container", "Status", container);
+                // Create a container for the indicator
+                const container = document.createElement("div");
+                container.classList.add("vrch-server-indicator-container");
+                node.addDOMWidget("indicator_container", "Status", container);
 
-            // Initialize the indicator
-            const statusIndicator = createServerStatusIndicatorElement();
-            container.appendChild(statusIndicator);
+                // Initialize the indicator
+                const statusIndicator = createServerStatusIndicatorElement();
+                container.appendChild(statusIndicator);
+
+                // Create Full Address container with copy feature
+                const addrContainer = document.createElement("div");
+                addrContainer.classList.add("vrch-server-address-container");
+                const addrText = document.createElement("span");
+                addrText.classList.add("vrch-server-address");
+                addrText.textContent = "-";
+                addrContainer.appendChild(addrText);
+                node.addDOMWidget("full_address_container", "Address", addrContainer);
+
+                function computeAddress() {
+                    const host = serverWidget?.value ?? "";
+                    const port = portWidget?.value ?? "";
+                    return `${host}:${port}`;
+                }
+
+                function updateAddress(fromExecuted) {
+                    // Compute locally; onExecuted will override with server_full if provided
+                    addrText.textContent = computeAddress();
+                }
+
+                async function copyToClipboard(text) {
+                    try {
+                        if (navigator.clipboard && window.isSecureContext) {
+                            await navigator.clipboard.writeText(text);
+                        } else {
+                            const ta = document.createElement("textarea");
+                            ta.value = text;
+                            ta.style.position = "fixed";
+                            ta.style.left = "-9999px";
+                            document.body.appendChild(ta);
+                            ta.focus();
+                            ta.select();
+                            document.execCommand("copy");
+                            document.body.removeChild(ta);
+                        }
+                        // Show a checkmark via CSS without shifting layout
+                        addrText.classList.add("copied");
+                        setTimeout(() => { addrText.classList.remove("copied"); }, 1200);
+                    } catch (e) {
+                        console.warn("[VrchWebSocketServerNode] Copy failed", e);
+                    }
+                }
+
+                addrText.addEventListener("click", () => {
+                    copyToClipboard(addrText.textContent || "");
+                });
+
+            // Hook widget callbacks to refresh address
+                function hookWidget(widget) {
+                    if (!widget) return;
+                    const orig = widget.callback;
+                    widget.callback = function() {
+                        try { orig?.apply(this, arguments); } catch(e) { /* ignore */ }
+                        try { updateAddress(false); } catch(e) { /* ignore */ }
+                    };
+                }
+                hookWidget(serverWidget);
+                hookWidget(portWidget);
+                // initial
+                updateAddress(false);
 
             // Update indicator based on execution results
             const onExecuted = node.onExecuted;
-            node.onExecuted = function(message) {
-                onExecuted?.apply(this, arguments);
+                node.onExecuted = function(message) {
+                    onExecuted?.apply(this, arguments);
 
                 // Get server status and debug status from message
                 const isRunning = message?.server_status?.[0];
@@ -203,13 +267,23 @@ app.registerExtension({
                         console.log(`[VrchWebSocketServerNode] Server status update: ${isRunning ? 'Running' : 'Stopped'}`);
                     }
                 }
+                // Update full address if provided
+                    const serverFull = message?.server_full?.[0];
+                    if (serverFull) {
+                        addrText.textContent = serverFull;
+                    } else {
+                        updateAddress(true);
+                    }
                 
                 // If there's an error message from path validation, it would be handled by ComfyUI's error system
                 // We can add extra debug logging here if needed
                 if (isDebugEnabled && typeof isRunning === 'undefined') {
                     console.log("[VrchWebSocketServerNode] Executed but no status received:", message);
                 }
-            };
+                };
+            } catch (e) {
+                console.error("[vrch.WebSocketServer] UI init failed:", e);
+            }
         }
     }
 });
@@ -315,7 +389,8 @@ style.textContent = `
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 4px;
+        padding: 2px; /* tighter */
+        margin: 0;    /* remove extra gap */
     }
     .vrch-server-indicator {
         width: 200px; 
@@ -362,5 +437,44 @@ style.textContent = `
     }
     .vrch-filter-reset-btn:hover { background-color: #45a049; transform: scale(1.01); }
     .vrch-filter-reset-btn:active { background-color: #3e8e41; transform: scale(1); }
+
+    /* Server full address (centered, clickable, checkmark overlay) */
+    .vrch-server-address-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2px 0; /* tighter */
+        margin-top: -4px; /* pull closer to status */
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .vrch-server-address {
+        padding: 6px 14px;
+        background: #222;
+        border: 1px solid #555;
+        border-radius: 6px;
+        font-family: monospace;
+        font-size: 15px;
+        position: relative;
+        cursor: pointer;
+    }
+    .vrch-server-address::after {
+        content: "copied"; /* small indicator */
+        position: absolute;
+        right: -28px;  /* outside top-right corner */
+        top: -8px;
+        color: #7CFC00;
+        font-weight: 700;
+        font-size: 11px; /* small text */
+        letter-spacing: 0.3px;
+        opacity: 0;
+        transform: scale(0.96);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        pointer-events: none;
+    }
+    .vrch-server-address.copied::after {
+        opacity: 1;
+        transform: scale(1.0);
+    }
 `;
 document.head.appendChild(style);

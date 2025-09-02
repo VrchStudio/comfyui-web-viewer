@@ -26,7 +26,10 @@ class VrchWebSocketServerNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                # Server host selection: show resolved default IP value, not string literal
+                "server": (["127.0.0.1", "0.0.0.0", f"{DEFAULT_SERVER_IP}"], {"default": f"{DEFAULT_SERVER_IP}"}),
+                # Port selection with default
+                "port": ("INT", {"default": int(DEFAULT_SERVER_PORT), "min": 1, "max": 65535}),
                 "debug": ("BOOLEAN", {"default": False}),
             }
         }
@@ -37,11 +40,16 @@ class VrchWebSocketServerNode:
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
 
-    def start_server(self, server, debug):
+    def start_server(self, server, port, debug):
+        # Compose full server string
+        try:
+            port = int(port)
+        except Exception:
+            port = int(DEFAULT_SERVER_PORT)
+        server_str = f"{server}:{port}"
         # Detect change in server address or first initialization
-        server_changed = server != getattr(self, '_last_server', None)
-        host, port_str = server.split(":")
-        port = int(port_str)
+        server_changed = server_str != getattr(self, '_last_server', None)
+        host = server
         # Get or create the global server
         ws_server = get_global_server(host, port, debug=debug)
         # Register default paths on first init or server change
@@ -49,7 +57,7 @@ class VrchWebSocketServerNode:
             for p in ["/image", "/json", "/latent", "/audio", "/video", "/text"]:
                 ws_server.register_path(p)
             self._initialized = True
-            self._last_server = server
+            self._last_server = server_str
             if debug:
                 print(f"[VrchWebSocketServerNode] Registered default paths on {host}:{port}")
         
@@ -59,9 +67,10 @@ class VrchWebSocketServerNode:
         return {
             "ui": {
                 "server_status": [is_running],
-                "debug_status": [debug]
+                "debug_status": [debug],
+                "server_full": [server_str],
             },
-            "result": (server,)
+            "result": (server_str,)
         }
 
     @classmethod
