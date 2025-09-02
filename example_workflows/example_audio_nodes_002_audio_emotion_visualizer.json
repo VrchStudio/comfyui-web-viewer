@@ -1,28 +1,57 @@
 {
   "id": "00000000-0000-0000-0000-000000000000",
   "revision": 0,
-  "last_node_id": 20,
-  "last_link_id": 34,
+  "last_node_id": 30,
+  "last_link_id": 52,
   "nodes": [
     {
       "id": 11,
       "type": "PreviewImage",
       "pos": [
-        927.8858642578125,
-        -1136.2978515625
+        972.1475830078125,
+        -1172.9306640625
       ],
       "size": [
         553.2933959960938,
         280.0331726074219
       ],
       "flags": {},
-      "order": 3,
+      "order": 4,
       "mode": 0,
       "inputs": [
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 33
+          "link": 49
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.45",
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 22,
+      "type": "PreviewImage",
+      "pos": [
+        975.189453125,
+        -463.68359375
+      ],
+      "size": [
+        541.3803100585938,
+        323.1564636230469
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 51
         }
       ],
       "outputs": [],
@@ -37,21 +66,21 @@
       "id": 12,
       "type": "PreviewImage",
       "pos": [
-        925.7359008789062,
-        -784.7626953125
+        974.7163696289062,
+        -838.8994140625
       ],
       "size": [
-        541.3803100585938,
-        323.1564636230469
+        539.0443725585938,
+        308.3009948730469
       ],
       "flags": {},
-      "order": 4,
+      "order": 5,
       "mode": 0,
       "inputs": [
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 34
+          "link": 50
         }
       ],
       "outputs": [],
@@ -63,73 +92,43 @@
       "widgets_values": []
     },
     {
-      "id": 20,
-      "type": "VrchAudioEmotionVisualizerNode",
+      "id": 23,
+      "type": "Display Any (rgthree)",
       "pos": [
-        568.5411376953125,
-        -1068.145263671875
+        500.21282958984375,
+        -455.8359680175781
       ],
       "size": [
-        327.0376892089844,
-        462
+        378.2642517089844,
+        267.5
       ],
       "flags": {},
       "order": 2,
       "mode": 0,
       "inputs": [
         {
-          "name": "raw_data",
-          "type": "JSON",
-          "link": 32
+          "dir": 3,
+          "name": "source",
+          "type": "*",
+          "link": 39
         }
       ],
-      "outputs": [
-        {
-          "name": "MOODS_RADAR_IMAGE",
-          "type": "IMAGE",
-          "links": [
-            33
-          ]
-        },
-        {
-          "name": "VALENCE_AROUSAL_IMAGE",
-          "type": "IMAGE",
-          "links": [
-            34
-          ]
-        }
-      ],
+      "outputs": [],
       "properties": {
-        "cnr_id": "comfyui-web-viewer",
-        "ver": "2402bb257fb4dd1b0db87c24dadfc7065a5097ff",
-        "Node name for S&R": "VrchAudioEmotionVisualizerNode"
+        "cnr_id": "rgthree-comfy",
+        "ver": "1.0.2507112302",
+        "Node name for S&R": "Display Any (rgthree)"
       },
       "widgets_values": [
-        640,
-        480,
-        "#111111",
-        "#EFEFEF",
-        "medium",
-        "sunset",
-        6,
-        false,
-        true,
-        true,
-        "neon",
-        false,
-        true,
-        true,
-        false,
-        "#FFCC00",
-        false
+        "{\"predicted_moods\": [\"love\", \"happy\", \"funny\", \"energetic\", \"party\", \"sexy\", \"upbeat\", \"summer\", \"fun\", \"holiday\", \"fast\"], \"mood_probs\": {\"love\": 0.8596, \"happy\": 0.812, \"funny\": 0.7989, \"energetic\": 0.7695, \"party\": 0.7613, \"sexy\": 0.7544, \"upbeat\": 0.7155, \"summer\": 0.7015, \"fun\": 0.6189, \"holiday\": 0.5781, \"fast\": 0.505}, \"valence\": 7.2869038581848145, \"arousal\": 7.240624904632568, \"threshold_used\": 0.5, \"analysis_success\": true}"
       ]
     },
     {
       "id": 5,
       "type": "VrchAudioMusic2EmotionNode",
       "pos": [
-        216.42872619628906,
-        -818.7120361328125
+        99.03620147705078,
+        -737.4212646484375
       ],
       "size": [
         323.4312438964844,
@@ -155,7 +154,8 @@
           "name": "RAW_DATA",
           "type": "JSON",
           "links": [
-            32
+            39,
+            48
           ]
         },
         {
@@ -185,11 +185,85 @@
       ]
     },
     {
+      "id": 26,
+      "type": "VrchAudioEmotionVisualizerNode",
+      "pos": [
+        521.2845458984375,
+        -1142.8681640625
+      ],
+      "size": [
+        331.716796875,
+        602
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "raw_data",
+          "type": "JSON",
+          "link": 48
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MOODS_RADAR_IMAGE",
+          "type": "IMAGE",
+          "links": [
+            49
+          ]
+        },
+        {
+          "name": "MOODS_WORDCLOUD_IMAGE",
+          "type": "IMAGE",
+          "links": [
+            50
+          ]
+        },
+        {
+          "name": "VALENCE_AROUSAL_IMAGE",
+          "type": "IMAGE",
+          "links": [
+            51
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-web-viewer",
+        "ver": "eea627dc77896a5705a449064fd970dcb9b8e3a2",
+        "Node name for S&R": "VrchAudioEmotionVisualizerNode"
+      },
+      "widgets_values": [
+        640,
+        480,
+        "#111111",
+        "#EFEFEF",
+        "medium",
+        "pastel",
+        6,
+        false,
+        true,
+        true,
+        "pastel",
+        "sequential_flow",
+        12,
+        true,
+        "medium",
+        "neon",
+        false,
+        true,
+        true,
+        true,
+        "#FFCC00",
+        false
+      ]
+    },
+    {
       "id": 6,
       "type": "LoadAudio",
       "pos": [
-        211.65794372558594,
-        -1030.364990234375
+        88.56800842285156,
+        -950.07958984375
       ],
       "size": [
         331.822265625,
@@ -214,7 +288,7 @@
         "Node name for S&R": "LoadAudio"
       },
       "widgets_values": [
-        "A Gentle Whisper.mp4",
+        "燃烧我的离谱值.mp3",
         null,
         null
       ]
@@ -230,26 +304,42 @@
       "AUDIO"
     ],
     [
-      32,
+      39,
       5,
       1,
-      20,
+      23,
+      0,
+      "*"
+    ],
+    [
+      48,
+      5,
+      1,
+      26,
       0,
       "JSON"
     ],
     [
-      33,
-      20,
+      49,
+      26,
       0,
       11,
       0,
       "IMAGE"
     ],
     [
-      34,
-      20,
+      50,
+      26,
       1,
       12,
+      0,
+      "IMAGE"
+    ],
+    [
+      51,
+      26,
+      2,
+      22,
       0,
       "IMAGE"
     ]
@@ -258,13 +348,13 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 1,
+      "scale": 0.7513148009015777,
       "offset": [
-        -87.79488161026941,
-        1214.6640811840703
+        126.13646693376407,
+        1388.3814035917412
       ]
     },
-    "frontendVersion": "1.24.1",
+    "frontendVersion": "1.26.7",
     "VHS_latentpreview": false,
     "VHS_latentpreviewrate": 0,
     "VHS_MetadataImage": true,
