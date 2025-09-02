@@ -3,7 +3,8 @@ VrchAudioMusic2EmotionNode – music emotion recognition using Music2Emotion.
 Category: vrch.ai/audio
 """
 
-import os, tempfile, json
+import os, tempfile, json, random
+from collections import OrderedDict
 import soundfile as sf
 import torch
 from PIL import Image, ImageDraw, ImageFont
@@ -207,7 +208,7 @@ class VrchAudioMusic2EmotionNode:
             mood_probs = result.get("mood_probs", {})
             valence = float(result.get("valence", 0.0))
             arousal = float(result.get("arousal", 0.0))
-            
+
             # Format moods as "mood: probability" sorted by probability (high to low)
             if mood_probs and isinstance(mood_probs, dict):
                 # Sort moods by probability in descending order
@@ -230,12 +231,35 @@ class VrchAudioMusic2EmotionNode:
             valence = max(0.0, min(9.0, valence))
             arousal = max(0.0, min(9.0, arousal))
             
-            # Format mood_probs to 4 decimal places for consistency
-            formatted_mood_probs = {mood: round(prob, 4) for mood, prob in mood_probs.items()} if mood_probs else {}
-            
+            # Apply threshold filter to mood_probs and predicted_moods for raw_data
+            filtered_mood_probs = {}
+            if mood_probs and isinstance(mood_probs, dict):
+                try:
+                    filtered_mood_probs = {
+                        str(mood): float(prob) for mood, prob in mood_probs.items() if float(prob) >= float(threshold)
+                    }
+                except Exception:
+                    # If any casting fails, skip that entry
+                    filtered_mood_probs = {}
+
+            # Round to 4 decimals and sort by probability desc for consistency
+            if filtered_mood_probs:
+                sorted_pairs = sorted(filtered_mood_probs.items(), key=lambda x: x[1], reverse=True)
+                formatted_mood_probs = OrderedDict((m, round(float(p), 4)) for m, p in sorted_pairs)
+            else:
+                formatted_mood_probs = {}
+
+            # Build moods list sorted by probability desc for raw_data
+            if filtered_mood_probs:
+                predicted_moods_sorted = [m for m, _ in sorted(filtered_mood_probs.items(), key=lambda x: x[1], reverse=True)]
+            else:
+                # Fallback: keep original order when backend provides no probs
+                predicted_moods_sorted = predicted_moods or []
+
             # Create raw data JSON output
             raw_data = {
-                "predicted_moods": predicted_moods,
+                # Only return threshold-filtered fields (sorted high->low)
+                "predicted_moods": predicted_moods_sorted,
                 "mood_probs": formatted_mood_probs,
                 "valence": valence,
                 "arousal": arousal,
@@ -263,14 +287,15 @@ class VrchAudioEmotionVisualizerNode:
     """
     Visualize emotion data from VrchAudioMusic2EmotionNode RAW_DATA.
 
-    Generates two images:
+    Generates three images:
     - Moods radar chart (top-k moods by probability)
+    - Moods word cloud (top-k moods by probability)
     - Valence/Arousal quadrant plot
     """
 
     CATEGORY = CATEGORY
-    RETURN_TYPES = ("IMAGE", "IMAGE")
-    RETURN_NAMES = ("MOODS_RADAR_IMAGE", "VALENCE_AROUSAL_IMAGE")
+    RETURN_TYPES = ("IMAGE", "IMAGE", "IMAGE")
+    RETURN_NAMES = ("MOODS_RADAR_IMAGE", "MOODS_WORDCLOUD_IMAGE", "VALENCE_AROUSAL_IMAGE")
     FUNCTION = "visualize_emotion"
 
     @classmethod
@@ -295,6 +320,19 @@ class VrchAudioEmotionVisualizerNode:
                 "radar_normalize": ("BOOLEAN", {"default": False}),
                 "radar_show_labels": ("BOOLEAN", {"default": True}),
                 "radar_show_values": ("BOOLEAN", {"default": True}),
+
+                # wordcloud settings (theme first)
+                "wordcloud_theme": ([
+                    "pastel", "ocean", "sunset", "forest", "neon", "mono-blue", "mono-gray"
+                ], {"default": "pastel"}),
+                # layout option placed right after theme for better UX
+                "wordcloud_layout": ([
+                    "center_spiral", "archimedean_spiral_desc", "concentric_rings", "sequential_flow"
+                ], {"default": "sequential_flow"}),
+                "wordcloud_top_k": ("INT", {"default": 12, "min": 3, "max": 64, "step": 1}),
+                "wordcloud_use_opacity": ("BOOLEAN", {"default": True}),
+                # size scaling intensity (probability -> font size mapping)
+                "wordcloud_size_scale": (["low", "medium", "high"], {"default": "high"}),
 
                 # valence/arousal settings (theme first)
                 "va_theme": ([
@@ -335,6 +373,19 @@ class VrchAudioEmotionVisualizerNode:
             "mono-gray": {"fill": "#BDBDBD", "outline": "#E0E0E0", "grid": "#4A4A4A"},
         }
         return presets.get(theme, presets["pastel"])  # default to pastel
+
+    def _apply_wordcloud_theme(self, theme: str):
+        """Return a palette (list of hex colors) for wordcloud words."""
+        palettes = {
+            "pastel": ["#7FD1FF", "#F7A6B8", "#8CCB9B", "#FFD38C", "#C6A8FF"],
+            "ocean": ["#2BA6B9", "#5FD1C9", "#1E90FF", "#6EC1FF", "#00CED1"],
+            "sunset": ["#FF7F50", "#FFB385", "#FFD38C", "#FF6F91", "#FFA07A"],
+            "forest": ["#5E8D6A", "#8CCB9B", "#A3D9A5", "#6B8E23", "#3CB371"],
+            "neon": ["#39FF14", "#00E5FF", "#FF00FF", "#FFFF00", "#00FF7F"],
+            "mono-blue": ["#1E90FF", "#6EC1FF", "#A7D8FF", "#3FA9F5", "#0F6ABF"],
+            "mono-gray": ["#B0B0B0", "#D0D0D0", "#9AA0A6", "#ECECEC", "#7A7A7A"],
+        }
+        return palettes.get(theme, palettes["pastel"])
 
     def _va_theme_config(self, theme: str):
         """Return VA theme config: (quadrant_colors or None, grid_hex)."""
@@ -710,6 +761,7 @@ class VrchAudioEmotionVisualizerNode:
                           background_color="#111111", font_color="#EFEFEF", font_size="medium",
                           radar_top_k=6, radar_normalize=False, radar_show_labels=True, radar_show_values=True,
                           radar_theme="pastel",
+                          wordcloud_theme="pastel", wordcloud_top_k=12, wordcloud_use_opacity=True, wordcloud_layout="center_spiral", wordcloud_size_scale="medium",
                           va_show_minor_gridlines=True, va_show_mood_labels=False, va_show_axis_labels=True, va_show_value_labels=True,
                           va_point_color="#FFCC00", va_theme="no_background",
                           debug=False):
@@ -784,6 +836,25 @@ class VrchAudioEmotionVisualizerNode:
         if not moods_sel:
             self._text_with_outline(r_draw, (10, 10), "NO MOOD DATA", font_color_rgb, radar_label_font)
 
+        # Wordcloud image
+        wc_img = Image.new('RGB', (image_width, image_height), bg_rgb)
+        wc_draw = ImageDraw.Draw(wc_img)
+        # Build sorted moods for wordcloud
+        moods_wc_sorted = []
+        if isinstance(mood_probs, dict) and mood_probs:
+            try:
+                moods_wc_sorted = sorted(((k, float(v)) for k, v in mood_probs.items()), key=lambda x: x[1], reverse=True)
+            except Exception:
+                moods_wc_sorted = [(k, v) for k, v in mood_probs.items()]
+        moods_wc_sel = moods_wc_sorted[:max(1, int(wordcloud_top_k))] if moods_wc_sorted else []
+
+        # Draw wordcloud
+        self._draw_wordcloud(
+            wc_img, wc_draw, (image_width, image_height), bg_rgb,
+            moods_wc_sel, self._apply_wordcloud_theme(wordcloud_theme),
+            radar_label_font, fs, font_color_rgb, wordcloud_use_opacity, wordcloud_layout, wordcloud_size_scale, debug
+        )
+
         # VA image
         va_img = Image.new('RGB', (image_width, image_height), bg_rgb)
         v_draw = ImageDraw.Draw(va_img)
@@ -799,9 +870,11 @@ class VrchAudioEmotionVisualizerNode:
         # Convert to tensors (ComfyUI IMAGE)
         radar_array = np.array(radar_img).astype(np.float32) / 255.0
         radar_tensor = torch.from_numpy(radar_array)[None,]
+        wc_array = np.array(wc_img).astype(np.float32) / 255.0
+        wc_tensor = torch.from_numpy(wc_array)[None,]
         va_array = np.array(va_img).astype(np.float32) / 255.0
         va_tensor = torch.from_numpy(va_array)[None,]
-        return (radar_tensor, va_tensor)
+        return (radar_tensor, wc_tensor, va_tensor)
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
@@ -817,6 +890,7 @@ class VrchAudioEmotionVisualizerNode:
             keys = [
                 "image_width", "image_height", "background_color", "font_color", "font_size",
                 "radar_theme", "radar_top_k", "radar_normalize", "radar_show_labels", "radar_show_values",
+                "wordcloud_theme", "wordcloud_layout", "wordcloud_top_k", "wordcloud_use_opacity", "wordcloud_size_scale",
                 "va_theme", "va_show_minor_gridlines", "va_show_mood_labels", "va_show_axis_labels", "va_show_value_labels", "va_point_color",
             ]
             for k in keys:
@@ -825,3 +899,244 @@ class VrchAudioEmotionVisualizerNode:
             return m.hexdigest()
         except Exception:
             return float("NaN")
+
+    def _draw_wordcloud(self, base_img: Image.Image, draw: ImageDraw.ImageDraw, size, bg_rgb,
+                        moods: list, palette_hex: list,
+                        base_font, base_font_px: int, fallback_color_rgb,
+                        use_opacity: bool, layout: str, size_scale: str,
+                        debug=False):
+        """
+        Draw a simple word cloud from (mood, prob) list.
+
+        - Uses row-based flow layout with slight jitter.
+        - Font size scales linearly with probability.
+        - Colors cycle through a themed palette.
+        """
+        w, h = size
+        # Fallback when no data
+        if not moods:
+            self._text_with_outline(draw, (10, 10), "NO MOOD DATA", fallback_color_rgb, base_font)
+            return
+
+        # Normalize probabilities for sizing
+        probs = [float(v) for _, v in moods]
+        p_min, p_max = (min(probs), max(probs)) if probs else (0.0, 1.0)
+        if p_max == p_min:
+            p_min = 0.0
+        # Size bounds derived from UI font size choice and scale level
+        # Keep minimum at or above base size; increase maximum across levels
+        scale_level = str(size_scale).lower()
+        if scale_level == "low":
+            lo, hi = 1.00, 2.6
+        elif scale_level == "high":
+            lo, hi = 1.00, 4.0
+        else:  # medium
+            lo, hi = 1.00, 3.2
+        sz_min = max(12, int(base_font_px * lo))
+        sz_max = max(sz_min + 2, int(base_font_px * hi))
+
+        def scale_sz(p: float):
+            t = 0.0 if p_max == p_min else (p - p_min) / (p_max - p_min)
+            return int(sz_min + t * (sz_max - sz_min))
+
+        # Prepare measured words with chosen colors and fonts
+        palette_rgb = [self.hex_to_rgb(c) for c in (palette_hex or [])]
+        if not palette_rgb:
+            palette_rgb = [fallback_color_rgb]
+
+        measured = []
+        for idx, (word, p) in enumerate(moods):
+            sz = scale_sz(float(p))
+            font = self._get_font(sz)
+            tw, th = self._text_size(draw, str(word), font)
+            color = palette_rgb[idx % len(palette_rgb)]
+            measured.append((str(word), font, tw, th, color, float(p)))
+
+        # Helper: draw word with alpha and outline into overlay
+        def draw_item(od, x, y, item, t_norm):
+            word, font, tw, th, color, p = item
+            alpha = int(210 if not use_opacity else (80 + t_norm * 160))
+            oa = min(255, alpha + 40)
+            for dx, dy in [(-1,0),(1,0),(0,-1),(0,1)]:
+                od.text((x+dx, y+dy), word, fill=(0,0,0,oa), font=font)
+            od.text((x, y), word, fill=(color[0], color[1], color[2], alpha), font=font)
+
+        # Helper: collision check (l,t,r,b) vs placed rects with padding
+        def collide(rect, placed, pad=3):
+            l, t, r, b = rect
+            l -= pad; t -= pad; r += pad; b += pad
+            for L,T,R,B in placed:
+                if not (r < L or l > R or b < T or t > B):
+                    return True
+            return False
+
+        cx, cy = w // 2, h // 2
+        overlay = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+        od = ImageDraw.Draw(overlay)
+        placed = []  # list of (l,t,r,b)
+        spacing = 8
+
+        # Normalize probs per item for drawing alpha
+        def tnorm(p):
+            return 0.0 if p_max == p_min else max(0.0, min(1.0, (p - p_min) / (p_max - p_min)))
+
+        if layout == "sequential_flow":
+            # Simple line flow centered, minimal overlap by construction
+            margin_x = int(w * 0.05)
+            margin_y = int(h * 0.06)
+            max_line_w = w - margin_x * 2
+            lines = []
+            line_items = []
+            line_w = 0
+            line_h = 0
+            for item in measured:
+                _, _, tw, th, _, _ = item
+                need = tw if not line_items else (tw + spacing)
+                if line_w + need > max_line_w:
+                    if line_items:
+                        lines.append((line_items, line_w, line_h))
+                    line_items = [item]
+                    line_w = tw
+                    line_h = th
+                else:
+                    if line_items:
+                        line_w += spacing
+                    line_w += tw
+                    line_h = max(line_h, th)
+                    line_items.append(item)
+            if line_items:
+                lines.append((line_items, line_w, line_h))
+
+            total_h = sum(lh for _, _, lh in lines) + (len(lines) - 1) * (spacing // 2)
+            y = max(margin_y, (h - total_h) // 2)
+            for items, lw, lh in lines:
+                x = (w - lw) // 2
+                for item in items:
+                    word, font, tw, th, color, p = item
+                    tx = x
+                    ty = y + (lh - th) // 2
+                    draw_item(od, tx, ty, item, tnorm(p))
+                    placed.append((tx, ty, tx + tw, ty + th))
+                    x += tw + spacing
+                y += lh + (spacing // 2)
+
+        elif layout == "archimedean_spiral_desc":
+            # Place from center along a growing spiral, avoiding overlaps
+            a = 0.0
+            b = min(w, h) * 0.015
+            theta_step = 0.35
+            max_steps = 1200
+            for idx, item in enumerate(measured):
+                word, font, tw, th, color, p = item
+                placed_ok = False
+                theta = 0.0
+                for step in range(max_steps):
+                    r = a + b * theta
+                    x = int(cx + r * np.cos(theta)) - tw // 2
+                    y = int(cy + r * np.sin(theta)) - th // 2
+                    x = max(2, min(w - tw - 2, x))
+                    y = max(2, min(h - th - 2, y))
+                    rect = (x, y, x + tw, y + th)
+                    if not collide(rect, placed, pad=3):
+                        draw_item(od, x, y, item, tnorm(p))
+                        placed.append(rect)
+                        placed_ok = True
+                        break
+                    theta += theta_step
+                if not placed_ok:
+                    # Fallback near bottom-right corner
+                    x = min(w - tw - 2, max(2, w - tw - 10))
+                    y = min(h - th - 2, max(2, h - th - 10))
+                    draw_item(od, x, y, item, tnorm(p))
+                    placed.append((x, y, x + tw, y + th))
+
+        elif layout == "concentric_rings":
+            # Top-1 at center, others distributed on rings by capacity
+            if measured:
+                item0 = measured[0]
+                word, font, tw, th, color, p = item0
+                x0 = cx - tw // 2
+                y0 = cy - th // 2
+                draw_item(od, x0, y0, item0, tnorm(p))
+                placed.append((x0, y0, x0 + tw, y0 + th))
+                rest = measured[1:]
+            else:
+                rest = []
+
+            min_r = int(min(w, h) * 0.14)
+            ring_step = int(min(w, h) * 0.14)
+            idx = 0
+            ring_idx = 0
+            while idx < len(rest) and ring_idx < 6:
+                R = min_r + ring_idx * ring_step
+                # Estimate capacity from circumference
+                slice_items = rest[idx:]
+                if not slice_items:
+                    break
+                avg_w = max(1, int(sum(it[2] for it in slice_items[:6]) / min(6, len(slice_items))))
+                capacity = max(3, int((2 * np.pi * R) / (avg_w + spacing)))
+                ring_items = rest[idx: idx + capacity]
+                n = len(ring_items)
+                if n == 0:
+                    break
+                angle_step = 2 * np.pi / n
+                for i in range(n):
+                    item = ring_items[i]
+                    ang = i * angle_step
+                    # Try small angular adjustments to avoid overlaps
+                    attempts = 24
+                    for atry in range(attempts):
+                        a_off = ((atry // 2) * 0.06) * ((-1) ** atry)
+                        ang_try = ang + a_off
+                        x = cx + int(R * np.cos(ang_try)) - item[2] // 2
+                        y = cy + int(R * np.sin(ang_try)) - item[3] // 2
+                        x = max(2, min(w - item[2] - 2, x))
+                        y = max(2, min(h - item[3] - 2, y))
+                        rect = (x, y, x + item[2], y + item[3])
+                        if not collide(rect, placed, pad=3):
+                            draw_item(od, x, y, item, tnorm(item[5]))
+                            placed.append(rect)
+                            break
+                idx += n
+                ring_idx += 1
+
+        else:  # center_spiral (default)
+            # Place center word then others along golden-angle spiral with overlap avoidance
+            if measured:
+                item0 = measured[0]
+                word, font, tw, th, color, p = item0
+                x0 = cx - tw // 2
+                y0 = cy - th // 2
+                draw_item(od, x0, y0, item0, tnorm(p))
+                placed.append((x0, y0, x0 + tw, y0 + th))
+
+            max_r = int(min(w, h) * 0.42)
+            min_r = int(min(w, h) * 0.08)
+            golden_angle = np.deg2rad(137.508)
+            for i, item in enumerate(measured[1:], start=1):
+                p = item[5]
+                t = tnorm(p)
+                r_base = int(min_r + (1.0 - t) * (max_r - min_r))
+                placed_ok = False
+                # Try multiple angle and radius offsets
+                for k in range(180):
+                    ang = i * golden_angle + k * 0.12 * ((-1) ** k)
+                    r = r_base + (k // 12) * 6
+                    x = cx + int(r * np.cos(ang)) - item[2] // 2
+                    y = cy + int(r * np.sin(ang)) - item[3] // 2
+                    x = max(2, min(w - item[2] - 2, x))
+                    y = max(2, min(h - item[3] - 2, y))
+                    rect = (x, y, x + item[2], y + item[3])
+                    if not collide(rect, placed, pad=3):
+                        draw_item(od, x, y, item, t)
+                        placed.append(rect)
+                        placed_ok = True
+                        break
+                if not placed_ok:
+                    # Last resort near edges
+                    x = random.randint(2, max(2, w - item[2] - 2))
+                    y = random.randint(2, max(2, h - item[3] - 2))
+                    draw_item(od, x, y, item, t)
+                    placed.append((x, y, x + item[2], y + item[3]))
+
+        base_img.paste(overlay, (0, 0), overlay)
