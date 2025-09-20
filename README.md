@@ -59,8 +59,15 @@ To use the `AUDIO Music to Emotion Detector @ vrch.ai` node, you'll need to inst
    ```
 
 2. **Initialize and download the Music2Emotion submodule:**
+   
    ```bash
    git submodule update --init --recursive
+   ```
+
+   Alternatively, you may maunally install it as follows:
+   ```bash
+   cd path/to/ComfyUI/custom_nodes/comfyui-web-viewer/third_party
+   git clone https://github.com/VrchStudio/Music2Emotion.git music2emotion
    ```
 
 3. **Install dependencies using the main project's requirements.txt:**
