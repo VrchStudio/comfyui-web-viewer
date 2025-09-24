@@ -1,5 +1,6 @@
 import io, base64
 import os
+import re
 import torch
 import numpy as np
 from PIL import Image
@@ -165,3 +166,163 @@ class VrchImagePreviewBackgroundNewNode:
                 "background_display": [background_display],
             }
         }
+
+
+class VrchImageFallbackNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "fallback_option": (["default_image", "placeholder_image", "last_valid_image"], {"default": "placeholder_image"}),
+                "placeholder_width": ("INT", {"default": 512, "min": 1, "max": 4096}),
+                "placeholder_height": ("INT", {"default": 512, "min": 1, "max": 4096}),
+                "placeholder_color": ("STRING", {"default": "#000000"}),
+                "debug": ("BOOLEAN", {"default": False}),
+            },
+            "optional": {
+                "image": ("IMAGE",),
+                "default_image": ("IMAGE",),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("IMAGE",)
+    FUNCTION = "resolve_image"
+    CATEGORY = CATEGORY
+
+    def __init__(self):
+        self.last_valid_image = None
+
+    def resolve_image(self, fallback_option, placeholder_width, placeholder_height,
+                      placeholder_color, debug=False, image=None, default_image=None):
+        resolved_image = self._normalize_image(image)
+        if self._is_valid_image(resolved_image):
+            self.last_valid_image = resolved_image
+            if debug:
+                print("[VrchImageFallbackNode] Using provided image")
+            return (resolved_image,)
+
+        if debug:
+            print("[VrchImageFallbackNode] Input image invalid, applying fallback")
+
+        default_image = self._normalize_image(default_image)
+
+        if fallback_option == "default_image" and not self._is_valid_image(default_image):
+            if debug:
+                print("[VrchImageFallbackNode] default_image unavailable, switching to placeholder_image")
+            fallback_option = "placeholder_image"
+
+        if fallback_option == "last_valid_image" and not self._is_valid_image(self.last_valid_image):
+            if debug:
+                print("[VrchImageFallbackNode] last_valid_image unavailable, switching to placeholder_image")
+            fallback_option = "placeholder_image"
+
+        candidates = self._build_candidate_sequence(
+            fallback_option,
+            default_image,
+        )
+
+        for candidate_name in candidates:
+            if candidate_name == "default_image":
+                if self._is_valid_image(default_image):
+                    if debug:
+                        print("[VrchImageFallbackNode] Using default_image fallback")
+                    return (default_image,)
+            elif candidate_name == "last_valid_image" and self._is_valid_image(self.last_valid_image):
+                if debug:
+                    print("[VrchImageFallbackNode] Using last_valid_image fallback")
+                return (self.last_valid_image,)
+            elif candidate_name == "placeholder_image":
+                placeholder = self._build_placeholder_tensor(
+                    placeholder_width,
+                    placeholder_height,
+                    placeholder_color,
+                    debug,
+                )
+                if debug:
+                    print("[VrchImageFallbackNode] Using placeholder_image fallback")
+                return (placeholder,)
+
+        placeholder = self._build_placeholder_tensor(
+            placeholder_width,
+            placeholder_height,
+            placeholder_color,
+            debug,
+        )
+        if debug:
+            print("[VrchImageFallbackNode] No fallback successful, using generated placeholder")
+        return (placeholder,)
+
+    def _build_candidate_sequence(self, primary_option, default_image):
+        order = ["placeholder_image", "default_image", "last_valid_image"]
+        if primary_option not in order:
+            primary_option = "placeholder_image"
+
+        if primary_option == "default_image" and default_image is None:
+            # No default supplied, deprioritize it.
+            order.remove("default_image")
+            order.append("default_image")
+
+        reordered = [primary_option] + [name for name in order if name != primary_option]
+        return reordered
+
+    def _normalize_image(self, image):
+        if image is None:
+            return None
+
+        if isinstance(image, torch.Tensor):
+            tensor = image
+        elif isinstance(image, np.ndarray):
+            tensor = torch.from_numpy(image)
+        else:
+            return None
+
+        if tensor.ndim == 3:
+            tensor = tensor.unsqueeze(0)
+        if tensor.ndim != 4 or tensor.shape[-1] not in (1, 3, 4):
+            return None
+
+        tensor = tensor.detach().to(torch.float32)
+        if torch.isnan(tensor).any() or torch.isinf(tensor).any():
+            return None
+        return tensor.contiguous().clone()
+
+    def _is_valid_image(self, image):
+        return image is not None and isinstance(image, torch.Tensor) and image.ndim == 4 and image.numel() > 0
+
+    def _build_placeholder_tensor(self, width, height, color_str, debug):
+        width = max(1, int(width))
+        height = max(1, int(height))
+        rgb = self._parse_color_string(color_str)
+        placeholder = torch.tensor(rgb, dtype=torch.float32).view(1, 1, 1, 3)
+        placeholder = placeholder.expand(1, height, width, 3).contiguous()
+        if debug:
+            print(f"[VrchImageFallbackNode] Placeholder params width={width} height={height} color={rgb}")
+        return placeholder
+
+    def _parse_color_string(self, color_str):
+        if not isinstance(color_str, str):
+            return [0.0, 0.0, 0.0]
+
+        color_str = color_str.strip()
+        if color_str.startswith("#"):
+            color_str = color_str[1:]
+
+        if re.fullmatch(r"[0-9a-fA-F]{3}", color_str):
+            r, g, b = (int(c * 2, 16) for c in color_str)
+            return [r / 255.0, g / 255.0, b / 255.0]
+
+        if re.fullmatch(r"[0-9a-fA-F]{6}", color_str):
+            r = int(color_str[0:2], 16)
+            g = int(color_str[2:4], 16)
+            b = int(color_str[4:6], 16)
+            return [r / 255.0, g / 255.0, b / 255.0]
+
+        if re.fullmatch(r"[0-9a-fA-F]{8}", color_str):
+            r = int(color_str[0:2], 16)
+            g = int(color_str[2:4], 16)
+            b = int(color_str[4:6], 16)
+            # Alpha ignored; assumes opaque placeholder.
+            return [r / 255.0, g / 255.0, b / 255.0]
+
+        return [0.0, 0.0, 0.0]
