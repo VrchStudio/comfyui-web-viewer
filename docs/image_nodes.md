@@ -101,7 +101,7 @@ This node guarantees a valid image output even when the incoming `image` input i
 Add the `IMAGE Fallback @ vrch.ai` node to your workflow and connect the primary `image` input whenever available.
 
 #### 2. Node Configuration
-- **`image`**: Primary image input. Can be empty or invalid.
+- **`image`** (optional): Primary image input. Can be empty or invalid.
 - **`fallback_option`**: Chooses the first fallback source among:
   - `default_image`: Use the optional `default_image` input when it is valid. If missing or invalid, the node automatically falls back to a placeholder image.
   - `placeholder_image`: Generate a solid placeholder using the width, height, and color parameters.
