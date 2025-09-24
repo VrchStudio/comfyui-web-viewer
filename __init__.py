@@ -10,7 +10,7 @@ from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
 
-__version__ = "1.1.5"
+__version__ = "1.1.6"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -35,9 +35,10 @@ NODE_CLASS_MAPPINGS = {
     "VrchFloatRemapNode": VrchFloatRemapNode,
     "VrchGamepadLoaderNode": VrchGamepadLoaderNode,
     "VrchImageChannelLoaderNode": VrchImageChannelLoaderNode,
+    "VrchImageFallbackNode": VrchImageFallbackNode,
     "VrchImageFlipBookWebViewerNode": VrchImageFlipBookWebViewerNode,
-    "VrchImagePreviewBackgroundNode": VrchImagePreviewBackgroundNode,
     "VrchImagePreviewBackgroundNewNode": VrchImagePreviewBackgroundNewNode,
+    "VrchImagePreviewBackgroundNode": VrchImagePreviewBackgroundNode,
     "VrchImageSaverNode": VrchImageSaverNode,
     "VrchImageSwitchOSCControlNode": VrchImageSwitchOSCControlNode,
     "VrchImageWebSocketChannelLoaderNode": VrchImageWebSocketChannelLoaderNode,
@@ -71,9 +72,9 @@ NODE_CLASS_MAPPINGS = {
     "VrchVideoWebViewerNode": VrchVideoWebViewerNode,
     "VrchWebSocketServerNode": VrchWebSocketServerNode,
     "VrchWebViewerNode": VrchWebViewerNode,
-    "VrchXboxControllerNode": VrchXboxControllerNode,
     "VrchXYOSCControlNode": VrchXYOSCControlNode,
     "VrchXYZOSCControlNode": VrchXYZOSCControlNode,
+    "VrchXboxControllerNode": VrchXboxControllerNode,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -99,9 +100,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchFloatRemapNode": "FLOAT Remap @ vrch.ai",
     "VrchGamepadLoaderNode": "Gamepad Loader @ vrch.ai",
     "VrchImageChannelLoaderNode": "IMAGE Web Viewer Channel Loader @ vrch.ai",
+    "VrchImageFallbackNode": "IMAGE Fallback @ vrch.ai",
     "VrchImageFlipBookWebViewerNode": "IMAGE Flipbook Web Viewer @ vrch.ai",
-    "VrchImagePreviewBackgroundNode": "IMAGE Preview in Background (Legacy) @ vrch.ai",
     "VrchImagePreviewBackgroundNewNode": "IMAGE Preview in Background @ vrch.ai",
+    "VrchImagePreviewBackgroundNode": "IMAGE Preview in Background (Legacy) @ vrch.ai",
     "VrchImageSaverNode": "IMAGE Saver @ vrch.ai",
     "VrchImageSwitchOSCControlNode": "IMAGE Switch OSC Control @ vrch.ai",
     "VrchImageWebSocketChannelLoaderNode": "IMAGE WebSocket Channel Loader @ vrch.ai",
@@ -135,9 +137,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchVideoWebViewerNode": "VIDEO Web Viewer @ vrch.ai",
     "VrchWebSocketServerNode": "WebSocket Server @ vrch.ai",
     "VrchWebViewerNode": "Web Viewer @ vrch.ai",
-    "VrchXboxControllerNode": "Xbox Controller Mapper @ vrch.ai",
     "VrchXYOSCControlNode": "XY OSC Control @ vrch.ai",
     "VrchXYZOSCControlNode": "XYZ OSC Control @ vrch.ai",
+    "VrchXboxControllerNode": "Xbox Controller Mapper @ vrch.ai",
 }
 
 # WEB_DIRECTORY is the comfyui nodes directory that ComfyUI will link and auto-load.

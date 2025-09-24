@@ -90,3 +90,32 @@ Add the `IMAGE Preview in Background @ vrch.ai` node to your ComfyUI workflow.
 #### 4. Notes
 - No disk I/O required; previews are delivered through the UI payload.
 - Batch mode loops through all images automatically at the specified interval.
+
+---
+
+### Node: `IMAGE Fallback @ vrch.ai` (vrch.ai/image)
+
+This node guarantees a valid image output even when the incoming `image` input is missing or corrupted.
+
+#### 1. Adding the Node
+Add the `IMAGE Fallback @ vrch.ai` node to your workflow and connect the primary `image` input whenever available.
+
+#### 2. Node Configuration
+- **`image`** (optional): Primary image input. Can be empty or invalid.
+- **`fallback_option`**: Chooses the first fallback source among:
+  - `default_image`: Use the optional `default_image` input when it is valid. If missing or invalid, the node automatically falls back to a placeholder image.
+  - `placeholder_image`: Generate a solid placeholder using the width, height, and color parameters.
+  - `last_valid_image`: Reuse the most recent valid primary `image` input seen by the node during the current session. If none is cached, the node automatically falls back to a placeholder image.
+- **`placeholder_width` / `placeholder_height`**: Dimensions (pixels) for the generated placeholder; defaults to 512×512.
+- **`placeholder_color`**: Hex color (e.g. `#FF8800` or `#F80`) used for the placeholder background. Alpha values are ignored if provided.
+- **`default_image`** (optional input): Provide a backup image tensor to be used when selected.
+- **`debug`**: Enable to print diagnostic messages prefixed with `[VrchImageFallbackNode]` describing the fallback decisions.
+
+#### 3. Behavior
+1. If the primary `image` input is valid, it is forwarded unchanged and cached as the latest valid image.
+2. When the primary input is invalid or absent, the node attempts the selected fallback source first, then other sources until a valid image is found.
+3. Placeholder images are generated as float tensors in the 0–1 range with shape `(1, H, W, 3)`.
+
+#### 4. Notes
+- The node remembers the most recent valid image for reuse within the same ComfyUI session.
+- All outputs are standard `IMAGE` tensors, ready to connect to downstream nodes.

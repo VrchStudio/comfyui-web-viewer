@@ -303,7 +303,8 @@ app.registerExtension({
                 "hue_rotate",
                 "invert",
                 "saturate",
-                "sepia"
+                "sepia",
+                "opacity"
             ];
             const defaults = {
                 blur: 0,
@@ -314,6 +315,7 @@ app.registerExtension({
                 invert: 0.0,
                 saturate: 1.0,
                 sepia: 0.0,
+                opacity: 1.0,
             };
 
             // Create button container
