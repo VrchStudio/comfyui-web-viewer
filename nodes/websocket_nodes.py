@@ -338,6 +338,7 @@ class VrchImageWebSocketFilterSettingsNode:
                 "invert": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
                 "saturate": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 2.0, "step": 0.01}),
                 "sepia": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "opacity": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
             }
         }
 
@@ -355,7 +356,8 @@ class VrchImageWebSocketFilterSettingsNode:
                            hue_rotate,
                            invert,
                            saturate,
-                           sepia):
+                           sepia,
+                           opacity):
         # Produce object matching previous spec {"filters": {...}} for backward compatibility
         payload = {
             "filters": {
@@ -367,6 +369,7 @@ class VrchImageWebSocketFilterSettingsNode:
                 "invert": float(invert),
                 "saturate": float(saturate),
                 "sepia": float(sepia),
+                "opacity": float(opacity),
             }
         }
         return (payload,)
