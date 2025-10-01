@@ -145,15 +145,14 @@ A dedicated node for managing and transmitting WebSocket settings parameters sep
           "bgColourPicker": "#222222",
           "serverMessages": "",
           "filters": {
-            "blur": 4,
+            "opacity": 1.0,
             "brightness": 1.2,
             "contrast": 1.1,
-            "grayscale": 0.0,
+            "saturate": 1.4,
             "hueRotate": 180,
             "invert": 0.0,
-            "saturate": 1.4,
             "sepia": 0.2,
-            "opacity": 1.0
+            "blur": 4
           }
         }
       }
@@ -176,15 +175,16 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
 1. **Add the `IMAGE Filter Settings @ vrch.ai` node to your workflow.**
 
 2. **Configure Filter Parameters (inputs):**
-  - **`blur`**: Integer pixels (0–50) – matches `blur(px)`.
-  - **`brightness`**: Float (0.0–2.0) – 1.0 is neutral.
-  - **`contrast`**: Float (0.0–2.0) – 1.0 is neutral.
-  - **`grayscale`**: Float (0.0–1.0) – 0 is color, 1 is fully grayscale.
-  - **`hue_rotate`**: Integer degrees (0–360) – applied as CSS `hue-rotate()`.
-  - **`invert`**: Float (0.0–1.0) – 0 no invert, 1 full invert.
-  - **`saturate`**: Float (0.0–2.0) – 1.0 is neutral.
+  Order (updated): `opacity`, `brightness`, `contrast`, `saturate`, `hue_rotate`, `invert`, `sepia`, `blur`.
+  - **`opacity`**: Float (0.0–1.0) – 1.0 fully opaque.
+  - **`brightness`**: Float (0.0–2.0) – 1.0 neutral.
+  - **`contrast`**: Float (0.0–2.0) – 1.0 neutral.
+  - **`saturate`**: Float (0.0–2.0) – 1.0 neutral.
+  - **`hue_rotate`**: Integer degrees (0–360) – CSS `hue-rotate()`.
+  - **`invert`**: Float (0.0–1.0) – 0 none, 1 full invert.
   - **`sepia`**: Float (0.0–1.0) – 0 none, 1 full sepia.
-  - **`opacity`**: Float (0.0–1.0) – 1.0 is fully opaque.
+  - **`blur`**: Integer pixels (0–50) – `blur(px)`.
+  (Deprecated: `grayscale` has been removed.)
 
 3. **UI Convenience:**
   - A small green "Reset Filters" button (in the node UI) resets all parameters to their defaults.
@@ -194,15 +194,14 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
     ```json
     {
       "filters": {
-        "blur": 0,
+        "opacity": 1.0,
         "brightness": 1.0,
         "contrast": 1.0,
-        "grayscale": 0.0,
+        "saturate": 1.0,
         "hueRotate": 0,
         "invert": 0.0,
-        "saturate": 1.0,
         "sepia": 0.0,
-        "opacity": 1.0
+        "blur": 0
       }
     }
     ```
@@ -212,8 +211,8 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
   - Execute the settings node (with `send_settings=True`) to broadcast both regular settings and filters to the viewer.
 
 **Notes:**
-- The key names (`blur`, `brightness`, `contrast`, `grayscale`, `hueRotate`, `invert`, `saturate`, `sepia`) match the front‑end's `applyRemoteFilters()` expectations.
-- The key names (`blur`, `brightness`, `contrast`, `grayscale`, `hueRotate`, `invert`, `saturate`, `sepia`, `opacity`) match the front‑end's `applyRemoteFilters()` expectations.
+- The key names (`opacity`, `brightness`, `contrast`, `saturate`, `hueRotate`, `invert`, `sepia`, `blur`) match the front‑end's `applyRemoteFilters()` expectations.
+- Legacy workflows containing `grayscale` will ignore that value silently.
 - Values are clamped on the viewer side as a safety measure; staying within documented ranges ensures predictable results.
 - You can route this JSON through additional logic or merge nodes before feeding into the settings node to implement animations or dynamic modulation.
 

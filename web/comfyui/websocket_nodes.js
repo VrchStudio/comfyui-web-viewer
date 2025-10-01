@@ -295,27 +295,26 @@ app.registerExtension({
     name: "vrch.ImageWebSocketFilterSettings",
     async nodeCreated(node) {
         if (node.comfyClass === "VrchImageWebSocketFilterSettingsNode") {
+            // New order (grayscale removed): opacity, brightness, contrast, saturate, hue_rotate, invert, sepia, blur
             const widgetNames = [
-                "blur",
+                "opacity",
                 "brightness",
                 "contrast",
-                "grayscale",
+                "saturate",
                 "hue_rotate",
                 "invert",
-                "saturate",
                 "sepia",
-                "opacity"
+                "blur"
             ];
             const defaults = {
-                blur: 0,
+                opacity: 1.0,
                 brightness: 1.0,
                 contrast: 1.0,
-                grayscale: 0.0,
+                saturate: 1.0,
                 hue_rotate: 0,
                 invert: 0.0,
-                saturate: 1.0,
                 sepia: 0.0,
-                opacity: 1.0,
+                blur: 0,
             };
 
             // Create button container
