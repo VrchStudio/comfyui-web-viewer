@@ -329,16 +329,17 @@ class VrchImageWebSocketFilterSettingsNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                # Pure parameter node (no channel/server). Ranges mirror applyRemoteFilters().
-                "blur": ("INT", {"default": 0, "min": 0, "max": 50}),
+                # Reordered & streamlined (grayscale removed)
+                # New order requested:
+                # opacity, brightness, contrast, saturate, hueRotate, invert, sepia, blur
+                "opacity": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
                 "brightness": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 2.0, "step": 0.01}),
                 "contrast": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 2.0, "step": 0.01}),
-                "grayscale": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "saturate": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 2.0, "step": 0.01}),
                 "hue_rotate": ("INT", {"default": 0, "min": 0, "max": 360}),
                 "invert": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
-                "saturate": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 2.0, "step": 0.01}),
                 "sepia": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
-                "opacity": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "blur": ("INT", {"default": 0, "min": 0, "max": 50}),
             }
         }
 
@@ -349,27 +350,31 @@ class VrchImageWebSocketFilterSettingsNode:
     CATEGORY = CATEGORY
 
     def build_filters_json(self,
-                           blur,
+                           opacity,
                            brightness,
                            contrast,
-                           grayscale,
+                           saturate,
                            hue_rotate,
                            invert,
-                           saturate,
                            sepia,
-                           opacity):
+                           blur,
+                           **legacy):
+        """Build the filters JSON.
+
+        Note: grayscale has been removed. Any legacy workflows providing a
+        grayscale positional/keyword argument will be ignored gracefully via **legacy.
+        """
         # Produce object matching previous spec {"filters": {...}} for backward compatibility
         payload = {
             "filters": {
-                "blur": int(blur),
+                "opacity": float(opacity),
                 "brightness": float(brightness),
                 "contrast": float(contrast),
-                "grayscale": float(grayscale),
+                "saturate": float(saturate),
                 "hueRotate": int(hue_rotate),
                 "invert": float(invert),
-                "saturate": float(saturate),
                 "sepia": float(sepia),
-                "opacity": float(opacity),
+                "blur": int(blur),
             }
         }
         return (payload,)
