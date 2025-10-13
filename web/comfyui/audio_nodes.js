@@ -200,6 +200,29 @@ app.registerExtension({
                 const recordModeWidget = currentNode.widgets.find(w => w.name === 'record_mode');
                 const newGenerationWidget = currentNode.widgets.find(w => w.name === 'new_generation_after_recording');
 
+                const shouldAutoLoop = () => {
+                    const loopWidget = currentNode.widgets.find(w => w.name === 'loop');
+                    return !!(loopWidget && loopWidget.value === true && recordModeWidget && recordModeWidget.value === 'start_and_stop');
+                };
+
+                const scheduleLoopRestart = () => {
+                    const loopIntervalWidget = currentNode.widgets.find(w => w.name === 'loop_interval');
+                    const loopInterval = (loopIntervalWidget && loopIntervalWidget.value) ? loopIntervalWidget.value : 0.5;
+
+                    const attemptRestart = () => {
+                        if (!shouldAutoLoop()) {
+                            return;
+                        }
+                        if (isStopping) {
+                            loopIntervalTimer = setTimeout(attemptRestart, 100);
+                            return;
+                        }
+                        startRecording();
+                    };
+
+                    loopIntervalTimer = setTimeout(attemptRestart, loopInterval * 1000);
+                };
+
                 if (enableShortcutWidget) {
                     enableShortcut = enableShortcutWidget.value;
                     enableShortcutWidget.callback = (value) => {
@@ -300,7 +323,7 @@ app.registerExtension({
                     }
 
                     if (loopIntervalTimer) {
-                        clearInterval(loopIntervalTimer);
+                        clearTimeout(loopIntervalTimer);
                         loopIntervalTimer = null;
                     }
 
@@ -358,6 +381,9 @@ app.registerExtension({
                                     // ensure state flags progress, but skip UI/trigger
                                     isStopping = false;
                                     cooldownUntil = Date.now() + COOL_DOWN_MS;
+                                    if (shouldAutoLoop()) {
+                                        cooldownUntil = Date.now();
+                                    }
                                     return;
                                 }
 
@@ -387,6 +413,9 @@ app.registerExtension({
                                     // finalize stop state and start cooldown
                                     isStopping = false;
                                     cooldownUntil = Date.now() + COOL_DOWN_MS;
+                                    if (shouldAutoLoop()) {
+                                        cooldownUntil = Date.now();
+                                    }
                                     syncStatus();
 
                                 };
@@ -471,13 +500,9 @@ app.registerExtension({
                             }
                         }
                         debugLog('Recording stopped manually');
-                    } else if (loopWidget && loopWidget.value === true && recordModeWidget.value === 'start_and_stop') {
+                    } else if (shouldAutoLoop()) {
                         // Auto-stop: schedule restart after interval
-                        const loopIntervalWidget = currentNode.widgets.find(w => w.name === 'loop_interval');
-                        const loopInterval = (loopIntervalWidget && loopIntervalWidget.value) ? loopIntervalWidget.value : 0.5;
-                        loopIntervalTimer = setTimeout(() => {
-                            startRecording();
-                        }, loopInterval * 1000);
+                        scheduleLoopRestart();
                         debugLog('Recording will restart after loop interval');
                     }
 
@@ -490,6 +515,9 @@ app.registerExtension({
                         // Not actually recording (e.g., rapid double stop), finalize flags
                         isStopping = false;
                         cooldownUntil = Date.now() + COOL_DOWN_MS;
+                        if (shouldAutoLoop()) {
+                            cooldownUntil = Date.now();
+                        }
                     }
 
                     isRecording = false;
