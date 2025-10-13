@@ -9,6 +9,10 @@
      - **"Start and Stop":**
        - **Button Control:** Click "START" to begin recording; click "STOP" to end.
        - **Shortcut Control:** Press the selected shortcut key once to start recording; press again to stop.
+   - **Microphone & Debug Options:**
+     - `device_id` / `device_name`: Select a microphone from the dropdown; use **Reload** to refresh the list.
+     - **Mute Button:** Toggle the recorder input on/off without changing selection.
+     - `debug`: Enable to print `[VrchAudioRecorderNode]` logs for troubleshooting.
    - **Recording Parameters:**
      - `record_duration_max`: Set the maximum recording duration (1-60 seconds).
      - `loop`: Enable or disable loop recording.
@@ -26,7 +30,7 @@
      - **Shortcut Control:** Press the selected shortcut key once to start recording; press again to stop.
    - **Loop Mode (Applicable in "Start and Stop" Mode):**
      - Click "START" to begin loop recording.
-     - Click "STOP LOOPING" to end loop recording.
+     - Loop restarts automatically after `loop_interval`; click "STOP LOOPING" to end the cycle.
 4. **Playback and Output:**
    - The recorded audio will appear in the `audioUI` widget for playback.
    - Use the `AUDIO` output to connect the recorded audio to other nodes in your workflow.
