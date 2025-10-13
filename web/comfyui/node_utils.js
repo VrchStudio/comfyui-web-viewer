@@ -37,6 +37,245 @@ export function showWidget(node, widget) {
 }
 
 /**
+ * Enumerate available microphone input devices.
+ *
+ * @param {Object} [options]
+ * @param {boolean} [options.requestAccess=true] - Whether to request `getUserMedia` before enumerating.
+ * @param {string} [options.logPrefix="[Microphone]"] - Prefix for debug logging.
+ * @param {boolean} [options.debugEnabled=false] - Enable console logs when true.
+ * @returns {Promise<MediaDeviceInfo[]>} Resolves with the list of audioinput devices.
+ */
+export async function listMicrophoneDevices(options = {}) {
+    const { requestAccess = true, logPrefix = "[Microphone]", debugEnabled = false } = options;
+    try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+            throw new Error("MediaDevices API not supported in this browser");
+        }
+
+        if (requestAccess) {
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+            } catch (permissionError) {
+                if (debugEnabled) {
+                    console.warn(`${logPrefix} Permission request failed:`, permissionError);
+                }
+            }
+        }
+
+        const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+        const audioInputs = mediaDevices.filter(device => device.kind === "audioinput");
+
+        if (debugEnabled) {
+            console.log(`${logPrefix} Enumerated ${audioInputs.length} microphone device(s).`);
+        }
+
+        return audioInputs;
+    } catch (error) {
+        if (debugEnabled) {
+            console.error(`${logPrefix} Failed to enumerate microphones:`, error);
+        }
+        throw error;
+    }
+}
+
+/**
+ * Populate a <select> element with microphone device options.
+ *
+ * @param {HTMLSelectElement} selectEl - The select element to populate.
+ * @param {MediaDeviceInfo[]} devices - List of microphone devices.
+ * @param {Object} [options]
+ * @param {string} [options.placeholder="Select Microphone..."] - Placeholder option label.
+ * @param {string} [options.previousValue] - Previously selected deviceId to restore if available.
+ * @returns {{selection: string, restored: boolean}} Selected value and whether it was restored.
+ */
+export function populateMicrophoneSelect(selectEl, devices, options = {}) {
+    if (!selectEl) {
+        return { selection: "", restored: false };
+    }
+
+    const { placeholder = "Select Microphone...", previousValue } = options;
+    const priorValue = previousValue !== undefined ? previousValue : selectEl.value;
+
+    while (selectEl.options.length > 0) {
+        selectEl.remove(0);
+    }
+
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent = placeholder;
+    selectEl.appendChild(defaultOption);
+
+    let restored = false;
+    devices.forEach(device => {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.textContent = device.label || `Microphone (${device.deviceId.slice(0, 5)}...)`;
+        selectEl.appendChild(option);
+        if (priorValue && device.deviceId === priorValue) {
+            restored = true;
+        }
+    });
+
+    if (restored) {
+        selectEl.value = priorValue;
+    } else {
+        selectEl.value = "";
+    }
+
+    return {
+        selection: selectEl.value,
+        restored,
+    };
+}
+
+/**
+ * Create reusable microphone controls UI (select + reload + mute + status).
+ *
+ * @param {Object} options
+ * @param {boolean} [options.debug=false] - Enable console logging.
+ * @param {Function} [options.onDeviceChange] - Called with deviceId when selection changes.
+ * @param {Function} [options.onMuteChange] - Called with boolean when mute toggles.
+ * @param {Function} [options.filterDevices] - Optional filter returning filtered list.
+ * @returns {Object} { container, selectEl, reloadButton, muteButton, statusLabel, refreshDevices, setMuted, setStatus, getSelection, setSelection }
+ */
+export function createMicrophoneControls(options = {}) {
+    const {
+        debug = false,
+        onDeviceChange,
+        onMuteChange,
+        filterDevices,
+    } = options;
+
+    const log = (...args) => {
+        if (debug) {
+            console.log("[MicrophoneControls]", ...args);
+        }
+    };
+
+    let devicesCache = [];
+    let isMuted = false;
+
+    const container = document.createElement("div");
+    container.classList.add("mic-controls-container");
+
+    const deviceRow = document.createElement("div");
+    deviceRow.classList.add("mic-device-row");
+    const selectEl = document.createElement("select");
+    selectEl.classList.add("mic-device-select");
+    populateMicrophoneSelect(selectEl, []);
+    deviceRow.appendChild(selectEl);
+
+    const buttonRow = document.createElement("div");
+    buttonRow.classList.add("mic-button-row");
+
+    const reloadButton = document.createElement("button");
+    reloadButton.textContent = "Reload";
+    reloadButton.classList.add("vrch-mic-reload-button");
+
+    const muteButton = document.createElement("button");
+    muteButton.classList.add("vrch-mic-mute-button");
+    const applyMuteStyle = () => {
+        muteButton.innerHTML = isMuted
+            ? '<span class="vrch-mic-speaker-icon">🔇</span>'
+            : '<span class="vrch-mic-speaker-icon">🔊</span>';
+        muteButton.style.backgroundColor = isMuted ? "#9e6a6a" : "#4f9cff";
+    };
+    applyMuteStyle();
+
+    buttonRow.appendChild(reloadButton);
+    buttonRow.appendChild(muteButton);
+
+    const statusContainer = document.createElement("div");
+    statusContainer.classList.add("vrch-mic-status-container");
+    const statusLabel = document.createElement("div");
+    statusLabel.classList.add("vrch-mic-status-label");
+    statusLabel.textContent = "Status: Ready";
+    statusContainer.appendChild(statusLabel);
+
+    container.appendChild(deviceRow);
+    container.appendChild(buttonRow);
+    container.appendChild(statusContainer);
+
+    const setStatus = (status) => {
+        statusLabel.textContent = `Status: ${status}`;
+    };
+
+    const updateSelection = (deviceId) => {
+        if (!selectEl) return;
+        selectEl.value = deviceId || "";
+        if (onDeviceChange) {
+            onDeviceChange(selectEl.value);
+        }
+    };
+
+    const setMuted = (mute) => {
+        isMuted = !!mute;
+        applyMuteStyle();
+        if (onMuteChange) {
+            onMuteChange(isMuted);
+        }
+    };
+
+    const getSelection = () => selectEl.value;
+
+    const setSelection = (deviceId) => {
+        const existing = devicesCache.find(device => device.deviceId === deviceId);
+        if (existing) {
+            selectEl.value = deviceId;
+        }
+    };
+
+    const refreshDevices = async ({ requestAccess = false, logPrefix = "[MicrophoneControls]" } = {}) => {
+        try {
+            const deviceList = await listMicrophoneDevices({
+                requestAccess,
+                logPrefix,
+                debugEnabled: debug,
+            });
+            const filtered = filterDevices ? deviceList.filter(filterDevices) : deviceList;
+            devicesCache = filtered;
+            const prior = selectEl.value;
+            const { selection } = populateMicrophoneSelect(selectEl, devicesCache, {
+                previousValue: prior,
+            });
+            if (selection !== prior && onDeviceChange) {
+                onDeviceChange(selection);
+            }
+            log(`Refreshed devices: ${devicesCache.length}`);
+            return devicesCache;
+        } catch (error) {
+            log("Failed to refresh devices", error);
+            throw error;
+        }
+    };
+
+    selectEl.addEventListener("change", () => {
+        if (onDeviceChange) {
+            onDeviceChange(selectEl.value);
+        }
+    });
+
+    muteButton.addEventListener("click", () => {
+        setMuted(!isMuted);
+    });
+
+    return {
+        container,
+        selectEl,
+        reloadButton,
+        muteButton,
+        statusLabel,
+        refreshDevices,
+        setMuted,
+        getMuted: () => isMuted,
+        setStatus,
+        getSelection,
+        setSelection,
+        devices: () => devicesCache.slice(),
+    };
+}
+
+/**
  * Helper function to build the URL based on configuration.
  *
  * @param {Object} config - The configuration object with the following properties:

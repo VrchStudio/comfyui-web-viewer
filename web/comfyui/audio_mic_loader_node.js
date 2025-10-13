@@ -3,7 +3,8 @@ import { api } from "../../scripts/api.js";
 
 import { 
     hideWidget, 
-    showWidget 
+    showWidget,
+    createMicrophoneControls
 } from "./node_utils.js";
 
 app.registerExtension({
@@ -28,7 +29,7 @@ app.registerExtension({
             let animationFrameId = null;
             let isCapturing = false;
             let isMuted = false;
-            let devices = [];
+            let suppressMuteCallback = false;
             
             // Hide technical widgets from the UI
             if (rawDataWidget) {
@@ -83,62 +84,81 @@ app.registerExtension({
             
             volumeMeterContainer.appendChild(volumeMeterFill);
             
-            // Create controls container
-            const controlsContainer = document.createElement("div");
-            controlsContainer.classList.add("mic-controls-container");
+            let micControls;
+            let statusIndicator = null;
+
+            const updateStatusIndicator = (status) => {
+                if (micControls) {
+                    micControls.setStatus(status);
+                }
+            };
+
+            const updateMuteState = (mute, { syncControl = false } = {}) => {
+                isMuted = mute;
+
+                if (gainNode) {
+                    gainNode.gain.value = mute ? 0 : 1;
+                }
+
+                if (mute) {
+                    volumeMeterFill.style.width = "0%";
+                }
+
+                if (syncControl && micControls) {
+                    suppressMuteCallback = true;
+                    micControls.setMuted(mute);
+                    suppressMuteCallback = false;
+                }
+
+                if (statusIndicator) {
+                    const text = statusIndicator.textContent;
+                    if (text === "Status: Ready" || text === "Status: Muted") {
+                        updateStatusIndicator(mute ? "Muted" : "Ready");
+                    }
+                }
+            };
+
+            const handleDeviceSelection = (deviceId) => {
+                if (deviceIdWidget) {
+                    deviceIdWidget.value = deviceId || "";
+                }
+
+                if (nameWidget) {
+                    const selectedDevice = micControls ? micControls.devices().find(d => d.deviceId === deviceId) : null;
+                    if (selectedDevice && selectedDevice.label) {
+                        nameWidget.value = selectedDevice.label;
+                    } else if (!deviceId) {
+                        nameWidget.value = "";
+                    }
+                }
+
+                if (deviceId) {
+                    updateStatusIndicator(isMuted ? "Muted" : "Ready");
+                } else {
+                    updateStatusIndicator("Ready");
+                }
+            };
+
+            micControls = createMicrophoneControls({
+                onDeviceChange: handleDeviceSelection,
+                onMuteChange: (muted) => {
+                    if (suppressMuteCallback) {
+                        return;
+                    }
+                    updateMuteState(muted);
+                }
+            });
+
+            const deviceSelect = micControls.selectEl;
+            const reloadButton = micControls.reloadButton;
+            const muteButton = micControls.muteButton;
+            statusIndicator = micControls.statusLabel;
+            handleDeviceSelection(micControls.getSelection());
             
-            // First row: Device dropdown
-            const deviceRow = document.createElement("div");
-            deviceRow.classList.add("mic-device-row");
-            
-            // Device dropdown
-            const deviceSelect = document.createElement("select");
-            deviceSelect.classList.add("mic-device-select");
-            
-            // Create default option
-            const defaultOption = document.createElement("option");
-            defaultOption.value = "";
-            defaultOption.textContent = "Select Microphone...";
-            deviceSelect.appendChild(defaultOption);
-            
-            deviceRow.appendChild(deviceSelect);
-            
-            // Second row: Buttons
-            const buttonRow = document.createElement("div");
-            buttonRow.classList.add("mic-button-row");
-            
-            // Reload button
-            const reloadButton = document.createElement("button");
-            reloadButton.textContent = "Reload";
-            reloadButton.classList.add("vrch-mic-reload-button");
-            
-            // Mute button with speaker icon instead of text
-            const muteButton = document.createElement("button");
-            muteButton.innerHTML = '<span class="vrch-mic-speaker-icon">🔊</span>';
-            muteButton.classList.add("vrch-mic-mute-button");
-            
-            buttonRow.appendChild(reloadButton);
-            buttonRow.appendChild(muteButton);
-            
-            // Add rows to controls container
-            controlsContainer.appendChild(deviceRow);
-            controlsContainer.appendChild(buttonRow);
-            
-            // Status indicator - now text-based on its own line
-            const statusIndicator = document.createElement("div");
-            statusIndicator.classList.add("vrch-mic-status-label");
-            
-            // Create a separate container for the status label to put it on its own line
-            const statusContainer = document.createElement("div");
-            statusContainer.classList.add("vrch-mic-status-container");
-            statusContainer.appendChild(statusIndicator);
-            
-            // Set initial status
             visualizerContainer.appendChild(waveformCanvas);
             visualizerContainer.appendChild(spectrumCanvas);
             visualizerContainer.appendChild(volumeMeterContainer);
-            visualizerContainer.appendChild(controlsContainer);
-            visualizerContainer.appendChild(statusContainer);
+            visualizerContainer.appendChild(micControls.container);
             
             // Function to update visualizer visibility (only visual elements)
             const updateVisualizerVisibility = () => {
@@ -166,64 +186,25 @@ app.registerExtension({
             };
 
             // Function to enumerate and list available audio devices
-            const listAudioDevices = async () => {
+            const listAudioDevices = async ({ requestAccess = false } = {}) => {
+                updateStatusIndicator("Loading");
                 try {
-                    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-                        throw new Error("MediaDevices API not supported in this browser");
-                    }
-                    
-                    // Request permission first to get proper device labels
-                    try {
-                        await navigator.mediaDevices.getUserMedia({ audio: true });
-                    } catch (permissionError) {
-                        console.warn("Could not get microphone permission:", permissionError);
-                    }
-                    
-                    // Clear existing options except default
-                    while (deviceSelect.options.length > 1) {
-                        deviceSelect.remove(1);
-                    }
-                    
-                    // Get devices
-                    const mediaDevices = await navigator.mediaDevices.enumerateDevices();
-                    devices = mediaDevices.filter(device => device.kind === "audioinput");
-                    
-                    // Store selected device ID before clearing
-                    const previouslySelectedDeviceId = deviceSelect.value || deviceIdWidget.value;
-                    let selectedDeviceStillExists = false;
-                    
-                    // Add devices to dropdown
-                    devices.forEach(device => {
-                        const option = document.createElement("option");
-                        option.value = device.deviceId;
-                        option.textContent = device.label || `Microphone (${device.deviceId.slice(0, 5)}...)`;
-                        deviceSelect.appendChild(option);
-                        
-                        // Check if previously selected device still exists
-                        if (device.deviceId === previouslySelectedDeviceId) {
-                            selectedDeviceStillExists = true;
-                        }
+                    const deviceList = await micControls.refreshDevices({
+                        requestAccess,
+                        logPrefix: "[VrchMicLoaderNode]"
                     });
-                    
-                    // Restore previously selected device if it still exists
-                    if (previouslySelectedDeviceId && selectedDeviceStillExists) {
-                        deviceSelect.value = previouslySelectedDeviceId;
-                        deviceIdWidget.value = previouslySelectedDeviceId;
-                    } else if (devices.length > 0 && deviceIdWidget.value) {
-                        // Reset if device doesn't exist anymore
-                        deviceIdWidget.value = "";
+
+                    const savedDeviceId = deviceIdWidget ? deviceIdWidget.value : "";
+                    if (savedDeviceId && !micControls.getSelection()) {
+                        micControls.setSelection(savedDeviceId);
                     }
-                    
-                    // Show correct status based on mute state if a device is selected
-                    if (deviceSelect.value) {
-                        updateStatusIndicator(isMuted ? "Muted" : "Ready");
-                    } else {
-                        updateStatusIndicator("Ready");
-                    }
+
+                    handleDeviceSelection(micControls.getSelection());
+                    updateMuteState(isMuted, { syncControl: true });
+
                     return true; // Indicate successful completion
-                    
                 } catch (error) {
-                    console.error("Error listing audio devices:", error);
+                    console.error("[VrchMicLoaderNode] Error listing audio devices:", error);
                     updateStatusIndicator("Error");
                     return false; // Indicate error
                 }
@@ -235,7 +216,8 @@ app.registerExtension({
                     // Stop any existing capture
                     stopCapturing();
                     
-                    if (!deviceSelect.value) {
+                    const selectedDeviceId = micControls.getSelection();
+                    if (!selectedDeviceId) {
                         updateStatusIndicator("No device");
                         return;
                     }
@@ -248,7 +230,7 @@ app.registerExtension({
                     // Request microphone access
                     const constraints = {
                         audio: {
-                            deviceId: deviceSelect.value ? { exact: deviceSelect.value } : undefined,
+                            deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
                             echoCancellation: true,
                             noiseSuppression: true,
                             autoGainControl: false
@@ -271,13 +253,13 @@ app.registerExtension({
                     gainNode.connect(analyser);
                     
                     // Update mute state
-                    setMuted(isMuted);
+                    updateMuteState(isMuted, { syncControl: true });
                     
                     // Get the selected device info
-                    const selectedDevice = devices.find(d => d.deviceId === deviceSelect.value);
+                    const selectedDevice = micControls.devices().find(d => d.deviceId === selectedDeviceId);
                     
                     // Update widgets with device info
-                    deviceIdWidget.value = deviceSelect.value;
+                    deviceIdWidget.value = selectedDeviceId;
                     if (selectedDevice && selectedDevice.label) {
                         nameWidget.value = selectedDevice.label;
                     }
@@ -534,41 +516,9 @@ app.registerExtension({
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             };
             
-            // Function to toggle mute state
-            const setMuted = (mute) => {
-                isMuted = mute;
-                
-                if (gainNode) {
-                    gainNode.gain.value = mute ? 0 : 1;
-                }
-                
-                // Update icon instead of text
-                muteButton.innerHTML = mute ? 
-                    '<span class="vrch-mic-speaker-icon">🔇</span>' : 
-                    '<span class="vrch-mic-speaker-icon">🔊</span>';
-                
-                // Update button background color based on mute state
-                muteButton.style.backgroundColor = mute ? "#9e6a6a" : "#4f9cff";
-                
-                // Update status text if device is in Ready or Muted state
-                if (statusIndicator.textContent === "Status: Ready" || statusIndicator.textContent === "Status: Muted") {
-                    updateStatusIndicator(mute ? "Muted" : "Ready");
-                }
-                
-                if (mute) {
-                    volumeMeterFill.style.width = "0%";
-                }
-            };
-            
-            // Function to update status indicator - now text-only
-            const updateStatusIndicator = (status) => {
-                // Just set the text content - no background color changes
-                statusIndicator.textContent = `Status: ${status}`;
-            };
-            
             // Set up event listeners
             deviceSelect.addEventListener("change", () => {
-                if (deviceSelect.value) {
+                if (micControls.getSelection()) {
                     startCapturing();
                 } else {
                     stopCapturing();
@@ -580,18 +530,14 @@ app.registerExtension({
                 stopCapturing();
                 
                 // Then reload device list
-                const devicesLoaded = await listAudioDevices();
+                const devicesLoaded = await listAudioDevices({ requestAccess: true });
                 
                 // Automatically restart if a device is selected
-                if (devicesLoaded && deviceSelect.value) {
+                if (devicesLoaded && micControls.getSelection()) {
                     startCapturing();
                 }
             });
             
-            muteButton.addEventListener("click", () => {
-                setMuted(!isMuted);
-            });
-
             // Set a delay initialization for the widget visibility
             setTimeout(async () => {
                 // Initial setup
@@ -612,19 +558,13 @@ app.registerExtension({
                 // Try to restore the previously selected device
                 if (devicesLoaded) {
                     if (savedDeviceId && savedDeviceId !== "") {
-                        // Set the dropdown value to match the stored device ID
-                        for (let i = 0; i < deviceSelect.options.length; i++) {
-                            if (deviceSelect.options[i].value === savedDeviceId) {
-                                deviceSelect.selectedIndex = i;
-                                console.log("Restored previously selected microphone:", savedDeviceId);
-                                
-                                // Start capturing with a slight delay to ensure the device is properly selected
-                                setTimeout(() => {
-                                    startCapturing();
-                                }, 100);
-                                
-                                break;
-                            }
+                        micControls.setSelection(savedDeviceId);
+                        handleDeviceSelection(micControls.getSelection());
+                        if (micControls.getSelection()) {
+                            console.log("Restored previously selected microphone:", savedDeviceId);
+                            setTimeout(() => {
+                                startCapturing();
+                            }, 100);
                         }
                     } else {
                         updateStatusIndicator("Ready"); // No device selected
