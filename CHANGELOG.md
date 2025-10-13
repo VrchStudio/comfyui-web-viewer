@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Updated
+
+- update `VrchAudioRecorderNode` node to add microphone selector, mute toggle, debug logging, and more robust loop restart handling
+- update `VrchMicLoaderNode` front-end to reuse the shared microphone controls component
+- update `web/comfyui/node_utils.js` with reusable microphone utilities for Recorder and Mic Loader
+- update `docs/audio_nodes.md` to document the new recorder controls and loop behaviour
+
+
 ## 1.1.7 - 2025-10-01
 
 ### Updated
