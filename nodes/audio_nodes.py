@@ -100,6 +100,9 @@ class VrchAudioRecorderNode:
                     ],
                     {"default": "F2"},
                 ),
+                "device_id": ("STRING", {"default": ""}),
+                "device_name": ("STRING", {"default": ""}),
+                "debug": ("BOOLEAN", {"default": False}),
             }
         }
 
@@ -110,7 +113,7 @@ class VrchAudioRecorderNode:
     
     def process_audio(self, base64_data, record_mode, record_duration_max, 
                       loop, loop_interval, shortcut, shortcut_key, 
-                      new_generation_after_recording):
+                      new_generation_after_recording, device_id="", device_name="", debug=False):
         
         def _silent_audio(duration_sec: float = 0.5, sample_rate: int = 44100):
             """Return a short silent stereo audio as a safe fallback."""
@@ -167,7 +170,7 @@ class VrchAudioRecorderNode:
     @classmethod
     def IS_CHANGED(cls, base64_data, record_mode, record_duration_max, 
                    loop, loop_interval, shortcut, shortcut_key, 
-                   new_generation_after_recording):
+                   new_generation_after_recording, device_id="", device_name="", debug=False):
         
         # Create a new SHA-256 hash object
         m = hashlib.sha256()

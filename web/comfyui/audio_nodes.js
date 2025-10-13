@@ -1,6 +1,10 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
-import { triggerNewGeneration } from "./node_utils.js";
+
+import { 
+    triggerNewGeneration, 
+    createMicrophoneControls
+} from "./node_utils.js";
 
 app.registerExtension({
     name: "vrch.AudioSaverNode",
@@ -73,6 +77,36 @@ app.registerExtension({
                     base64Widget.type = "hidden";
                 }
 
+                const deviceIdWidget = currentNode.widgets.find(w => w.name === "device_id");
+                const deviceNameWidget = currentNode.widgets.find(w => w.name === "device_name");
+                const debugWidget = currentNode.widgets.find(w => w.name === "debug");
+
+                const isDebugEnabled = () => !!(debugWidget && debugWidget.value);
+                const debugLog = (...args) => {
+                    if (isDebugEnabled()) {
+                        console.log("[VrchAudioRecorderNode]", ...args);
+                    }
+                };
+                const debugError = (...args) => {
+                    if (isDebugEnabled()) {
+                        console.error("[VrchAudioRecorderNode]", ...args);
+                    } else {
+                        console.error(...args);
+                    }
+                };
+
+                if (debugWidget) {
+                    const originalDebugCallback = debugWidget.callback;
+                    debugWidget.callback = (value) => {
+                        if (originalDebugCallback) {
+                            originalDebugCallback(value);
+                        }
+                        if (value) {
+                            console.log("[VrchAudioRecorderNode] Debug enabled");
+                        }
+                    };
+                }
+
                 // Create a custom button element
                 const startBtn = document.createElement("div");
                 startBtn.textContent = "";
@@ -84,6 +118,77 @@ app.registerExtension({
                 // Add the button and tag to the node using addDOMWidget
                 this.addDOMWidget("button_widget", "Press and Hold to Record", startBtn);
                 this.addDOMWidget("text_widget", "Countdown Display", countdownDisplay);
+
+                // Microphone selector block
+                const micContainer = document.createElement("div");
+                micContainer.classList.add("mic-visualizer-container");
+
+                const micControls = createMicrophoneControls({
+                    onDeviceChange: (deviceId) => {
+                        updateDeviceWidgets(deviceId);
+                        syncStatus();
+                    },
+                    onMuteChange: () => {
+                        if (currentSession && currentSession.stream) {
+                            currentSession.stream.getAudioTracks().forEach(track => {
+                                track.enabled = !micControls.getMuted();
+                            });
+                        }
+                        debugLog("Mute state:", micControls.getMuted());
+                        syncStatus();
+                    }
+                });
+                micContainer.appendChild(micControls.container);
+
+                const micWidget = this.addDOMWidget("mic_selector_widget", "Microphone", micContainer);
+                micWidget.computeSize = function(width) {
+                    return [width, 140];
+                };
+
+                const updateDeviceWidgets = (deviceId) => {
+                    if (deviceIdWidget) {
+                        deviceIdWidget.value = deviceId || "";
+                    }
+                    if (deviceNameWidget) {
+                        const selected = micControls.devices().find(device => device.deviceId === deviceId);
+                        deviceNameWidget.value = selected && selected.label ? selected.label : "";
+                    }
+                    debugLog("Device selected:", deviceId || "(none)");
+                };
+
+                const syncStatus = () => {
+                    if (!micControls.getSelection()) {
+                        micControls.setStatus("No device");
+                    } else if (micControls.getMuted()) {
+                        micControls.setStatus("Muted");
+                    } else {
+                        micControls.setStatus(isRecording ? "Recording" : "Ready");
+                    }
+                };
+                syncStatus();
+
+                const refreshMicrophones = async ({ requestAccess = false } = {}) => {
+                    micControls.setStatus("Loading");
+                    try {
+                        const devices = await micControls.refreshDevices({
+                            requestAccess,
+                            logPrefix: "[VrchAudioRecorderNode]",
+                        });
+                        if (deviceIdWidget && deviceIdWidget.value) {
+                            micControls.setSelection(deviceIdWidget.value);
+                        }
+                        updateDeviceWidgets(micControls.getSelection());
+                        syncStatus();
+                        debugLog(`Microphone list refreshed (${devices.length})`);
+                    } catch (error) {
+                        micControls.setStatus("Error");
+                        debugError("Failed to refresh microphone list", error);
+                    }
+                };
+
+                micControls.reloadButton.addEventListener("click", () => {
+                    refreshMicrophones({ requestAccess: true });
+                });
 
                 // Default shortcut settings
                 let enableShortcut = false;
@@ -120,7 +225,7 @@ app.registerExtension({
                 // Handle keyboard press events based on record mode
                 const handleKeyPress = (event) => {
                     if (enableShortcut && event.key === selectedShortcut) {
-                        console.log("shortcut key pressed");
+                        debugLog("Shortcut key pressed");
                         if (recordModeWidget.value === 'press_and_hold') {
                             if (!shortcutKeyPressed) {
                                 shortcutKeyPressed = true; // Mark shortcut as pressed
@@ -138,7 +243,7 @@ app.registerExtension({
 
                 const handleKeyRelease = (event) => {
                     if (enableShortcut && event.key === selectedShortcut && recordModeWidget.value === 'press_and_hold') {
-                        console.log("shortcut key released");
+                        debugLog("Shortcut key released");
                         if (shortcutKeyPressed) {
                             stopRecording(true); // Manual stop on key release
                             shortcutKeyPressed = false; // Reset flag
@@ -184,11 +289,13 @@ app.registerExtension({
                 const startRecording = () => {
                     // Prevent starting while already recording, stopping, or during cooldown
                     if (isRecording || isStopping || inCooldown()) {
+                        debugLog("Start ignored due to active recording or cooldown");
                         return;
                     }
 
                     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                        console.error('Browser does not support audio recording');
+                        debugError('Browser does not support audio recording');
+                        micControls.setStatus("Error");
                         return;
                     }
 
@@ -200,7 +307,14 @@ app.registerExtension({
                     isRecording = true;
                     isStopping = false;
 
-                    navigator.mediaDevices.getUserMedia({ audio: true })
+                    micControls.setStatus("Requesting");
+
+                    const selectedDeviceId = micControls.getSelection();
+                    const mediaConstraints = selectedDeviceId
+                        ? { audio: { deviceId: { exact: selectedDeviceId } } }
+                        : { audio: true };
+
+                    navigator.mediaDevices.getUserMedia(mediaConstraints)
                         .then((stream) => {
                             // If recording was cancelled before permissions resolved, abort cleanly
                             const isPressAndHold = recordModeWidget && recordModeWidget.value === 'press_and_hold';
@@ -209,6 +323,7 @@ app.registerExtension({
                                 try { stream.getTracks().forEach(t => t.stop()); } catch (e) {}
                                 // Ensure state is consistent and UI reflects idle
                                 isRecording = false;
+                                syncStatus();
                                 switchButtonMode(recordModeWidget.value);
                                 return; // do not start a recorder anymore
                             }
@@ -223,6 +338,9 @@ app.registerExtension({
                                 recorder: mediaRecorder,
                                 active: true,
                             };
+                            stream.getAudioTracks().forEach(track => {
+                                track.enabled = !micControls.getMuted();
+                            });
                             currentSession = session;
                             mediaRecorder.ondataavailable = (event) => {
                                 // Only accept data for current active session
@@ -259,7 +377,7 @@ app.registerExtension({
                                         audioUIWidget.element.classList.remove("empty-audio-widget");
                                     }
 
-                                    console.log('Audio recording saved.');
+                                    debugLog('Audio recording saved');
 
                                     // Trigger a new queue job if `new_generation_after_recording` is enabled
                                     if (newGenerationWidget && newGenerationWidget.value === true) {
@@ -269,6 +387,7 @@ app.registerExtension({
                                     // finalize stop state and start cooldown
                                     isStopping = false;
                                     cooldownUntil = Date.now() + COOL_DOWN_MS;
+                                    syncStatus();
 
                                 };
                                 reader.readAsDataURL(audioBlob);
@@ -277,7 +396,9 @@ app.registerExtension({
 
                             switchButtonMode(recordModeWidget.value);
 
-                            console.log('Recording started...');
+                            updateDeviceWidgets(selectedDeviceId);
+                            syncStatus();
+                            debugLog('Recording started');
 
                             // Start the countdown for maximum recording duration
                             const recordDurationMaxWidget = currentNode.widgets.find(w => w.name === 'record_duration_max');
@@ -313,11 +434,12 @@ app.registerExtension({
                             recordingTimer = setInterval(updateCountdown, 1000);
                         })
                         .catch(error => {
-                            console.error('Error accessing audio devices.', error);
+                            debugError('Error accessing audio devices.', error);
                             // reset state if we failed to start
                             isRecording = false;
                             isStopping = false;
                             countdownDisplay.textContent = '';
+                            micControls.setStatus("Error");
                             switchButtonMode(recordModeWidget.value);
                         });
                 };
@@ -348,7 +470,7 @@ app.registerExtension({
                                 loopWidget.callback(loopWidget.value);
                             }
                         }
-                        console.log('Recording stopped manually');
+                        debugLog('Recording stopped manually');
                     } else if (loopWidget && loopWidget.value === true && recordModeWidget.value === 'start_and_stop') {
                         // Auto-stop: schedule restart after interval
                         const loopIntervalWidget = currentNode.widgets.find(w => w.name === 'loop_interval');
@@ -356,7 +478,7 @@ app.registerExtension({
                         loopIntervalTimer = setTimeout(() => {
                             startRecording();
                         }, loopInterval * 1000);
-                        console.log('Recording is restarted in a loop');
+                        debugLog('Recording will restart after loop interval');
                     }
 
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
@@ -372,6 +494,7 @@ app.registerExtension({
 
                     isRecording = false;
                     switchButtonMode(recordModeWidget.value);
+                    syncStatus();
                 };
 
                 // Initialize button mode based on the record mode
@@ -390,12 +513,13 @@ app.registerExtension({
                     if (shortcutOptionWidget) {
                         selectedShortcut = shortcutOptionWidget.value;
                     }
-                    console.log("[VrchAudioRecorderNode] init() - shortcut enabled:", enableShortcut, "key:", selectedShortcut);
+                    debugLog("init() - shortcut enabled:", enableShortcut, "key:", selectedShortcut);
                 }
 
                 // Initialize display after ensuring all widgets are loaded
-                function delayedInit() {
+                async function delayedInit() {
                     init();
+                    await refreshMicrophones({ requestAccess: true });
                 }
                 setTimeout(delayedInit, 1000);
 
