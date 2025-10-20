@@ -5,6 +5,28 @@ import srt
 from datetime import timedelta
 import traceback
 
+def _coerce_raw_data(raw):
+    """
+    Normalize the raw_data input into a dict plus pretty JSON string.
+    Returns (parsed_dict, pretty_string).
+    """
+    if isinstance(raw, dict):
+        try:
+            pretty = json.dumps(raw, indent=2, ensure_ascii=False)
+        except Exception:
+            pretty = "{}"
+        return raw, pretty
+    if isinstance(raw, str) and raw.strip():
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, dict):
+                pretty = json.dumps(parsed, indent=2, ensure_ascii=False)
+                return parsed, pretty
+        except json.JSONDecodeError:
+            pass
+        return {}, raw
+    return {}, "{}"
+
 CATEGORY="vrch.ai/control/gamepad"
 
 class VrchGamepadLoaderNode:
@@ -56,16 +78,17 @@ class VrchGamepadLoaderNode:
                      name: str, 
                      refresh_interval: int=100,
                      debug: bool=False,
-                     raw_data: str=""):
+                     raw_data=None):
         """
         Load gamepad data and return it as JSON.
         """
         try:
-            # Parse raw_data as JSON
+            parsed_raw, _ = _coerce_raw_data(raw_data)
+            resolved_name = name or parsed_raw.get("id", "") if isinstance(parsed_raw, dict) else name
             gamepad_data = {
-                "index": index,
-                "name": name,
-                "raw_data": raw_data,
+                "index": str(index),
+                "name": resolved_name,
+                "raw_data": parsed_raw,
             }
             
             # Initialize default values
@@ -78,56 +101,37 @@ class VrchGamepadLoaderNode:
             buttons_float = []
             
             # Try to parse the gamepad data from raw_data
-            if raw_data:
-                try:
-                    parsed_data = json.loads(raw_data)
-                    
-                    # Extract axis data if available
-                    if "axes" in parsed_data and isinstance(parsed_data["axes"], list):
-                        axes = parsed_data["axes"]
-                        if len(axes) > 0:
-                            left_stick[0] = float(axes[0])  # Left X
-                        if len(axes) > 1:
-                            left_stick[1] = float(axes[1])  # Left Y
-                        if len(axes) > 2:
-                            right_stick[0] = float(axes[2])  # Right X
-                        if len(axes) > 3:
-                            right_stick[1] = float(axes[3])  # Right Y
-                    
-                    # Extract button data if available
-                    if "buttons" in parsed_data and isinstance(parsed_data["buttons"], list):
-                        button_count = len(parsed_data["buttons"])
-                        
-                        # Initialize arrays with the correct size based on actual gamepad data
-                        buttons_boolean = [False] * button_count
-                        buttons_int = [0] * button_count
-                        buttons_float = [0.0] * button_count
-                        
-                        for i, btn in enumerate(parsed_data["buttons"]):
-                            if isinstance(btn, dict):
-                                is_pressed = bool(btn.get("pressed", False))
-                                value = float(btn.get("value", 0.0))
-                            elif hasattr(btn, "pressed") and hasattr(btn, "value"):
-                                is_pressed = bool(btn.pressed)
-                                value = float(btn.value)
-                            else:
-                                continue
-                                
-                            buttons_boolean[i] = is_pressed
-                            buttons_int[i] = 1 if is_pressed else 0
-                            buttons_float[i] = value
+            parsed_data = parsed_raw if isinstance(parsed_raw, dict) else {}
+
+            axes = parsed_data.get("axes")
+            if isinstance(axes, list):
+                if len(axes) > 0:
+                    left_stick[0] = float(axes[0])
+                if len(axes) > 1:
+                    left_stick[1] = float(axes[1])
+                if len(axes) > 2:
+                    right_stick[0] = float(axes[2])
+                if len(axes) > 3:
+                    right_stick[1] = float(axes[3])
+
+            buttons = parsed_data.get("buttons")
+            if isinstance(buttons, list):
+                button_count = len(buttons)
+                buttons_boolean = [False] * button_count
+                buttons_int = [0] * button_count
+                buttons_float = [0.0] * button_count
+                for i, btn in enumerate(buttons):
+                    if isinstance(btn, dict):
+                        is_pressed = bool(btn.get("pressed", False))
+                        value = float(btn.get("value", 0.0))
+                    elif hasattr(btn, "pressed") and hasattr(btn, "value"):
+                        is_pressed = bool(btn.pressed)
+                        value = float(btn.value)
                     else:
-                        # If no buttons data found, initialize with default empty arrays
-                        buttons_boolean = []
-                        buttons_int = []
-                        buttons_float = []
-                            
-                except json.JSONDecodeError:
-                    if debug:
-                        print("[VrchGamepadLoaderNode] Failed to parse gamepad data as JSON")
-                except Exception as e:
-                    if debug:
-                        print(f"[VrchGamepadLoaderNode] Error processing gamepad data: {str(e)}")
+                        continue
+                    buttons_boolean[i] = is_pressed
+                    buttons_int[i] = 1 if is_pressed else 0
+                    buttons_float[i] = value
 
             # Ensure we have at least empty arrays even if no data was processed
             if not buttons_boolean:
@@ -159,7 +163,7 @@ class VrchGamepadLoaderNode:
             print(f"[VrchGamepadLoaderNode] Error loading gamepad data: {str(e)}")
             # Return default values for all outputs
             return (
-                {}              # RAW_DATA
+                {},             # RAW_DATA
                 [0.0, 0.0],     # LEFT_STICK
                 [0.0, 0.0],     # RIGHT_STICK
                 [],             # BUTTONS_BOOLEAN (empty array instead of fixed size)
@@ -169,15 +173,18 @@ class VrchGamepadLoaderNode:
         
     @classmethod
     def IS_CHANGED(cls, **kwargs):
-        raw_data = kwargs.get("raw_data", "")
+        raw_input = kwargs.get("raw_data", None)
         debug = kwargs.get("debug", False)
-        if not raw_data:
+        parsed_raw, serialized = _coerce_raw_data(raw_input)
+        if not parsed_raw and not serialized.strip():
             if debug:
                 print("[VrchGamepadLoaderNode] No raw_data provided to IS_CHANGED.")
             return False
-        
         m = hashlib.sha256()
-        m.update(raw_data.encode("utf-8"))
+        try:
+            m.update(json.dumps(parsed_raw, sort_keys=True, ensure_ascii=False).encode("utf-8"))
+        except Exception:
+            m.update(serialized.encode("utf-8"))
         return m.hexdigest()
     
     
@@ -363,17 +370,17 @@ class VrchXboxControllerNode:
         try:  
             # Extract data from raw_data  
             if "raw_data" in raw_data and raw_data["raw_data"]:  
-                # Handle cases where raw_data might be a JSON string  
-                if isinstance(raw_data["raw_data"], str):  
-                    try:  
-                        parsed_data = json.loads(raw_data["raw_data"])  
-                    except json.JSONDecodeError:  
-                        # If JSON parsing fails, use raw_data as is  
-                        parsed_data = raw_data  
-                else:  
-                    # If raw_data is already a dict, use it directly  
-                    parsed_data = raw_data  
-                  
+                raw_section = raw_data["raw_data"]
+                if isinstance(raw_section, str):
+                    try:
+                        parsed_data = json.loads(raw_section)
+                    except json.JSONDecodeError:
+                        parsed_data = {}
+                elif isinstance(raw_section, dict):
+                    parsed_data = raw_section
+                else:
+                    parsed_data = {}
+            
                 # Process axes data (analog sticks)  
                 if "axes" in parsed_data and isinstance(parsed_data["axes"], list):  
                     axes = parsed_data["axes"]  
@@ -555,13 +562,14 @@ class VrchXboxControllerNode:
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
-        raw_data = kwargs.get("raw_data", "")
-        debug = kwargs.get("debug", False)
-        if not raw_data:
-            if debug:
+        raw_input = kwargs.get("raw_data", {})
+        if not raw_input:
+            if kwargs.get("debug", False):
                 print("[VrchXboxControllerNode] No raw_data provided to IS_CHANGED.")
             return False
-        
         m = hashlib.sha256()
-        m.update(raw_data.encode("utf-8"))
+        try:
+            m.update(json.dumps(raw_input, sort_keys=True, ensure_ascii=False).encode("utf-8"))
+        except Exception:
+            m.update(str(raw_input).encode("utf-8"))
         return m.hexdigest()
