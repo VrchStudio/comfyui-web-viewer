@@ -20,7 +20,7 @@ app.registerExtension({
             const enablePreviewWidget = node.widgets.find(w => w.name === "enable_preview");
             const rawDataWidget = node.widgets.find(w => w.name === "raw_data");
             const debugWidget = node.widgets.find(w => w.name === "debug");
-            
+
             // State variables
             let audioContext = null;
             let analyser = null;
@@ -32,6 +32,9 @@ app.registerExtension({
             let suppressMuteCallback = false;
             
             // Hide technical widgets from the UI
+            if (deviceIdWidget) {
+                hideWidget(node, deviceIdWidget);
+            }
             if (rawDataWidget) {
                 hideWidget(node, rawDataWidget);
             }

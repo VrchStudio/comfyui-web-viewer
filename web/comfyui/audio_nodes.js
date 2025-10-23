@@ -3,7 +3,8 @@ import { api } from "../../scripts/api.js";
 
 import { 
     triggerNewGeneration, 
-    createMicrophoneControls
+    createMicrophoneControls,
+    hideWidget,
 } from "./node_utils.js";
 
 app.registerExtension({
@@ -74,12 +75,16 @@ app.registerExtension({
                 // Hide the base64_data widget
                 const base64Widget = currentNode.widgets.find(w => w.name === 'base64_data');
                 if (base64Widget) {
-                    base64Widget.type = "hidden";
+                    hideWidget(currentNode, base64Widget);
                 }
 
                 const deviceIdWidget = currentNode.widgets.find(w => w.name === "device_id");
                 const deviceNameWidget = currentNode.widgets.find(w => w.name === "device_name");
                 const debugWidget = currentNode.widgets.find(w => w.name === "debug");
+
+                if (deviceIdWidget) {
+                    hideWidget(currentNode, deviceIdWidget);
+                }
 
                 const isDebugEnabled = () => !!(debugWidget && debugWidget.value);
                 const debugLog = (...args) => {
