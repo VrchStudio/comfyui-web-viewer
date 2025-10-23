@@ -22,18 +22,36 @@ export function triggerNewGeneration() {
 
 // Helper functions to hide and show widgets
 export function hideWidget(node, widget) {
-    // If widget is already hidden, do nothing
-    if (widget.type === "hidden") return;
-    // Save original type and computeSize so it can be restored later
-    widget.origType = widget.type;
-    widget.origComputeSize = widget.computeSize;
+    if (!widget) return;
+    if (widget.type === "hidden" || widget.hidden) return;
+
+    widget.origType ??= widget.type;
+    widget.origComputeSize ??= widget.computeSize;
+    widget.origHidden = widget.hidden ?? false;
+
     widget.type = "hidden";
+    widget.hidden = true;
+    widget.computeSize = widget.computeSize || (() => [0, 0]);
+
+    if (widget.element) {
+        widget.element.style.display = "none";
+    }
+
+    node?.setDirtyCanvas?.(true, true);
 }
 
 export function showWidget(node, widget) {
-    // Restore the widget's original type and computeSize
-    widget.type = widget.origType;
-    widget.computeSize = widget.origComputeSize;
+    if (!widget) return;
+
+    widget.type = widget.origType ?? widget.type;
+    widget.computeSize = widget.origComputeSize ?? widget.computeSize;
+    widget.hidden = widget.origHidden ?? false;
+
+    if (widget.element) {
+        widget.element.style.removeProperty("display");
+    }
+
+    node?.setDirtyCanvas?.(true, true);
 }
 
 /**
