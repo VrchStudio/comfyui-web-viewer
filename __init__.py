@@ -10,7 +10,7 @@ from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
 
-__version__ = "1.1.8"
+__version__ = "1.1.9"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
