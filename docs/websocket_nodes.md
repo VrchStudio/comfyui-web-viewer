@@ -284,6 +284,33 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
 
 ---
 
+### Node: `AUDIO WebSocket Channel Loader @ vrch.ai` (vrch.ai/viewer/websocket)
+
+Receives audio streams sent over the WebSocket `/audio` path, decodes them to the ComfyUI audio tensor format, and provides graceful fallbacks for silence or custom default clips.
+
+1. **Add the `AUDIO WebSocket Channel Loader @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+  - **`channel`**: Select a channel number from **"1"** to **"8"** (default **"1"**) to choose which audio stream to subscribe to.
+  - **`server`**: Enter the WebSocket server in `IP:PORT` format (defaults to **`127.0.0.1:8001`**).
+  - **`debug`**: Toggle verbose logging for connection status and decode errors (default **False**).
+  - **`default_audio`** *(optional)*: Provide an `AUDIO` tensor to use when no live audio has been received yet or decoding fails. Useful for pre-roll ambience or voice prompts.
+
+3. **Outputs:**
+  - **`AUDIO`**: A dictionary with keys `waveform` (shape `[1, channels, samples]`) and `sample_rate`. When no stream is available and no default clip is supplied, the node emits a 0.5-second stereo silent buffer at 44.1 kHz.
+
+4. **Receiving Audio:**
+  - The node maintains a persistent WebSocket subscription to `/audio` for the selected channel and automatically reconnects when needed.
+  - Incoming payloads are expected to contain base64-encoded **WebM** audio. The node pipes the data through `ffmpeg` and `torchaudio` to produce a normalized waveform tensor, auto-expanding mono inputs to stereo.
+  - If decoding fails or no payload has been received yet, the node returns the provided `default_audio`; otherwise it falls back to the generated silent clip.
+
+**Notes:**
+- Requires `ffmpeg` to be available in the environment (CLI executable or library). Missing `ffmpeg` will result in decode failures logged when `debug=True`.
+- The output format matches the expectations of downstream VRCH audio visualization nodes (`waveform` batched, `sample_rate` integer).
+- Pair with `AUDIO WebSocket Sender @ vrch.ai` (or other compatible publishers) and ensure the `WebSocket Server @ vrch.ai` node is running on the same host/port.
+
+---
+
 ### Node: `JSON WebSocket Sender @ vrch.ai` (vrch.ai/viewer/websocket)
 
 1. **Add the `JSON WebSocket Sender @ vrch.ai` node to your ComfyUI workflow.**
