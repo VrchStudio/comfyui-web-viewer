@@ -3,12 +3,15 @@ import io
 import json
 import time
 import struct
+import base64
 import numpy as np
 import asyncio
 import websockets
 import threading
 import torch
 import urllib.parse
+import ffmpeg
+import torchaudio
 from PIL import Image
 from .node_utils import VrchNodeUtils
 from .utils.websocket_server import get_global_server
@@ -509,6 +512,18 @@ def latent_data_handler(message):
         # If parsing fails, return None
         return None
 
+def audio_data_handler(message):
+    """Default handler for processing audio messages"""
+    try:
+        if isinstance(message, bytes):
+            message = message.decode('utf-8')
+        payload = json.loads(message)
+        if isinstance(payload, dict) and payload.get("base64_data"):
+            return payload
+        return None
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return None
+
 class VrchJsonWebSocketSenderNode:
     @classmethod
     def INPUT_TYPES(cls):
@@ -773,4 +788,100 @@ class VrchImageWebSocketChannelLoaderNode:
     @classmethod
     def IS_CHANGED(cls, **kwargs):
         # Always trigger evaluation to check for new images
+        return float("NaN")
+
+class VrchAudioWebSocketChannelLoaderNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "debug": ("BOOLEAN", {"default": False}),
+            },
+            "optional": {
+                "default_audio": ("AUDIO",),
+            }
+        }
+
+    RETURN_TYPES = ("AUDIO",)
+    RETURN_NAMES = ("AUDIO",)
+    FUNCTION = "receive_audio"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def receive_audio(self, channel=1, server="", debug=False, default_audio=None):
+        host, port = server.split(":")
+        client = get_websocket_client(host, port, "/audio", channel, data_handler=audio_data_handler, debug=debug)
+        payload = client.get_latest_data()
+
+        if isinstance(payload, dict) and payload.get("base64_data"):
+            audio = self._decode_base64_audio(payload["base64_data"], debug=debug)
+            if audio is not None:
+                return (audio,)
+
+        if default_audio is not None:
+            return (default_audio,)
+
+        return (self._silent_audio(),)
+
+    @staticmethod
+    def _silent_audio(duration_sec: float = 0.5, sample_rate: int = 44100):
+        num_samples = max(int(sample_rate * duration_sec), 1)
+        waveform = torch.zeros(2, num_samples)
+        return {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
+
+    @staticmethod
+    def _decode_base64_audio(base64_data, debug=False):
+        if not base64_data or not isinstance(base64_data, str) or not base64_data.strip():
+            if debug:
+                print("[VrchAudioWebSocketChannelLoaderNode] Empty base64 payload")
+            return None
+
+        try:
+            audio_bytes = base64.b64decode(base64_data)
+        except Exception as err:
+            if debug:
+                print(f"[VrchAudioWebSocketChannelLoaderNode] Base64 decode failed: {err}")
+            return None
+
+        if not audio_bytes:
+            if debug:
+                print("[VrchAudioWebSocketChannelLoaderNode] Decoded payload empty")
+            return None
+
+        input_buffer = io.BytesIO(audio_bytes)
+        try:
+            process = (
+                ffmpeg
+                .input('pipe:0', format='webm')
+                .output('pipe:1', format='wav')
+                .run_async(pipe_stdin=True, pipe_stdout=True, pipe_stderr=True)
+            )
+            output, _ = process.communicate(input=input_buffer.read())
+            if not output:
+                if debug:
+                    print("[VrchAudioWebSocketChannelLoaderNode] ffmpeg produced no output")
+                return None
+            wav_buffer = io.BytesIO(output)
+            waveform, sample_rate = torchaudio.load(wav_buffer)
+        except Exception as err:
+            if debug:
+                print(f"[VrchAudioWebSocketChannelLoaderNode] Audio decode failed: {err}")
+            return None
+
+        try:
+            if waveform.dim() == 1:
+                waveform = waveform.unsqueeze(0)
+            if waveform.shape[0] == 1:
+                waveform = waveform.repeat(2, 1)
+            audio = {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
+            return audio
+        except Exception as err:
+            if debug:
+                print(f"[VrchAudioWebSocketChannelLoaderNode] Waveform reshape failed: {err}")
+            return None
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
         return float("NaN")

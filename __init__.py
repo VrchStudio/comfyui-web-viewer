@@ -10,7 +10,7 @@ from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
 
-__version__ = "1.1.9"
+__version__ = "1.1.10"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -23,6 +23,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchAudioRecorderNode": VrchAudioRecorderNode,
     "VrchAudioSaverNode": VrchAudioSaverNode,
     "VrchAudioVisualizerNode": VrchAudioVisualizerNode,
+    "VrchAudioWebSocketChannelLoaderNode": VrchAudioWebSocketChannelLoaderNode,
     "VrchAudioWebViewerNode": VrchAudioWebViewerNode,
     "VrchBPMDetectorNode": VrchBPMDetectorNode,
     "VrchBooleanKeyControlNode": VrchBooleanKeyControlNode,
@@ -88,6 +89,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchAudioRecorderNode": "AUDIO Recorder @ vrch.ai",
     "VrchAudioSaverNode": "AUDIO Saver @ vrch.ai",
     "VrchAudioVisualizerNode": "AUDIO Visualizer @ vrch.ai",
+    "VrchAudioWebSocketChannelLoaderNode": "AUDIO WebSocket Channel Loader @ vrch.ai",
     "VrchAudioWebViewerNode": "AUDIO Web Viewer @ vrch.ai",
     "VrchBPMDetectorNode": "AUDIO BPM Detector (Experimental) @ vrch.ai",
     "VrchBooleanKeyControlNode": "BOOLEAN Key Control @ vrch.ai",
