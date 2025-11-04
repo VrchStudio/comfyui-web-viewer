@@ -255,6 +255,7 @@ class VrchImageWebSocketSettingsNode:
                 "update_on_end": ("BOOLEAN", {"default": False}),
                 "background_colour_hex": ("STRING", {"default": "#222222", "multiline": False}),
                 "server_messages": ("STRING", {"default": "", "multiline": False}),
+                "incremental_update": ("BOOLEAN", {"default": False}),
                 "debug": ("BOOLEAN", {"default": False}),
             },
             "optional": {
@@ -280,8 +281,12 @@ class VrchImageWebSocketSettingsNode:
                       update_on_end,
                       background_colour_hex,
                       server_messages,
+                      incremental_update,
                       debug,
                       image_filters_json=None):
+        if not hasattr(self, "_last_full_settings"):
+            self._last_full_settings = {}
+
         # Check if settings should be sent
         if not send_settings:
             if debug:
@@ -320,11 +325,46 @@ class VrchImageWebSocketSettingsNode:
             except Exception as e:
                 if debug:
                     print(f"[VrchImageWebSocketSettingsNode] Failed to merge image_filters_json: {e}")
+        full_settings = settings["settings"]
+        key = (host, port, ch)
+
+        if incremental_update:
+            prev = self._last_full_settings.get(key, {})
+            diff = {}
+
+            for param_key, param_value in full_settings.items():
+                if param_key == "filters" and isinstance(param_value, dict):
+                    prev_filters = prev.get("filters", {}) if isinstance(prev, dict) else {}
+                    filter_diff = {
+                        f_key: f_val
+                        for f_key, f_val in param_value.items()
+                        if prev_filters.get(f_key) != f_val
+                    }
+                    if filter_diff:
+                        diff.setdefault("filters", {}).update(filter_diff)
+                else:
+                    if prev.get(param_key) != param_value:
+                        diff[param_key] = param_value
+
+            if diff:
+                payload = {"settings": diff}
+                payload_json = json.dumps(payload)
+                server.send_to_channel("/image", ch, payload_json)
+                if debug:
+                    print(f"[VrchImageWebSocketSettingsNode] Incremental update -> channel {ch}: {payload_json}")
+                self._last_full_settings[key] = full_settings
+                return (payload,)
+            else:
+                if debug:
+                    print("[VrchImageWebSocketSettingsNode] Incremental update skipped (no changes detected)")
+                return (None,)
+
         settings_json = json.dumps(settings)
         server.send_to_channel("/image", ch, settings_json)
         if debug:
             print(f"[VrchImageWebSocketSettingsNode] Sending settings to channel {ch} via global server on {host}:{port} with path '/image': {settings_json}")
-        # Return the Python dict (already merged) so downstream nodes can reuse/augment
+
+        self._last_full_settings[key] = full_settings
         return (settings,)
 
 class VrchImageWebSocketFilterSettingsNode:
@@ -343,6 +383,8 @@ class VrchImageWebSocketFilterSettingsNode:
                 "invert": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
                 "sepia": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
                 "blur": ("INT", {"default": 0, "min": 0, "max": 50}),
+                "incremental_update": ("BOOLEAN", {"default": False}),
+                "debug": ("BOOLEAN", {"default": False}),
             }
         }
 
@@ -361,25 +403,49 @@ class VrchImageWebSocketFilterSettingsNode:
                            invert,
                            sepia,
                            blur,
+                           incremental_update,
+                           debug,
                            **legacy):
         """Build the filters JSON.
 
         Note: grayscale has been removed. Any legacy workflows providing a
         grayscale positional/keyword argument will be ignored gracefully via **legacy.
         """
+        if not hasattr(self, "_last_filters"):
+            self._last_filters = None
+
         # Produce object matching previous spec {"filters": {...}} for backward compatibility
-        payload = {
-            "filters": {
-                "opacity": float(opacity),
-                "brightness": float(brightness),
-                "contrast": float(contrast),
-                "saturate": float(saturate),
-                "hueRotate": int(hue_rotate),
-                "invert": float(invert),
-                "sepia": float(sepia),
-                "blur": int(blur),
-            }
+        filters_full = {
+            "opacity": float(opacity),
+            "brightness": float(brightness),
+            "contrast": float(contrast),
+            "saturate": float(saturate),
+            "hueRotate": int(hue_rotate),
+            "invert": float(invert),
+            "sepia": float(sepia),
+            "blur": int(blur),
         }
+
+        if incremental_update and isinstance(self._last_filters, dict):
+            diff = {
+                key: value
+                for key, value in filters_full.items()
+                if self._last_filters.get(key) != value
+            }
+            if diff:
+                payload = {"filters": diff}
+                if debug:
+                    print(f"[VrchImageWebSocketFilterSettingsNode] Incremental filters diff: {payload}")
+                self._last_filters = filters_full
+                return (payload,)
+            if debug:
+                print("[VrchImageWebSocketFilterSettingsNode] Incremental update skipped (no filter changes)")
+            return (None,)
+
+        payload = {"filters": filters_full}
+        if debug:
+            print(f"[VrchImageWebSocketFilterSettingsNode] Full filters payload: {payload}")
+        self._last_filters = filters_full
         return (payload,)
 
 # Dictionary to keep track of WebSocket client instances
