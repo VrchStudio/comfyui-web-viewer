@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Updated
+
+- update `VrchImageWebSocketFilterSettingsNode` node to add `incremental_update` and `debug` options
+- update `VrchImageWebSocketSettingsNode` to add `incremental_update` option
+- update `docs/websocket_nodes.md` to document the new options in filter settings node
+
 ## 1.1.10 - 2025-10-29
 
 ### Added
