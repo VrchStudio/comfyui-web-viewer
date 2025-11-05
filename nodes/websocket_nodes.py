@@ -546,9 +546,13 @@ def get_websocket_client(host, port, path, channel, data_handler=None, debug=Fal
 
 def image_data_handler(message):
     """Default handler for processing image messages"""
+    if not isinstance(message, (bytes, bytearray)):
+        # Non-binary payload (e.g. JSON settings) is ignored by the image handler
+        return None
+
     if len(message) < 8:  # At least 8 bytes for the header
         return None
-        
+
     # Unpack header (2 uint32 values)
     first, second = struct.unpack(">II", message[:8])
     image_data = message[8:]
