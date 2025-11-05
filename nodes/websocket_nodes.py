@@ -141,13 +141,19 @@ class VrchImageWebSocketWebViewerNode:
         host, port = server.split(":")
         server = get_global_server(host, port, path="/image", debug=debug) # Ensure path is set correctly for viewer
         ch = int(channel)
-        for tensor in images:
+        batch_size = len(images)
+        batch_id = getattr(self, "_last_batch_id", 0)
+        batch_id = (batch_id + 1) % 65536
+        self._last_batch_id = batch_id
+
+        for index, tensor in enumerate(images):
             arr = 255.0 * tensor.cpu().numpy()
             img = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
             buf = io.BytesIO()
             img.save(buf, format=format)
             binary_data = buf.getvalue()
-            header = struct.pack(">II", 1, 2)
+            meta = (batch_id << 16) | ((index & 0xFF) << 8) | (batch_size & 0xFF)
+            header = struct.pack(">II", 1, meta)
             data = header + binary_data
             server.send_to_channel("/image", ch, data)
             
@@ -222,13 +228,19 @@ class VrchImageWebSocketSimpleWebViewerNode:
         host, port = server.split(":")
         server = get_global_server(host, port, path="/image", debug=debug) # Ensure path is set correctly for viewer
         ch = int(channel)
-        for tensor in images:
+        batch_size = len(images)
+        batch_id = getattr(self, "_last_batch_id", 0)
+        batch_id = (batch_id + 1) % 65536
+        self._last_batch_id = batch_id
+
+        for index, tensor in enumerate(images):
             arr = 255.0 * tensor.cpu().numpy()
             img = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
             buf = io.BytesIO()
             img.save(buf, format=format)
             binary_data = buf.getvalue()
-            header = struct.pack(">II", 1, 2)
+            meta = (batch_id << 16) | ((index & 0xFF) << 8) | (batch_size & 0xFF)
+            header = struct.pack(">II", 1, meta)
             data = header + binary_data
             server.send_to_channel("/image", ch, data)
             
@@ -538,14 +550,23 @@ def image_data_handler(message):
         return None
         
     # Unpack header (2 uint32 values)
-    header = struct.unpack(">II", message[:8])
+    first, second = struct.unpack(">II", message[:8])
     image_data = message[8:]
+
+    batch_id = (second >> 16) & 0xFFFF
+    frame_index = (second >> 8) & 0xFF
+    frame_total = second & 0xFF
     
     # Convert image data to tensor
     image = Image.open(io.BytesIO(image_data))
     image_np = np.array(image).astype(np.float32) / 255.0
     image_tensor = torch.from_numpy(image_np)[None,]
-    
+    image_tensor._metadata = {
+        "batch_id": batch_id,
+        "frame_index": frame_index,
+        "frame_total": frame_total,
+        "raw_type": first,
+    }
     return image_tensor
 
 def json_data_handler(message):
@@ -832,6 +853,17 @@ class VrchImageWebSocketChannelLoaderNode:
         
         image = client.get_latest_data()
         if image is not None:
+            if debug and hasattr(image, "_metadata"):
+                meta = getattr(image, "_metadata", {})
+                print(
+                    "[VrchImageWebSocketChannelLoaderNode] Received frame",
+                    meta.get("frame_index"),
+                    "of",
+                    meta.get("frame_total"),
+                    "(batch",
+                    meta.get("batch_id"),
+                    ")",
+                )
             return (image, False)
         
         # No image data, select placeholder
