@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Updated
 
+- add frame sequence metadata to WebSocket image senders and handle non-binary payloads in `image_data_handler`
 - update `VrchImageWebSocketFilterSettingsNode` node to add `incremental_update` and `debug` options
 - update `VrchImageWebSocketSettingsNode` to add `incremental_update` option
 - update `docs/websocket_nodes.md` to document the new options in filter settings node
