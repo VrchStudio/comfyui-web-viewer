@@ -117,10 +117,12 @@ A dedicated node for managing and transmitting WebSocket settings parameters sep
      - **`update_on_end`**: Toggle whether to update the image cache only at the end of playback (default is **False**).
    - **Background Settings:**
      - **`background_colour_hex`**: Set the background color in hexadecimal format (default is **"#222222"**).
-   - **Server Messages:**
-     - **`server_messages`**: Server messages to send to the web page viewer (default is empty string).
-   - **Debug Mode:**
-     - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting (default is **False**).
+  - **Server Messages:**
+    - **`server_messages`**: Server messages to send to the web page viewer (default is empty string).
+  - **Incremental Update:**
+    - **`incremental_update`**: When enabled, only changed settings fields are sent (diff payload). When disabled, the full settings block is sent every time (default is **False**).
+  - **Debug Mode:**
+    - **`debug`**: Enable this option to print detailed debug information; in incremental mode it also reports skipped updates (default is **False**).
    - **Optional Filters JSON:**
      - **`filters_json`** *(optional input)*: Connect the output of `IMAGE Filter Settings @ vrch.ai` (or any JSON node providing a compatible structure). When present, its filter data is merged into the outgoing settings under `settings.filters`.
 
@@ -128,10 +130,11 @@ A dedicated node for managing and transmitting WebSocket settings parameters sep
    - When **`send_settings`** is enabled (default), this node saves the WebSocket settings to a JSON format and sends them via the WebSocket connection.
    - When **`send_settings`** is disabled, the node will skip transmission and output a debug message (if debug mode is enabled) indicating that settings sending is disabled.
    - Settings are transmitted to the specified channel and can be received by web viewers or other WebSocket clients.
-   - The settings JSON includes: numberOfImages, imageDisplayDuration, fadeAnimDuration, mixBlendMode, enableLoop, enableUpdateOnEnd, bgColourPicker, and serverMessages.
+   - The settings JSON includes: numberOfImages, imageDisplayDuration, fadeAnimDuration, mixBlendMode, enableLoop, enableUpdateOnEnd, bgColourPicker, serverMessages, and (optionally) filters.
+   - With **`incremental_update`** enabled, the node remembers the previous settings per channel/server and only sends the fields that changed. If nothing changed, no JSON is produced.
 
 4. **Outputs:**
-   - **`IMAGE_SETTINGS_JSON`**: The settings dictionary (Python/JSON) actually sent over WebSocket (only produced when `send_settings=True`; if sending is disabled, no output is generated). Structure example:
+  - **`IMAGE_SETTINGS_JSON`**: The settings dictionary (Python/JSON) actually sent over WebSocket (only produced when `send_settings=True`). When incrementals are enabled and no values changed, the output is `None`. Structure example:
 
       ```json
       {
@@ -186,11 +189,15 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
   - **`blur`**: Integer pixels (0–50) – `blur(px)`.
   (Deprecated: `grayscale` has been removed.)
 
-3. **UI Convenience:**
+3. **Advanced Options:**
+  - **`incremental_update`**: When enabled, only filter values that changed since the previous execution are emitted; otherwise a full filter block is produced each run.
+  - **`debug`**: Enable console logging for the node; in incremental mode it reports the diff or whether no changes were detected.
+
+4. **UI Convenience:**
   - A small green "Reset Filters" button (in the node UI) resets all parameters to their defaults.
 
-4. **Output:**
-  - **`IMAGE_FILTERS_JSON`**: JSON structure:
+5. **Output:**
+  - **`IMAGE_FILTERS_JSON`**: JSON structure (or `None` when incremental mode finds no differences):
     ```json
     {
       "filters": {
