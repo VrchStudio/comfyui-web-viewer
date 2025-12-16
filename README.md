@@ -10,6 +10,11 @@ The **ComfyUI Web Viewer** by [vrch.ai](https://vrch.ai) is a custom node collec
 - **Multi-Input Support**: Easily integrates keyboard, OSC, and audio input for versatile interactivity.
 - **Universal Web Accessibility**: Compatible with any device equipped with a web browser.
 
+**🔗 Related Projects:**
+
+- **Comfyputer**: 3D Printable & Portable DIY AI Computer for running ComfyUI - Coming Soon on [Github](https://github.com/VrchStudio/comfyputer)
+- **Agentic VJ**: Real-time Visual Generation with Multi-modal Agents for Live Performances - Integrated with ComfyUI Web Viewer nodes. Releasing Soon on [vrch.ai/vj](https://vrch.ai/vj) and CES 2026!
+
 **🚀 Support Us:**
 
 If you find the **ComfyUI Web Viewer** useful or inspiring, consider supporting us:
