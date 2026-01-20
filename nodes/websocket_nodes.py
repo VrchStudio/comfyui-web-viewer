@@ -22,6 +22,8 @@ CATEGORY = "vrch.ai/viewer/websocket"
 DEFAULT_SERVER_IP = VrchNodeUtils.get_default_ip_address(fallback_ip="0.0.0.0")
 # The default server Port
 DEFAULT_SERVER_PORT = 8001
+JSON_STATE_MAX_KEYS = 128
+JSON_STATE_CLEAR_KEY = "__clear__"
 
 class VrchWebSocketServerNode:
 
@@ -542,6 +544,8 @@ def get_websocket_client(host, port, path, channel, data_handler=None, debug=Fal
     else:
         # Update debug setting if client already exists
         _websocket_clients[key].debug = debug
+        if hasattr(_websocket_clients[key].data_handler, "debug"):
+            _websocket_clients[key].data_handler.debug = debug
     return _websocket_clients[key]
 
 def image_data_handler(message):
@@ -573,15 +577,44 @@ def image_data_handler(message):
     }
     return image_tensor
 
-def json_data_handler(message):
-    """Default handler for processing JSON messages"""
-    try:
-        # Try to parse the message as JSON
-        json_data = json.loads(message)
-        return json_data
-    except json.JSONDecodeError:
-        # If it's not valid JSON, return None
-        return None
+class JsonStateMerger:
+    def __init__(self, max_keys=JSON_STATE_MAX_KEYS, clear_key=JSON_STATE_CLEAR_KEY, debug=False):
+        self.state = {}
+        self.max_keys = max_keys
+        self.clear_key = clear_key
+        self.debug = debug
+
+    def __call__(self, message):
+        try:
+            payload = json.loads(message)
+        except (json.JSONDecodeError, TypeError):
+            if self.debug:
+                print("[JsonStateMerger] Invalid JSON payload; ignoring")
+            return dict(self.state) if self.state else None
+
+        if not isinstance(payload, dict):
+            if self.debug:
+                print("[JsonStateMerger] Non-dict JSON payload ignored")
+            return dict(self.state) if self.state else None
+
+        if payload.get(self.clear_key):
+            if self.debug:
+                print(f"[JsonStateMerger] Clear key '{self.clear_key}' received; resetting state")
+            self.state = {}
+
+        for key, value in payload.items():
+            if key == self.clear_key:
+                continue
+            if self.max_keys and self.max_keys > 0 and key not in self.state and len(self.state) >= self.max_keys:
+                if self.debug:
+                    print(f"[JsonStateMerger] Max keys {self.max_keys} reached; skipping new key '{key}'")
+                continue
+            self.state[key] = value
+
+        return dict(self.state)
+
+def make_json_state_handler(debug=False):
+    return JsonStateMerger(max_keys=JSON_STATE_MAX_KEYS, clear_key=JSON_STATE_CLEAR_KEY, debug=debug)
 
 def latent_data_handler(message):
     """Default handler for processing latent messages"""
@@ -730,22 +763,26 @@ class VrchJsonWebSocketChannelLoaderNode:
     
     def receive_json(self, channel=1, server="", debug=False, default_json_string=None):
         host, port = server.split(":")
-        client = get_websocket_client(host, port, "/json", channel, data_handler=json_data_handler, debug=debug)
+        client = get_websocket_client(host, port, "/json", channel, data_handler=make_json_state_handler(debug=debug), debug=debug)
         
         # Get JSON data from WebSocket client
         json_data = client.get_latest_data()
+        fallback_reason = None
         
-        # If we received data from WebSocket, return it
+        # If we received data from WebSocket, process it
         if json_data is not None:
             if debug:
                 print(f"[VrchJsonWebSocketChannelLoaderNode] Received JSON data on channel {channel}")
                 print(f"[VrchJsonWebSocketChannelLoaderNode] JSON content: {str(json_data)[:200]}{'...' if len(str(json_data)) > 200 else ''}")
             return (json_data,)
-        
+        else:
+            fallback_reason = "No JSON data received"
+
         # If we didn't receive data, use the default JSON string (if provided)
         if default_json_string:
             if debug:
-                print(f"[VrchJsonWebSocketChannelLoaderNode] No JSON data received, using default JSON string")
+                reason = fallback_reason or "No JSON data received"
+                print(f"[VrchJsonWebSocketChannelLoaderNode] {reason}; using default JSON string")
             
             try:
                 # Try to parse the default JSON string
@@ -756,7 +793,8 @@ class VrchJsonWebSocketChannelLoaderNode:
         
         # If no default provided, return empty object
         if debug:
-            print(f"[VrchJsonWebSocketChannelLoaderNode] No JSON data received and no default provided, returning empty object")
+            reason = fallback_reason or "No JSON data received"
+            print(f"[VrchJsonWebSocketChannelLoaderNode] {reason} and no default provided, returning empty object")
         return ({},)
     
     @classmethod

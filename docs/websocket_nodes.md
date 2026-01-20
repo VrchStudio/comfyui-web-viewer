@@ -362,7 +362,10 @@ Receives audio streams sent over the WebSocket `/audio` path, decodes them to th
 3. **Receiving JSON Data:**
    - This node automatically connects to the specified WebSocket channel and listens for incoming JSON data.
    - When JSON data is received, it will be parsed and made available as an output that can be connected to other nodes in your workflow.
-   - If no JSON data has been received yet, the default JSON string will be used (if provided), otherwise an empty object `{}` is returned.
+   - Incoming JSON **dict** payloads are shallow‑merged by top‑level keys into a persistent state for that channel. Non‑dict JSON payloads are ignored.
+   - The merged state is capped at **128 top‑level keys**; new keys beyond the limit are ignored.
+   - Send `{"__clear__": true}` to clear the merged state (you may include additional keys in the same message after clearing).
+   - If no JSON data has been received yet, the **`default_json_string`** is used (if provided). Otherwise an empty object `{}` is returned.
    - If the provided default JSON string is not valid JSON, the node will raise a ValueError.
 
 **Notes:**
@@ -445,7 +448,10 @@ Receives audio streams sent over the WebSocket `/audio` path, decodes them to th
 3. **Receiving JSON Data:**
    - This node automatically connects to the specified WebSocket channel and listens for incoming JSON data.
    - When JSON data is received, it will be parsed and made available as an output that can be connected to other nodes in your workflow.
-   - If no JSON data has been received yet, the default JSON string will be used (if provided), otherwise an empty object `{}` is returned.
+   - Incoming JSON **dict** payloads are shallow‑merged by top‑level keys into a persistent state for that channel. Non‑dict JSON payloads are ignored.
+   - The merged state is capped at **128 top‑level keys**; new keys beyond the limit are ignored.
+   - Send `{"__clear__": true}` to clear the merged state (you may include additional keys in the same message after clearing).
+   - If no JSON data has been received yet, the **`default_json_string`** is used (if provided). Otherwise an empty object `{}` is returned.
    - If the provided default JSON string is not valid JSON, the node will raise a ValueError.
 
 **Notes:**
