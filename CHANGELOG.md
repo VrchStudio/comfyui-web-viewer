@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.12 - 2026-01-20]
+
+### Updated
+
+- enhance JSON data handling with state merging and clear functionality
+- update `VrchLatentWebSocketChannelLoaderNode` to support SD1/SDXL, SD3/FLUX latent types
+- update `docs/websocket_nodes.md` to reflect changes in JSON WebSocket nodes
+
 ## 1.1.11 - 2025-11-05
 
 ### Updated
