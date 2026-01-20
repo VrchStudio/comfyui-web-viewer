@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 
 - enhance JSON data handling with state merging and clear functionality
+- update `VrchLatentWebSocketChannelLoaderNode` to support SD1/SDXL, SD3/FLUX latent types
 - update `docs/websocket_nodes.md` to reflect changes in JSON WebSocket nodes
 
 ## 1.1.11 - 2025-11-05
