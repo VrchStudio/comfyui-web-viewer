@@ -412,6 +412,8 @@ Receives audio streams sent over the WebSocket `/audio` path, decodes them to th
      - **`channel`**: Select a channel number from **"1"** to **"8"** (default is **"1"**) to specify which WebSocket channel to listen on.
    - **Server:**
      - **`server`**: Enter the server's domain or IP address along with its port in the format `IP:PORT`. The default typically uses your IP and port **8001** (e.g., **`127.0.0.1:8001`**).
+   - **Latent Format:**
+     - **`latent_format`**: Choose the expected latent format. **`SD1/SDXL`** uses 4 channels; **`SD3/FLUX`** uses 16 channels.
    - **Debug Mode:**
      - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
    - **Default Latent:**
@@ -420,8 +422,9 @@ Receives audio streams sent over the WebSocket `/audio` path, decodes them to th
 3. **Receiving Latent Data:**
    - This node automatically connects to the specified WebSocket channel and listens for incoming latent data.
    - When latent data is received, it will be parsed and reconstructed into the proper tensor format for use in your workflow.
-   - If no latent data has been received yet, the default latent will be used (if provided), otherwise an empty latent tensor is created.
-   - The empty latent has dimensions (1, 4, 64, 64) suitable for most diffusion model workflows.
+   - If the received latent channels do not match the selected **`latent_format`**, the node outputs an empty latent (or the **`default_latent`** if it matches the selected format).
+   - If no latent data has been received yet, the default latent will be used (if provided), otherwise an empty latent tensor is created using the selected format.
+   - The empty latent has dimensions (1, 4, 64, 64) for **SD1/SDXL** or (1, 16, 64, 64) for **SD3/FLUX**.
 
 **Notes:**
 - This node is designed to work with the `LATENT WebSocket Sender @ vrch.ai` node, receiving the latent data it broadcasts.

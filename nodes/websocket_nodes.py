@@ -630,6 +630,12 @@ def latent_data_handler(message):
             samples_tensor = torch.from_numpy(samples_np)
             
             latent = {"samples": samples_tensor}
+            if "shape" in latent_data:
+                latent["shape"] = latent_data["shape"]
+            if "channels" in latent_data:
+                latent["channels"] = latent_data["channels"]
+            else:
+                latent["channels"] = int(samples_tensor.shape[1]) if samples_tensor.ndim >= 2 else None
             return latent
         return None
     except (json.JSONDecodeError, KeyError, ValueError):
@@ -725,7 +731,8 @@ class VrchLatentWebSocketSenderNode:
             
             latent_data = {
                 "samples": samples_list,
-                "shape": list(samples_tensor.shape)
+                "shape": list(samples_tensor.shape),
+                "channels": int(samples_tensor.shape[1]) if samples_tensor.ndim >= 2 else None,
             }
             latent_json = json.dumps(latent_data)
             
@@ -809,6 +816,7 @@ class VrchLatentWebSocketChannelLoaderNode:
             "required": {
                 "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
                 "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "latent_format": (["SD1/SDXL", "SD3/FLUX"], {"default": "SD1/SDXL"}),
                 "debug": ("BOOLEAN", {"default": False}),
             },
             "optional": {
@@ -822,9 +830,50 @@ class VrchLatentWebSocketChannelLoaderNode:
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
     
-    def receive_latent(self, channel=1, server="", debug=False, default_latent=None):
+    def receive_latent(self, channel=1, server="", latent_format="SD1/SDXL", debug=False, default_latent=None):
+        def _get_latent_channels(latent):
+            if isinstance(latent, dict):
+                samples = latent.get("samples")
+                if isinstance(samples, torch.Tensor) and samples.ndim >= 2:
+                    return int(samples.shape[1])
+            return None
+
+        def _make_empty_latent(channels, reference_latent=None, shape_hint=None, dtype_hint=None, device_hint=None):
+            samples = None
+            if isinstance(reference_latent, dict):
+                samples = reference_latent.get("samples")
+            if isinstance(samples, torch.Tensor) and samples.ndim >= 4:
+                shape = list(samples.shape)
+                shape[1] = channels
+                return {"samples": torch.zeros(shape, dtype=samples.dtype, device=samples.device)}
+            if isinstance(shape_hint, (list, tuple)) and len(shape_hint) >= 4:
+                shape = list(shape_hint)
+                shape[1] = channels
+                dtype = dtype_hint if dtype_hint is not None else torch.float32
+                device = device_hint if device_hint is not None else "cpu"
+                return {"samples": torch.zeros(shape, dtype=dtype, device=device)}
+            return {"samples": torch.zeros((1, channels, 64, 64), dtype=torch.float32)}
+        
+        def _target_channels():
+            return 16 if latent_format == "SD3/FLUX" else 4
+
         host, port = server.split(":")
         client = get_websocket_client(host, port, "/latent", channel, data_handler=latent_data_handler, debug=debug)
+        cache = getattr(self, "_last_latent_info", None)
+        if cache is None:
+            cache = {}
+            self._last_latent_info = cache
+        cache_key = (server, str(channel))
+        
+        def _update_cache(latent):
+            if isinstance(latent, dict):
+                samples = latent.get("samples")
+                if isinstance(samples, torch.Tensor) and samples.ndim >= 4:
+                    cache[cache_key] = {
+                        "shape": tuple(samples.shape),
+                        "dtype": samples.dtype,
+                        "device": samples.device,
+                    }
         
         # Get latent data from WebSocket client
         latent_data = client.get_latest_data()
@@ -835,20 +884,50 @@ class VrchLatentWebSocketChannelLoaderNode:
                 print(f"[VrchLatentWebSocketChannelLoaderNode] Received latent data on channel {channel}")
                 if "samples" in latent_data:
                     print(f"[VrchLatentWebSocketChannelLoaderNode] Latent shape: {latent_data['samples'].shape}")
-            return (latent_data,)
+            received_channels = _get_latent_channels(latent_data)
+            if received_channels is None:
+                if debug:
+                    print("[VrchLatentWebSocketChannelLoaderNode] Invalid latent format; using fallback")
+            else:
+                target_channels = _target_channels()
+                if received_channels == target_channels:
+                    _update_cache(latent_data)
+                    return (latent_data,)
+                if debug:
+                    print(f"[VrchLatentWebSocketChannelLoaderNode] Channel mismatch: expected {target_channels}, received {received_channels}")
+                if default_latent is not None:
+                    default_channels = _get_latent_channels(default_latent)
+                    if default_channels == target_channels:
+                        _update_cache(default_latent)
+                        return (default_latent,)
+                    if debug and default_channels is not None:
+                        print(f"[VrchLatentWebSocketChannelLoaderNode] Default latent channels {default_channels} mismatch; creating empty latent")
+                return (_make_empty_latent(target_channels, latent_data, shape_hint=getattr(latent_data.get("samples", None), "shape", None)),)
         
         # If we didn't receive data, use the default latent (if provided)
         if default_latent is not None:
             if debug:
                 print(f"[VrchLatentWebSocketChannelLoaderNode] No latent data received, using default latent")
-            return (default_latent,)
+            target_channels = _target_channels()
+            default_channels = _get_latent_channels(default_latent)
+            if default_channels == target_channels:
+                _update_cache(default_latent)
+                return (default_latent,)
+            if debug and default_channels is not None:
+                print(f"[VrchLatentWebSocketChannelLoaderNode] Default latent channels {default_channels} mismatch; creating empty latent")
+            return (_make_empty_latent(target_channels, default_latent),)
         
         # If no default provided, create empty latent
         if debug:
             print(f"[VrchLatentWebSocketChannelLoaderNode] No latent data received and no default provided, creating empty latent")
         
-        # Create a minimal empty latent with proper shape
-        empty_latent = {"samples": torch.zeros((1, 4, 64, 64), dtype=torch.float32)}
+        # Create a minimal empty latent with cached shape (or fallback)
+        info = cache.get(cache_key)
+        shape_hint = info["shape"] if info else None
+        dtype_hint = info["dtype"] if info else None
+        device_hint = info["device"] if info else None
+        channels = _target_channels()
+        empty_latent = _make_empty_latent(channels, shape_hint=shape_hint, dtype_hint=dtype_hint, device_hint=device_hint)
         return (empty_latent,)
     
     @classmethod
