@@ -464,6 +464,7 @@ class VrchImageWebSocketFilterSettingsNode:
 
 # Dictionary to keep track of WebSocket client instances
 _websocket_clients = {}
+_websocket_clients_lock = threading.RLock()
 
 class WebSocketClient:
     def __init__(self, host, port, path, channel, data_handler=None, debug=False):
@@ -476,23 +477,35 @@ class WebSocketClient:
         self.data_handler = data_handler
         self.lock = threading.Lock()
         self.running = True
+        self._ws = None
+        self._listen_task = None
         self.loop = asyncio.new_event_loop()
         self.thread = threading.Thread(target=self._run_loop, daemon=True)
         self.thread.start()
     
     def _run_loop(self):
         asyncio.set_event_loop(self.loop)
-        self.loop.create_task(self._connect_and_listen())
+        self._listen_task = self.loop.create_task(self._connect_and_listen())
         self.loop.run_forever()
+        pending = [task for task in asyncio.all_tasks(self.loop) if not task.done()]
+        for task in pending:
+            task.cancel()
+        if pending:
+            self.loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
+        self.loop.run_until_complete(self.loop.shutdown_asyncgens())
+        self.loop.close()
     
     async def _connect_and_listen(self):
+        reconnect_delay = 1.0
         while self.running:
             try:
                 uri = f"ws://{self.host}:{self.port}{self.path}?channel={self.channel}"
                 if self.debug:
                     print(f"[WebSocketClient] Connecting to {uri}")
                 
-                async with websockets.connect(uri) as websocket:
+                async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
+                    self._ws = websocket
+                    reconnect_delay = 1.0
                     if self.debug:
                         print(f"[WebSocketClient] Connected to {uri}")
                     
@@ -519,35 +532,91 @@ class WebSocketClient:
                         except Exception as e:
                             if self.debug:
                                 print(f"[WebSocketClient] Error processing message: {e}")
+            except asyncio.CancelledError:
+                break
             
             except Exception as e:
                 if self.debug:
                     print(f"[WebSocketClient] Connection error: {e}")
+            finally:
+                self._ws = None
             
-            # Wait before reconnecting
-            await asyncio.sleep(5)
+            # Backoff reconnect to avoid tight loops.
+            if self.running:
+                await asyncio.sleep(reconnect_delay)
+                reconnect_delay = min(reconnect_delay * 2, 5.0)
     
     def get_latest_data(self):
         with self.lock:
             return self.received_data
     
+    async def _shutdown_async(self):
+        ws = self._ws
+        if ws is not None:
+            try:
+                await ws.close()
+            except Exception:
+                pass
+        self._ws = None
+        if self._listen_task is not None and not self._listen_task.done():
+            self._listen_task.cancel()
+            await asyncio.gather(self._listen_task, return_exceptions=True)
+
     def stop(self):
+        if not self.running:
+            return
         self.running = False
-        if self.loop:
-            self.loop.call_soon_threadsafe(self.loop.stop)
-        self.thread.join(timeout=1)
-        
+        if self.loop and self.loop.is_running():
+            try:
+                future = asyncio.run_coroutine_threadsafe(self._shutdown_async(), self.loop)
+                future.result(timeout=2.0)
+            except Exception:
+                pass
+        if self.loop and self.loop.is_running():
+            try:
+                self.loop.call_soon_threadsafe(self.loop.stop)
+            except RuntimeError:
+                pass
+        if self.thread and self.thread.is_alive():
+            self.thread.join(timeout=1.5)
+
 def get_websocket_client(host, port, path, channel, data_handler=None, debug=False):
     key = f"{host}:{port}:{path}:{channel}"
-    if key not in _websocket_clients:
-        _websocket_clients[key] = WebSocketClient(host, port, path, channel, data_handler, debug)
-    else:
-        # Update debug setting if client already exists
-        _websocket_clients[key].debug = debug
-        if hasattr(_websocket_clients[key].data_handler, "debug"):
-            _websocket_clients[key].data_handler.debug = debug
-    return _websocket_clients[key]
+    with _websocket_clients_lock:
+        client = _websocket_clients.get(key)
+        # Replace dead/stopped clients instead of reusing stale instances.
+        if client is not None:
+            thread_alive = bool(getattr(client, "thread", None) and client.thread.is_alive())
+            if not client.running or not thread_alive:
+                try:
+                    client.stop()
+                except Exception:
+                    pass
+                _websocket_clients.pop(key, None)
+                client = None
 
+        if client is None:
+            client = WebSocketClient(host, port, path, channel, data_handler, debug)
+            _websocket_clients[key] = client
+        else:
+            # Update debug setting if client already exists.
+            client.debug = debug
+            if hasattr(client.data_handler, "debug"):
+                client.data_handler.debug = debug
+        return client
+
+
+def stop_all_websocket_clients():
+    with _websocket_clients_lock:
+        clients = list(_websocket_clients.values())
+        _websocket_clients.clear()
+
+    for client in clients:
+        try:
+            client.stop()
+        except Exception:
+            pass
+        
 def image_data_handler(message):
     """Default handler for processing image messages"""
     if not isinstance(message, (bytes, bytearray)):

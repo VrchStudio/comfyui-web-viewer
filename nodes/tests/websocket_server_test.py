@@ -7,6 +7,7 @@ Includes both safe tests (no real servers) and integration tests (real WebSocket
 """
 
 import asyncio
+import struct
 import sys
 import time
 import unittest
@@ -162,6 +163,77 @@ class TestWebSocketServerUnit(unittest.TestCase):
             self.assertTrue(callable(getattr(SimpleWebSocketServer, method_name)))
         
         print("✓ Server methods existence test passed")
+
+    def test_07_realtime_slow_client_drop_frame_without_disconnect(self):
+        """Realtime path should drop frames for busy client without removing connection"""
+
+        class SlowClient:
+            def __init__(self):
+                self.closed = False
+
+            async def send(self, _data):
+                await asyncio.sleep(0.25)
+
+        class FailingClient:
+            def __init__(self):
+                self.closed = False
+
+            async def send(self, _data):
+                raise RuntimeError("send failed")
+
+        async def run_case():
+            server = SimpleWebSocketServer.__new__(SimpleWebSocketServer)
+            server.host = self.test_host
+            server.port = self.base_port + 9
+            server.debug = False
+            server.paths = {"/image"}
+            server.clients = {"/image": {i: [] for i in range(1, 9)}}
+            server._is_running = True
+            server._connection_tasks = set()
+            server._realtime_pending = {}
+            server._realtime_send_tasks = {}
+
+            slow_client = SlowClient()
+            failing_client = FailingClient()
+            server.clients["/image"][1] = [slow_client, failing_client]
+
+            await server._broadcast_channel("/image", 1, b"frame-1")
+            await server._broadcast_channel("/image", 1, b"frame-2")
+            await asyncio.sleep(0.05)
+
+            # Slow client should remain connected while busy (frame dropped for it).
+            self.assertIn(slow_client, server.clients["/image"][1])
+            # Failing client should be removed.
+            self.assertNotIn(failing_client, server.clients["/image"][1])
+
+            await asyncio.sleep(0.30)
+            await server._broadcast_channel("/image", 1, b"frame-3")
+            await asyncio.sleep(0.05)
+            self.assertIn(slow_client, server.clients["/image"][1])
+
+        asyncio.run(run_case())
+        print("✓ Realtime slow client handling test passed")
+
+    def test_08_image_payload_realtime_detection(self):
+        """Only single-frame image payload should use realtime drop policy."""
+        server = SimpleWebSocketServer.__new__(SimpleWebSocketServer)
+
+        # frame_total = 1 => realtime path enabled
+        meta_single = (0 << 16) | (0 << 8) | 1
+        single = struct.pack(">II", 1, meta_single) + b"x" * 32
+        self.assertTrue(server._is_realtime_payload("/image", single))
+
+        # frame_total = 4 => must be reliable (no frame dropping)
+        meta_multi = (0 << 16) | (0 << 8) | 4
+        multi = struct.pack(">II", 1, meta_multi) + b"x" * 32
+        self.assertFalse(server._is_realtime_payload("/image", multi))
+
+        # /image text settings should also be reliable
+        self.assertFalse(server._is_realtime_payload("/image", '{"settings":true}'))
+
+        # /video still uses realtime behavior
+        self.assertTrue(server._is_realtime_payload("/video", b"12345678"))
+        print("✓ Image payload realtime detection test passed")
 
 
 class TestWebSocketServerIntegration(unittest.TestCase):
@@ -512,6 +584,64 @@ class TestWebSocketServerIntegration(unittest.TestCase):
         asyncio.run(test_shared_communication())
         
         print("✓ Port sharing across processes test passed")
+
+    def test_13_send_call_latency_under_load(self):
+        """Test send_to_channel call latency under moderate concurrent load"""
+        port = self.base_port + 7
+        server = SimpleWebSocketServer(self.test_host, port, debug=False)
+        self.servers.append(server)
+        server.register_path("/perf")
+
+        time.sleep(1.5)
+
+        async def run_perf_case():
+            clients = []
+            call_latencies = []
+            message_count = 20
+            client_count = 10
+
+            try:
+                uri = f"ws://{self.test_host}:{port}/perf?channel=1"
+                for _ in range(client_count):
+                    client = await websockets.connect(uri)
+                    clients.append(client)
+                    self.clients.append(client)
+
+                await asyncio.sleep(0.5)
+
+                for idx in range(message_count):
+                    payload = f"perf-{idx}"
+                    recv_tasks = [
+                        asyncio.create_task(asyncio.wait_for(client.recv(), timeout=3.0))
+                        for client in clients
+                    ]
+
+                    t0 = time.perf_counter()
+                    server.send_to_channel("/perf", 1, payload)
+                    t1 = time.perf_counter()
+                    call_latencies.append((t1 - t0) * 1000.0)
+
+                    recv_results = await asyncio.gather(*recv_tasks, return_exceptions=True)
+                    for received in recv_results:
+                        if isinstance(received, Exception):
+                            self.fail(f"Expected payload '{payload}', but receive failed: {received}")
+                        self.assertEqual(received, payload)
+
+                sorted_lat = sorted(call_latencies)
+                p95_index = max(0, int(len(sorted_lat) * 0.95) - 1)
+                p95_ms = sorted_lat[p95_index]
+
+                # Keep threshold conservative to reduce test flakiness.
+                self.assertLess(p95_ms, 10.0, f"send_to_channel p95 too high: {p95_ms:.3f} ms")
+            finally:
+                for client in clients:
+                    try:
+                        await client.close()
+                    except Exception:
+                        pass
+
+        asyncio.run(run_perf_case())
+        print("✓ Send call latency under load test passed")
 
 
 def run_all_tests():
