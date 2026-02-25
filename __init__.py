@@ -55,6 +55,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
     "VrchJsonWebSocketChannelLoaderNode": VrchJsonWebSocketChannelLoaderNode,
     "VrchJsonWebSocketSenderNode": VrchJsonWebSocketSenderNode,
+    "VrchLiveConsoleControlNode": VrchLiveConsoleControlNode,
     "VrchLatentWebSocketChannelLoaderNode": VrchLatentWebSocketChannelLoaderNode,
     "VrchLatentWebSocketSenderNode": VrchLatentWebSocketSenderNode,
     "VrchMicLoaderNode": VrchMicLoaderNode,
@@ -121,6 +122,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchJsonUrlLoaderNode": "JSON URL Loader @ vrch.ai",
     "VrchJsonWebSocketChannelLoaderNode": "JSON WebSocket Channel Loader @ vrch.ai",
     "VrchJsonWebSocketSenderNode": "JSON WebSocket Sender @ vrch.ai",
+    "VrchLiveConsoleControlNode": "LIVE Console Control @ vrch.ai",
     "VrchLatentWebSocketChannelLoaderNode": "LATENT WebSocket Channel Loader @ vrch.ai",
     "VrchLatentWebSocketSenderNode": "LATENT WebSocket Sender @ vrch.ai",
     "VrchMicLoaderNode": "AUDIO Microphone Loader @ vrch.ai",
@@ -148,4 +150,3 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 WEB_DIRECTORY = "./web/comfyui"
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]
-

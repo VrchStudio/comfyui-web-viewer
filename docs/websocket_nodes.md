@@ -345,6 +345,70 @@ Receives audio streams sent over the WebSocket `/audio` path, decodes them to th
 
 ---
 
+### Node: `LIVE Console Control @ vrch.ai` (vrch.ai/viewer/websocket)
+
+This node is designed for controlling `vrch_live_console.html` panes from a ComfyUI workflow through `/json`.
+
+1. **Add the `LIVE Console Control @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Connection:**
+     - **`server`**: WebSocket server in `IP:PORT` format (for example `127.0.0.1:8001`).
+     - **`channel`**: Channel **"1"** to **"8"** used by Live Console (default **"8"**).
+   - **Behavior:**
+     - **`only_send_changed`**: When enabled, only pane states changed since last execution are sent.
+     - **`debug`**: Enable verbose logs.
+   - **Pane Visibility Toggles (boolean):**
+     - `display_image_viewer`
+     - `display_image_viewer_aux`
+     - `display_image_settings`
+     - `display_prompt_sender`
+     - `display_srt_player`
+     - `display_sketch_sender`
+     - `display_image_sender`
+     - `display_audio_recorder`
+     - `display_audio_player`
+     - `display_midi_sender`
+     - `display_gamepad_sender`
+     - Each toggle directly represents target visibility (`true` = show, `false` = hide).
+
+3. **Sending Control Data:**
+   - The node sends a `/json` payload with a dedicated top-level key:
+
+     ```json
+     {
+       "live_console_control": {
+         "version": "1.0",
+         "request_id": "lc-1760000000000",
+         "timestamp_ms": 1760000000000,
+         "ops": [
+           {
+             "op": "pane.set_visibility",
+             "target": "audioPlayer",
+             "args": { "visible": true }
+           }
+         ],
+         "meta": {
+           "source": "VrchLiveConsoleControlNode"
+         }
+       }
+     }
+     ```
+
+4. **Live Console Execution Rules (receiver side):**
+   - Receiver reads `live_console_control.ops[]`.
+   - Supported V1 operation:
+     - `pane.set_visibility`
+   - Unknown operations or unknown targets are safely ignored.
+   - Control channel handling should be independent from status-bar visibility (status bar on/off must not affect control).
+
+5. **Notes:**
+   - V1 intentionally uses standard Comfy widgets only (no customWidget required).
+   - The `ops[]` envelope is reserved for future extensibility (layout control, splitter lock, section focus, etc.) without breaking compatibility.
+   - `show/hide` semantics are idempotent and preferred for automation stability.
+
+---
+
 ### Node: `JSON WebSocket Channel Loader @ vrch.ai` (vrch.ai/viewer/websocket)
 
 1. **Add the `JSON WebSocket Channel Loader @ vrch.ai` node to your ComfyUI workflow.**

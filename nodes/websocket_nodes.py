@@ -723,6 +723,119 @@ def audio_data_handler(message):
     except (json.JSONDecodeError, UnicodeDecodeError):
         return None
 
+class VrchLiveConsoleControlNode:
+    PANE_CONFIG = [
+        ("display_image_viewer", "viewer", True),
+        ("display_image_viewer_aux", "viewerAux", False),
+        ("display_image_settings", "settings", True),
+        ("display_prompt_sender", "prompt", True),
+        ("display_srt_player", "srt", True),
+        ("display_sketch_sender", "sketch", True),
+        ("display_image_sender", "image", True),
+        ("display_audio_recorder", "audioRecorder", False),
+        ("display_audio_player", "audioPlayer", False),
+        ("display_midi_sender", "midi", False),
+        ("display_gamepad_sender", "gamepad", False),
+    ]
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        required = {
+            "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "8"}),
+            "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+        }
+        for input_name, _target, default_visible in cls.PANE_CONFIG:
+            required[input_name] = ("BOOLEAN", {"default": bool(default_visible)})
+        required["only_send_changed"] = ("BOOLEAN", {"default": True})
+        required["debug"] = ("BOOLEAN", {"default": False})
+        return {"required": required}
+
+    RETURN_TYPES = ("JSON",)
+    RETURN_NAMES = ("JSON",)
+    FUNCTION = "send_control"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def send_control(
+        self,
+        channel,
+        server,
+        display_image_viewer,
+        display_image_viewer_aux,
+        display_image_settings,
+        display_prompt_sender,
+        display_srt_player,
+        display_sketch_sender,
+        display_image_sender,
+        display_audio_recorder,
+        display_audio_player,
+        display_midi_sender,
+        display_gamepad_sender,
+        only_send_changed,
+        debug,
+    ):
+        host, port = server.split(":")
+        ws_server = get_global_server(host, port, path="/json", debug=debug)
+        ch = int(channel)
+
+        pane_input_values = {
+            "display_image_viewer": bool(display_image_viewer),
+            "display_image_viewer_aux": bool(display_image_viewer_aux),
+            "display_image_settings": bool(display_image_settings),
+            "display_prompt_sender": bool(display_prompt_sender),
+            "display_srt_player": bool(display_srt_player),
+            "display_sketch_sender": bool(display_sketch_sender),
+            "display_image_sender": bool(display_image_sender),
+            "display_audio_recorder": bool(display_audio_recorder),
+            "display_audio_player": bool(display_audio_player),
+            "display_midi_sender": bool(display_midi_sender),
+            "display_gamepad_sender": bool(display_gamepad_sender),
+        }
+        pane_state = {}
+        for input_name, target_key, _default_visible in self.PANE_CONFIG:
+            pane_state[target_key] = pane_input_values[input_name]
+
+        cache_key = f"{host}:{port}|{ch}"
+        if not hasattr(self, "_last_state_by_target"):
+            self._last_state_by_target = {}
+        previous = self._last_state_by_target.get(cache_key) or {}
+
+        ops = []
+        for pane_id, visible in pane_state.items():
+            if only_send_changed and pane_id in previous and previous[pane_id] == visible:
+                continue
+            if only_send_changed and pane_id not in previous:
+                # First run for this target still sends explicit state to avoid ambiguity.
+                pass
+            ops.append({
+                "op": "pane.set_visibility",
+                "target": pane_id,
+                "args": {"visible": visible},
+            })
+
+        payload = {
+            "live_console_control": {
+                "version": "1.0",
+                "request_id": f"lc-{int(time.time() * 1000)}",
+                "timestamp_ms": int(time.time() * 1000),
+                "ops": ops,
+                "meta": {
+                    "source": "VrchLiveConsoleControlNode",
+                },
+            }
+        }
+
+        if ops:
+            ws_server.send_to_channel("/json", ch, json.dumps(payload))
+            self._last_state_by_target[cache_key] = dict(pane_state)
+            if debug:
+                print(f"[VrchLiveConsoleControlNode] Sent {len(ops)} ops to channel {ch} via {host}:{port}")
+        else:
+            if debug:
+                print(f"[VrchLiveConsoleControlNode] No changed pane states; skipped send for channel {ch}")
+
+        return (payload,)
+
 class VrchJsonWebSocketSenderNode:
     @classmethod
     def INPUT_TYPES(cls):
