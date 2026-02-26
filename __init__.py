@@ -9,8 +9,9 @@ from .nodes.gamepad_nodes import *
 from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
+from .nodes.workflow_export_nodes import *
 
-__version__ = "1.1.13"
+__version__ = "1.1.14"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -55,6 +56,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
     "VrchJsonWebSocketChannelLoaderNode": VrchJsonWebSocketChannelLoaderNode,
     "VrchJsonWebSocketSenderNode": VrchJsonWebSocketSenderNode,
+    "VrchLiveConsoleControlNode": VrchLiveConsoleControlNode,
     "VrchLatentWebSocketChannelLoaderNode": VrchLatentWebSocketChannelLoaderNode,
     "VrchLatentWebSocketSenderNode": VrchLatentWebSocketSenderNode,
     "VrchMicLoaderNode": VrchMicLoaderNode,
@@ -71,6 +73,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchTriggerToggleX4Node": VrchTriggerToggleX4Node,
     "VrchTriggerToggleX8Node": VrchTriggerToggleX8Node,
     "VrchVideoWebViewerNode": VrchVideoWebViewerNode,
+    "VrchWorkflowApiExportNode": VrchWorkflowApiExportNode,
     "VrchWebSocketServerNode": VrchWebSocketServerNode,
     "VrchWebViewerNode": VrchWebViewerNode,
     "VrchXYOSCControlNode": VrchXYOSCControlNode,
@@ -121,6 +124,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchJsonUrlLoaderNode": "JSON URL Loader @ vrch.ai",
     "VrchJsonWebSocketChannelLoaderNode": "JSON WebSocket Channel Loader @ vrch.ai",
     "VrchJsonWebSocketSenderNode": "JSON WebSocket Sender @ vrch.ai",
+    "VrchLiveConsoleControlNode": "LIVE Console Control @ vrch.ai",
     "VrchLatentWebSocketChannelLoaderNode": "LATENT WebSocket Channel Loader @ vrch.ai",
     "VrchLatentWebSocketSenderNode": "LATENT WebSocket Sender @ vrch.ai",
     "VrchMicLoaderNode": "AUDIO Microphone Loader @ vrch.ai",
@@ -137,6 +141,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchTriggerToggleX4Node": "Trigger Toggle x4 @ vrch.ai",
     "VrchTriggerToggleX8Node": "Trigger Toggle x8 @ vrch.ai",
     "VrchVideoWebViewerNode": "VIDEO Web Viewer @ vrch.ai",
+    "VrchWorkflowApiExportNode": "Export Workflow API @ vrch.ai",
     "VrchWebSocketServerNode": "WebSocket Server @ vrch.ai",
     "VrchWebViewerNode": "Web Viewer @ vrch.ai",
     "VrchXYOSCControlNode": "XY OSC Control @ vrch.ai",
@@ -148,4 +153,3 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 WEB_DIRECTORY = "./web/comfyui"
 
 __all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]
-
