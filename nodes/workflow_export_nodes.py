@@ -20,6 +20,7 @@ class VrchWorkflowApiExportNode:
         return {
             "required": {
                 "enable_save": ("BOOLEAN", {"default": True}),
+                "disable_save_in_exported_api": ("BOOLEAN", {"default": True}),
                 "workflow_folder": ("STRING", {"default": "", "multiline": False, "dynamicPrompts": False}),
                 "workflow_name": ("STRING", {"default": "workflow_api", "multiline": False, "dynamicPrompts": False}),
                 "output_dir_option": (
@@ -53,6 +54,7 @@ class VrchWorkflowApiExportNode:
         workflow_name: str,
         output_dir_option: str,
         custom_dir: str,
+        disable_save_in_exported_api: bool = True,
         pretty_json: bool = True,
         debug: bool = False,
         prompt=None,
@@ -75,6 +77,8 @@ class VrchWorkflowApiExportNode:
             os.makedirs(output_dir, exist_ok=True)
             prompt_safe = self._normalize_json_value(prompt)
             prompt_safe = self._strip_runtime_fields(prompt_safe)
+            if disable_save_in_exported_api:
+                prompt_safe = self._disable_export_node_save(prompt_safe)
 
             output_path = os.path.join(output_dir, filename)
             content_key = json.dumps(prompt_safe, ensure_ascii=False, separators=(",", ":"), sort_keys=True, allow_nan=False)
@@ -177,4 +181,19 @@ class VrchWorkflowApiExportNode:
         for node in workflow.values():
             if isinstance(node, dict):
                 node.pop("is_changed", None)
+        return workflow
+
+    def _disable_export_node_save(self, workflow):
+        if not isinstance(workflow, dict):
+            return workflow
+        for node in workflow.values():
+            if not isinstance(node, dict):
+                continue
+            if node.get("class_type") != "VrchWorkflowApiExportNode":
+                continue
+            inputs = node.get("inputs")
+            if not isinstance(inputs, dict):
+                inputs = {}
+                node["inputs"] = inputs
+            inputs["enable_save"] = False
         return workflow

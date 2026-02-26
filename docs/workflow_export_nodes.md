@@ -21,6 +21,10 @@ Because this is an `OUTPUT_NODE`, it can be used as an end-stage export step.
   - Global switch for this node.
   - `False` skips export without errors.
 
+- **`disable_save_in_exported_api`** (`BOOLEAN`)
+  - Default: `True`
+  - When enabled, exported API workflow will set `enable_save=false` for all `VrchWorkflowApiExportNode` nodes.
+
 - **`workflow_folder`** (`STRING`)
   - Relative subfolder under the selected target base directory.
   - Default: empty string (`""`, save into target root directly).
