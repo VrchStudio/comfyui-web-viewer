@@ -9,6 +9,7 @@ from .nodes.gamepad_nodes import *
 from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
+from .nodes.workflow_export_nodes import *
 
 __version__ = "1.1.13"
 
@@ -72,6 +73,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchTriggerToggleX4Node": VrchTriggerToggleX4Node,
     "VrchTriggerToggleX8Node": VrchTriggerToggleX8Node,
     "VrchVideoWebViewerNode": VrchVideoWebViewerNode,
+    "VrchWorkflowApiExportNode": VrchWorkflowApiExportNode,
     "VrchWebSocketServerNode": VrchWebSocketServerNode,
     "VrchWebViewerNode": VrchWebViewerNode,
     "VrchXYOSCControlNode": VrchXYOSCControlNode,
@@ -139,6 +141,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchTriggerToggleX4Node": "Trigger Toggle x4 @ vrch.ai",
     "VrchTriggerToggleX8Node": "Trigger Toggle x8 @ vrch.ai",
     "VrchVideoWebViewerNode": "VIDEO Web Viewer @ vrch.ai",
+    "VrchWorkflowApiExportNode": "Export Workflow API @ vrch.ai",
     "VrchWebSocketServerNode": "WebSocket Server @ vrch.ai",
     "VrchWebViewerNode": "Web Viewer @ vrch.ai",
     "VrchXYOSCControlNode": "XY OSC Control @ vrch.ai",
