@@ -1,16 +1,61 @@
 import asyncio
+import builtins
 import socket
 import struct
 import threading
+import time
 import urllib.parse
 from concurrent.futures import TimeoutError as FutureTimeoutError
 
 import websockets
 
-# Track servers by host:port (not by path)
-_port_servers = {}
-_server_lock = threading.RLock()
+# Track servers by host:port (not by path).
+# Store in builtins so multiple module-import paths still share one registry.
+if not hasattr(builtins, "__vrch_ws_port_servers"):
+    builtins.__vrch_ws_port_servers = {}
+if not hasattr(builtins, "__vrch_ws_server_lock"):
+    builtins.__vrch_ws_server_lock = threading.RLock()
+
+_port_servers = builtins.__vrch_ws_port_servers
+_server_lock = builtins.__vrch_ws_server_lock
 _REALTIME_PATHS = {"/image", "/video"}
+
+
+def _normalize_endpoint(host, port):
+    clean_host = str(host).strip()
+    clean_port = int(str(port).strip())
+    return clean_host, clean_port
+
+
+def _ws_is_closed(ws):
+    """Best-effort websocket closed-state check across websockets versions."""
+    if ws is None:
+        return True
+
+    closed_attr = getattr(ws, "closed", None)
+    if isinstance(closed_attr, bool):
+        return closed_attr
+
+    if callable(closed_attr):
+        try:
+            value = closed_attr()
+            if isinstance(value, bool):
+                return value
+        except Exception:
+            pass
+
+    state = getattr(ws, "state", None)
+    if state is not None:
+        state_name = getattr(state, "name", None)
+        if state_name:
+            return str(state_name).upper() in {"CLOSED", "CLOSING"}
+        state_text = str(state).upper()
+        if state_text in {"CLOSED", "CLOSING"}:
+            return True
+        if state_text.endswith(".CLOSED") or state_text.endswith(".CLOSING"):
+            return True
+
+    return False
 
 
 def _port_is_in_use(host, port):
@@ -72,8 +117,9 @@ class WebSocketClientProxy:
     """Client proxy that connects to an existing WebSocket server."""
 
     def __init__(self, host, port, debug=False):
+        host, port = _normalize_endpoint(host, port)
         self.host = host
-        self.port = int(port)
+        self.port = port
         self.debug = debug
         self.paths = set()
         self.clients = {}  # path -> channel -> [websocket connections] (compat only)
@@ -85,7 +131,9 @@ class WebSocketClientProxy:
         self._connections = {}  # uri -> websocket connection
         self._endpoint_queues = {}  # uri -> asyncio.Queue
         self._endpoint_workers = {}  # uri -> asyncio.Task
+        self._endpoint_readers = {}  # uri -> asyncio.Task
         self._endpoint_realtime = {}  # uri -> bool
+        self._endpoint_last_control = {}  # uri -> last control text payload
 
         self._thread.start()
 
@@ -133,18 +181,29 @@ class WebSocketClientProxy:
                     return True
         return True
 
+    def _is_realtime_uri(self, uri):
+        try:
+            parsed = urllib.parse.urlparse(uri)
+            return self._is_realtime_path(parsed.path or "/")
+        except Exception:
+            return False
+
     def _ensure_endpoint_worker(self, uri, realtime=False):
         queue = self._endpoint_queues.get(uri)
         if queue is None:
-            queue = asyncio.Queue(maxsize=1 if realtime else 0)
+            # Realtime paths use bounded queue to avoid unbounded lag buildup.
+            queue = asyncio.Queue(maxsize=1 if self._is_realtime_uri(uri) else 0)
             self._endpoint_queues[uri] = queue
             self._endpoint_realtime[uri] = bool(realtime)
             self._endpoint_workers[uri] = self._loop.create_task(self._endpoint_worker(uri, queue))
+        elif realtime:
+            self._endpoint_realtime[uri] = True
         return queue
 
     async def _endpoint_worker(self, uri, queue):
         websocket = None
         reconnect_backoff = 0.5
+        sent_count = 0
 
         while self._is_running:
             try:
@@ -164,20 +223,29 @@ class WebSocketClientProxy:
                             break
                         data = newer_data
 
-                if websocket is None or websocket.closed:
+                if _ws_is_closed(websocket):
                     websocket = await asyncio.wait_for(
                         websockets.connect(uri, ping_interval=20, ping_timeout=20),
                         timeout=5.0,
                     )
                     self._connections[uri] = websocket
+                    self._cancel_endpoint_reader(uri)
+                    self._endpoint_readers[uri] = self._loop.create_task(self._endpoint_reader(uri, websocket))
                     reconnect_backoff = 0.5
+                    sent_count = 0
                     if self.debug:
                         print(f"[WebSocketClientProxy] Connected: {uri}")
 
                 await websocket.send(data)
+                sent_count += 1
             except Exception as e:
                 if self.debug:
-                    print(f"[WebSocketClientProxy] Send failed for {uri}: {e}")
+                    ws_close_code = getattr(websocket, "close_code", None) if websocket is not None else None
+                    ws_close_reason = getattr(websocket, "close_reason", None) if websocket is not None else None
+                    print(
+                        f"[WebSocketClientProxy] Send failed for {uri}: {type(e).__name__}: {e} "
+                        f"(sent={sent_count}, ws_close_code={ws_close_code}, ws_close_reason={ws_close_reason})"
+                    )
 
                 if websocket is not None:
                     try:
@@ -186,6 +254,7 @@ class WebSocketClientProxy:
                         pass
                 websocket = None
                 self._connections.pop(uri, None)
+                self._cancel_endpoint_reader(uri)
 
                 # Keep behavior resilient for temporary disconnects.
                 await asyncio.sleep(reconnect_backoff)
@@ -197,11 +266,77 @@ class WebSocketClientProxy:
             except Exception:
                 pass
         self._connections.pop(uri, None)
+        self._cancel_endpoint_reader(uri)
+
+    async def _endpoint_reader(self, uri, websocket):
+        try:
+            async for _ in websocket:
+                # Drain inbound messages to avoid receiver backpressure disconnects.
+                pass
+        except websockets.exceptions.ConnectionClosed as e:
+            if self.debug:
+                print(
+                    f"[WebSocketClientProxy] Reader closed for {uri}: "
+                    f"{type(e).__name__}(code={e.code}, reason={e.reason})"
+                )
+        except Exception as e:
+            if self.debug:
+                print(f"[WebSocketClientProxy] Reader closed for {uri}: {type(e).__name__}: {e}")
+        finally:
+            if self.debug:
+                ws_close_code = getattr(websocket, "close_code", None)
+                ws_close_reason = getattr(websocket, "close_reason", None)
+                print(
+                    f"[WebSocketClientProxy] Reader finalized for {uri} "
+                    f"(ws_close_code={ws_close_code}, ws_close_reason={ws_close_reason})"
+                )
+
+    def _cancel_endpoint_reader(self, uri):
+        task = self._endpoint_readers.pop(uri, None)
+        if task is not None and not task.done():
+            task.cancel()
 
     def _enqueue_message(self, uri, data, realtime=False):
         if not self._is_running:
             return
         queue = self._ensure_endpoint_worker(uri, realtime=realtime)
+        if realtime:
+            self._endpoint_realtime[uri] = True
+
+        if self._is_realtime_uri(uri):
+            # Control messages on realtime paths should not starve frame delivery.
+            # Deduplicate unchanged control payloads and enqueue as best-effort only.
+            if isinstance(data, str):
+                if self._endpoint_last_control.get(uri) == data:
+                    return
+                try:
+                    queue.put_nowait(data)
+                    # Mark as delivered to queue only after successful enqueue.
+                    self._endpoint_last_control[uri] = data
+                except asyncio.QueueFull:
+                    # Drop control update when a realtime frame is already pending.
+                    pass
+                return
+
+            # Keep only the latest pending payload for realtime endpoints.
+            try:
+                while True:
+                    queue.get_nowait()
+            except asyncio.QueueEmpty:
+                pass
+            try:
+                queue.put_nowait(data)
+            except asyncio.QueueFull:
+                try:
+                    queue.get_nowait()
+                except asyncio.QueueEmpty:
+                    pass
+                try:
+                    queue.put_nowait(data)
+                except asyncio.QueueFull:
+                    pass
+            return
+
         if realtime:
             try:
                 queue.put_nowait(data)
@@ -250,6 +385,12 @@ class WebSocketClientProxy:
         if workers:
             await asyncio.gather(*workers, return_exceptions=True)
 
+        readers = [task for task in self._endpoint_readers.values() if task and not task.done()]
+        for task in readers:
+            task.cancel()
+        if readers:
+            await asyncio.gather(*readers, return_exceptions=True)
+
         for ws in list(self._connections.values()):
             try:
                 await ws.close()
@@ -258,8 +399,10 @@ class WebSocketClientProxy:
 
         self._connections.clear()
         self._endpoint_workers.clear()
+        self._endpoint_readers.clear()
         self._endpoint_queues.clear()
         self._endpoint_realtime.clear()
+        self._endpoint_last_control.clear()
 
     def is_running(self):
         """Check if the proxy is operational."""
@@ -298,8 +441,9 @@ class WebSocketClientProxy:
 
 class SimpleWebSocketServer:
     def __init__(self, host, port, debug=False):
+        host, port = _normalize_endpoint(host, port)
         self.host = host
-        self.port = int(port)
+        self.port = port
         self.debug = debug
 
         self.paths = set()
@@ -309,6 +453,7 @@ class SimpleWebSocketServer:
         self._connection_tasks = set()
         self._realtime_pending = {}
         self._realtime_send_tasks = {}
+        self._conn_id_seq = 0
 
         self.loop = asyncio.new_event_loop()
         self.server = None
@@ -397,7 +542,7 @@ class SimpleWebSocketServer:
                     return True
         return True
 
-    async def _broadcast_to_clients(self, target_clients, data, send_timeout=2.0):
+    async def _broadcast_to_clients(self, target_clients, data, send_timeout=2.0, path=None, channel=None):
         if not target_clients:
             return []
 
@@ -411,6 +556,12 @@ class SimpleWebSocketServer:
         for client, result in zip(target_clients, results):
             if isinstance(result, Exception):
                 failed_clients.append(client)
+                if self.debug:
+                    peer = getattr(client, "remote_address", None)
+                    print(
+                        f"[SimpleWebSocketServer] Send failed to peer={peer} "
+                        f"on {path} channel {channel}: {type(result).__name__}: {result}"
+                    )
 
         return failed_clients
 
@@ -431,7 +582,9 @@ class SimpleWebSocketServer:
             self._broadcast_channel_realtime(path, channel, snapshot, data)
             return
 
-        failed_clients = await self._broadcast_to_clients(snapshot, data, send_timeout=2.0)
+        failed_clients = await self._broadcast_to_clients(
+            snapshot, data, send_timeout=2.0, path=path, channel=channel
+        )
 
         for failed in failed_clients:
             if failed in channel_clients:
@@ -439,7 +592,7 @@ class SimpleWebSocketServer:
 
     def _broadcast_channel_realtime(self, path, channel, clients, data):
         for client in clients:
-            if getattr(client, "closed", False):
+            if _ws_is_closed(client):
                 channel_clients = self.clients.get(path, {}).get(channel, [])
                 if client in channel_clients:
                     channel_clients.remove(client)
@@ -472,7 +625,11 @@ class SimpleWebSocketServer:
             return
 
         if self.debug:
-            print(f"[SimpleWebSocketServer] Realtime send error on {path} channel {channel}: {exc}")
+            peer = getattr(client, "remote_address", None)
+            print(
+                f"[SimpleWebSocketServer] Realtime send error on {path} channel {channel} "
+                f"to peer={peer}: {type(exc).__name__}: {exc}"
+            )
 
         channel_clients = self.clients.get(path, {}).get(channel, [])
         if client in channel_clients:
@@ -482,6 +639,12 @@ class SimpleWebSocketServer:
         task = asyncio.current_task()
         if task is not None:
             self._connection_tasks.add(task)
+        self._conn_id_seq += 1
+        conn_id = self._conn_id_seq
+        conn_started = time.monotonic()
+        rx_count = 0
+        rx_bytes = 0
+        rx_last_desc = None
 
         resource_path = self._extract_request_path(websocket, path=path).split("?")[0]
 
@@ -514,7 +677,10 @@ class SimpleWebSocketServer:
             return
 
         if self.debug:
-            print(f"[SimpleWebSocketServer] New connection from {websocket.remote_address} on path '{resource_path}' with channel {channel}")
+            print(
+                f"[SimpleWebSocketServer] New connection id={conn_id} from {websocket.remote_address} "
+                f"on path '{resource_path}' with channel {channel}"
+            )
 
         self.clients[resource_path][channel].append(websocket)
         print(f"Connection open on {resource_path} channel {channel}")
@@ -522,25 +688,51 @@ class SimpleWebSocketServer:
         message_task = None
         try:
             async def message_handler():
-                async for message in websocket:
-                    if self.debug:
+                nonlocal rx_count, rx_bytes, rx_last_desc
+                try:
+                    async for message in websocket:
+                        rx_count += 1
                         if isinstance(message, bytes):
-                            print(f"[SimpleWebSocketServer] Received binary message on {resource_path} channel {channel}: {len(message)} bytes")
+                            size = len(message)
+                            rx_bytes += size
+                            rx_last_desc = f"binary:{size}B"
                         elif isinstance(message, str):
-                            if len(message) > 256:
-                                print(
-                                    f"[SimpleWebSocketServer] Received text message on {resource_path} channel {channel}: "
-                                    f"{len(message)} chars (truncated: {message[:200]}...)"
-                                )
-                            else:
-                                print(f"[SimpleWebSocketServer] Received text message on {resource_path} channel {channel}: {message}")
+                            size = len(message)
+                            rx_bytes += size
+                            rx_last_desc = f"text:{size}C"
                         else:
-                            print(
-                                f"[SimpleWebSocketServer] Received message on {resource_path} channel {channel}: "
-                                f"{type(message).__name__} ({len(str(message))} chars)"
-                            )
+                            rx_last_desc = type(message).__name__
 
-                    await self._broadcast_channel(resource_path, channel, message, exclude=websocket)
+                        if self.debug:
+                            if isinstance(message, bytes):
+                                print(f"[SimpleWebSocketServer] Received binary message on {resource_path} channel {channel}: {len(message)} bytes")
+                            elif isinstance(message, str):
+                                if len(message) > 256:
+                                    print(
+                                        f"[SimpleWebSocketServer] Received text message on {resource_path} channel {channel}: "
+                                        f"{len(message)} chars (truncated: {message[:200]}...)"
+                                    )
+                                else:
+                                    print(f"[SimpleWebSocketServer] Received text message on {resource_path} channel {channel}: {message}")
+                            else:
+                                print(
+                                    f"[SimpleWebSocketServer] Received message on {resource_path} channel {channel}: "
+                                    f"{type(message).__name__} ({len(str(message))} chars)"
+                                )
+
+                        await self._broadcast_channel(resource_path, channel, message, exclude=websocket)
+                except websockets.exceptions.ConnectionClosed as e:
+                    if self.debug:
+                        print(
+                            f"[SimpleWebSocketServer] Connection closed while reading on {resource_path} "
+                            f"channel {channel} id={conn_id}: {type(e).__name__}(code={e.code}, reason={e.reason})"
+                        )
+                except Exception as e:
+                    if self.debug:
+                        print(
+                            f"[SimpleWebSocketServer] Reader exception on {resource_path} channel {channel} "
+                            f"id={conn_id}: {type(e).__name__}: {e}"
+                        )
 
             message_task = asyncio.create_task(message_handler())
 
@@ -554,8 +746,9 @@ class SimpleWebSocketServer:
             if self.debug:
                 print(f"[SimpleWebSocketServer] Exception on {resource_path} channel {channel}: {e}")
         finally:
-            if message_task is not None and not message_task.done():
-                message_task.cancel()
+            if message_task is not None:
+                if not message_task.done():
+                    message_task.cancel()
                 await asyncio.gather(message_task, return_exceptions=True)
 
             channel_clients = self.clients.get(resource_path, {}).get(channel, [])
@@ -566,7 +759,15 @@ class SimpleWebSocketServer:
                 self._connection_tasks.remove(task)
 
             if self.debug:
-                print(f"[SimpleWebSocketServer] Connection closed from {websocket.remote_address} on {resource_path} channel {channel}")
+                lifetime_ms = int((time.monotonic() - conn_started) * 1000)
+                close_code = getattr(websocket, "close_code", None)
+                close_reason = getattr(websocket, "close_reason", None)
+                print(
+                    f"[SimpleWebSocketServer] Connection closed id={conn_id} from {websocket.remote_address} "
+                    f"on {resource_path} channel {channel} "
+                    f"(lifetime_ms={lifetime_ms}, rx_count={rx_count}, rx_bytes={rx_bytes}, "
+                    f"last_rx={rx_last_desc}, close_code={close_code}, close_reason={close_reason})"
+                )
 
     async def _send_to_channel_async(self, path, channel, data):
         channel_map = self.clients.get(path)
@@ -743,6 +944,8 @@ def get_global_server(host, port, path="", debug=False):
     Each host:port combination has exactly one server that handles all paths.
     If port is already in use by another process, creates a client proxy instead.
     """
+    host, port = _normalize_endpoint(host, port)
+
     if not path:
         path = "/"
 
