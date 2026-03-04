@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Updated
 
 - update `VrchWebSocketServerNode` (`nodes/websocket_nodes.py`) with `external_server_only` option to force external proxy mode
+- update `VrchWebSocketServerNode` to make `external_server_only` optional for backward compatibility with existing API workflows
 - update websocket core (`nodes/utils/websocket_server.py`) to support `get_global_server(..., mode="external_only")`
 - update websocket core to switch existing built-in server to proxy when `external_server_only` is enabled on the same host:port
 - update websocket unit tests (`nodes/tests/websocket_server_test.py`) with `external_only` coverage (free-port proxy creation and built-in replacement)
