@@ -150,11 +150,42 @@ class TestWebSocketServerUnit(unittest.TestCase):
         sig = inspect.signature(get_global_server)
         params = list(sig.parameters.keys())
         
-        expected_params = ['host', 'port', 'path']
+        expected_params = ['host', 'port', 'path', 'mode']
         for param in expected_params:
             self.assertIn(param, params)
         
         print("✓ Global server management test passed")
+
+    def test_10_external_only_mode_creates_proxy_on_free_port(self):
+        """external_only mode should create a proxy even when target port is free."""
+        port = self.base_port + 20
+        server = get_global_server(self.test_host, port, "/image", debug=False, mode="external_only")
+        self.assertIsInstance(server, WebSocketClientProxy)
+        self.assertTrue(server.is_running())
+        print("✓ external_only mode proxy creation test passed")
+
+    def test_10b_external_only_mode_replaces_existing_builtin(self):
+        """external_only mode should stop and replace an existing built-in server."""
+        port = self.base_port + 21
+        server_key = f"{self.test_host}:{port}"
+
+        built_in = SimpleWebSocketServer.__new__(SimpleWebSocketServer)
+        built_in.stopped = False
+
+        def _stop():
+            built_in.stopped = True
+
+        built_in.stop = _stop
+
+        with _server_lock:
+            _port_servers[server_key] = built_in
+
+        server = get_global_server(self.test_host, port, "/image", debug=False, mode="external_only")
+        self.assertTrue(built_in.stopped)
+        self.assertIsInstance(server, WebSocketClientProxy)
+        with _server_lock:
+            self.assertIs(_port_servers[server_key], server)
+        print("✓ external_only mode replacement test passed")
     
     def test_06_server_methods_exist(self):
         """Test that all required methods exist and are callable"""

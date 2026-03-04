@@ -938,13 +938,19 @@ class SimpleWebSocketServer:
         return self._is_running and self.server is not None
 
 
-def get_global_server(host, port, path="", debug=False):
+def get_global_server(host, port, path="", debug=False, mode="auto"):
     """Get or create a WebSocket server for the specified host:port.
 
     Each host:port combination has exactly one server that handles all paths.
     If port is already in use by another process, creates a client proxy instead.
+    mode:
+      - "auto": existing behavior (create local server when port is free)
+      - "external_only": always use client proxy, never create local server
     """
     host, port = _normalize_endpoint(host, port)
+    mode = str(mode or "auto").strip().lower()
+    if mode not in {"auto", "external_only"}:
+        mode = "auto"
 
     if not path:
         path = "/"
@@ -954,8 +960,29 @@ def get_global_server(host, port, path="", debug=False):
     server_key = f"{host}:{port}"
 
     with _server_lock:
+        existing_server = _port_servers.get(server_key)
+        if (
+            mode == "external_only"
+            and isinstance(existing_server, SimpleWebSocketServer)
+        ):
+            if debug:
+                print(
+                    f"[get_global_server] Switching {host}:{port} from built-in server "
+                    f"to external proxy (external_only mode)"
+                )
+            try:
+                existing_server.stop()
+            except Exception as e:
+                if debug:
+                    print(f"[get_global_server] Failed to stop built-in server on {host}:{port}: {e}")
+            _port_servers[server_key] = WebSocketClientProxy(host, port, debug)
+
         if server_key not in _port_servers:
-            if _port_is_in_use(host, port):
+            if mode == "external_only":
+                if debug:
+                    print(f"[get_global_server] external_only mode enabled for {host}:{port}, creating client proxy")
+                _port_servers[server_key] = WebSocketClientProxy(host, port, debug)
+            elif _port_is_in_use(host, port):
                 if debug:
                     print(f"[get_global_server] Port {host}:{port} is in use, checking if it's a valid WebSocket server")
 
