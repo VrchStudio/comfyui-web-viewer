@@ -35,6 +35,8 @@ class VrchWebSocketServerNode:
                 "server": (["127.0.0.1", "0.0.0.0", f"{DEFAULT_SERVER_IP}"], {"default": f"{DEFAULT_SERVER_IP}"}),
                 # Port selection with default
                 "port": ("INT", {"default": int(DEFAULT_SERVER_PORT), "min": 1, "max": 65535}),
+            },
+            "optional": {
                 "external_server_only": ("BOOLEAN", {"default": False}),
                 "debug": ("BOOLEAN", {"default": False}),
             }
@@ -46,7 +48,7 @@ class VrchWebSocketServerNode:
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
 
-    def start_server(self, server, port, external_server_only, debug):
+    def start_server(self, server, port, external_server_only=False, debug=False):
         # Compose full server string
         try:
             port = int(port)

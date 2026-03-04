@@ -235,7 +235,7 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
    - **Port:**
      - **`port`**: TCP port for the server (default: **8001**).
    - **External Server Only:**
-     - **`external_server_only`**: Force external-proxy mode on the selected `server:port`.
+     - **`external_server_only`** *(optional, default **False**)*: Force external-proxy mode on the selected `server:port`.
        - When **False** (default), behavior is unchanged (`auto` mode): if port is free, node can create/use built-in server.
        - When **True**, node uses external-only mode: it does not create a new built-in server on that host:port and proxies to an existing external websocket service.
    - **Debug Mode:**
