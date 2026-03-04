@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Updated
+
+- update `VrchWebSocketServerNode` (`nodes/websocket_nodes.py`) with `external_server_only` option to force external proxy mode
+- update websocket core (`nodes/utils/websocket_server.py`) to support `get_global_server(..., mode="external_only")`
+- update websocket core to switch existing built-in server to proxy when `external_server_only` is enabled on the same host:port
+- update websocket unit tests (`nodes/tests/websocket_server_test.py`) with `external_only` coverage (free-port proxy creation and built-in replacement)
+- update `docs/websocket_nodes.md` to document `external_server_only` behavior
+
 ## 1.1.14 - 2026-02-26
 
 ### Added
