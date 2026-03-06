@@ -35,6 +35,9 @@ class VrchWebSocketServerNode:
                 "server": (["127.0.0.1", "0.0.0.0", f"{DEFAULT_SERVER_IP}"], {"default": f"{DEFAULT_SERVER_IP}"}),
                 # Port selection with default
                 "port": ("INT", {"default": int(DEFAULT_SERVER_PORT), "min": 1, "max": 65535}),
+            },
+            "optional": {
+                "external_server_only": ("BOOLEAN", {"default": False}),
                 "debug": ("BOOLEAN", {"default": False}),
             }
         }
@@ -45,7 +48,7 @@ class VrchWebSocketServerNode:
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
 
-    def start_server(self, server, port, debug):
+    def start_server(self, server, port, external_server_only=False, debug=False):
         # Compose full server string
         try:
             port = int(port)
@@ -56,7 +59,8 @@ class VrchWebSocketServerNode:
         server_changed = server_str != getattr(self, '_last_server', None)
         host = server
         # Get or create the global server
-        ws_server = get_global_server(host, port, debug=debug)
+        server_mode = "external_only" if external_server_only else "auto"
+        ws_server = get_global_server(host, port, debug=debug, mode=server_mode)
         # Register default paths on first init or server change
         if server_changed or not getattr(self, '_initialized', False):
             for p in ["/image", "/json", "/latent", "/audio", "/video", "/text"]:

@@ -234,6 +234,10 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
      - **`server`**: Choose from `127.0.0.1` / `0.0.0.0` / your resolved default IP (from `VrchNodeUtils.get_default_ip_address(...)`).
    - **Port:**
      - **`port`**: TCP port for the server (default: **8001**).
+   - **External Server Only:**
+     - **`external_server_only`** *(optional, default **False**)*: Force external-proxy mode on the selected `server:port`.
+       - When **False** (default), behavior is unchanged (`auto` mode): if port is free, node can create/use built-in server.
+       - When **True**, node uses external-only mode: it does not create a new built-in server on that host:port and proxies to an existing external websocket service.
    - **Debug Mode:**
      - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
 
@@ -253,6 +257,8 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
 - This node is required for any WebSocket-based communication in your workflow.
 - Only one server can run on a specific IP:port combination.
 - If a server is already running on the specified address and port, the node will use the existing server.
+- With `external_server_only=True`, the node forces proxy behavior for the target address/port and is intended to pair with a standalone websocket service (for example `vrch-websocket-server.service` on `127.0.0.1:8001`).
+- If `external_server_only=True` is enabled after a built-in server was already created in this process for the same host:port, the node will switch from built-in to proxy mode.
 - WebSocket connections are maintained even when your workflow is not actively running.
 - When debug mode is enabled, the server outputs detailed connection logs to the console.
 

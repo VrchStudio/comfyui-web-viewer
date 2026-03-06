@@ -7,8 +7,10 @@ Includes both safe tests (no real servers) and integration tests (real WebSocket
 """
 
 import asyncio
+import socket
 import struct
 import sys
+import threading
 import time
 import unittest
 import websockets
@@ -18,7 +20,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
-    from utils.websocket_server import SimpleWebSocketServer, get_global_server, _port_servers, _server_lock
+    from utils.websocket_server import WebSocketClientProxy, SimpleWebSocketServer, get_global_server, _port_servers, _server_lock
     print("✓ Successfully imported websocket_server module")
 except ImportError as e:
     print(f"✗ Failed to import websocket_server module: {e}")
@@ -148,11 +150,42 @@ class TestWebSocketServerUnit(unittest.TestCase):
         sig = inspect.signature(get_global_server)
         params = list(sig.parameters.keys())
         
-        expected_params = ['host', 'port', 'path']
+        expected_params = ['host', 'port', 'path', 'mode']
         for param in expected_params:
             self.assertIn(param, params)
         
         print("✓ Global server management test passed")
+
+    def test_10_external_only_mode_creates_proxy_on_free_port(self):
+        """external_only mode should create a proxy even when target port is free."""
+        port = self.base_port + 20
+        server = get_global_server(self.test_host, port, "/image", debug=False, mode="external_only")
+        self.assertIsInstance(server, WebSocketClientProxy)
+        self.assertTrue(server.is_running())
+        print("✓ external_only mode proxy creation test passed")
+
+    def test_10b_external_only_mode_replaces_existing_builtin(self):
+        """external_only mode should stop and replace an existing built-in server."""
+        port = self.base_port + 21
+        server_key = f"{self.test_host}:{port}"
+
+        built_in = SimpleWebSocketServer.__new__(SimpleWebSocketServer)
+        built_in.stopped = False
+
+        def _stop():
+            built_in.stopped = True
+
+        built_in.stop = _stop
+
+        with _server_lock:
+            _port_servers[server_key] = built_in
+
+        server = get_global_server(self.test_host, port, "/image", debug=False, mode="external_only")
+        self.assertTrue(built_in.stopped)
+        self.assertIsInstance(server, WebSocketClientProxy)
+        with _server_lock:
+            self.assertIs(_port_servers[server_key], server)
+        print("✓ external_only mode replacement test passed")
     
     def test_06_server_methods_exist(self):
         """Test that all required methods exist and are callable"""
@@ -234,6 +267,35 @@ class TestWebSocketServerUnit(unittest.TestCase):
         # /video still uses realtime behavior
         self.assertTrue(server._is_realtime_payload("/video", b"12345678"))
         print("✓ Image payload realtime detection test passed")
+
+    def test_09_realtime_control_retry_after_queue_full(self):
+        """Control payload should be retried after a full-queue drop."""
+        proxy = WebSocketClientProxy.__new__(WebSocketClientProxy)
+        proxy._is_running = True
+        proxy._endpoint_last_control = {}
+        proxy._endpoint_realtime = {}
+
+        uri = "ws://127.0.0.1:9000/image?channel=1"
+        settings = '{"settings":{"bg":"#112233"}}'
+
+        q = asyncio.Queue(maxsize=1)
+        q.put_nowait(b"frame-pending")
+
+        proxy._ensure_endpoint_worker = lambda _uri, realtime=False: q
+        proxy._is_realtime_uri = lambda _uri: True
+
+        # First attempt: queue full, settings cannot be enqueued now.
+        WebSocketClientProxy._enqueue_message(proxy, uri, settings, realtime=False)
+        self.assertEqual(q.qsize(), 1, "Queue should remain full after first dropped settings")
+
+        # Queue drains (next tick), same settings should be retried successfully.
+        q.get_nowait()
+        WebSocketClientProxy._enqueue_message(proxy, uri, settings, realtime=False)
+
+        self.assertEqual(q.qsize(), 1, "Settings should be enqueued on retry when queue has room")
+        queued = q.get_nowait()
+        self.assertEqual(queued, settings, "Retried settings payload should be queued")
+        print("✓ Realtime control retry test passed")
 
 
 class TestWebSocketServerIntegration(unittest.TestCase):
@@ -642,6 +704,261 @@ class TestWebSocketServerIntegration(unittest.TestCase):
 
         asyncio.run(run_perf_case())
         print("✓ Send call latency under load test passed")
+
+    def test_14_abrupt_client_disconnect_recovery(self):
+        """Test abrupt disconnect is cleaned up and server still works."""
+        port = self.base_port + 8
+        server = SimpleWebSocketServer(self.test_host, port, debug=False)
+        self.servers.append(server)
+        server.register_path("/abrupt")
+
+        time.sleep(1.5)
+
+        async def run_case():
+            uri = f"ws://{self.test_host}:{port}/abrupt?channel=1"
+
+            client = await websockets.connect(uri)
+            self.clients.append(client)
+            await asyncio.sleep(0.6)
+
+            tracked_before = server.clients.get("/abrupt", {}).get(1, [])
+            self.assertGreater(len(tracked_before), 0, "Client should be tracked before abort")
+
+            # Simulate non-graceful disconnect without close frame.
+            transport = getattr(client, "transport", None)
+            self.assertIsNotNone(transport, "Client transport should be available")
+            transport.abort()
+
+            await asyncio.sleep(0.8)
+            tracked_after = server.clients.get("/abrupt", {}).get(1, [])
+            self.assertEqual(len(tracked_after), 0, "Aborted client should be removed from tracked list")
+
+            # Verify server remains healthy after abrupt disconnect.
+            receiver = await websockets.connect(uri)
+            self.clients.append(receiver)
+            await asyncio.sleep(0.3)
+
+            payload = "after-abort"
+            server.send_to_channel("/abrupt", 1, payload)
+            received = await asyncio.wait_for(receiver.recv(), timeout=3.0)
+            self.assertEqual(received, payload)
+            await receiver.close()
+
+        asyncio.run(run_case())
+        print("✓ Abrupt disconnect recovery test passed")
+
+    def test_15_proxy_realtime_queue_stays_bounded_after_settings_first(self):
+        """Proxy /image queue should stay bounded even if first payload is settings text."""
+        port = self.base_port + 9
+        server = SimpleWebSocketServer(self.test_host, port, debug=False)
+        self.servers.append(server)
+        server.register_path("/image")
+
+        time.sleep(1.2)
+        proxy = get_global_server(self.test_host, port, "/image", debug=False)
+
+        async def run_case():
+            uri = f"ws://{self.test_host}:{port}/image?channel=1"
+            slow = await websockets.connect(uri, max_queue=1)
+            self.clients.append(slow)
+            await asyncio.sleep(0.4)
+
+            proxy.send_to_channel("/image", 1, '{"settings":{"numberOfImages":1}}')
+            await asyncio.sleep(0.2)
+
+            endpoint_uri = f"ws://{self.test_host}:{port}/image?channel=1"
+            queue = proxy._endpoint_queues.get(endpoint_uri)
+            self.assertIsNotNone(queue, "Proxy endpoint queue should exist")
+            self.assertEqual(queue.maxsize, 1, "Realtime endpoint queue must be bounded")
+
+            payload = struct.pack(">II", 1, (3 << 16) | (0 << 8) | 4) + (b"x" * (96 * 1024))
+            for _ in range(800):
+                proxy.send_to_channel("/image", 1, payload)
+
+            await asyncio.sleep(0.2)
+            queue = proxy._endpoint_queues.get(endpoint_uri)
+            self.assertIsNotNone(queue, "Queue should still exist after burst")
+            self.assertLessEqual(queue.qsize(), 1, f"Queue should stay bounded, current size: {queue.qsize()}")
+
+            await slow.close()
+
+        try:
+            asyncio.run(run_case())
+        finally:
+            try:
+                if hasattr(proxy, "stop"):
+                    proxy.stop()
+            except Exception:
+                pass
+        print("✓ Proxy realtime queue boundedness test passed")
+
+    def test_16_proxy_realtime_frames_not_starved_by_repeated_settings(self):
+        """Proxy /image should keep frame delivery when settings text is sent every tick."""
+        port = self.base_port + 10
+        server = SimpleWebSocketServer(self.test_host, port, debug=False)
+        self.servers.append(server)
+        server.register_path("/image")
+        time.sleep(1.2)
+
+        proxy = get_global_server(self.test_host, port, "/image", debug=False)
+
+        async def run_case():
+            uri = f"ws://{self.test_host}:{port}/image?channel=1"
+            receiver = await websockets.connect(uri, max_size=None)
+            self.clients.append(receiver)
+            await asyncio.sleep(0.3)
+
+            tick_count = 40
+            for _ in range(tick_count):
+                payload = struct.pack(">II", 1, (1 << 16) | (0 << 8) | 1) + (b"x" * (45 * 1024))
+                proxy.send_to_channel("/image", 1, payload)
+                proxy.send_to_channel("/image", 1, '{"settings":{"numberOfImages":1}}')
+                await asyncio.sleep(1.0 / 15.0)
+
+            binary_count = 0
+            text_count = 0
+            end_time = time.perf_counter() + 2.0
+            while time.perf_counter() < end_time:
+                try:
+                    msg = await asyncio.wait_for(receiver.recv(), timeout=0.2)
+                except asyncio.TimeoutError:
+                    continue
+                if isinstance(msg, (bytes, bytearray)):
+                    binary_count += 1
+                else:
+                    text_count += 1
+
+            # Frame stream should not be starved by repeated settings payloads.
+            self.assertGreaterEqual(binary_count, int(tick_count * 0.75), f"Too few binary frames received: {binary_count}")
+            # Settings payloads should be deduplicated/dropped under load.
+            self.assertLessEqual(text_count, 5, f"Too many settings messages delivered: {text_count}")
+
+            await receiver.close()
+
+        try:
+            asyncio.run(run_case())
+        finally:
+            try:
+                if hasattr(proxy, "stop"):
+                    proxy.stop()
+            except Exception:
+                pass
+        print("✓ Proxy frame starvation prevention test passed")
+
+    def test_17_proxy_sender_connection_stability_under_downlink_pressure(self):
+        """Proxy sender should not reconnect repeatedly when server sends heavy downlink traffic."""
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.bind((self.test_host, 0))
+            port = sock.getsockname()[1]
+        connection_state = {"open": 0, "close": 0, "recv": 0}
+        stop_event = threading.Event()
+        server_loop = asyncio.new_event_loop()
+        server_ready = threading.Event()
+        pressure_server = {"instance": None}
+
+        async def pressure_handler(websocket, _path=None):
+            connection_state["open"] += 1
+
+            async def spam_downlink():
+                while not stop_event.is_set():
+                    try:
+                        await websocket.send('{"sync":1}')
+                        await asyncio.sleep(0.001)
+                    except Exception:
+                        break
+
+            spam_task = asyncio.create_task(spam_downlink())
+            try:
+                async for _ in websocket:
+                    connection_state["recv"] += 1
+            except Exception:
+                pass
+            finally:
+                spam_task.cancel()
+                await asyncio.gather(spam_task, return_exceptions=True)
+                connection_state["close"] += 1
+
+        def run_pressure_server():
+            asyncio.set_event_loop(server_loop)
+
+            async def start_server():
+                ws_server = await websockets.serve(
+                    pressure_handler,
+                    self.test_host,
+                    port,
+                    ping_interval=0.2,
+                    ping_timeout=0.2,
+                )
+                pressure_server["instance"] = ws_server
+                server_ready.set()
+                await ws_server.wait_closed()
+
+            server_loop.create_task(start_server())
+            server_loop.run_forever()
+
+        pressure_thread = threading.Thread(target=run_pressure_server, daemon=True)
+        pressure_thread.start()
+
+        self.assertTrue(server_ready.wait(timeout=3.0), "Pressure test server did not start in time")
+
+        import importlib
+
+        wsmod = importlib.import_module(WebSocketClientProxy.__module__)
+        original_connect = wsmod.websockets.connect
+
+        def patched_connect(*args, **kwargs):
+            kwargs.setdefault("max_queue", 1)
+            return original_connect(*args, **kwargs)
+
+        proxy = None
+        try:
+            wsmod.websockets.connect = patched_connect
+
+            proxy = WebSocketClientProxy(self.test_host, port, debug=False)
+            proxy.register_path("/image")
+
+            payload = struct.pack(">II", 1, (1 << 16) | (0 << 8) | 1) + (b"x" * (8 * 1024))
+            tick_count = 75
+            for _ in range(tick_count):
+                proxy.send_to_channel("/image", 1, payload)
+                time.sleep(1.0 / 15.0)
+
+            # Let in-flight messages settle.
+            time.sleep(0.4)
+
+            self.assertGreaterEqual(connection_state["recv"], int(tick_count * 0.6))
+            self.assertLessEqual(
+                connection_state["open"],
+                2,
+                f"Proxy reconnected too often under downlink pressure: opens={connection_state['open']}",
+            )
+        finally:
+            stop_event.set()
+            wsmod.websockets.connect = original_connect
+
+            if proxy is not None:
+                try:
+                    proxy.stop()
+                except Exception:
+                    pass
+
+            if pressure_server["instance"] is not None and server_loop.is_running():
+                try:
+                    async def shutdown_pressure_server():
+                        pressure_server["instance"].close()
+                        await pressure_server["instance"].wait_closed()
+
+                    fut = asyncio.run_coroutine_threadsafe(shutdown_pressure_server(), server_loop)
+                    fut.result(timeout=1.5)
+                except Exception:
+                    pass
+            try:
+                server_loop.call_soon_threadsafe(server_loop.stop)
+            except Exception:
+                pass
+            pressure_thread.join(timeout=1.0)
+
+        print("✓ Proxy sender stability under downlink pressure test passed")
 
 
 def run_all_tests():
