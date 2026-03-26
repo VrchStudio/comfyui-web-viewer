@@ -368,6 +368,7 @@ This node is designed for controlling `vrch_live_console.html` panes from a Comf
      - `display_image_viewer`
      - `display_image_viewer_aux`
      - `display_image_settings`
+     - `display_shader_editor`
      - `display_prompt_sender`
      - `display_srt_player`
      - `display_sketch_sender`
