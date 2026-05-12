@@ -5,6 +5,7 @@ from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
 from .nodes.websocket_nodes import *
+from .nodes.midi_control_nodes import *
 from .nodes.gamepad_nodes import *
 from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
@@ -33,6 +34,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchDelayNode": VrchDelayNode,
     "VrchDelayOSCControlNode": VrchDelayOSCControlNode,
     "VrchFloatKeyControlNode": VrchFloatKeyControlNode,
+    "VrchFloatMidiControlNode": VrchFloatMidiControlNode,
     "VrchFloatOSCControlNode": VrchFloatOSCControlNode,
     "VrchFloatRemapNode": VrchFloatRemapNode,
     "VrchGamepadLoaderNode": VrchGamepadLoaderNode,
@@ -51,6 +53,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchImageWebViewerNode": VrchImageWebViewerNode,
     "VrchInstantQueueKeyControlNode": VrchInstantQueueKeyControlNode,
     "VrchIntKeyControlNode": VrchIntKeyControlNode,
+    "VrchIntMidiControlNode": VrchIntMidiControlNode,
     "VrchIntOSCControlNode": VrchIntOSCControlNode,
     "VrchIntRemapNode": VrchIntRemapNode,
     "VrchJsonUrlLoaderNode": VrchJsonUrlLoaderNode,
@@ -61,6 +64,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchLatentWebSocketSenderNode": VrchLatentWebSocketSenderNode,
     "VrchMicLoaderNode": VrchMicLoaderNode,
     "VrchMidiDeviceLoaderNode": VrchMidiDeviceLoaderNode,
+    "VrchMidiWebSocketChannelLoaderNode": VrchMidiWebSocketChannelLoaderNode,
     "VrchModelWebViewerNode": VrchModelWebViewerNode,
     "VrchOSCControlSettingsNode": VrchOSCControlSettingsNode,
     "VrchQRCodeNode": VrchQRCodeNode,
@@ -101,6 +105,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchDelayNode": "DELAY @ vrch.ai",
     "VrchDelayOSCControlNode": "DELAY OSC Control @ vrch.ai",
     "VrchFloatKeyControlNode": "FLOAT Key Control @ vrch.ai",
+    "VrchFloatMidiControlNode": "FLOAT MIDI Control @ vrch.ai",
     "VrchFloatOSCControlNode": "FLOAT OSC Control @ vrch.ai",
     "VrchFloatRemapNode": "FLOAT Remap @ vrch.ai",
     "VrchGamepadLoaderNode": "Gamepad Loader @ vrch.ai",
@@ -119,6 +124,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchImageWebViewerNode": "IMAGE Web Viewer @ vrch.ai",
     "VrchInstantQueueKeyControlNode": "Instant Queue Key Control @ vrch.ai",
     "VrchIntKeyControlNode": "INT Key Control @ vrch.ai",
+    "VrchIntMidiControlNode": "INT MIDI Control @ vrch.ai",
     "VrchIntOSCControlNode": "INT OSC Control @ vrch.ai",
     "VrchIntRemapNode": "INT Remap @ vrch.ai",
     "VrchJsonUrlLoaderNode": "JSON URL Loader @ vrch.ai",
@@ -129,6 +135,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchLatentWebSocketSenderNode": "LATENT WebSocket Sender @ vrch.ai",
     "VrchMicLoaderNode": "AUDIO Microphone Loader @ vrch.ai",
     "VrchMidiDeviceLoaderNode": "MIDI Device Loader @ vrch.ai",
+    "VrchMidiWebSocketChannelLoaderNode": "MIDI WebSocket Channel Loader @ vrch.ai",
     "VrchModelWebViewerNode": "3D MODEL Web Viewer @ vrch.ai",
     "VrchOSCControlSettingsNode": "OSC Control Settings @ vrch.ai",
     "VrchQRCodeNode": "QR Code Generator @ vrch.ai",

@@ -15,6 +15,7 @@ import torchaudio
 from PIL import Image
 from .node_utils import VrchNodeUtils
 from .utils.websocket_server import get_global_server
+from .midi_websocket_protocol import MidiStateParser
 
 # Category for organizational purposes
 CATEGORY = "vrch.ai/viewer/websocket"
@@ -24,6 +25,7 @@ DEFAULT_SERVER_IP = VrchNodeUtils.get_default_ip_address(fallback_ip="0.0.0.0")
 DEFAULT_SERVER_PORT = 8001
 JSON_STATE_MAX_KEYS = 128
 JSON_STATE_CLEAR_KEY = "__clear__"
+DEFAULT_WEBSOCKET_PATHS = ["/image", "/json", "/latent", "/audio", "/video", "/text", "/midi"]
 
 class VrchWebSocketServerNode:
 
@@ -63,7 +65,7 @@ class VrchWebSocketServerNode:
         ws_server = get_global_server(host, port, debug=debug, mode=server_mode)
         # Register default paths on first init or server change
         if server_changed or not getattr(self, '_initialized', False):
-            for p in ["/image", "/json", "/latent", "/audio", "/video", "/text"]:
+            for p in DEFAULT_WEBSOCKET_PATHS:
                 ws_server.register_path(p)
             self._initialized = True
             self._last_server = server_str
@@ -689,6 +691,9 @@ class JsonStateMerger:
 def make_json_state_handler(debug=False):
     return JsonStateMerger(max_keys=JSON_STATE_MAX_KEYS, clear_key=JSON_STATE_CLEAR_KEY, debug=debug)
 
+def make_midi_state_handler(debug=False):
+    return MidiStateParser(debug=debug)
+
 def latent_data_handler(message):
     """Default handler for processing latent messages"""
     try:
@@ -996,6 +1001,41 @@ class VrchJsonWebSocketChannelLoaderNode:
     @classmethod
     def IS_CHANGED(cls, **kwargs):
         # Always trigger evaluation to check for new data
+        return float("NaN")
+
+class VrchMidiWebSocketChannelLoaderNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+
+    RETURN_TYPES = ("VRCH_MIDI",)
+    RETURN_NAMES = ("MIDI",)
+    FUNCTION = "receive_midi"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def receive_midi(self, channel=1, server="", debug=False):
+        host, port = server.split(":")
+        client = get_websocket_client(host, port, "/midi", channel, data_handler=make_midi_state_handler(debug=debug), debug=debug)
+        midi_data = client.get_latest_data()
+        if midi_data is None:
+            handler = client.data_handler if isinstance(client.data_handler, MidiStateParser) else make_midi_state_handler(debug=debug)
+            midi_data = handler.empty_state()
+        if debug:
+            print(
+                f"[VrchMidiWebSocketChannelLoaderNode] Received MIDI state on channel {channel}: "
+                f"definition_ready={midi_data.get('definition_ready')}"
+            )
+        return (midi_data,)
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
         return float("NaN")
 
 class VrchLatentWebSocketChannelLoaderNode:
