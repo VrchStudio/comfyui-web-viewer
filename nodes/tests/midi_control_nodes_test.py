@@ -33,9 +33,25 @@ class TestMidiControlNodes(unittest.TestCase):
     def test_int_workflow_key_lookup(self):
         node = VrchIntMidiControlNode()
         value, raw = node.load_int_midi(
-            midi_state(), "workflow_key", "brightness", "any", 0, 0, 127, 0, 127, False, 0, False
+            midi_state(), "workflow_key", "brightness", "any", 0, 0, 127, 0, 127, False, 0, 0, False
         )
         self.assertEqual(value, 96)
+        self.assertEqual(raw, 96.0)
+
+    def test_int_supports_large_output_ranges(self):
+        node = VrchIntMidiControlNode()
+        value, raw = node.load_int_midi(
+            midi_state(), "workflow_key", "brightness", "any", 0, 0, 127, 0, 65535, False, 0, 0, False
+        )
+        self.assertEqual(value, int(96 / 127 * 65535))
+        self.assertEqual(raw, 96.0)
+
+    def test_int_rounds_up_to_multiple(self):
+        node = VrchIntMidiControlNode()
+        value, raw = node.load_int_midi(
+            midi_state(), "workflow_key", "brightness", "any", 0, 0, 96, 0, 510, False, 0, 64, False
+        )
+        self.assertEqual(value, 512)
         self.assertEqual(raw, 96.0)
 
     def test_float_cc_number_lookup(self):
@@ -49,7 +65,7 @@ class TestMidiControlNodes(unittest.TestCase):
     def test_no_fallback_from_missing_key_to_valid_cc(self):
         node = VrchIntMidiControlNode()
         value, raw = node.load_int_midi(
-            midi_state(), "workflow_key", "missing", "1", 22, 0, 127, 0, 127, False, 5, False
+            midi_state(), "workflow_key", "missing", "1", 22, 0, 127, 0, 127, False, 5, 0, False
         )
         self.assertEqual(value, 5)
         self.assertEqual(raw, 0.0)
@@ -57,10 +73,10 @@ class TestMidiControlNodes(unittest.TestCase):
     def test_conflict_resolves_by_lookup_mode_only(self):
         node = VrchIntMidiControlNode()
         key_value, _ = node.load_int_midi(
-            midi_state(), "workflow_key", "brightness", "1", 7, 0, 127, 0, 127, False, 0, False
+            midi_state(), "workflow_key", "brightness", "1", 7, 0, 127, 0, 127, False, 0, 0, False
         )
         cc_value, _ = node.load_int_midi(
-            midi_state(), "cc_number", "brightness", "1", 7, 0, 127, 0, 127, False, 0, False
+            midi_state(), "cc_number", "brightness", "1", 7, 0, 127, 0, 127, False, 0, 0, False
         )
         self.assertEqual(key_value, 96)
         self.assertEqual(cc_value, 42)
@@ -68,7 +84,7 @@ class TestMidiControlNodes(unittest.TestCase):
     def test_display_label_is_not_lookup_key(self):
         node = VrchIntMidiControlNode()
         value, raw = node.load_int_midi(
-            midi_state(), "workflow_key", "Brightness", "any", 0, 0, 127, 0, 127, False, 9, False
+            midi_state(), "workflow_key", "Brightness", "any", 0, 0, 127, 0, 127, False, 9, 0, False
         )
         self.assertEqual(value, 9)
         self.assertEqual(raw, 0.0)
@@ -77,10 +93,10 @@ class TestMidiControlNodes(unittest.TestCase):
         state = json.loads(json.dumps(midi_state()))
         int_node = VrchIntMidiControlNode()
         key_value, key_raw = int_node.load_int_midi(
-            state, "workflow_key", "brightness", "any", 0, 0, 127, 0, 127, False, 0, False
+            state, "workflow_key", "brightness", "any", 0, 0, 127, 0, 127, False, 0, 0, False
         )
         cc_value, cc_raw = int_node.load_int_midi(
-            state, "cc_number", "", "1", 22, 0, 127, 0, 127, False, 0, False
+            state, "cc_number", "", "1", 22, 0, 127, 0, 127, False, 0, 0, False
         )
         self.assertEqual(key_value, 96)
         self.assertEqual(key_raw, 96.0)
@@ -90,7 +106,7 @@ class TestMidiControlNodes(unittest.TestCase):
     def test_reverse_mapping(self):
         node = VrchIntMidiControlNode()
         value, raw = node.load_int_midi(
-            midi_state(), "workflow_key", "brightness", "any", 0, 0, 127, 0, 127, True, 0, False
+            midi_state(), "workflow_key", "brightness", "any", 0, 0, 127, 0, 127, True, 0, 0, False
         )
         self.assertEqual(value, 31)
         self.assertEqual(raw, 96.0)

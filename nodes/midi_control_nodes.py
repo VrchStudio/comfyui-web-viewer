@@ -11,6 +11,8 @@ from .node_utils import VrchNodeUtils
 CATEGORY = "vrch.ai/control/midi"
 LOOKUP_MODES = ["workflow_key", "cc_number"]
 MIDI_CHANNELS = ["any"] + [str(i) for i in range(1, 17)]
+INT_OUTPUT_MIN_LIMIT = -999999
+INT_OUTPUT_MAX_LIMIT = 999999
 
 
 def _empty_midi_state() -> dict[str, Any]:
@@ -98,6 +100,16 @@ def _validate_ranges(input_min, input_max, output_min, output_max, output_defaul
         raise ValueError(f"[{node_name}] Default value must be within the output range.")
 
 
+def _round_up_to_multiple(value: int, multiple: int) -> int:
+    try:
+        multiple = int(multiple)
+    except Exception:
+        return value
+    if multiple <= 1:
+        return value
+    return -(-int(value) // multiple) * multiple
+
+
 class VrchIntMidiControlNode:
     @classmethod
     def INPUT_TYPES(cls):
@@ -110,10 +122,11 @@ class VrchIntMidiControlNode:
                 "cc_number": ("INT", {"default": 0, "min": 0, "max": 127}),
                 "input_min": ("FLOAT", {"default": 0.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
                 "input_max": ("FLOAT", {"default": 127.0, "min": -9999.0, "max": 9999.0, "step": 0.01}),
-                "output_min": ("INT", {"default": 0, "min": -9999, "max": 9999}),
-                "output_max": ("INT", {"default": 100, "min": -9999, "max": 9999}),
+                "output_min": ("INT", {"default": 0, "min": INT_OUTPUT_MIN_LIMIT, "max": INT_OUTPUT_MAX_LIMIT}),
+                "output_max": ("INT", {"default": 100, "min": INT_OUTPUT_MIN_LIMIT, "max": INT_OUTPUT_MAX_LIMIT}),
                 "output_invert": ("BOOLEAN", {"default": False}),
-                "output_default": ("INT", {"default": 0, "min": -9999, "max": 9999}),
+                "output_default": ("INT", {"default": 0, "min": INT_OUTPUT_MIN_LIMIT, "max": INT_OUTPUT_MAX_LIMIT}),
+                "output_round_to_step": ("INT", {"default": 0, "min": 0, "max": INT_OUTPUT_MAX_LIMIT}),
                 "debug": ("BOOLEAN", {"default": False}),
             }
         }
@@ -140,6 +153,7 @@ class VrchIntMidiControlNode:
         output_max=100,
         output_invert=False,
         output_default=0,
+        output_round_to_step=0,
         debug=False,
     ):
         start = time.perf_counter()
@@ -151,10 +165,12 @@ class VrchIntMidiControlNode:
             return int(output_default), 0.0
         remap_func = VrchNodeUtils.select_remap_func(output_invert)
         mapped = remap_func(float(raw), float(input_min), float(input_max), float(output_min), float(output_max))
+        mapped_int = int(mapped)
+        mapped_int = _round_up_to_multiple(mapped_int, output_round_to_step)
         if debug:
             elapsed_ms = (time.perf_counter() - start) * 1000.0
-            print(f"[VrchIntMidiControlNode] {source}; mapped={mapped}; elapsed={elapsed_ms:.3f} ms")
-        return int(mapped), float(raw)
+            print(f"[VrchIntMidiControlNode] {source}; mapped={mapped_int}; elapsed={elapsed_ms:.3f} ms")
+        return mapped_int, float(raw)
 
 
 class VrchFloatMidiControlNode:

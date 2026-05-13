@@ -146,6 +146,11 @@ To use the `AUDIO Music to Emotion Detector @ vrch.ai` node, you'll need to inst
 - Documentation: [Usage of Midi Device nodes](./docs/midi_nodes.md)
 - Example workflows: TBA
 
+### `MIDI Control Nodes`
+
+- Documentation: [Usage of MIDI Control nodes](./docs/midi_control_nodes.md)
+- Example workflows: TBA
+
 ### `Audio Nodes`
 
 - Documentation: [Usage of Audio nodes](./docs/audio_nodes.md)
