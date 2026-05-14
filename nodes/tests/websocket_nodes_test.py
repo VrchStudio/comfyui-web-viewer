@@ -23,6 +23,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from nodes import websocket_nodes as ws_nodes  # noqa: E402
+from nodes.midi_websocket_protocol import encode_definition_frame, encode_state_frame  # noqa: E402
 from nodes.utils.websocket_server import (  # noqa: E402
     SimpleWebSocketServer,
     get_global_server,
@@ -89,6 +90,26 @@ class TestWebSocketNodesUnit(unittest.TestCase):
 
         self.assertIsNone(ws_nodes.latent_data_handler("not-json"))
 
+    def test_05_midi_state_handler(self):
+        handler = ws_nodes.make_midi_state_handler(debug=False)
+        state = handler(encode_definition_frame([{"key": "brightness", "number": 22}], definition_seq=1, seq=1))
+        self.assertTrue(state["definition_ready"])
+        self.assertIn("brightness", state["index_by_key"])
+
+        state = handler(
+            encode_state_frame(
+                raw_cc=[{"midi_channel": 0, "number": 22, "value": 96}],
+                control_values=[{"control_index": 0, "value": 96}],
+                definition_seq=1,
+                seq=2,
+            )
+        )
+        self.assertEqual(state["values_by_index"][0], 96)
+        self.assertEqual(state["cc_values"]["1"][22], 96)
+
+    def test_06_default_websocket_paths_include_midi(self):
+        self.assertIn("/midi", ws_nodes.DEFAULT_WEBSOCKET_PATHS)
+
 
 class TestWebSocketNodesIntegration(unittest.TestCase):
     def setUp(self):
@@ -132,7 +153,7 @@ class TestWebSocketNodesIntegration(unittest.TestCase):
             sock.bind(("127.0.0.1", 0))
             return sock.getsockname()[1]
 
-    def test_05_client_cache_reuse_and_refresh(self):
+    def test_07_client_cache_reuse_and_refresh(self):
         port = self._find_free_port()
         server = SimpleWebSocketServer(self.host, port, debug=False)
         server.register_path("/json")
@@ -192,7 +213,7 @@ class TestWebSocketNodesIntegration(unittest.TestCase):
         self.assertIsInstance(data2, dict)
         self.assertEqual(data2.get("b"), 2)
 
-    def test_06_json_sender_and_loader_integration(self):
+    def test_08_json_sender_and_loader_integration(self):
         port = self._find_free_port()
         server = get_global_server(self.host, port, path="/json", debug=False)
         running = self._wait_for(lambda: server.is_running(), timeout=3.0)
@@ -245,6 +266,50 @@ class TestWebSocketNodesIntegration(unittest.TestCase):
 
         self.assertIsInstance(loaded, dict)
         self.assertEqual(loaded.get("state"), 123)
+
+    def test_09_midi_loader_integration(self):
+        port = self._find_free_port()
+        server = get_global_server(self.host, port, path="/midi", debug=False)
+        running = self._wait_for(lambda: server.is_running(), timeout=3.0)
+        self.assertTrue(running, "Managed WebSocket server did not start in time")
+
+        loader = ws_nodes.VrchMidiWebSocketChannelLoaderNode()
+        empty = loader.receive_midi(channel="1", server=f"{self.host}:{port}", debug=False)[0]
+        self.assertFalse(empty["definition_ready"])
+
+        connected_loader = self._wait_for(
+            lambda: len(server.clients.get("/midi", {}).get(1, [])) >= 1,
+            timeout=3.0,
+        )
+        self.assertTrue(connected_loader, "MIDI loader websocket client did not connect in time")
+
+        server.send_to_channel(
+            "/midi",
+            1,
+            encode_definition_frame([{"key": "brightness", "label": "Brightness", "number": 22}], definition_seq=1, seq=1),
+        )
+        server.send_to_channel(
+            "/midi",
+            1,
+            encode_state_frame(
+                raw_cc=[{"midi_channel": 0, "number": 22, "value": 96}],
+                control_values=[{"control_index": 0, "value": 96}],
+                definition_seq=1,
+                seq=2,
+            ),
+        )
+
+        def receive_ready_midi():
+            data = loader.receive_midi(channel="1", server=f"{self.host}:{port}", debug=False)[0]
+            if data.get("definition_ready") and data.get("values_by_index", {}).get(0) == 96:
+                return data
+            return None
+
+        loaded = self._wait_for(receive_ready_midi, timeout=3.0)
+
+        self.assertTrue(loaded["definition_ready"])
+        self.assertEqual(loaded["index_by_key"]["brightness"], 0)
+        self.assertEqual(loaded["values_by_index"][0], 96)
 
 
 def run_all_tests():
