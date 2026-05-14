@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- add `VrchMidiWebSocketChannelLoaderNode` for receiving optimized MIDI packets from the `/midi` WebSocket channel
+- add `INT MIDI Control @ vrch.ai` and `FLOAT MIDI Control @ vrch.ai` nodes for mapping MIDI CC data by `control_key` or `cc_number`
+- add MIDI WebSocket protocol parsing, unit tests, and dedicated MIDI control node documentation
+
+### Updated
+
+- update default websocket paths to include `/midi`
+- enhance `INT MIDI Control @ vrch.ai` with a larger output range and `output_round_to_step` rounding support
+- move MIDI control node documentation into `docs/midi_control_nodes.md`
+
 ## [1.1.16 - 2026-03-26]
 
 ### Updated
