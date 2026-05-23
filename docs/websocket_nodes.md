@@ -324,6 +324,41 @@ Receives audio streams sent over the WebSocket `/audio` path, decodes them to th
 
 ---
 
+### Node: `AUDIO WebSocket Sender @ vrch.ai` (vrch.ai/viewer/websocket)
+
+Sends a ComfyUI `AUDIO` tensor to Audio WebSocket Player over the shared `/audio` path. The player receives the clip, stores it in the browser playlist cache, and may play it when both sides allow autoplay.
+
+1. **Add the `AUDIO WebSocket Sender @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+  - **`audio`**: Connect the ComfyUI audio clip to send.
+  - **`channel`**: Select a channel number from **"1"** to **"8"** (default **"1"**). This appears before `server` so channel selection stays the primary routing choice.
+  - **`server`**: Enter the WebSocket server in `IP:PORT` format (defaults to **`127.0.0.1:8001`**).
+  - **`title`**: Playlist row name shown in Audio WebSocket Player (default **`ComfyUI Audio`**). The filename is derived from this title and a message id.
+  - **`autoplay_request`**: Request immediate playback after the player caches the clip (default **True**). Audio Player only honors this when its local **Auto Play** toggle is also enabled.
+  - **`quality`**: Opus bitrate preset for WebSocket transport:
+    - **`compact`**: 64 kbps
+    - **`standard`**: 128 kbps (default)
+    - **`high`**: 192 kbps
+  - **`debug`**: Print concise send metadata without base64 payloads (default **False**).
+
+3. **Outputs:**
+  - **`AUDIO`**: Pass-through original audio.
+  - **`PAYLOAD`**: Metadata-only JSON payload for inspection. The full base64 audio body is omitted from this output.
+
+4. **Payload Contract:**
+  - The sender emits a typed JSON envelope with root `type="vrch_audio_player_track"` and `target="audio_player_playlist"`.
+  - The sender does **not** put `base64_data` at the root. Root `base64_data` remains reserved for legacy Browser -> ComfyUI audio input consumed by `AUDIO WebSocket Channel Loader @ vrch.ai`.
+  - The audio body is WebM/Opus with MIME type `audio/webm`, base64-encoded under `audio.base64`.
+  - Audio Player ignores this payload unless `Receive WebSocket Audio` is enabled.
+
+**Notes:**
+- Requires `ffmpeg` with WebM muxing and Opus encoding support (`libopus` or native `opus`).
+- WebM/Opus is used as the transport format to avoid the bandwidth overhead of raw WAV.
+- If Audio Player has both **Auto Play** and **Send audio chunks via /audio** enabled, an autoplayed generated clip can be sent back to ComfyUI as legacy audio chunks during playback. Disable either local option if that echo-back is not desired.
+
+---
+
 ### Node: `JSON WebSocket Sender @ vrch.ai` (vrch.ai/viewer/websocket)
 
 1. **Add the `JSON WebSocket Sender @ vrch.ai` node to your ComfyUI workflow.**

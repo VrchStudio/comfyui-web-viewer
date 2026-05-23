@@ -5,16 +5,19 @@ This suite validates helper handlers and node/client integration behavior.
 """
 
 import asyncio
+import base64
 import io
 import json
 import socket
 import struct
 import sys
+import tempfile
 import time
 import unittest
 from pathlib import Path
 
 import numpy as np
+import torch
 import websockets
 from PIL import Image
 
@@ -54,6 +57,11 @@ class TestWebSocketNodesUnit(unittest.TestCase):
 
         self.assertIsNone(ws_nodes.audio_data_handler("not-json"))
         self.assertIsNone(ws_nodes.audio_data_handler(json.dumps({"no_base64": True})))
+        self.assertIsNone(ws_nodes.audio_data_handler(json.dumps({
+            "type": "vrch_audio_player_track",
+            "target": "audio_player_playlist",
+            "audio": {"base64": "abc", "mime_type": "audio/webm"},
+        })))
 
     def test_03_image_data_handler(self):
         img = Image.new("RGB", (2, 2), color=(255, 0, 0))
@@ -109,6 +117,41 @@ class TestWebSocketNodesUnit(unittest.TestCase):
 
     def test_06_default_websocket_paths_include_midi(self):
         self.assertIn("/midi", ws_nodes.DEFAULT_WEBSOCKET_PATHS)
+
+    def test_07_audio_sender_quality_presets(self):
+        self.assertEqual(ws_nodes._normalize_audio_quality("compact"), ("compact", 64))
+        self.assertEqual(ws_nodes._normalize_audio_quality("standard"), ("standard", 128))
+        self.assertEqual(ws_nodes._normalize_audio_quality("high"), ("high", 192))
+        self.assertEqual(ws_nodes._normalize_audio_quality("unknown"), ("standard", 128))
+
+    def test_08_audio_sender_payload_shape(self):
+        audio = {
+            "waveform": torch.zeros(1, 1, 2205),
+            "sample_rate": 44100,
+        }
+        try:
+            payload = ws_nodes._build_audio_player_track_payload(
+                audio=audio,
+                title="Test Clip",
+                quality="compact",
+                autoplay_request=True,
+            )
+        except ValueError as err:
+            self.skipTest(f"ffmpeg WebM/Opus unavailable: {err}")
+
+        self.assertEqual(payload["type"], "vrch_audio_player_track")
+        self.assertEqual(payload["target"], "audio_player_playlist")
+        self.assertEqual(payload["source"], "comfyui_audio_sender")
+        self.assertNotIn("base64_data", payload)
+        self.assertEqual(payload["audio"]["mime_type"], "audio/webm")
+        self.assertEqual(payload["audio"]["encoding"], "webm-opus")
+        self.assertTrue(payload["audio"]["base64"])
+        self.assertEqual(payload["audio"]["bitrate_bps"], 64000)
+        self.assertEqual(payload["audio"]["sample_rate"], 44100)
+        self.assertEqual(payload["audio"]["channels"], 1)
+        self.assertEqual(payload["playlist"]["display_name"], "Test Clip")
+        self.assertTrue(payload["playlist"]["filename"].endswith(".webm"))
+        self.assertTrue(payload["playlist"]["autoplay_request"])
 
 
 class TestWebSocketNodesIntegration(unittest.TestCase):
@@ -310,6 +353,86 @@ class TestWebSocketNodesIntegration(unittest.TestCase):
         self.assertTrue(loaded["definition_ready"])
         self.assertEqual(loaded["index_by_key"]["brightness"], 0)
         self.assertEqual(loaded["values_by_index"][0], 96)
+
+    def test_10_audio_sender_integration(self):
+        port = self._find_free_port()
+        server = get_global_server(self.host, port, path="/audio", debug=False)
+        running = self._wait_for(lambda: server.is_running(), timeout=3.0)
+        self.assertTrue(running, "Managed WebSocket server did not start in time")
+
+        sender = ws_nodes.VrchAudioWebSocketSenderNode()
+        audio = {
+            "waveform": torch.zeros(1, 1, 2205),
+            "sample_rate": 44100,
+        }
+
+        async def send_and_receive():
+            uri = f"ws://{self.host}:{port}/audio?channel=1"
+            async with websockets.connect(uri) as ws:
+                await asyncio.sleep(0.1)
+                try:
+                    sent_audio, sent_payload = sender.send_audio(
+                        audio=audio,
+                        channel="1",
+                        server=f"{self.host}:{port}",
+                        title="WebSocket Test",
+                        autoplay_request=False,
+                        quality="compact",
+                        debug=False,
+                    )
+                except ValueError as err:
+                    return None, None, err
+                message = await asyncio.wait_for(ws.recv(), timeout=6.0)
+                return sent_audio, sent_payload, message
+
+        sent_audio, sent_payload, received = asyncio.run(send_and_receive())
+        if isinstance(received, ValueError):
+            self.skipTest(f"ffmpeg WebM/Opus unavailable: {received}")
+
+        self.assertIs(sent_audio, audio)
+        self.assertIsInstance(sent_payload, dict)
+        self.assertNotIn("base64", sent_payload.get("audio", {}))
+        payload = json.loads(received)
+        self.assertEqual(payload["type"], "vrch_audio_player_track")
+        self.assertEqual(payload["target"], "audio_player_playlist")
+        self.assertEqual(payload["audio"]["mime_type"], "audio/webm")
+        self.assertTrue(payload["audio"]["base64"])
+        self.assertFalse(payload["playlist"]["autoplay_request"])
+
+        with tempfile.TemporaryDirectory(prefix="vrch-audio-sender-test-") as tmpdir:
+            webm_path = Path(tmpdir) / "received.webm"
+            webm_path.write_bytes(base64.b64decode(payload["audio"]["base64"]))
+            try:
+                probe = ws_nodes.ffmpeg.probe(str(webm_path))
+            except Exception as err:
+                self.skipTest(f"ffprobe unavailable for WebM duration check: {err}")
+            duration = float((probe.get("format") or {}).get("duration") or 0)
+            self.assertGreater(duration, 0, "WebM sender output should include seekable duration metadata")
+
+    def test_11_large_audio_text_payload_is_supported(self):
+        port = self._find_free_port()
+        server = get_global_server(self.host, port, path="/audio", debug=False)
+        running = self._wait_for(lambda: server.is_running(), timeout=3.0)
+        self.assertTrue(running, "Managed WebSocket server did not start in time")
+
+        client = ws_nodes.get_websocket_client(
+            self.host,
+            port,
+            "/audio",
+            1,
+            data_handler=None,
+            debug=False,
+        )
+        connected = self._wait_for(
+            lambda: len(server.clients.get("/audio", {}).get(1, [])) >= 1,
+            timeout=3.0,
+        )
+        self.assertTrue(connected, "Large-payload websocket client did not connect in time")
+
+        large_message = "x" * (1024 * 1024 + 4096)
+        server.send_to_channel("/audio", 1, large_message)
+        received = self._wait_for(lambda: client.get_latest_data(), timeout=3.0)
+        self.assertEqual(received, large_message)
 
 
 def run_all_tests():
