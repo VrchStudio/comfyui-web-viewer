@@ -4,6 +4,7 @@ import io
 import base64
 import json
 import ffmpeg
+import tempfile
 from pathlib import Path
 import torch
 import torchaudio
@@ -121,18 +122,56 @@ class VrchAudioRecorderNode:
             waveform = torch.zeros(2, num_samples)
             return {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
 
+        def _audio_from_waveform(waveform, sample_rate):
+            if waveform.dim() == 1:
+                waveform = waveform.unsqueeze(0)
+            elif waveform.dim() > 2:
+                waveform = waveform.reshape(waveform.size(0), -1)
+
+            if waveform.shape[0] == 1:
+                waveform = waveform.repeat(2, 1)
+
+            return {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
+
         # Validate base64 content early to avoid decoder/ffmpeg crashes
         if not base64_data or not isinstance(base64_data, str) or not base64_data.strip():
             return (_silent_audio(),)
 
         try:
-            audio_data = base64.b64decode(base64_data)
+            base64_str = base64_data.strip()
+            if "," in base64_str:
+                base64_str = base64_str.split(",", 1)[1]
+            base64_str += "=" * (-len(base64_str) % 4)
+            audio_data = base64.b64decode(base64_str)
         except Exception:
             # Bad/partial base64 -> return silence
             return (_silent_audio(),)
 
         if not audio_data:
             return (_silent_audio(),)
+
+        # Prefer ComfyUI's native loader for browser WebM recordings.
+        try:
+            from comfy_extras.nodes_audio import load as comfy_load_audio
+
+            temp_path = None
+            try:
+                with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as temp_file:
+                    temp_file.write(audio_data)
+                    temp_path = temp_file.name
+
+                waveform, sample_rate = comfy_load_audio(temp_path)
+            finally:
+                if temp_path and os.path.exists(temp_path):
+                    try:
+                        os.remove(temp_path)
+                    except OSError:
+                        pass
+
+            return (_audio_from_waveform(waveform, sample_rate),)
+        except Exception as e:
+            if debug:
+                print(f"[VrchAudioRecorderNode] ComfyUI audio loader failed: {str(e)}")
 
         input_buffer = io.BytesIO(audio_data)
 
@@ -159,13 +198,7 @@ class VrchAudioRecorderNode:
         except Exception:
             return (_silent_audio(),)
         
-        # Ensure stereo output for downstream consistency
-        if waveform.shape[0] == 1:
-            waveform = waveform.repeat(2, 1)
-        
-        audio = {"waveform": waveform.unsqueeze(0), "sample_rate": sample_rate}
-
-        return (audio,)
+        return (_audio_from_waveform(waveform, sample_rate),)
     
     @classmethod
     def IS_CHANGED(cls, base64_data, record_mode, record_duration_max, 
