@@ -4,6 +4,8 @@ import json
 import time
 import struct
 import base64
+import re
+import tempfile
 import numpy as np
 import asyncio
 import websockets
@@ -14,7 +16,7 @@ import ffmpeg
 import torchaudio
 from PIL import Image
 from .node_utils import VrchNodeUtils
-from .utils.websocket_server import get_global_server
+from .utils.websocket_server import WEBSOCKET_MAX_MESSAGE_BYTES, get_global_server
 from .midi_websocket_protocol import MidiStateParser
 
 # Category for organizational purposes
@@ -26,6 +28,14 @@ DEFAULT_SERVER_PORT = 8001
 JSON_STATE_MAX_KEYS = 128
 JSON_STATE_CLEAR_KEY = "__clear__"
 DEFAULT_WEBSOCKET_PATHS = ["/image", "/json", "/latent", "/audio", "/video", "/text", "/midi"]
+AUDIO_PLAYER_TRACK_MESSAGE_TYPE = "vrch_audio_player_track"
+AUDIO_PLAYER_TRACK_TARGET = "audio_player_playlist"
+AUDIO_PLAYER_TRACK_SOURCE = "comfyui_audio_sender"
+AUDIO_PLAYER_QUALITY_PRESETS_KBPS = {
+    "compact": 64,
+    "standard": 128,
+    "high": 192,
+}
 
 class VrchWebSocketServerNode:
 
@@ -509,7 +519,12 @@ class WebSocketClient:
                 if self.debug:
                     print(f"[WebSocketClient] Connecting to {uri}")
                 
-                async with websockets.connect(uri, ping_interval=20, ping_timeout=20) as websocket:
+                async with websockets.connect(
+                    uri,
+                    ping_interval=20,
+                    ping_timeout=20,
+                    max_size=WEBSOCKET_MAX_MESSAGE_BYTES,
+                ) as websocket:
                     self._ws = websocket
                     reconnect_delay = 1.0
                     if self.debug:
@@ -726,11 +741,128 @@ def audio_data_handler(message):
         if isinstance(message, bytes):
             message = message.decode('utf-8')
         payload = json.loads(message)
+        if isinstance(payload, dict) and payload.get("type") == AUDIO_PLAYER_TRACK_MESSAGE_TYPE:
+            return None
         if isinstance(payload, dict) and payload.get("base64_data"):
             return payload
         return None
     except (json.JSONDecodeError, UnicodeDecodeError):
         return None
+
+def _normalize_audio_quality(quality):
+    key = str(quality or "standard").strip().lower()
+    if key not in AUDIO_PLAYER_QUALITY_PRESETS_KBPS:
+        key = "standard"
+    return key, AUDIO_PLAYER_QUALITY_PRESETS_KBPS[key]
+
+def _sanitize_audio_track_name(value, fallback="ComfyUI Audio"):
+    text = str(value or "").strip() or fallback
+    text = re.sub(r'[\\/:*?"<>|\x00-\x1f]+', "-", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return (text[:80].strip() or fallback)
+
+def _normalize_comfy_audio(audio):
+    if not isinstance(audio, dict):
+        raise ValueError("[VrchAudioWebSocketSenderNode] Invalid AUDIO input")
+    waveform = audio.get("waveform")
+    sample_rate = audio.get("sample_rate")
+    if waveform is None:
+        raise ValueError("[VrchAudioWebSocketSenderNode] AUDIO input missing waveform")
+    try:
+        sample_rate = int(sample_rate)
+    except Exception:
+        raise ValueError("[VrchAudioWebSocketSenderNode] AUDIO input missing valid sample_rate")
+    if sample_rate <= 0:
+        raise ValueError("[VrchAudioWebSocketSenderNode] AUDIO input sample_rate must be positive")
+    if not torch.is_tensor(waveform):
+        waveform = torch.as_tensor(waveform)
+    waveform = waveform.detach().cpu().float()
+    if waveform.dim() == 3:
+        waveform = waveform[0]
+    elif waveform.dim() == 1:
+        waveform = waveform.unsqueeze(0)
+    elif waveform.dim() != 2:
+        raise ValueError("[VrchAudioWebSocketSenderNode] AUDIO waveform must be 1D, 2D, or batched 3D")
+    if waveform.shape[0] <= 0 or waveform.shape[1] <= 0:
+        raise ValueError("[VrchAudioWebSocketSenderNode] AUDIO waveform is empty")
+    return waveform.clamp(-1.0, 1.0), sample_rate
+
+def _audio_waveform_to_pcm16(waveform):
+    samples = waveform.numpy()
+    pcm = (np.clip(samples, -1.0, 1.0) * 32767.0).astype(np.int16)
+    return np.ascontiguousarray(pcm.T).tobytes()
+
+def _encode_pcm16_to_webm_opus(pcm_bytes, sample_rate, channels, bitrate_kbps):
+    if not pcm_bytes:
+        raise ValueError("[VrchAudioWebSocketSenderNode] Empty PCM audio payload")
+    last_error = None
+    for codec in ("libopus", "opus"):
+        try:
+            with tempfile.TemporaryDirectory(prefix="vrch-audio-webm-") as tmpdir:
+                output_path = f"{tmpdir}/audio.webm"
+                process = (
+                    ffmpeg
+                    .input("pipe:0", format="s16le", ar=int(sample_rate), ac=int(channels))
+                    .output(output_path, format="webm", acodec=codec, audio_bitrate=f"{int(bitrate_kbps)}k")
+                    .global_args("-loglevel", "error")
+                    .overwrite_output()
+                    .run_async(pipe_stdin=True, pipe_stdout=True, pipe_stderr=True)
+                )
+                _, err = process.communicate(input=pcm_bytes)
+                if process.returncode == 0:
+                    with open(output_path, "rb") as f:
+                        output = f.read()
+                    if output:
+                        return output, codec
+            last_error = (err or b"").decode("utf-8", errors="replace")
+        except Exception as err:
+            last_error = str(err)
+    raise ValueError(f"[VrchAudioWebSocketSenderNode] ffmpeg WebM/Opus encode failed: {last_error}")
+
+def _build_audio_player_track_payload(audio, title="ComfyUI Audio", quality="standard", autoplay_request=True):
+    waveform, sample_rate = _normalize_comfy_audio(audio)
+    channels = int(waveform.shape[0])
+    samples = int(waveform.shape[1])
+    quality_key, bitrate_kbps = _normalize_audio_quality(quality)
+    pcm_bytes = _audio_waveform_to_pcm16(waveform)
+    webm_bytes, codec = _encode_pcm16_to_webm_opus(pcm_bytes, sample_rate, channels, bitrate_kbps)
+    now_ms = int(time.time() * 1000)
+    digest = hashlib.sha1(webm_bytes).hexdigest()[:8]
+    message_id = f"comfyui-audio-{now_ms}-{digest}"
+    display_name = _sanitize_audio_track_name(title)
+    filename_base = _sanitize_audio_track_name(display_name)
+    duration_ms = int(round((samples / float(sample_rate)) * 1000))
+    return {
+        "type": AUDIO_PLAYER_TRACK_MESSAGE_TYPE,
+        "version": 1,
+        "source": AUDIO_PLAYER_TRACK_SOURCE,
+        "target": AUDIO_PLAYER_TRACK_TARGET,
+        "id": message_id,
+        "created_at": now_ms,
+        "audio": {
+            "encoding": "webm-opus",
+            "mime_type": "audio/webm",
+            "codec": codec,
+            "bitrate_bps": int(bitrate_kbps) * 1000,
+            "sample_rate": int(sample_rate),
+            "channels": channels,
+            "duration_ms": duration_ms,
+            "base64": base64.b64encode(webm_bytes).decode("ascii"),
+        },
+        "playlist": {
+            "display_name": display_name,
+            "filename": f"{filename_base}-{message_id}.webm",
+            "autoplay_request": bool(autoplay_request),
+        },
+        "quality": quality_key,
+    }
+
+def _strip_audio_base64_for_output(payload):
+    result = json.loads(json.dumps(payload))
+    audio = result.get("audio")
+    if isinstance(audio, dict):
+        audio.pop("base64", None)
+    return result
 
 class VrchLiveConsoleControlNode:
     PANE_CONFIG = [
@@ -941,6 +1073,52 @@ class VrchLatentWebSocketSenderNode:
             
         except Exception as e:
             raise ValueError(f"[VrchLatentWebSocketSenderNode] Error processing latent data: {str(e)}")
+
+class VrchAudioWebSocketSenderNode:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "audio": ("AUDIO",),
+                "channel": (["1", "2", "3", "4", "5", "6", "7", "8"], {"default": "1"}),
+                "server": ("STRING", {"default": f"{DEFAULT_SERVER_IP}:{DEFAULT_SERVER_PORT}", "multiline": False}),
+                "title": ("STRING", {"default": "ComfyUI Audio", "multiline": False}),
+                "autoplay_request": ("BOOLEAN", {"default": True}),
+                "quality": (["compact", "standard", "high"], {"default": "standard"}),
+                "debug": ("BOOLEAN", {"default": False}),
+            }
+        }
+
+    RETURN_TYPES = ("AUDIO", "JSON")
+    RETURN_NAMES = ("AUDIO", "PAYLOAD")
+    FUNCTION = "send_audio"
+    OUTPUT_NODE = True
+    CATEGORY = CATEGORY
+
+    def send_audio(self, audio, channel, server, title, autoplay_request, quality, debug):
+        try:
+            host, port = server.split(":")
+        except Exception:
+            raise ValueError("[VrchAudioWebSocketSenderNode] Server must be in host:port format")
+        ws_server = get_global_server(host, port, path="/audio", debug=debug)
+        ch = int(channel)
+        payload = _build_audio_player_track_payload(
+            audio=audio,
+            title=title,
+            quality=quality,
+            autoplay_request=autoplay_request,
+        )
+        ws_server.send_to_channel("/audio", ch, json.dumps(payload))
+        output_payload = _strip_audio_base64_for_output(payload)
+        if debug:
+            audio_meta = output_payload.get("audio", {})
+            print(
+                "[VrchAudioWebSocketSenderNode] Sent AUDIO to "
+                f"channel {ch} via {host}:{port} as {audio_meta.get('encoding')} "
+                f"{audio_meta.get('sample_rate')}Hz/{audio_meta.get('channels')}ch "
+                f"duration={audio_meta.get('duration_ms')}ms"
+            )
+        return (audio, output_payload)
 
 class VrchJsonWebSocketChannelLoaderNode:
     @classmethod

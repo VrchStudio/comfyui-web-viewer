@@ -19,6 +19,7 @@ if not hasattr(builtins, "__vrch_ws_server_lock"):
 _port_servers = builtins.__vrch_ws_port_servers
 _server_lock = builtins.__vrch_ws_server_lock
 _REALTIME_PATHS = {"/image", "/video"}
+WEBSOCKET_MAX_MESSAGE_BYTES = 64 * 1024 * 1024
 
 
 def _normalize_endpoint(host, port):
@@ -72,7 +73,10 @@ async def _is_valid_websocket_server(host, port, timeout=5):
     """Check if there's a valid WebSocket server at the given address."""
     try:
         uri = f"ws://{host}:{port}/"
-        websocket = await asyncio.wait_for(websockets.connect(uri), timeout=timeout)
+        websocket = await asyncio.wait_for(
+            websockets.connect(uri, max_size=WEBSOCKET_MAX_MESSAGE_BYTES),
+            timeout=timeout,
+        )
         try:
             pass
         finally:
@@ -85,7 +89,10 @@ async def _is_valid_websocket_server(host, port, timeout=5):
     for path in common_paths:
         try:
             uri = f"ws://{host}:{port}{path}"
-            websocket = await asyncio.wait_for(websockets.connect(uri), timeout=timeout)
+            websocket = await asyncio.wait_for(
+                websockets.connect(uri, max_size=WEBSOCKET_MAX_MESSAGE_BYTES),
+                timeout=timeout,
+            )
             try:
                 pass
             finally:
@@ -97,7 +104,12 @@ async def _is_valid_websocket_server(host, port, timeout=5):
     try:
         uri = f"ws://{host}:{port}/"
         websocket = await asyncio.wait_for(
-            websockets.connect(uri, subprotocols=[], extra_headers={}),
+            websockets.connect(
+                uri,
+                subprotocols=[],
+                extra_headers={},
+                max_size=WEBSOCKET_MAX_MESSAGE_BYTES,
+            ),
             timeout=timeout,
         )
         try:
@@ -225,7 +237,12 @@ class WebSocketClientProxy:
 
                 if _ws_is_closed(websocket):
                     websocket = await asyncio.wait_for(
-                        websockets.connect(uri, ping_interval=20, ping_timeout=20),
+                        websockets.connect(
+                            uri,
+                            ping_interval=20,
+                            ping_timeout=20,
+                            max_size=WEBSOCKET_MAX_MESSAGE_BYTES,
+                        ),
                         timeout=5.0,
                     )
                     self._connections[uri] = websocket
@@ -502,6 +519,7 @@ class SimpleWebSocketServer:
                 self.port,
                 ping_interval=20,
                 ping_timeout=20,
+                max_size=WEBSOCKET_MAX_MESSAGE_BYTES,
             )
             print(f"Server listening on {self.host}:{self.port}")
 
