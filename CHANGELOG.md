@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.18 - 2026-05-25]
+
+### Added
+
+- add `AUDIO WebSocket Sender @ vrch.ai` for sending ComfyUI `AUDIO` output to Audio Player playlists over `/audio`
+- add typed `vrch_audio_player_track` payload handling to keep player-bound audio separate from legacy recorder `base64_data`
+- add unit and integration coverage for Audio WebSocket sender payloads, large `/audio` messages, and seekable WebM output
+
+### Updated
+
+- update websocket message size handling to support larger audio payloads
+- encode WebM/Opus sender output through a temporary file so browser playback can read duration metadata and seek correctly
+- document the new Audio WebSocket sender node in `docs/websocket_nodes.md`
+
 ## [1.1.17 - 2026-05-14]
 
 ### Added
