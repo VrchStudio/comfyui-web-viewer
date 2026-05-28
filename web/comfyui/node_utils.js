@@ -6,18 +6,28 @@ export const ENABLE_DEBUG = false;
  * This function finds the queue button and clicks it to start a new generation.
  */
 export function triggerNewGeneration() {
+    let queueButton = document.querySelector('button[data-testid="queue-button"]');
+    if (queueButton) {
+        console.log('Triggering new queue generation.');
+        queueButton.click();
+        return;
+    }
+
     const buttonContainer = document.querySelector('div[data-testid="queue-button"]');
     if (buttonContainer) {
-        const queueButton = buttonContainer.querySelector('button[data-pc-name="pcbutton"]');
+        queueButton = buttonContainer.querySelector('button[data-pc-name="pcbutton"]');
         if (queueButton) {
+            console.log('Triggering new queue generation.');
             queueButton.click();
-            console.log('New queue generation triggered.');
+            return;	// Do not proceed to default fail condition.
         } else {
             console.warn("Queue button not found inside container.");
+            return;	// Do not proceed to default fail condition.
         }
-    } else {
-        console.warn("Queue button container not found.");
     }
+
+    // Default fail condition.
+    console.error("Queue button not found.");
 }
 
 // Helper functions to hide and show widgets

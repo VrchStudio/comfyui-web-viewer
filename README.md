@@ -216,7 +216,37 @@ For additional details, refer to [this discussion on GitHub](https://github.com/
 
 ---
 
-### 3. Why can’t the ComfyUI service run at HTTPS/TLS/SSL on port 8189?
+### 3. How can I fix FFmpeg errors in audio nodes?
+
+The audio recorder and WebSocket audio nodes need both:
+
+- the FFmpeg command line tool installed and available on `PATH`;
+- the Python package `ffmpeg-python`, which provides the `ffmpeg.input(...)` API.
+
+If you see `[Errno 2] No such file or directory: 'ffmpeg'`, install FFmpeg for
+your operating system and make sure the `ffmpeg` command works in the same
+terminal or Python environment used to start ComfyUI.
+
+If you see `AttributeError: module 'ffmpeg' has no attribute 'input'`, the
+wrong Python package may be installed. Remove the `ffmpeg` package and install
+the project requirements again so that `ffmpeg-python` is used:
+
+```bash
+pip uninstall ffmpeg
+pip install -r requirements.txt
+```
+
+For Windows portable installs, run the same commands with the embedded Python
+from your `ComfyUI_windows_portable` folder:
+
+```bash
+python_embeded\python.exe -m pip uninstall ffmpeg
+python_embeded\python.exe -m pip install -r ComfyUI\custom_nodes\comfyui-web-viewer\requirements.txt
+```
+
+---
+
+### 4. Why can’t the ComfyUI service run at HTTPS/TLS/SSL on port 8189?
 
 `ComfyUI Web Viewer` provides a build-in, self-signed certificate (intended for development only, not production use). To launch the ComfyUI service with HTTPS enabled on port 8189, use the following command:
 
@@ -253,6 +283,13 @@ This project uses `bump2version` for version management. To update the version:
 Created and maintained by the [vrch.io](https://vrch.io) team.
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Acknowledgements
+
+Thanks to these community contributors:
+
+- [Penguin-Guru](https://github.com/Penguin-Guru)
+- [Mirochill](https://github.com/Mirochill)
 
 ## Contact Us
 

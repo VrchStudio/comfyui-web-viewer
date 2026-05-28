@@ -2,6 +2,7 @@ aiohttp
 ffmpeg-python
 matplotlib
 pydub
+audioop-lts; python_version >= "3.13"
 python-osc
 qrcode[pil]
 scikit-learn
