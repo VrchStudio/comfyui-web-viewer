@@ -58,14 +58,11 @@ class VrchAudioSaverNode:
             elif waveform.dim() > 2:
                 waveform = waveform.view(waveform.size(0), -1)
 
-            # Save audio using BytesIO
-            buff = io.BytesIO()
-            torchaudio.save(buff, waveform, audio["sample_rate"], format=extension.upper())
-            buff.seek(0)
-
-            # Write BytesIO content to file
-            with open(full_path, 'wb') as f:
-                f.write(buff.getvalue())
+            audio_format = extension.lower()
+            save_kwargs = {"format": audio_format}
+            if audio_format == "mp3":
+                save_kwargs["backend"] = "ffmpeg"
+            torchaudio.save(full_path, waveform, audio["sample_rate"], **save_kwargs)
 
             results.append({
                 "filename": file_name,
