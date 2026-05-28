@@ -284,6 +284,13 @@ Created and maintained by the [vrch.io](https://vrch.io) team.
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+## Acknowledgements
+
+Thanks to these community contributors:
+
+- [Penguin-Guru](https://github.com/Penguin-Guru)
+- [Mirochill](https://github.com/Mirochill)
+
 ## Contact Us
 
 For any inquiries, you can contact us at [hi@vrch.io](mailto:hi@vrch.io?subject=ComfyUI%20Web%20Viewer%20-%20General%20Inquiry).
