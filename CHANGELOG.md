@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- add `audioop-lts` as a Python 3.13+ dependency for environments where the standard library `audioop` module has been removed
+
+### Updated
+
+- update `VrchAudioRecorderNode` to normalize browser audio payloads and prefer ComfyUI's native WebM audio loader before falling back to ffmpeg/torchaudio decoding
+- update `VrchAudioSaverNode` to write audio directly to the output path and use the ffmpeg backend for MP3 saves
+- document FFmpeg command-line and `ffmpeg-python` package troubleshooting for audio nodes in `README.md`
+
+### Fixed
+
+- fix queue button detection in `triggerNewGeneration()` for newer ComfyUI front-end markup while preserving the existing fallback selector
+
 ## [1.1.18 - 2026-05-25]
 
 ### Added
