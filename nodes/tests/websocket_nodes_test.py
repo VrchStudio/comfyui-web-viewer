@@ -153,6 +153,51 @@ class TestWebSocketNodesUnit(unittest.TestCase):
         self.assertTrue(payload["playlist"]["filename"].endswith(".webm"))
         self.assertTrue(payload["playlist"]["autoplay_request"])
 
+    def test_09_image_loader_prefers_websocket_image_over_default_image(self):
+        received_image = torch.ones((1, 2, 2, 3), dtype=torch.float32)
+
+        class FakeClient:
+            def get_latest_data(self):
+                return received_image
+
+        original_get_client = ws_nodes.get_websocket_client
+        self.addCleanup(lambda: setattr(ws_nodes, "get_websocket_client", original_get_client))
+        ws_nodes.get_websocket_client = lambda *args, **kwargs: FakeClient()
+
+        node = ws_nodes.VrchImageWebSocketChannelLoaderNode()
+        default_image = torch.zeros((1, 2, 2, 3), dtype=torch.float32)
+
+        image, is_default = node.receive_image("1", "127.0.0.1:8001", "image", False, default_image)
+
+        self.assertIs(image, received_image)
+        self.assertFalse(is_default)
+
+    def test_10_image_loader_keeps_cached_websocket_image_for_ignored_messages(self):
+        received_image = torch.ones((1, 2, 2, 3), dtype=torch.float32)
+
+        class FakeClient:
+            def __init__(self):
+                self.values = [received_image, None]
+
+            def get_latest_data(self):
+                return self.values.pop(0) if self.values else None
+
+        fake_client = FakeClient()
+        original_get_client = ws_nodes.get_websocket_client
+        self.addCleanup(lambda: setattr(ws_nodes, "get_websocket_client", original_get_client))
+        ws_nodes.get_websocket_client = lambda *args, **kwargs: fake_client
+
+        node = ws_nodes.VrchImageWebSocketChannelLoaderNode()
+        default_image = torch.zeros((1, 2, 2, 3), dtype=torch.float32)
+
+        first_image, first_is_default = node.receive_image("1", "127.0.0.1:8001", "image", False, default_image)
+        second_image, second_is_default = node.receive_image("1", "127.0.0.1:8001", "image", False, default_image)
+
+        self.assertIs(first_image, received_image)
+        self.assertFalse(first_is_default)
+        self.assertIs(second_image, received_image)
+        self.assertFalse(second_is_default)
+
 
 class TestWebSocketNodesIntegration(unittest.TestCase):
     def setUp(self):

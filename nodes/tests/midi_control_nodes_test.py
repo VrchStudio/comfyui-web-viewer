@@ -30,13 +30,18 @@ def midi_state():
 
 
 class TestMidiControlNodes(unittest.TestCase):
+    def test_raw_cc_output_type_is_int(self):
+        self.assertEqual(VrchIntMidiControlNode.RETURN_TYPES, ("INT", "INT"))
+        self.assertEqual(VrchFloatMidiControlNode.RETURN_TYPES, ("FLOAT", "INT"))
+
     def test_int_workflow_key_lookup(self):
         node = VrchIntMidiControlNode()
         value, raw = node.load_int_midi(
             midi_state(), "workflow_key", "brightness", "any", 0, 0, 127, 0, 127, False, 0, 0, False
         )
         self.assertEqual(value, 96)
-        self.assertEqual(raw, 96.0)
+        self.assertEqual(raw, 96)
+        self.assertIsInstance(raw, int)
 
     def test_int_supports_large_output_ranges(self):
         node = VrchIntMidiControlNode()
@@ -44,7 +49,7 @@ class TestMidiControlNodes(unittest.TestCase):
             midi_state(), "workflow_key", "brightness", "any", 0, 0, 127, 0, 65535, False, 0, 0, False
         )
         self.assertEqual(value, int(96 / 127 * 65535))
-        self.assertEqual(raw, 96.0)
+        self.assertEqual(raw, 96)
 
     def test_int_rounds_up_to_multiple(self):
         node = VrchIntMidiControlNode()
@@ -52,7 +57,7 @@ class TestMidiControlNodes(unittest.TestCase):
             midi_state(), "workflow_key", "brightness", "any", 0, 0, 96, 0, 510, False, 0, 64, False
         )
         self.assertEqual(value, 512)
-        self.assertEqual(raw, 96.0)
+        self.assertEqual(raw, 96)
 
     def test_float_cc_number_lookup(self):
         node = VrchFloatMidiControlNode()
@@ -60,7 +65,8 @@ class TestMidiControlNodes(unittest.TestCase):
             midi_state(), "cc_number", "ignored", "1", 22, 0, 127, 0.0, 1.0, False, 0.0, False
         )
         self.assertAlmostEqual(value, 11 / 127)
-        self.assertEqual(raw, 11.0)
+        self.assertEqual(raw, 11)
+        self.assertIsInstance(raw, int)
 
     def test_no_fallback_from_missing_key_to_valid_cc(self):
         node = VrchIntMidiControlNode()
@@ -68,7 +74,7 @@ class TestMidiControlNodes(unittest.TestCase):
             midi_state(), "workflow_key", "missing", "1", 22, 0, 127, 0, 127, False, 5, 0, False
         )
         self.assertEqual(value, 5)
-        self.assertEqual(raw, 0.0)
+        self.assertEqual(raw, 0)
 
     def test_conflict_resolves_by_lookup_mode_only(self):
         node = VrchIntMidiControlNode()
@@ -87,7 +93,7 @@ class TestMidiControlNodes(unittest.TestCase):
             midi_state(), "workflow_key", "Brightness", "any", 0, 0, 127, 0, 127, False, 9, 0, False
         )
         self.assertEqual(value, 9)
-        self.assertEqual(raw, 0.0)
+        self.assertEqual(raw, 0)
 
     def test_json_roundtrip_state_still_resolves_indexes(self):
         state = json.loads(json.dumps(midi_state()))
@@ -99,9 +105,9 @@ class TestMidiControlNodes(unittest.TestCase):
             state, "cc_number", "", "1", 22, 0, 127, 0, 127, False, 0, 0, False
         )
         self.assertEqual(key_value, 96)
-        self.assertEqual(key_raw, 96.0)
+        self.assertEqual(key_raw, 96)
         self.assertEqual(cc_value, 11)
-        self.assertEqual(cc_raw, 11.0)
+        self.assertEqual(cc_raw, 11)
 
     def test_reverse_mapping(self):
         node = VrchIntMidiControlNode()
@@ -109,7 +115,7 @@ class TestMidiControlNodes(unittest.TestCase):
             midi_state(), "workflow_key", "brightness", "any", 0, 0, 127, 0, 127, True, 0, 0, False
         )
         self.assertEqual(value, 31)
-        self.assertEqual(raw, 96.0)
+        self.assertEqual(raw, 96)
 
     def test_range_validation(self):
         node = VrchFloatMidiControlNode()

@@ -1364,23 +1364,19 @@ class VrchImageWebSocketChannelLoaderNode:
     CATEGORY = CATEGORY
     
     def receive_image(self, channel, server, placeholder, debug, default_image=None):
-        if placeholder == "image" and default_image is not None:
-             # use tensor data_ptr to detect new image instance
-             cur_id = default_image.data_ptr() if hasattr(default_image, 'data_ptr') else id(default_image)
-             last_id = getattr(self, '_last_default_image_id', None)
-             if cur_id != last_id:
-                # update stored id and return new default_image immediately
-                self._last_default_image_id = cur_id
-                if debug:
-                    print(f"[VrchImageWebSocketChannelLoaderNode] Detected new default_image, passing it downstream once")
-                return (default_image, True)
-            
         host, port = server.split(":")
+        cache = getattr(self, "_last_image_by_target", None)
+        if cache is None:
+            cache = {}
+            self._last_image_by_target = cache
+        cache_key = (server, str(channel))
+
         # Ensure path is set correctly for loader
         client = get_websocket_client(host, port, "/image", channel, data_handler=image_data_handler, debug=debug) 
         
         image = client.get_latest_data()
         if image is not None:
+            cache[cache_key] = image
             if debug and hasattr(image, "_metadata"):
                 meta = getattr(image, "_metadata", {})
                 print(
@@ -1393,6 +1389,12 @@ class VrchImageWebSocketChannelLoaderNode:
                     ")",
                 )
             return (image, False)
+
+        cached_image = cache.get(cache_key)
+        if cached_image is not None:
+            if debug:
+                print(f"[VrchImageWebSocketChannelLoaderNode] No new image data received, using cached websocket image")
+            return (cached_image, False)
         
         # No image data, select placeholder
         if placeholder == "image":

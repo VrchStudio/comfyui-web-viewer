@@ -131,7 +131,7 @@ class VrchIntMidiControlNode:
             }
         }
 
-    RETURN_TYPES = ("INT", "FLOAT")
+    RETURN_TYPES = ("INT", "INT")
     RETURN_NAMES = ("VALUE", "RAW_CC")
     FUNCTION = "load_int_midi"
     CATEGORY = CATEGORY
@@ -162,7 +162,7 @@ class VrchIntMidiControlNode:
         if raw is None:
             if debug:
                 print(f"[VrchIntMidiControlNode] {source}; using default value: {output_default}")
-            return int(output_default), 0.0
+            return int(output_default), 0
         remap_func = VrchNodeUtils.select_remap_func(output_invert)
         mapped = remap_func(float(raw), float(input_min), float(input_max), float(output_min), float(output_max))
         mapped_int = int(mapped)
@@ -170,7 +170,7 @@ class VrchIntMidiControlNode:
         if debug:
             elapsed_ms = (time.perf_counter() - start) * 1000.0
             print(f"[VrchIntMidiControlNode] {source}; mapped={mapped_int}; elapsed={elapsed_ms:.3f} ms")
-        return mapped_int, float(raw)
+        return mapped_int, int(raw)
 
 
 class VrchFloatMidiControlNode:
@@ -193,7 +193,7 @@ class VrchFloatMidiControlNode:
             }
         }
 
-    RETURN_TYPES = ("FLOAT", "FLOAT")
+    RETURN_TYPES = ("FLOAT", "INT")
     RETURN_NAMES = ("VALUE", "RAW_CC")
     FUNCTION = "load_float_midi"
     CATEGORY = CATEGORY
@@ -223,10 +223,10 @@ class VrchFloatMidiControlNode:
         if raw is None:
             if debug:
                 print(f"[VrchFloatMidiControlNode] {source}; using default value: {output_default}")
-            return float(output_default), 0.0
+            return float(output_default), 0
         remap_func = VrchNodeUtils.select_remap_func(output_invert)
         mapped = remap_func(float(raw), float(input_min), float(input_max), float(output_min), float(output_max))
         if debug:
             elapsed_ms = (time.perf_counter() - start) * 1000.0
             print(f"[VrchFloatMidiControlNode] {source}; mapped={mapped}; elapsed={elapsed_ms:.3f} ms")
-        return float(mapped), float(raw)
+        return float(mapped), int(raw)

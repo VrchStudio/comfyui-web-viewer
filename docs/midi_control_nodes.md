@@ -25,7 +25,7 @@ Maps values from `VRCH_MIDI` state to Int or Float outputs.
 
 3. **Outputs:**
    - **`VALUE`**: Remapped Int or Float value.
-   - **`RAW_CC`**: Raw source value as Float. When default is used, `RAW_CC` is `0.0`.
+   - **`RAW_CC`**: Raw source value as Int. When default is used, `RAW_CC` is `0`.
 
 **Notes:**
 - The default mode is `workflow_key`, which is the recommended user-facing setup.
