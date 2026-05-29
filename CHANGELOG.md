@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.20 - 2026-05-29]
+
+### Updated
+
+- update MIDI Control node `RAW_CC` outputs to use `INT` for raw MIDI/source values
+
+### Fixed
+
+- fix `IMAGE WebSocket Channel Loader @ vrch.ai` falling back to `default_image` after receiving WebSocket images when `placeholder` is set to `image`
+
 ## [1.1.19 - 2026-05-28]
 
 ### Added

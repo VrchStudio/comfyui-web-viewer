@@ -275,7 +275,7 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
          - **"black"**: pure black placeholder image.
          - **"white"**: pure white placeholder image.
          - **"grey"**: mid-grey placeholder image.
-         - **"image"**: use the provided **`default_image`** as placeholder. Requires supplying **`default_image`**. The node detects changes to this image and outputs it immediately once per change.
+         - **"image"**: use the provided **`default_image`** as placeholder until a WebSocket image is available. Requires supplying **`default_image`**.
    - **`default_image`**: *(Optional)* Image to use when **`placeholder`** is set to **"image"**.
    - **`debug`**: Enable this option to print detailed debug information to the console for troubleshooting.
 
@@ -286,8 +286,8 @@ Provides adjustable CSS image filter parameters as a JSON object for composition
 4. **Receiving Images:**
    - This node automatically connects to the specified WebSocket channel and listens for incoming image data.
    - When an image is received, it will be processed and made available as the `IMAGE` output with `IS_DEFAULT_IMAGE` set to `False`.
-   - If **`placeholder`** is set to **"image"** and a new **`default_image`** was provided since the last execution, it is output immediately once (`IMAGE` + `True`).
-   - If no WebSocket image is received afterward, the **`default_image`** is used as the placeholder output (`IS_DEFAULT_IMAGE=False` in that case?).
+   - Once a WebSocket image has been received, the loader keeps returning the latest received image until a newer one arrives.
+   - If **`placeholder`** is set to **"image"** and no WebSocket image has been received yet, the **`default_image`** is used as the placeholder output with `IS_DEFAULT_IMAGE=True`.
 
 **Notes:**
 - This node is designed to work with the `IMAGE WebSocket Web Viewer @ vrch.ai` node, receiving the images it broadcasts.
