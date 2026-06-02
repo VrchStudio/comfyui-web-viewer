@@ -397,7 +397,8 @@ This node is designed for controlling `vrch_live_console.html` panes from a Comf
      - **`server`**: WebSocket server in `IP:PORT` format (for example `127.0.0.1:8001`).
      - **`channel`**: Channel **"1"** to **"8"** used by Live Console (default **"8"**).
    - **Behavior:**
-     - **`only_send_changed`**: When enabled, only pane states changed since last execution are sent.
+     - **`collapse_sidebar`**: Collapse the Live Console sidebar when enabled (default **`True`**).
+     - **`only_send_changed`**: When enabled, only pane/sidebar states changed since last execution are sent.
      - **`debug`**: Enable verbose logs.
    - **Pane Visibility Toggles (boolean):**
      - `display_image_viewer`
@@ -425,6 +426,11 @@ This node is designed for controlling `vrch_live_console.html` panes from a Comf
          "timestamp_ms": 1760000000000,
          "ops": [
            {
+             "op": "sidebar.set_mode",
+             "target": "sidebar",
+             "args": { "mode": "thin" }
+           },
+           {
              "op": "pane.set_visibility",
              "target": "audioPlayer",
              "args": { "visible": true }
@@ -439,7 +445,8 @@ This node is designed for controlling `vrch_live_console.html` panes from a Comf
 
 4. **Live Console Execution Rules (receiver side):**
    - Receiver reads `live_console_control.ops[]`.
-   - Supported V1 operation:
+   - Supported V1 operations:
+     - `sidebar.set_mode`
      - `pane.set_visibility`
    - Unknown operations or unknown targets are safely ignored.
    - Control channel handling should be independent from status-bar visibility (status bar on/off must not affect control).
