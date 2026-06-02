@@ -888,6 +888,7 @@ class VrchLiveConsoleControlNode:
         }
         for input_name, _target, default_visible in cls.PANE_CONFIG:
             required[input_name] = ("BOOLEAN", {"default": bool(default_visible)})
+        required["collapse_sidebar"] = ("BOOLEAN", {"default": True})
         required["only_send_changed"] = ("BOOLEAN", {"default": True})
         required["debug"] = ("BOOLEAN", {"default": False})
         return {"required": required}
@@ -914,12 +915,14 @@ class VrchLiveConsoleControlNode:
         display_audio_player,
         display_midi_sender,
         display_gamepad_sender,
+        collapse_sidebar,
         only_send_changed,
         debug,
     ):
         host, port = server.split(":")
         ws_server = get_global_server(host, port, path="/json", debug=debug)
         ch = int(channel)
+        normalized_sidebar_mode = "thin" if collapse_sidebar else "icons"
 
         pane_input_values = {
             "display_image_viewer": bool(display_image_viewer),
@@ -945,6 +948,13 @@ class VrchLiveConsoleControlNode:
         previous = self._last_state_by_target.get(cache_key) or {}
 
         ops = []
+        if not (only_send_changed and previous.get("__sidebar_mode") == normalized_sidebar_mode):
+            ops.append({
+                "op": "sidebar.set_mode",
+                "target": "sidebar",
+                "args": {"mode": normalized_sidebar_mode},
+            })
+
         for pane_id, visible in pane_state.items():
             if only_send_changed and pane_id in previous and previous[pane_id] == visible:
                 continue
@@ -971,12 +981,14 @@ class VrchLiveConsoleControlNode:
 
         if ops:
             ws_server.send_to_channel("/json", ch, json.dumps(payload))
-            self._last_state_by_target[cache_key] = dict(pane_state)
+            next_state = dict(pane_state)
+            next_state["__sidebar_mode"] = normalized_sidebar_mode
+            self._last_state_by_target[cache_key] = next_state
             if debug:
                 print(f"[VrchLiveConsoleControlNode] Sent {len(ops)} ops to channel {ch} via {host}:{port}")
         else:
             if debug:
-                print(f"[VrchLiveConsoleControlNode] No changed pane states; skipped send for channel {ch}")
+                print(f"[VrchLiveConsoleControlNode] No changed live console states; skipped send for channel {ch}")
 
         return (payload,)
 
