@@ -22,6 +22,33 @@ _REALTIME_PATHS = {"/image", "/video"}
 WEBSOCKET_MAX_MESSAGE_BYTES = 64 * 1024 * 1024
 
 
+def _describe_ws_payload(path, data):
+    size = len(data) if hasattr(data, "__len__") else 0
+    clean_path = str(path or "").split("?", 1)[0]
+    if clean_path == "/image" and isinstance(data, (bytes, bytearray)) and len(data) >= 8:
+        try:
+            raw_type, meta = struct.unpack(">II", data[:8])
+            batch_id = (meta >> 16) & 0xFFFF
+            frame_index = (meta >> 8) & 0xFF
+            frame_total = meta & 0xFF
+            return (
+                f"type={raw_type} batch={batch_id} "
+                f"frame={frame_index}/{frame_total} bytes={size}"
+            )
+        except Exception as e:
+            return f"bytes={size} header_error={type(e).__name__}"
+    return f"type={type(data).__name__} bytes={size}"
+
+
+def _describe_ws_uri_payload(uri, data):
+    try:
+        parsed = urllib.parse.urlparse(uri)
+        path = parsed.path or "/"
+    except Exception:
+        path = ""
+    return _describe_ws_payload(path, data)
+
+
 def _normalize_endpoint(host, port):
     clean_host = str(host).strip()
     clean_port = int(str(port).strip())
@@ -74,7 +101,7 @@ async def _is_valid_websocket_server(host, port, timeout=5):
     try:
         uri = f"ws://{host}:{port}/"
         websocket = await asyncio.wait_for(
-            websockets.connect(uri, max_size=WEBSOCKET_MAX_MESSAGE_BYTES),
+            websockets.connect(uri, max_size=WEBSOCKET_MAX_MESSAGE_BYTES, compression=None),
             timeout=timeout,
         )
         try:
@@ -90,7 +117,7 @@ async def _is_valid_websocket_server(host, port, timeout=5):
         try:
             uri = f"ws://{host}:{port}{path}"
             websocket = await asyncio.wait_for(
-                websockets.connect(uri, max_size=WEBSOCKET_MAX_MESSAGE_BYTES),
+                websockets.connect(uri, max_size=WEBSOCKET_MAX_MESSAGE_BYTES, compression=None),
                 timeout=timeout,
             )
             try:
@@ -109,6 +136,7 @@ async def _is_valid_websocket_server(host, port, timeout=5):
                 subprotocols=[],
                 extra_headers={},
                 max_size=WEBSOCKET_MAX_MESSAGE_BYTES,
+                compression=None,
             ),
             timeout=timeout,
         )
@@ -227,6 +255,7 @@ class WebSocketClientProxy:
                 break
 
             try:
+                coalesced = 0
                 if self._endpoint_realtime.get(uri, False):
                     while True:
                         try:
@@ -234,6 +263,13 @@ class WebSocketClientProxy:
                         except asyncio.QueueEmpty:
                             break
                         data = newer_data
+                        coalesced += 1
+                    if coalesced and self.debug:
+                        print(
+                            f"[WebSocketClientProxy] Realtime worker coalesced {coalesced} "
+                            f"pending payload(s) for {uri}; sending latest "
+                            f"{_describe_ws_uri_payload(uri, data)}"
+                        )
 
                 if _ws_is_closed(websocket):
                     websocket = await asyncio.wait_for(
@@ -242,6 +278,7 @@ class WebSocketClientProxy:
                             ping_interval=20,
                             ping_timeout=20,
                             max_size=WEBSOCKET_MAX_MESSAGE_BYTES,
+                            compression=None,
                         ),
                         timeout=5.0,
                     )
@@ -386,7 +423,7 @@ class WebSocketClientProxy:
         except Exception:
             return
 
-        uri = f"ws://{self.host}:{self.port}{path}?channel={channel_int}"
+        uri = f"ws://{self.host}:{self.port}{path}?channel={channel_int}&client=comfyui-output"
         realtime = self._is_realtime_payload(path, data)
 
         try:
@@ -457,11 +494,12 @@ class WebSocketClientProxy:
 
 
 class SimpleWebSocketServer:
-    def __init__(self, host, port, debug=False):
+    def __init__(self, host, port, debug=False, compression=None):
         host, port = _normalize_endpoint(host, port)
         self.host = host
         self.port = port
         self.debug = debug
+        self.compression = compression
 
         self.paths = set()
         self.clients = {}  # path -> channel -> [websockets]
@@ -520,6 +558,7 @@ class SimpleWebSocketServer:
                 ping_interval=20,
                 ping_timeout=20,
                 max_size=WEBSOCKET_MAX_MESSAGE_BYTES,
+                compression=self.compression,
             )
             print(f"Server listening on {self.host}:{self.port}")
 
@@ -623,6 +662,12 @@ class SimpleWebSocketServer:
                     self._realtime_send_tasks.pop(task_key, None)
                 else:
                     # Client is still busy sending previous frame: drop this frame for this client.
+                    if self.debug:
+                        peer = getattr(client, "remote_address", None)
+                        print(
+                            f"[SimpleWebSocketServer] Realtime skip busy client on {path} "
+                            f"channel {channel} peer={peer}: {_describe_ws_payload(path, data)}"
+                        )
                     continue
 
             send_task = asyncio.create_task(client.send(data))
@@ -722,9 +767,7 @@ class SimpleWebSocketServer:
                             rx_last_desc = type(message).__name__
 
                         if self.debug:
-                            if isinstance(message, bytes):
-                                print(f"[SimpleWebSocketServer] Received binary message on {resource_path} channel {channel}: {len(message)} bytes")
-                            elif isinstance(message, str):
+                            if isinstance(message, str):
                                 if len(message) > 256:
                                     print(
                                         f"[SimpleWebSocketServer] Received text message on {resource_path} channel {channel}: "

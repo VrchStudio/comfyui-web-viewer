@@ -198,6 +198,102 @@ class TestWebSocketNodesUnit(unittest.TestCase):
         self.assertIs(second_image, received_image)
         self.assertFalse(second_is_default)
 
+    def test_11_image_loader_adds_source_sequence_metadata(self):
+        received_image = torch.ones((1, 2, 2, 3), dtype=torch.float32)
+
+        class FakeClient:
+            def get_latest_data_with_sequence(self):
+                return received_image, 42
+
+        original_get_client = ws_nodes.get_websocket_client
+        self.addCleanup(lambda: setattr(ws_nodes, "get_websocket_client", original_get_client))
+        ws_nodes.get_websocket_client = lambda *args, **kwargs: FakeClient()
+
+        node = ws_nodes.VrchImageWebSocketChannelLoaderNode()
+        image, is_default = node.receive_image("2", "127.0.0.1:8001", "black", False)
+
+        self.assertIs(image, received_image)
+        self.assertFalse(is_default)
+        self.assertTrue(hasattr(image, "_metadata"))
+        self.assertEqual(image._metadata["source_id"], "127.0.0.1:8001|/image|2")
+        self.assertEqual(image._metadata["source_sequence"], 42)
+
+    def test_12_simple_viewer_sends_each_workflow_call_with_same_source_sequence(self):
+        sent_messages = []
+
+        class FakeServer:
+            def send_to_channel(self, path, channel, data):
+                sent_messages.append((path, channel, data))
+
+        original_get_server = ws_nodes.get_global_server
+        self.addCleanup(lambda: setattr(ws_nodes, "get_global_server", original_get_server))
+        ws_nodes.get_global_server = lambda *args, **kwargs: FakeServer()
+
+        node = ws_nodes.VrchImageWebSocketSimpleWebViewerNode()
+        image = torch.zeros((1, 2, 2, 3), dtype=torch.float32)
+        image._metadata = {
+            "source_id": "127.0.0.1:8001|/image|2",
+            "source_sequence": 7,
+        }
+
+        kwargs = {
+            "images": image,
+            "channel": "1",
+            "server": "127.0.0.1:8001",
+            "format": "PNG",
+            "number_of_images": 1,
+            "image_display_duration": 50,
+            "fade_anim_duration": 10,
+            "window_width": 512,
+            "window_height": 512,
+            "show_url": False,
+            "dev_mode": False,
+            "debug": False,
+            "extra_params": "",
+            "url": "",
+        }
+
+        node.send_images(**kwargs)
+        node.send_images(**kwargs)
+        self.assertEqual(len(sent_messages), 2)
+
+        image._metadata["source_sequence"] = 8
+        node.send_images(**kwargs)
+        self.assertEqual(len(sent_messages), 3)
+
+    def test_13_websocket_client_latest_only_decodes_latest_raw_message(self):
+        decoded_payloads = []
+
+        def handler(message):
+            decoded_payloads.append(message)
+            return message[-1]
+
+        client = ws_nodes.WebSocketClient.__new__(ws_nodes.WebSocketClient)
+        client.host = "127.0.0.1"
+        client.port = 8001
+        client.path = "/image"
+        client.channel = 1
+        client.debug = False
+        client.received_data = None
+        client.received_sequence = 0
+        client.received_raw_data = None
+        client.decoded_sequence = 0
+        client.latest_only = True
+        client.data_handler = handler
+        client.lock = ws_nodes.threading.Lock()
+
+        first = struct.pack(">II", 1, 1) + b"first"
+        second = struct.pack(">II", 1, 2) + b"second"
+
+        self.assertTrue(client._store_latest_message(first))
+        self.assertTrue(client._store_latest_message(second))
+
+        data, sequence = client.get_latest_data_with_sequence()
+
+        self.assertEqual(data, ord("d"))
+        self.assertEqual(sequence, 2)
+        self.assertEqual(decoded_payloads, [second])
+
 
 class TestWebSocketNodesIntegration(unittest.TestCase):
     def setUp(self):
