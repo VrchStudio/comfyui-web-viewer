@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.22 - 2026-06-06]
+
 ### Fixed
 
 - process the latest `/image` websocket frame before falling back to cached image data
