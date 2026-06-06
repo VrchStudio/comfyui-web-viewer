@@ -20,6 +20,7 @@ _port_servers = builtins.__vrch_ws_port_servers
 _server_lock = builtins.__vrch_ws_server_lock
 _REALTIME_PATHS = {"/image", "/video"}
 WEBSOCKET_MAX_MESSAGE_BYTES = 64 * 1024 * 1024
+REALTIME_SKIP_WARNING_INTERVAL_SECONDS = 2.0
 
 
 def _describe_ws_payload(path, data):
@@ -47,6 +48,13 @@ def _describe_ws_uri_payload(uri, data):
     except Exception:
         path = ""
     return _describe_ws_payload(path, data)
+
+
+def _describe_ws_client(client):
+    conn_id = getattr(client, "_vrch_conn_id", None)
+    client_name = getattr(client, "_vrch_client_name", "") or "-"
+    peer = getattr(client, "remote_address", None)
+    return f"id={conn_id} client={client_name} peer={peer}"
 
 
 def _normalize_endpoint(host, port):
@@ -508,6 +516,7 @@ class SimpleWebSocketServer:
         self._connection_tasks = set()
         self._realtime_pending = {}
         self._realtime_send_tasks = {}
+        self._realtime_skip_warning_state = {}
         self._conn_id_seq = 0
 
         self.loop = asyncio.new_event_loop()
@@ -662,12 +671,7 @@ class SimpleWebSocketServer:
                     self._realtime_send_tasks.pop(task_key, None)
                 else:
                     # Client is still busy sending previous frame: drop this frame for this client.
-                    if self.debug:
-                        peer = getattr(client, "remote_address", None)
-                        print(
-                            f"[SimpleWebSocketServer] Realtime skip busy client on {path} "
-                            f"channel {channel} peer={peer}: {_describe_ws_payload(path, data)}"
-                        )
+                    self._warn_realtime_skip_busy_client(path, channel, client, data)
                     continue
 
             send_task = asyncio.create_task(client.send(data))
@@ -675,6 +679,35 @@ class SimpleWebSocketServer:
             send_task.add_done_callback(
                 lambda t, p=path, ch=channel, c=client: self._on_realtime_send_done(p, ch, c, t)
             )
+
+    def _warn_realtime_skip_busy_client(self, path, channel, client, data):
+        task_key = (path, channel, client)
+        now = time.monotonic()
+        state_map = getattr(self, "_realtime_skip_warning_state", None)
+        if state_map is None:
+            state_map = {}
+            self._realtime_skip_warning_state = state_map
+
+        state = state_map.get(task_key)
+        if state is None:
+            state = {"last": 0.0, "suppressed": 0}
+            state_map[task_key] = state
+
+        elapsed = now - state["last"]
+        if state["last"] > 0 and elapsed < REALTIME_SKIP_WARNING_INTERVAL_SECONDS:
+            state["suppressed"] += 1
+            return
+
+        suppressed = state["suppressed"]
+        state["suppressed"] = 0
+        state["last"] = now
+        suppressed_text = f" skipped_since_last={suppressed}" if suppressed else ""
+        print(
+            f"[SimpleWebSocketServer][WARNING] Realtime skip busy client on {path} "
+            f"channel {channel} {_describe_ws_client(client)}{suppressed_text}: "
+            f"{_describe_ws_payload(path, data)}",
+            flush=True,
+        )
 
     def _on_realtime_send_done(self, path, channel, client, task):
         task_key = (path, channel, client)
@@ -726,6 +759,7 @@ class SimpleWebSocketServer:
         parsed = urllib.parse.urlparse(full_path)
         params = urllib.parse.parse_qs(parsed.query)
         channel_str = params.get("channel", [None])[0]
+        client_name = params.get("client", [""])[0] or ""
 
         try:
             channel = int(channel_str)
@@ -744,6 +778,9 @@ class SimpleWebSocketServer:
                 f"[SimpleWebSocketServer] New connection id={conn_id} from {websocket.remote_address} "
                 f"on path '{resource_path}' with channel {channel}"
             )
+
+        setattr(websocket, "_vrch_conn_id", conn_id)
+        setattr(websocket, "_vrch_client_name", client_name)
 
         self.clients[resource_path][channel].append(websocket)
         print(f"Connection open on {resource_path} channel {channel}")
@@ -815,6 +852,7 @@ class SimpleWebSocketServer:
             channel_clients = self.clients.get(resource_path, {}).get(channel, [])
             if websocket in channel_clients:
                 channel_clients.remove(websocket)
+            self._realtime_skip_warning_state.pop((resource_path, channel, websocket), None)
 
             if task is not None and task in self._connection_tasks:
                 self._connection_tasks.remove(task)
