@@ -12,7 +12,7 @@ from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
 from .nodes.workflow_export_nodes import *
 
-__version__ = "1.1.21"
+__version__ = "1.1.22"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,

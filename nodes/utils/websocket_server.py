@@ -20,6 +20,41 @@ _port_servers = builtins.__vrch_ws_port_servers
 _server_lock = builtins.__vrch_ws_server_lock
 _REALTIME_PATHS = {"/image", "/video"}
 WEBSOCKET_MAX_MESSAGE_BYTES = 64 * 1024 * 1024
+REALTIME_SKIP_WARNING_INTERVAL_SECONDS = 2.0
+
+
+def _describe_ws_payload(path, data):
+    size = len(data) if hasattr(data, "__len__") else 0
+    clean_path = str(path or "").split("?", 1)[0]
+    if clean_path == "/image" and isinstance(data, (bytes, bytearray)) and len(data) >= 8:
+        try:
+            raw_type, meta = struct.unpack(">II", data[:8])
+            batch_id = (meta >> 16) & 0xFFFF
+            frame_index = (meta >> 8) & 0xFF
+            frame_total = meta & 0xFF
+            return (
+                f"type={raw_type} batch={batch_id} "
+                f"frame={frame_index}/{frame_total} bytes={size}"
+            )
+        except Exception as e:
+            return f"bytes={size} header_error={type(e).__name__}"
+    return f"type={type(data).__name__} bytes={size}"
+
+
+def _describe_ws_uri_payload(uri, data):
+    try:
+        parsed = urllib.parse.urlparse(uri)
+        path = parsed.path or "/"
+    except Exception:
+        path = ""
+    return _describe_ws_payload(path, data)
+
+
+def _describe_ws_client(client):
+    conn_id = getattr(client, "_vrch_conn_id", None)
+    client_name = getattr(client, "_vrch_client_name", "") or "-"
+    peer = getattr(client, "remote_address", None)
+    return f"id={conn_id} client={client_name} peer={peer}"
 
 
 def _normalize_endpoint(host, port):
@@ -74,7 +109,7 @@ async def _is_valid_websocket_server(host, port, timeout=5):
     try:
         uri = f"ws://{host}:{port}/"
         websocket = await asyncio.wait_for(
-            websockets.connect(uri, max_size=WEBSOCKET_MAX_MESSAGE_BYTES),
+            websockets.connect(uri, max_size=WEBSOCKET_MAX_MESSAGE_BYTES, compression=None),
             timeout=timeout,
         )
         try:
@@ -90,7 +125,7 @@ async def _is_valid_websocket_server(host, port, timeout=5):
         try:
             uri = f"ws://{host}:{port}{path}"
             websocket = await asyncio.wait_for(
-                websockets.connect(uri, max_size=WEBSOCKET_MAX_MESSAGE_BYTES),
+                websockets.connect(uri, max_size=WEBSOCKET_MAX_MESSAGE_BYTES, compression=None),
                 timeout=timeout,
             )
             try:
@@ -109,6 +144,7 @@ async def _is_valid_websocket_server(host, port, timeout=5):
                 subprotocols=[],
                 extra_headers={},
                 max_size=WEBSOCKET_MAX_MESSAGE_BYTES,
+                compression=None,
             ),
             timeout=timeout,
         )
@@ -227,6 +263,7 @@ class WebSocketClientProxy:
                 break
 
             try:
+                coalesced = 0
                 if self._endpoint_realtime.get(uri, False):
                     while True:
                         try:
@@ -234,6 +271,13 @@ class WebSocketClientProxy:
                         except asyncio.QueueEmpty:
                             break
                         data = newer_data
+                        coalesced += 1
+                    if coalesced and self.debug:
+                        print(
+                            f"[WebSocketClientProxy] Realtime worker coalesced {coalesced} "
+                            f"pending payload(s) for {uri}; sending latest "
+                            f"{_describe_ws_uri_payload(uri, data)}"
+                        )
 
                 if _ws_is_closed(websocket):
                     websocket = await asyncio.wait_for(
@@ -242,6 +286,7 @@ class WebSocketClientProxy:
                             ping_interval=20,
                             ping_timeout=20,
                             max_size=WEBSOCKET_MAX_MESSAGE_BYTES,
+                            compression=None,
                         ),
                         timeout=5.0,
                     )
@@ -386,7 +431,7 @@ class WebSocketClientProxy:
         except Exception:
             return
 
-        uri = f"ws://{self.host}:{self.port}{path}?channel={channel_int}"
+        uri = f"ws://{self.host}:{self.port}{path}?channel={channel_int}&client=comfyui-output"
         realtime = self._is_realtime_payload(path, data)
 
         try:
@@ -457,11 +502,12 @@ class WebSocketClientProxy:
 
 
 class SimpleWebSocketServer:
-    def __init__(self, host, port, debug=False):
+    def __init__(self, host, port, debug=False, compression=None):
         host, port = _normalize_endpoint(host, port)
         self.host = host
         self.port = port
         self.debug = debug
+        self.compression = compression
 
         self.paths = set()
         self.clients = {}  # path -> channel -> [websockets]
@@ -470,6 +516,7 @@ class SimpleWebSocketServer:
         self._connection_tasks = set()
         self._realtime_pending = {}
         self._realtime_send_tasks = {}
+        self._realtime_skip_warning_state = {}
         self._conn_id_seq = 0
 
         self.loop = asyncio.new_event_loop()
@@ -520,6 +567,7 @@ class SimpleWebSocketServer:
                 ping_interval=20,
                 ping_timeout=20,
                 max_size=WEBSOCKET_MAX_MESSAGE_BYTES,
+                compression=self.compression,
             )
             print(f"Server listening on {self.host}:{self.port}")
 
@@ -623,6 +671,7 @@ class SimpleWebSocketServer:
                     self._realtime_send_tasks.pop(task_key, None)
                 else:
                     # Client is still busy sending previous frame: drop this frame for this client.
+                    self._warn_realtime_skip_busy_client(path, channel, client, data)
                     continue
 
             send_task = asyncio.create_task(client.send(data))
@@ -630,6 +679,35 @@ class SimpleWebSocketServer:
             send_task.add_done_callback(
                 lambda t, p=path, ch=channel, c=client: self._on_realtime_send_done(p, ch, c, t)
             )
+
+    def _warn_realtime_skip_busy_client(self, path, channel, client, data):
+        task_key = (path, channel, client)
+        now = time.monotonic()
+        state_map = getattr(self, "_realtime_skip_warning_state", None)
+        if state_map is None:
+            state_map = {}
+            self._realtime_skip_warning_state = state_map
+
+        state = state_map.get(task_key)
+        if state is None:
+            state = {"last": 0.0, "suppressed": 0}
+            state_map[task_key] = state
+
+        elapsed = now - state["last"]
+        if state["last"] > 0 and elapsed < REALTIME_SKIP_WARNING_INTERVAL_SECONDS:
+            state["suppressed"] += 1
+            return
+
+        suppressed = state["suppressed"]
+        state["suppressed"] = 0
+        state["last"] = now
+        suppressed_text = f" skipped_since_last={suppressed}" if suppressed else ""
+        print(
+            f"[SimpleWebSocketServer][WARNING] Realtime skip busy client on {path} "
+            f"channel {channel} {_describe_ws_client(client)}{suppressed_text}: "
+            f"{_describe_ws_payload(path, data)}",
+            flush=True,
+        )
 
     def _on_realtime_send_done(self, path, channel, client, task):
         task_key = (path, channel, client)
@@ -681,6 +759,7 @@ class SimpleWebSocketServer:
         parsed = urllib.parse.urlparse(full_path)
         params = urllib.parse.parse_qs(parsed.query)
         channel_str = params.get("channel", [None])[0]
+        client_name = params.get("client", [""])[0] or ""
 
         try:
             channel = int(channel_str)
@@ -699,6 +778,9 @@ class SimpleWebSocketServer:
                 f"[SimpleWebSocketServer] New connection id={conn_id} from {websocket.remote_address} "
                 f"on path '{resource_path}' with channel {channel}"
             )
+
+        setattr(websocket, "_vrch_conn_id", conn_id)
+        setattr(websocket, "_vrch_client_name", client_name)
 
         self.clients[resource_path][channel].append(websocket)
         print(f"Connection open on {resource_path} channel {channel}")
@@ -722,9 +804,7 @@ class SimpleWebSocketServer:
                             rx_last_desc = type(message).__name__
 
                         if self.debug:
-                            if isinstance(message, bytes):
-                                print(f"[SimpleWebSocketServer] Received binary message on {resource_path} channel {channel}: {len(message)} bytes")
-                            elif isinstance(message, str):
+                            if isinstance(message, str):
                                 if len(message) > 256:
                                     print(
                                         f"[SimpleWebSocketServer] Received text message on {resource_path} channel {channel}: "
@@ -772,6 +852,7 @@ class SimpleWebSocketServer:
             channel_clients = self.clients.get(resource_path, {}).get(channel, [])
             if websocket in channel_clients:
                 channel_clients.remove(websocket)
+            self._realtime_skip_warning_state.pop((resource_path, channel, websocket), None)
 
             if task is not None and task in self._connection_tasks:
                 self._connection_tasks.remove(task)

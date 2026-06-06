@@ -37,6 +37,28 @@ AUDIO_PLAYER_QUALITY_PRESETS_KBPS = {
     "high": 192,
 }
 
+
+def _describe_image_binary_payload(data):
+    if not isinstance(data, (bytes, bytearray)):
+        return f"type={type(data).__name__}"
+
+    size = len(data)
+    if size < 8:
+        return f"bytes={size} header=short"
+
+    try:
+        raw_type, meta = struct.unpack(">II", data[:8])
+        batch_id = (meta >> 16) & 0xFFFF
+        frame_index = (meta >> 8) & 0xFF
+        frame_total = meta & 0xFF
+        return (
+            f"type={raw_type} batch={batch_id} "
+            f"frame={frame_index}/{frame_total} bytes={size}"
+        )
+    except Exception as e:
+        return f"bytes={size} header_error={type(e).__name__}"
+
+
 class VrchWebSocketServerNode:
 
     @classmethod
@@ -261,7 +283,7 @@ class VrchImageWebSocketSimpleWebViewerNode:
             header = struct.pack(">II", 1, meta)
             data = header + binary_data
             server.send_to_channel("/image", ch, data)
-            
+
         if debug:
             print(f"[VrchImageWebSocketSimpleWebViewerNode] Sent {len(images)} images to channel {ch} via global server on {host}:{port} with path '/image'")
         return (images, url)
@@ -481,23 +503,74 @@ class VrchImageWebSocketFilterSettingsNode:
 # Dictionary to keep track of WebSocket client instances
 _websocket_clients = {}
 _websocket_clients_lock = threading.RLock()
+_websocket_client_debug_seq = 0
+
+
+def _format_socket_address(addr):
+    if not addr:
+        return "unknown"
+    if isinstance(addr, (tuple, list)):
+        if len(addr) >= 2:
+            return f"{addr[0]}:{addr[1]}"
+        return ":".join(str(part) for part in addr)
+    return str(addr)
 
 class WebSocketClient:
-    def __init__(self, host, port, path, channel, data_handler=None, debug=False):
+    def __init__(self, host, port, path, channel, data_handler=None, debug=False, latest_only=False):
+        global _websocket_client_debug_seq
+        with _websocket_clients_lock:
+            _websocket_client_debug_seq += 1
+            self.debug_id = _websocket_client_debug_seq
         self.host = host
         self.port = int(port)
         self.path = path if path.startswith("/") else "/" + path
         self.channel = int(channel)
         self.debug = debug
         self.received_data = None
+        self.received_sequence = 0
+        self.received_raw_data = None
+        self.decoded_sequence = 0
+        self.latest_only = bool(latest_only)
         self.data_handler = data_handler
         self.lock = threading.Lock()
         self.running = True
         self._ws = None
         self._listen_task = None
+        self._connect_attempt = 0
+        self._connection_seq = 0
+        self._total_messages_received = 0
+        self._active_connection_started_at = None
+        self._active_connection_label = "local=unknown remote=unknown"
+        self._last_reuse_debug_log_at = 0.0
         self.loop = asyncio.new_event_loop()
         self.thread = threading.Thread(target=self._run_loop, daemon=True)
         self.thread.start()
+        if self.debug:
+            print(
+                f"[WebSocketClient] Created client#{self.debug_id} "
+                f"endpoint={self._endpoint_label()} latest_only={self.latest_only}"
+            )
+
+    def _endpoint_label(self):
+        return f"{self.host}:{self.port}{self.path}?channel={self.channel}&client=comfyui-loader"
+
+    def _connection_label(self, websocket=None):
+        ws = websocket or self._ws
+        transport = getattr(ws, "transport", None) if ws is not None else None
+        if transport is None:
+            return self._active_connection_label
+        local_addr = transport.get_extra_info("sockname")
+        remote_addr = transport.get_extra_info("peername")
+        return (
+            f"local={_format_socket_address(local_addr)} "
+            f"remote={_format_socket_address(remote_addr)}"
+        )
+
+    def _debug_prefix(self):
+        return (
+            f"[WebSocketClient] client#{self.debug_id} "
+            f"endpoint={self._endpoint_label()}"
+        )
     
     def _run_loop(self):
         asyncio.set_event_loop(self.loop)
@@ -514,62 +587,185 @@ class WebSocketClient:
     async def _connect_and_listen(self):
         reconnect_delay = 1.0
         while self.running:
+            connection_started = None
+            connection_message_count = 0
+            close_code = None
+            close_reason = None
             try:
-                uri = f"ws://{self.host}:{self.port}{self.path}?channel={self.channel}"
+                uri = f"ws://{self.host}:{self.port}{self.path}?channel={self.channel}&client=comfyui-loader"
+                self._connect_attempt += 1
                 if self.debug:
-                    print(f"[WebSocketClient] Connecting to {uri}")
+                    print(
+                        f"{self._debug_prefix()} connecting "
+                        f"attempt={self._connect_attempt} reconnect_delay={reconnect_delay:.1f}s "
+                        f"latest_only={self.latest_only}"
+                    )
                 
                 async with websockets.connect(
                     uri,
                     ping_interval=20,
                     ping_timeout=20,
                     max_size=WEBSOCKET_MAX_MESSAGE_BYTES,
+                    compression=None,
                 ) as websocket:
                     self._ws = websocket
+                    self._connection_seq += 1
+                    connection_id = self._connection_seq
+                    connection_started = time.monotonic()
+                    self._active_connection_started_at = connection_started
+                    self._active_connection_label = self._connection_label(websocket)
                     reconnect_delay = 1.0
                     if self.debug:
-                        print(f"[WebSocketClient] Connected to {uri}")
+                        print(
+                            f"{self._debug_prefix()} connected conn={connection_id} "
+                            f"{self._active_connection_label} "
+                            f"ping_interval=20 ping_timeout=20 compression=none"
+                        )
+                        print(
+                            f"{self._debug_prefix()} read loop started conn={connection_id} "
+                            f"{self._active_connection_label}"
+                        )
                     
                     async for message in websocket:
                         try:
                             if not self.running:
                                 break
+
+                            connection_message_count += 1
+                            self._total_messages_received += 1
                             
+                            if self.latest_only:
+                                self._store_latest_message(message)
+                                continue
+
                             # Process the message using the data handler if provided,
-                            # otherwise store the raw message
-                            processed_data = None
-                            if self.data_handler:
-                                processed_data = self.data_handler(message)
-                            else:
-                                processed_data = message
+                            # otherwise store the raw message.
+                            processed_data = self._process_message(message)
                             
-                            # Store the processed data
+                            # Store the processed data. The sequence only advances
+                            # for valid payloads so ignored messages do not look
+                            # like new source frames.
                             with self.lock:
+                                if processed_data is not None:
+                                    self.received_sequence += 1
                                 self.received_data = processed_data
                             
                             if self.debug:
-                                print(f"[WebSocketClient] Received data on {self.path} channel {self.channel}")
+                                print(
+                                    f"{self._debug_prefix()} received data "
+                                    f"conn={connection_id} msg={connection_message_count} "
+                                    f"total_msg={self._total_messages_received} "
+                                    f"{self._active_connection_label}"
+                                )
                         
                         except Exception as e:
                             if self.debug:
-                                print(f"[WebSocketClient] Error processing message: {e}")
+                                print(
+                                    f"{self._debug_prefix()} error processing message "
+                                    f"conn={connection_id} msg={connection_message_count} "
+                                    f"{type(e).__name__}: {e}"
+                                )
+                    close_code = getattr(websocket, "close_code", None)
+                    close_reason = getattr(websocket, "close_reason", None)
             except asyncio.CancelledError:
+                if self.debug:
+                    print(f"{self._debug_prefix()} listen task cancelled")
                 break
+            except websockets.exceptions.ConnectionClosed as e:
+                close_code = getattr(e, "code", None)
+                close_reason = getattr(e, "reason", None)
+                if self.debug:
+                    print(
+                        f"{self._debug_prefix()} connection closed by websocket "
+                        f"{self._active_connection_label} "
+                        f"code={close_code} reason={close_reason} "
+                        f"messages={connection_message_count}"
+                    )
             
             except Exception as e:
                 if self.debug:
-                    print(f"[WebSocketClient] Connection error: {e}")
+                    print(
+                        f"{self._debug_prefix()} connection error "
+                        f"{self._active_connection_label} "
+                        f"{type(e).__name__}: {e} messages={connection_message_count}"
+                    )
             finally:
+                if self.debug and connection_started is not None:
+                    duration_ms = int((time.monotonic() - connection_started) * 1000)
+                    print(
+                        f"{self._debug_prefix()} read loop ended "
+                        f"{self._active_connection_label} duration_ms={duration_ms} "
+                        f"messages={connection_message_count} close_code={close_code} "
+                        f"close_reason={close_reason}"
+                    )
                 self._ws = None
+                self._active_connection_started_at = None
+                self._active_connection_label = "local=unknown remote=unknown"
             
             # Backoff reconnect to avoid tight loops.
             if self.running:
+                if self.debug:
+                    print(
+                        f"{self._debug_prefix()} reconnect scheduled "
+                        f"delay={reconnect_delay:.1f}s next_delay={min(reconnect_delay * 2, 5.0):.1f}s"
+                    )
                 await asyncio.sleep(reconnect_delay)
                 reconnect_delay = min(reconnect_delay * 2, 5.0)
     
     def get_latest_data(self):
+        data, _sequence = self.get_latest_data_with_sequence()
+        return data
+
+    def get_latest_data_with_sequence(self):
+        if self.latest_only:
+            return self._decode_latest_message()
         with self.lock:
-            return self.received_data
+            return self.received_data, self.received_sequence
+
+    def _is_latest_message_candidate(self, message):
+        if self.path == "/image":
+            return isinstance(message, (bytes, bytearray)) and len(message) >= 8
+        return message is not None
+
+    def _store_latest_message(self, message):
+        if not self._is_latest_message_candidate(message):
+            return 0
+        with self.lock:
+            self.received_sequence += 1
+            source_sequence = self.received_sequence
+            self.received_raw_data = message
+        return source_sequence
+
+    def _process_message(self, message):
+        if self.data_handler:
+            return self.data_handler(message)
+        return message
+
+    def _decode_latest_message(self):
+        with self.lock:
+            source_sequence = self.received_sequence
+            if source_sequence == self.decoded_sequence:
+                return self.received_data, self.decoded_sequence
+            raw_data = self.received_raw_data
+
+        try:
+            processed_data = self._process_message(raw_data)
+        except Exception as e:
+            processed_data = None
+            if self.debug:
+                print(f"[WebSocketClient] Error processing latest message: {e}")
+        else:
+            if self.debug:
+                print(
+                    f"{self._debug_prefix()} decoded latest data "
+                    f"{self._active_connection_label} source_sequence={source_sequence} "
+                    f"{_describe_image_binary_payload(raw_data)}"
+                )
+
+        with self.lock:
+            self.received_data = processed_data
+            self.decoded_sequence = source_sequence
+        return processed_data, source_sequence
     
     async def _shutdown_async(self):
         ws = self._ws
@@ -586,6 +782,11 @@ class WebSocketClient:
     def stop(self):
         if not self.running:
             return
+        if self.debug:
+            print(
+                f"{self._debug_prefix()} stop requested "
+                f"{self._active_connection_label} total_msg={self._total_messages_received}"
+            )
         self.running = False
         if self.loop and self.loop.is_running():
             try:
@@ -601,7 +802,7 @@ class WebSocketClient:
         if self.thread and self.thread.is_alive():
             self.thread.join(timeout=1.5)
 
-def get_websocket_client(host, port, path, channel, data_handler=None, debug=False):
+def get_websocket_client(host, port, path, channel, data_handler=None, debug=False, latest_only=False):
     key = f"{host}:{port}:{path}:{channel}"
     with _websocket_clients_lock:
         client = _websocket_clients.get(key)
@@ -609,6 +810,11 @@ def get_websocket_client(host, port, path, channel, data_handler=None, debug=Fal
         if client is not None:
             thread_alive = bool(getattr(client, "thread", None) and client.thread.is_alive())
             if not client.running or not thread_alive:
+                if debug:
+                    print(
+                        f"[WebSocketClient] Replacing stale client key={key} "
+                        f"running={client.running} thread_alive={thread_alive}"
+                    )
                 try:
                     client.stop()
                 except Exception:
@@ -617,13 +823,30 @@ def get_websocket_client(host, port, path, channel, data_handler=None, debug=Fal
                 client = None
 
         if client is None:
-            client = WebSocketClient(host, port, path, channel, data_handler, debug)
+            client = WebSocketClient(host, port, path, channel, data_handler, debug, latest_only=latest_only)
             _websocket_clients[key] = client
         else:
             # Update debug setting if client already exists.
+            previous_debug = client.debug
+            previous_latest_only = client.latest_only
             client.debug = debug
+            client.latest_only = bool(latest_only)
             if hasattr(client.data_handler, "debug"):
                 client.data_handler.debug = debug
+            now = time.monotonic()
+            should_log_reuse = (
+                previous_debug != debug
+                or previous_latest_only != client.latest_only
+                or now - getattr(client, "_last_reuse_debug_log_at", 0.0) >= 10.0
+            )
+            if debug and should_log_reuse:
+                client._last_reuse_debug_log_at = now
+                print(
+                    f"{client._debug_prefix()} reused client key={key} "
+                    f"running={client.running} thread_alive={client.thread.is_alive()} "
+                    f"debug={previous_debug}->{debug} latest_only={previous_latest_only}->{client.latest_only} "
+                    f"{client._active_connection_label}"
+                )
         return client
 
 
@@ -1381,13 +1604,39 @@ class VrchImageWebSocketChannelLoaderNode:
         if cache is None:
             cache = {}
             self._last_image_by_target = cache
+        sequence_cache = getattr(self, "_last_sequence_by_target", None)
+        if sequence_cache is None:
+            sequence_cache = {}
+            self._last_sequence_by_target = sequence_cache
         cache_key = (server, str(channel))
+        source_id = f"{server}|/image|{channel}"
 
         # Ensure path is set correctly for loader
-        client = get_websocket_client(host, port, "/image", channel, data_handler=image_data_handler, debug=debug) 
-        
-        image = client.get_latest_data()
+        client = get_websocket_client(host, port, "/image", channel, data_handler=image_data_handler, debug=debug, latest_only=True)
+
+        if hasattr(client, "get_latest_data_with_sequence"):
+            image, source_sequence = client.get_latest_data_with_sequence()
+        else:
+            image = client.get_latest_data()
+            source_sequence = None
         if image is not None:
+            if source_sequence is not None:
+                metadata = getattr(image, "_metadata", None)
+                if not isinstance(metadata, dict):
+                    metadata = {}
+                metadata["source_id"] = source_id
+                metadata["source_sequence"] = source_sequence
+                image._metadata = metadata
+
+                if sequence_cache.get(cache_key) == source_sequence and cache_key in cache:
+                    if debug:
+                        print(
+                            f"[VrchImageWebSocketChannelLoaderNode] No new image data received, "
+                            f"using cached websocket image (source_sequence={source_sequence})"
+                        )
+                    return (cache[cache_key], False)
+                sequence_cache[cache_key] = source_sequence
+
             cache[cache_key] = image
             if debug and hasattr(image, "_metadata"):
                 meta = getattr(image, "_metadata", {})
@@ -1398,6 +1647,8 @@ class VrchImageWebSocketChannelLoaderNode:
                     meta.get("frame_total"),
                     "(batch",
                     meta.get("batch_id"),
+                    "source_sequence",
+                    meta.get("source_sequence"),
                     ")",
                 )
             return (image, False)
