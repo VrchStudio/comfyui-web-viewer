@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- keep primary MIDI control values authoritative when secondary MIDI senders are active
+
 ## [1.1.22 - 2026-06-06]
 
 ### Fixed
