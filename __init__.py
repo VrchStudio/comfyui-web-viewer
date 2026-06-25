@@ -12,7 +12,7 @@ from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
 from .nodes.workflow_export_nodes import *
 
-__version__ = "1.1.22"
+__version__ = "1.1.23"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -74,6 +74,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchTextKeyControlNode": VrchTextKeyControlNode,
     "VrchTextSrtPlayerNode": VrchTextSrtPlayerNode,
     "VrchTextSwitchOSCControlNode": VrchTextSwitchOSCControlNode,
+    "VrchTextWordReplacerNode": VrchTextWordReplacerNode,
     "VrchTriggerToggleNode": VrchTriggerToggleNode,
     "VrchTriggerToggleX4Node": VrchTriggerToggleX4Node,
     "VrchTriggerToggleX8Node": VrchTriggerToggleX8Node,
@@ -146,6 +147,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchTextKeyControlNode": "TEXT Key Control @ vrch.ai",
     "VrchTextSrtPlayerNode": "TEXT SRT Player @ vrch.ai",
     "VrchTextSwitchOSCControlNode": "TEXT Switch OSC Control @ vrch.ai",
+    "VrchTextWordReplacerNode": "TEXT Word Replacer @ vrch.ai",
     "VrchTriggerToggleNode": "Trigger Toggle @ vrch.ai",
     "VrchTriggerToggleX4Node": "Trigger Toggle x4 @ vrch.ai",
     "VrchTriggerToggleX8Node": "Trigger Toggle x8 @ vrch.ai",

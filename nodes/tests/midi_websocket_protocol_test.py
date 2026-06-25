@@ -78,6 +78,106 @@ class TestMidiWebSocketProtocol(unittest.TestCase):
         self.assertFalse(note["is_on"])
         self.assertTrue(note["is_off"])
 
+    def test_state_source_metadata_is_preserved(self):
+        parser = MidiStateParser(debug=False)
+        parser(encode_definition_frame([{"key": "brightness", "number": 22}], definition_seq=1, seq=1))
+        state = parser(
+            encode_state_frame(
+                control_values=[{"control_index": 0, "value": 32}],
+                definition_seq=1,
+                seq=2,
+                sender_id="midi-sender-secondary",
+                source_tier="secondary",
+            )
+        )
+        self.assertEqual(state["sender_id"], "midi-sender-secondary")
+        self.assertEqual(state["source_tier"], "secondary")
+        self.assertEqual(state["value_source_tiers_by_index"][0], "secondary")
+
+    def test_primary_control_values_override_secondary(self):
+        parser = MidiStateParser(debug=False)
+        parser(encode_definition_frame([{"key": "brightness", "number": 22}], definition_seq=1, seq=1))
+        state = parser(
+            encode_state_frame(
+                control_values=[{"control_index": 0, "value": 20}],
+                definition_seq=1,
+                seq=2,
+                sender_id="secondary-midi",
+                source_tier="secondary",
+            )
+        )
+        self.assertEqual(state["values_by_index"][0], 20)
+
+        state = parser(
+            encode_state_frame(
+                control_values=[{"control_index": 0, "value": 90}],
+                definition_seq=1,
+                seq=3,
+                sender_id="primary-midi",
+                source_tier="primary",
+            )
+        )
+        self.assertEqual(state["values_by_index"][0], 90)
+        self.assertEqual(state["value_source_tiers_by_index"][0], "primary")
+
+        state = parser(
+            encode_state_frame(
+                control_values=[{"control_index": 0, "value": 10}],
+                definition_seq=1,
+                seq=4,
+                sender_id="secondary-midi",
+                source_tier="secondary",
+            )
+        )
+        self.assertEqual(state["values_by_index"][0], 90)
+        self.assertEqual(state["value_source_tiers_by_index"][0], "primary")
+
+    def test_primary_raw_cc_and_notes_override_secondary(self):
+        parser = MidiStateParser(debug=False)
+        parser(encode_definition_frame([], definition_seq=1, seq=1))
+        state = parser(
+            encode_state_frame(
+                raw_cc=[{"midi_channel": 0, "number": 22, "value": 20}],
+                raw_notes=[{"midi_channel": 0, "number": 36, "velocity": 127, "status": "noteOn"}],
+                definition_seq=1,
+                seq=2,
+                sender_id="secondary-midi",
+                source_tier="secondary",
+            )
+        )
+        self.assertEqual(state["cc_values"]["1"][22], 20)
+        self.assertEqual(state["notes"]["1"][36]["velocity"], 127)
+
+        state = parser(
+            encode_state_frame(
+                raw_cc=[{"midi_channel": 0, "number": 22, "value": 90}],
+                raw_notes=[{"midi_channel": 0, "number": 36, "velocity": 64, "status": "noteOn"}],
+                definition_seq=1,
+                seq=3,
+                sender_id="primary-midi",
+                source_tier="primary",
+            )
+        )
+        self.assertEqual(state["cc_values"]["1"][22], 90)
+        self.assertEqual(state["notes"]["1"][36]["velocity"], 64)
+
+        state = parser(
+            encode_state_frame(
+                raw_cc=[{"midi_channel": 0, "number": 22, "value": 10}],
+                raw_notes=[{"midi_channel": 0, "number": 36, "velocity": 0, "status": "noteOff"}],
+                definition_seq=1,
+                seq=4,
+                sender_id="secondary-midi",
+                source_tier="secondary",
+            )
+        )
+        self.assertEqual(state["cc_values"]["1"][22], 90)
+        self.assertEqual(state["cc_values"]["any"][22], 90)
+        self.assertEqual(state["notes"]["1"][36]["velocity"], 64)
+        self.assertTrue(state["notes"]["1"][36]["is_on"])
+        self.assertEqual(state["cc_source_tiers"]["1"][22], "primary")
+        self.assertEqual(state["note_source_tiers"]["1"][36], "primary")
+
     def test_malformed_frames_do_not_raise(self):
         parser = MidiStateParser(debug=False)
         empty = parser.empty_state()

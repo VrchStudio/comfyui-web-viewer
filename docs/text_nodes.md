@@ -20,6 +20,77 @@
 
 ---
 
+### Node: `TEXT Word Replacer @ vrch.ai` (vrch.ai/text)
+
+1. **Add the `TEXT Word Replacer @ vrch.ai` node to your ComfyUI workflow.**
+
+2. **Configure the Node:**
+   - **Text:**
+     - **`text`**: Input text to transform.
+   - **Rules:**
+     - **`rules`**: One replacement rule per line.
+     - Use `source => target` format:
+       ```text
+       # source => target
+       happy => joyful
+       sad => melancholic
+       high energy => energetic
+       ```
+     - Empty lines and lines starting with `#` are ignored.
+     - If the target side is empty, the matched text is removed.
+     - If the same source appears more than once, the last rule wins.
+   - **Match Mode:**
+     - **`whole_word`**: Matches full words or phrases only. This is the default and avoids replacing `sad` inside `sadness`.
+     - **`literal`**: Matches the source text anywhere, including inside longer words.
+   - **Case Sensitive:**
+     - **`case_sensitive`**: Toggle this option to require exact uppercase/lowercase matching.
+   - **Debug:**
+     - **`debug`**: Print the replacement report to the console.
+
+3. **Replacement Behavior:**
+   - The node applies all rules in one pass, so replacements do not cascade.
+   - Longer source phrases are matched before shorter source phrases. For example, `cat girl` is matched before `cat`.
+   - Rules are treated as literal text, not regular expressions.
+
+4. **Outputs:**
+   - `TEXT`: The transformed text.
+   - `REPLACE_REPORT`: JSON report with rule and replacement counts:
+     ```json
+     {
+       "rules_count": 3,
+       "ignored_rules_count": 0,
+       "replaced_count": 5,
+       "matched": {
+         "happy": 2,
+         "sad": 3
+       },
+       "match_mode": "whole_word",
+       "case_sensitive": false
+     }
+     ```
+
+**Example:**
+
+Input text:
+```text
+happy and sad, high energy music
+```
+
+Rules:
+```text
+happy => joyful
+sad => melancholic
+high energy => energetic
+```
+
+Output text:
+```text
+joyful and melancholic, energetic music
+```
+
+
+---
+
 ### Node: `TEXT SRT Player @ vrch.ai` (vrch.ai/text)
 
 1. **Add the `TEXT SRT Player @ vrch.ai` node to your ComfyUI workflow.**

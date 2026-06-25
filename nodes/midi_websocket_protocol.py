@@ -24,6 +24,10 @@ CONTROL_TYPES = {
     5: "xy_y",
 }
 CONTROL_TYPE_IDS = {value: key for key, value in CONTROL_TYPES.items()}
+SOURCE_TIER_PRIORITY = {
+    "secondary": 1,
+    "primary": 2,
+}
 
 
 class MidiProtocolError(ValueError):
@@ -66,6 +70,17 @@ def cc_lookup_key(channel_key: str, number: int) -> str:
     return f"{channel_key}:{int(number)}"
 
 
+def normalize_source_tier(value: Any) -> str:
+    normalized = str(value or "").strip().lower()
+    if normalized == "secondary":
+        return "secondary"
+    return "primary"
+
+
+def source_tier_priority(value: Any) -> int:
+    return SOURCE_TIER_PRIORITY.get(normalize_source_tier(value), SOURCE_TIER_PRIORITY["primary"])
+
+
 def _read_u8(data: bytes, offset: int) -> tuple[int, int]:
     if offset + 1 > len(data):
         raise MidiProtocolError("truncated uint8")
@@ -87,6 +102,15 @@ def _read_string(data: bytes, offset: int) -> tuple[str, int]:
         raise MidiProtocolError("truncated string data")
     raw = data[offset:offset + length]
     return raw.decode("utf-8"), offset + length
+
+
+def _read_optional_string(data: bytes, offset: int) -> tuple[str, int]:
+    if offset >= len(data):
+        return "", offset
+    try:
+        return _read_string(data, offset)
+    except MidiProtocolError:
+        return "", len(data)
 
 
 def _pack_string(value: Any) -> bytes:
@@ -153,6 +177,8 @@ def encode_state_frame(
     seq: int = 1,
     timestamp_ms_low: int | None = None,
     device_index: int = 0,
+    sender_id: str = "",
+    source_tier: str = "primary",
 ) -> bytes:
     """Build a state frame. This is primarily used by tests."""
 
@@ -193,6 +219,8 @@ def encode_state_frame(
             clamp_u8(item.get("value", 0)),
             clamp_u8(item.get("flags", 0)),
         )
+    payload += _pack_string(sender_id)
+    payload += _pack_string(normalize_source_tier(source_tier))
     return _pack_header(FRAME_STATE, seq, timestamp_ms_low, device_index) + payload
 
 
@@ -217,8 +245,13 @@ class MidiStateStore:
         self.index_by_key: dict[str, int] = {}
         self.index_by_cc: dict[str, int] = {}
         self.values_by_index: dict[int, int] = {}
+        self.value_source_tiers_by_index: dict[int, str] = {}
         self.cc_values: dict[str, dict[int, int]] = {}
+        self.cc_source_tiers: dict[str, dict[int, str]] = {}
         self.notes: dict[str, dict[int, dict[str, Any]]] = {}
+        self.note_source_tiers: dict[str, dict[int, str]] = {}
+        self.sender_id = ""
+        self.source_tier = "primary"
         self.seq = None
         self.timestamp_ms_low = None
         self.received_at = None
@@ -233,8 +266,13 @@ class MidiStateStore:
             "index_by_key": dict(self.index_by_key),
             "index_by_cc": dict(self.index_by_cc),
             "values_by_index": dict(self.values_by_index),
+            "value_source_tiers_by_index": dict(self.value_source_tiers_by_index),
             "cc_values": {ch: dict(values) for ch, values in self.cc_values.items()},
+            "cc_source_tiers": {ch: dict(values) for ch, values in self.cc_source_tiers.items()},
             "notes": {ch: {num: dict(value) for num, value in notes.items()} for ch, notes in self.notes.items()},
+            "note_source_tiers": {ch: dict(values) for ch, values in self.note_source_tiers.items()},
+            "sender_id": self.sender_id,
+            "source_tier": self.source_tier,
             "seq": self.seq,
             "timestamp_ms_low": self.timestamp_ms_low,
             "received_at": self.received_at,
@@ -248,6 +286,31 @@ class MidiStateStore:
         self.received_at = now
         now_ms_low = int(now * 1000) & 0xFFFFFFFF
         self.packet_age_ms = float((now_ms_low - header.timestamp_ms_low) & 0xFFFFFFFF)
+
+    def _can_apply_source(self, current_tier: str | None, incoming_tier: str) -> bool:
+        if not current_tier:
+            return True
+        return source_tier_priority(incoming_tier) >= source_tier_priority(current_tier)
+
+    def _set_cc_value(self, channel_key: str, cc_number: int, value: int, source_tier: str):
+        source_map = self.cc_source_tiers.setdefault(channel_key, {})
+        if not self._can_apply_source(source_map.get(cc_number), source_tier):
+            return
+        self.cc_values.setdefault(channel_key, {})[cc_number] = value
+        source_map[cc_number] = source_tier
+
+    def _set_note_value(self, channel_key: str, note_number: int, note_value: dict[str, Any], source_tier: str):
+        source_map = self.note_source_tiers.setdefault(channel_key, {})
+        if not self._can_apply_source(source_map.get(note_number), source_tier):
+            return
+        self.notes.setdefault(channel_key, {})[note_number] = dict(note_value)
+        source_map[note_number] = source_tier
+
+    def _set_control_value(self, control_index: int, value: int, source_tier: str):
+        if not self._can_apply_source(self.value_source_tiers_by_index.get(control_index), source_tier):
+            return
+        self.values_by_index[control_index] = value
+        self.value_source_tiers_by_index[control_index] = source_tier
 
     def apply_definition(self, header: MidiFrameHeader, data: bytes, offset: int):
         definition_seq, offset = _read_u32(data, offset)
@@ -299,36 +362,37 @@ class MidiStateStore:
         self.index_by_key = index_by_key
         self.index_by_cc = index_by_cc
         self.values_by_index = {idx: value for idx, value in self.values_by_index.items() if idx in definitions_by_index}
+        self.value_source_tiers_by_index = {
+            idx: tier for idx, tier in self.value_source_tiers_by_index.items() if idx in definitions_by_index
+        }
         self._set_packet_meta(header)
         return self.snapshot()
 
     def apply_state(self, header: MidiFrameHeader, data: bytes, offset: int):
         frame_definition_seq, offset = _read_u32(data, offset)
         raw_cc_count, offset = _read_u8(data, offset)
+        raw_cc_records = []
         for _ in range(raw_cc_count):
             if offset + 3 > len(data):
                 raise MidiProtocolError("truncated raw cc record")
             midi_channel, cc_number, value = struct.unpack_from(">BBB", data, offset)
             offset += 3
-            channel_key = channel_to_key(midi_channel)
-            self.cc_values.setdefault(channel_key, {})[cc_number] = value
-            self.cc_values.setdefault("any", {})[cc_number] = value
+            raw_cc_records.append((midi_channel, cc_number, value))
 
         raw_note_count, offset = _read_u8(data, offset)
+        raw_note_records = []
         for _ in range(raw_note_count):
             if offset + 4 > len(data):
                 raise MidiProtocolError("truncated raw note record")
             midi_channel, note_number, velocity, flags = struct.unpack_from(">BBBB", data, offset)
             offset += 4
-            channel_key = channel_to_key(midi_channel)
             note_value = {
                 "velocity": velocity,
                 "is_on": bool(flags & 1) and velocity > 0,
                 "is_off": bool(flags & 2) or not (bool(flags & 1) and velocity > 0),
                 "flags": flags,
             }
-            self.notes.setdefault(channel_key, {})[note_number] = note_value
-            self.notes.setdefault("any", {})[note_number] = dict(note_value)
+            raw_note_records.append((midi_channel, note_number, note_value))
 
         control_value_count, offset = _read_u8(data, offset)
         control_values = []
@@ -339,10 +403,26 @@ class MidiStateStore:
             offset += 3
             control_values.append((control_index, value, flags))
 
+        sender_id, offset = _read_optional_string(data, offset)
+        raw_source_tier, offset = _read_optional_string(data, offset)
+        source_tier = normalize_source_tier(raw_source_tier)
+        self.sender_id = sender_id
+        self.source_tier = source_tier
+
+        for midi_channel, cc_number, value in raw_cc_records:
+            channel_key = channel_to_key(midi_channel)
+            self._set_cc_value(channel_key, cc_number, value, source_tier)
+            self._set_cc_value("any", cc_number, value, source_tier)
+
+        for midi_channel, note_number, note_value in raw_note_records:
+            channel_key = channel_to_key(midi_channel)
+            self._set_note_value(channel_key, note_number, note_value, source_tier)
+            self._set_note_value("any", note_number, note_value, source_tier)
+
         if self.definition_ready and frame_definition_seq == self.definition_seq:
             for control_index, value, _flags in control_values:
                 if control_index in self.definitions_by_index:
-                    self.values_by_index[control_index] = value
+                    self._set_control_value(control_index, value, source_tier)
         elif self.debug:
             print(
                 "[MidiStateParser] state definition_seq mismatch; "
