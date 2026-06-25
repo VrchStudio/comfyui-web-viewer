@@ -30,10 +30,11 @@ class VrchAudioMusic2EmotionNode:
     moods    : STRING (formatted as "mood: probability" sorted high to low)
     valence  : FLOAT  (emotional valence: 1-9 scale)
     arousal  : FLOAT  (emotional arousal: 1-9 scale)
+    moods_name_only : STRING (comma-separated mood names sorted high to low)
     """
 
-    RETURN_TYPES = ("AUDIO", "JSON", "STRING", "FLOAT", "FLOAT")
-    RETURN_NAMES = ("AUDIO", "RAW_DATA", "MOODS", "VALENCE", "AROUSAL")
+    RETURN_TYPES = ("AUDIO", "JSON", "STRING", "FLOAT", "FLOAT", "STRING")
+    RETURN_NAMES = ("AUDIO", "RAW_DATA", "MOODS", "VALENCE", "AROUSAL", "MOODS_NAME_ONLY")
     FUNCTION = "analyze"
     OUTPUT_NODE = True
     CATEGORY = CATEGORY
@@ -80,6 +81,31 @@ class VrchAudioMusic2EmotionNode:
                 "debug": ("BOOLEAN", {"default": False}),
             }
         }
+
+    @staticmethod
+    def _format_moods_outputs(predicted_moods, mood_probs, threshold):
+        if mood_probs and isinstance(mood_probs, dict):
+            formatted_pairs = []
+            for mood, prob in mood_probs.items():
+                try:
+                    prob_value = float(prob)
+                except Exception:
+                    continue
+                if prob_value >= float(threshold):
+                    formatted_pairs.append((str(mood), prob_value))
+
+            formatted_pairs.sort(key=lambda item: item[1], reverse=True)
+            if not formatted_pairs:
+                return "No moods detected", ""
+
+            moods_output = "\n".join(f"{mood}: {prob:.4f}" for mood, prob in formatted_pairs)
+            moods_name_only_output = ", ".join(mood for mood, _ in formatted_pairs)
+            return moods_output, moods_name_only_output
+
+        mood_names = [str(mood) for mood in (predicted_moods or [])]
+        moods_output = ", ".join(mood_names) if mood_names else "No moods detected"
+        moods_name_only_output = ", ".join(mood_names)
+        return moods_output, moods_name_only_output
 
     def _audio_to_tempfile(self, waveform, sr):
         """
@@ -132,12 +158,12 @@ class VrchAudioMusic2EmotionNode:
         Returns
         -------
         tuple
-            (audio_passthrough, raw_data_json, formatted_moods, valence, arousal)
+            (audio_passthrough, raw_data_json, formatted_moods, valence, arousal, moods_name_only)
         """
         if not self.model_loaded:
             error_msg = "Music2emo model not available. Please install the Music2emotion third-party module."
             raw_data = {"error": error_msg, "installation_required": True}
-            return (audio, raw_data, f"Error: {error_msg}", 0.0, 0.0)
+            return (audio, raw_data, f"Error: {error_msg}", 0.0, 0.0, "")
         
         try:
             # Extract audio data
@@ -209,23 +235,10 @@ class VrchAudioMusic2EmotionNode:
             valence = float(result.get("valence", 0.0))
             arousal = float(result.get("arousal", 0.0))
 
-            # Format moods as "mood: probability" sorted by probability (high to low)
-            if mood_probs and isinstance(mood_probs, dict):
-                # Sort moods by probability in descending order
-                sorted_moods = sorted(mood_probs.items(), key=lambda x: x[1], reverse=True)
-                formatted_moods = []
-                for mood, prob in sorted_moods:
-                    if prob >= threshold:  # Only include moods above threshold
-                        formatted_moods.append(f"{mood}: {prob:.4f}")
-                moods_output = "\n".join(formatted_moods) if formatted_moods else "No moods detected"
-                
-                if debug:
-                    print(f"[VrchAudioMusic2EmotionNode] Debug: Formatted moods: {moods_output}")
-            else:
-                # Fallback to predicted_moods list if mood_probs not available
-                moods_output = ", ".join(predicted_moods) if predicted_moods else "No moods detected"
-                if debug:
-                    print(f"[VrchAudioMusic2EmotionNode] Debug: Using fallback mood format")
+            moods_output, moods_name_only_output = self._format_moods_outputs(predicted_moods, mood_probs, threshold)
+            if debug:
+                print(f"[VrchAudioMusic2EmotionNode] Debug: Formatted moods: {moods_output}")
+                print(f"[VrchAudioMusic2EmotionNode] Debug: Moods name-only: {moods_name_only_output}")
             
             # Ensure values are in expected range
             valence = max(0.0, min(9.0, valence))
@@ -270,7 +283,7 @@ class VrchAudioMusic2EmotionNode:
             if debug:
                 print(f"[VrchAudioMusic2EmotionNode] Debug: Final outputs - Valence: {valence}, Arousal: {arousal}")
             
-            return (audio, raw_data, moods_output, valence, arousal)
+            return (audio, raw_data, moods_output, valence, arousal, moods_name_only_output)
             
         except Exception as e:
             error_msg = f"Error during analysis: {str(e)}"
@@ -280,7 +293,7 @@ class VrchAudioMusic2EmotionNode:
                 "analysis_success": False,
                 "threshold_used": threshold
             }
-            return (audio, raw_data, f"Error: {str(e)}", 0.0, 0.0)
+            return (audio, raw_data, f"Error: {str(e)}", 0.0, 0.0, "")
 
 
 class VrchAudioEmotionVisualizerNode:

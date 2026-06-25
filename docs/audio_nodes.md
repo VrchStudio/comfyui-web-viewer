@@ -219,6 +219,11 @@
      ```
    - `VALENCE`: Emotional valence value (1.0-9.0) representing positive/negative sentiment.
    - `AROUSAL`: Emotional arousal value (1.0-9.0) representing energy/activation level.
+   - `MOODS_NAME_ONLY`: Comma-separated mood names using the same threshold and probability order as `MOODS`, for example:
+     ```
+     children, fun, funny, happy, upbeat
+     ```
+     When no mood passes the threshold, this output is an empty string.
 5. **Mood Categories:**
    - The system can detect various musical moods including: happy, sad, energetic, calm, dramatic, romantic, epic, dark, upbeat, melancholic, aggressive, peaceful, triumphant, mysterious, and many others.
    - Each mood is assigned a probability score (0.0-1.0) indicating the confidence of detection.
