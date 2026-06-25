@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 import requests
 import srt
 from datetime import timedelta
@@ -45,6 +46,145 @@ class VrchJsonUrlLoaderNode:
 
         return (res,)
     
+
+class VrchTextWordReplacerNode:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "text": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
+                "rules": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
+                "match_mode": (["whole_word", "literal"], {"default": "whole_word"}),
+                "case_sensitive": ("BOOLEAN", {"default": False}),
+                "debug": ("BOOLEAN", {"default": False}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING", "JSON")
+    RETURN_NAMES = ("TEXT", "REPLACE_REPORT")
+    CATEGORY = CATEGORY
+    FUNCTION = "replace_text"
+
+    def __init__(self):
+        self._rules_cache_key = None
+        self._rules_cache_value = None
+
+    @staticmethod
+    def _rule_key(source: str, case_sensitive: bool):
+        return source if case_sensitive else source.casefold()
+
+    @classmethod
+    def _parse_replacement_rules(cls, rules: str, case_sensitive: bool=False):
+        parsed = {}
+        ignored_count = 0
+        for raw_line in (rules or "").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=>" not in line:
+                ignored_count += 1
+                continue
+
+            source, target = line.split("=>", 1)
+            source = source.strip()
+            target = target.strip()
+            if not source:
+                ignored_count += 1
+                continue
+
+            parsed[cls._rule_key(source, case_sensitive)] = {
+                "source": source,
+                "target": target,
+            }
+
+        return list(parsed.values()), ignored_count
+
+    @classmethod
+    def _compile_replacement_rules(cls, rules: str, match_mode: str, case_sensitive: bool=False):
+        parsed_rules, ignored_count = cls._parse_replacement_rules(rules, case_sensitive)
+        if not parsed_rules:
+            return None, {}, [], ignored_count
+
+        sorted_rules = sorted(parsed_rules, key=lambda rule: len(rule["source"]), reverse=True)
+        pattern_body = "|".join(re.escape(rule["source"]) for rule in sorted_rules)
+        if match_mode == "whole_word":
+            pattern_text = rf"(?<!\w)({pattern_body})(?!\w)"
+        else:
+            pattern_text = rf"({pattern_body})"
+
+        flags = 0 if case_sensitive else re.IGNORECASE
+        replacement_map = {
+            cls._rule_key(rule["source"], case_sensitive): rule
+            for rule in sorted_rules
+        }
+        return re.compile(pattern_text, flags), replacement_map, sorted_rules, ignored_count
+
+    def _get_compiled_rules(self, rules: str, match_mode: str, case_sensitive: bool):
+        cache_key = (rules or "", match_mode, bool(case_sensitive))
+        if self._rules_cache_key == cache_key:
+            return self._rules_cache_value
+
+        compiled = self._compile_replacement_rules(rules, match_mode, case_sensitive)
+        self._rules_cache_key = cache_key
+        self._rules_cache_value = compiled
+        return compiled
+
+    def replace_text(self,
+                     text: str,
+                     rules: str,
+                     match_mode: str="whole_word",
+                     case_sensitive: bool=False,
+                     debug: bool=False):
+        text = text or ""
+        if match_mode not in {"whole_word", "literal"}:
+            match_mode = "whole_word"
+
+        pattern, replacement_map, parsed_rules, ignored_count = self._get_compiled_rules(
+            rules, match_mode, bool(case_sensitive)
+        )
+
+        matched = {}
+        replaced_count = 0
+
+        if not pattern:
+            report = {
+                "rules_count": 0,
+                "ignored_rules_count": ignored_count,
+                "replaced_count": 0,
+                "matched": {},
+                "match_mode": match_mode,
+                "case_sensitive": bool(case_sensitive),
+            }
+            return (text, report)
+
+        def replace_match(match):
+            nonlocal replaced_count
+            source = match.group(0)
+            key = self._rule_key(source, bool(case_sensitive))
+            rule = replacement_map.get(key)
+            if not rule:
+                return source
+            matched_source = rule["source"]
+            target = rule["target"]
+            matched[matched_source] = matched.get(matched_source, 0) + 1
+            replaced_count += 1
+            return target
+
+        output_text = pattern.sub(replace_match, text)
+        report = {
+            "rules_count": len(parsed_rules),
+            "ignored_rules_count": ignored_count,
+            "replaced_count": replaced_count,
+            "matched": matched,
+            "match_mode": match_mode,
+            "case_sensitive": bool(case_sensitive),
+        }
+
+        if debug:
+            print(f"[VrchTextWordReplacerNode] Report: {json.dumps(report, ensure_ascii=False)}")
+
+        return (output_text, report)
+
     
 class VrchTextSrtPlayerNode:
     @classmethod
