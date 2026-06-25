@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.23 - 2026-06-25]
+
 ### Added
 
 - add `MOODS_NAME_ONLY` output to `VrchAudioMusic2EmotionNode`
