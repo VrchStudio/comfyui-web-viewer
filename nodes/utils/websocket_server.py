@@ -431,7 +431,7 @@ class WebSocketClientProxy:
         except Exception:
             return
 
-        uri = f"ws://{self.host}:{self.port}{path}?channel={channel_int}&client=comfyui-output"
+        uri = f"ws://{self.host}:{self.port}{path}?channel={channel_int}&client=comfyui-output&role=service"
         realtime = self._is_realtime_payload(path, data)
 
         try:

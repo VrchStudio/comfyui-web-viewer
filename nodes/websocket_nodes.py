@@ -552,7 +552,7 @@ class WebSocketClient:
             )
 
     def _endpoint_label(self):
-        return f"{self.host}:{self.port}{self.path}?channel={self.channel}&client=comfyui-loader"
+        return f"{self.host}:{self.port}{self.path}?channel={self.channel}&client=comfyui-loader&role=service"
 
     def _connection_label(self, websocket=None):
         ws = websocket or self._ws
@@ -592,7 +592,7 @@ class WebSocketClient:
             close_code = None
             close_reason = None
             try:
-                uri = f"ws://{self.host}:{self.port}{self.path}?channel={self.channel}&client=comfyui-loader"
+                uri = f"ws://{self.host}:{self.port}{self.path}?channel={self.channel}&client=comfyui-loader&role=service"
                 self._connect_attempt += 1
                 if self.debug:
                     print(
