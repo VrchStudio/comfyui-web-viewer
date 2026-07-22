@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.24 - 2026-07-22]
+
+### Fixed
+
+- preserve secondary MIDI changes when primary senders repeat unchanged full-state snapshots
+- identify ComfyUI WebSocket loader and output connections as persistent services
+
 ## [1.1.23 - 2026-06-25]
 
 ### Added

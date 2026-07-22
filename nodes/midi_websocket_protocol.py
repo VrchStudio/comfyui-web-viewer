@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import struct
 import time
-from dataclasses import dataclass
-from typing import Any
+from dataclasses import dataclass, field
+from typing import Any, Callable
 
 
 MAGIC = b"VMID"
@@ -28,6 +28,9 @@ SOURCE_TIER_PRIORITY = {
     "secondary": 1,
     "primary": 2,
 }
+PRIMARY_ACTIVITY_WINDOW_SECONDS = 0.3
+SOURCE_EXPIRY_SECONDS = 6.0
+LEGACY_SOURCE_KEY = "__legacy__"
 
 
 class MidiProtocolError(ValueError):
@@ -141,6 +144,12 @@ def encode_definition_frame(
     seq: int = 1,
     timestamp_ms_low: int | None = None,
     device_index: int = 0,
+    sender_id: str = "",
+    owner_id: str = "",
+    preset_id: str = "",
+    preset_name: str = "",
+    device_name: str = "",
+    source_tier: str = "primary",
 ) -> bytes:
     """Build a definition frame. This is primarily used by tests."""
 
@@ -166,6 +175,12 @@ def encode_definition_frame(
         payload += _pack_string(control.get("key", control.get("workflow_key", "")))
         payload += _pack_string(control.get("id", ""))
         payload += _pack_string(control.get("label", ""))
+    payload += _pack_string(sender_id)
+    payload += _pack_string(owner_id)
+    payload += _pack_string(preset_id)
+    payload += _pack_string(preset_name)
+    payload += _pack_string(device_name)
+    payload += _pack_string(normalize_source_tier(source_tier))
     return _pack_header(FRAME_DEFINITION, seq, timestamp_ms_low, device_index) + payload
 
 
@@ -233,9 +248,38 @@ class MidiFrameHeader:
     timestamp_ms_low: int
 
 
+@dataclass
+class MidiSourceState:
+    source_key: str
+    sender_id: str
+    source_tier: str = "primary"
+    state_tier: str | None = None
+    owner_id: str = ""
+    preset_id: str = ""
+    preset_name: str = ""
+    device_name: str = ""
+    definition_ready: bool = False
+    definition_seq: int | None = None
+    definitions_by_index: dict[int, dict[str, Any]] = field(default_factory=dict)
+    raw_cc_values: dict[tuple[str, int], int] = field(default_factory=dict)
+    raw_note_values: dict[tuple[str, int], dict[str, Any]] = field(default_factory=dict)
+    control_values: dict[int, int] = field(default_factory=dict)
+    state_initialized: bool = False
+    last_seen: float = 0.0
+
+
 class MidiStateStore:
-    def __init__(self, debug: bool = False):
+    def __init__(
+        self,
+        debug: bool = False,
+        monotonic_clock: Callable[[], float] | None = None,
+        primary_activity_window_seconds: float = PRIMARY_ACTIVITY_WINDOW_SECONDS,
+        source_expiry_seconds: float = SOURCE_EXPIRY_SECONDS,
+    ):
         self.debug = debug
+        self._monotonic_clock = monotonic_clock or time.monotonic
+        self.primary_activity_window_seconds = max(0.0, float(primary_activity_window_seconds))
+        self.source_expiry_seconds = max(0.0, float(source_expiry_seconds))
         self.reset()
 
     def reset(self):
@@ -256,6 +300,11 @@ class MidiStateStore:
         self.timestamp_ms_low = None
         self.received_at = None
         self.packet_age_ms = None
+        self._sources: dict[str, MidiSourceState] = {}
+        self._composite_index_by_identity: dict[tuple[Any, ...], int] = {}
+        self._values_by_identity: dict[tuple[Any, ...], int] = {}
+        self._value_source_tiers_by_identity: dict[tuple[Any, ...], str] = {}
+        self._primary_active_until: dict[tuple[Any, ...], float] = {}
 
     def snapshot(self) -> dict[str, Any]:
         return {
@@ -287,37 +336,230 @@ class MidiStateStore:
         now_ms_low = int(now * 1000) & 0xFFFFFFFF
         self.packet_age_ms = float((now_ms_low - header.timestamp_ms_low) & 0xFFFFFFFF)
 
-    def _can_apply_source(self, current_tier: str | None, incoming_tier: str) -> bool:
-        if not current_tier:
+    @staticmethod
+    def _source_key(sender_id: str) -> str:
+        return str(sender_id or "").strip() or LEGACY_SOURCE_KEY
+
+    @staticmethod
+    def _definition_identity(
+        definition_source_key: str,
+        control_index: int,
+        definition: dict[str, Any],
+    ) -> tuple[Any, ...]:
+        clean_key = str(definition.get("key") or "").strip()
+        if clean_key:
+            return ("key", clean_key)
+        return ("source", definition_source_key, int(control_index))
+
+    def _get_source(self, sender_id: str, source_tier: str, now: float) -> MidiSourceState:
+        source_key = self._source_key(sender_id)
+        source = self._sources.get(source_key)
+        if source is None:
+            source = MidiSourceState(source_key=source_key, sender_id=str(sender_id or ""))
+            self._sources[source_key] = source
+        source.sender_id = str(sender_id or "")
+        source.source_tier = normalize_source_tier(source_tier)
+        source.last_seen = now
+        return source
+
+    def _prune_expired_sources(self, now: float):
+        if self.source_expiry_seconds <= 0:
+            return
+        expired = [
+            source_key
+            for source_key, source in self._sources.items()
+            if now - source.last_seen > self.source_expiry_seconds
+        ]
+        if not expired:
+            return
+        for source_key in expired:
+            del self._sources[source_key]
+        self._rebuild_composite_definition()
+
+    def _rebuild_composite_definition(self):
+        definition_sources = [source for source in self._sources.values() if source.definition_ready]
+        definition_sources.sort(
+            key=lambda source: (
+                1 if source.source_key == LEGACY_SOURCE_KEY else 0,
+                -source_tier_priority(source.source_tier),
+                source.source_key,
+            )
+        )
+
+        definitions_by_index: dict[int, dict[str, Any]] = {}
+        index_by_key: dict[str, int] = {}
+        index_by_cc: dict[str, int] = {}
+        composite_index_by_identity: dict[tuple[Any, ...], int] = {}
+        used_composite_indexes: set[int] = set()
+        next_composite_index = 0
+
+        for source in definition_sources:
+            for local_index in sorted(source.definitions_by_index):
+                definition = source.definitions_by_index[local_index]
+                identity = self._definition_identity(source.source_key, local_index, definition)
+                if identity in composite_index_by_identity:
+                    if self.debug and identity[0] == "key":
+                        print(f"[MidiStateParser] duplicate workflow key ignored: {identity[1]}")
+                    continue
+
+                # Preserve sender-local indexes when they do not collide, especially for the primary source.
+                preferred_index = int(local_index)
+                if preferred_index not in used_composite_indexes:
+                    composite_index = preferred_index
+                else:
+                    while next_composite_index in used_composite_indexes:
+                        next_composite_index += 1
+                    composite_index = next_composite_index
+                used_composite_indexes.add(composite_index)
+                composite_index_by_identity[identity] = composite_index
+                definitions_by_index[composite_index] = dict(definition)
+
+                clean_key = str(definition.get("key") or "").strip()
+                if clean_key:
+                    index_by_key[clean_key] = composite_index
+
+                channel_key = str(definition.get("midi_channel") or "any")
+                number = clamp_u8(definition.get("number", 0))
+                channel_cc_key = cc_lookup_key(channel_key, number)
+                any_cc_key = cc_lookup_key("any", number)
+                if channel_cc_key not in index_by_cc:
+                    index_by_cc[channel_cc_key] = composite_index
+                if channel_key != "any" and any_cc_key not in index_by_cc:
+                    index_by_cc[any_cc_key] = composite_index
+
+        valid_identities = set(composite_index_by_identity)
+        self._values_by_identity = {
+            identity: value
+            for identity, value in self._values_by_identity.items()
+            if identity in valid_identities
+        }
+        self._value_source_tiers_by_identity = {
+            identity: tier
+            for identity, tier in self._value_source_tiers_by_identity.items()
+            if identity in valid_identities
+        }
+        self._primary_active_until = {
+            target: deadline
+            for target, deadline in self._primary_active_until.items()
+            if target[0] != "control" or target[1] in valid_identities
+        }
+        self.definition_ready = bool(definition_sources)
+        self.definitions_by_index = definitions_by_index
+        self.index_by_key = index_by_key
+        self.index_by_cc = index_by_cc
+        self._composite_index_by_identity = composite_index_by_identity
+        self._sync_values_by_index()
+
+    def _sync_values_by_index(self):
+        self.values_by_index = {}
+        self.value_source_tiers_by_index = {}
+        for identity, composite_index in self._composite_index_by_identity.items():
+            if identity in self._values_by_identity:
+                self.values_by_index[composite_index] = self._values_by_identity[identity]
+            if identity in self._value_source_tiers_by_identity:
+                self.value_source_tiers_by_index[composite_index] = self._value_source_tiers_by_identity[identity]
+
+    def _definition_source_for_state(
+        self,
+        source: MidiSourceState,
+        frame_definition_seq: int,
+    ) -> MidiSourceState | None:
+        if source.definition_ready and source.definition_seq == frame_definition_seq:
+            return source
+        legacy_source = self._sources.get(LEGACY_SOURCE_KEY)
+        if (
+            source.source_key != LEGACY_SOURCE_KEY
+            and legacy_source is not None
+            and legacy_source.definition_ready
+            and legacy_source.definition_seq == frame_definition_seq
+        ):
+            return legacy_source
+        return None
+
+    def _can_apply_target(self, target: tuple[Any, ...], source_tier: str, now: float) -> bool:
+        if source_tier == "primary":
             return True
-        return source_tier_priority(incoming_tier) >= source_tier_priority(current_tier)
+        deadline = self._primary_active_until.get(target, 0.0)
+        if deadline <= now:
+            self._primary_active_until.pop(target, None)
+            return True
+        return False
 
-    def _set_cc_value(self, channel_key: str, cc_number: int, value: int, source_tier: str):
-        source_map = self.cc_source_tiers.setdefault(channel_key, {})
-        if not self._can_apply_source(source_map.get(cc_number), source_tier):
-            return
-        self.cc_values.setdefault(channel_key, {})[cc_number] = value
-        source_map[cc_number] = source_tier
+    def _record_primary_activity(self, target: tuple[Any, ...], source_tier: str, now: float, active: bool):
+        if source_tier == "primary" and active:
+            self._primary_active_until[target] = now + self.primary_activity_window_seconds
 
-    def _set_note_value(self, channel_key: str, note_number: int, note_value: dict[str, Any], source_tier: str):
-        source_map = self.note_source_tiers.setdefault(channel_key, {})
-        if not self._can_apply_source(source_map.get(note_number), source_tier):
-            return
-        self.notes.setdefault(channel_key, {})[note_number] = dict(note_value)
-        source_map[note_number] = source_tier
+    def _merge_cc_value(
+        self,
+        channel_key: str,
+        cc_number: int,
+        value: int,
+        source_tier: str,
+        now: float,
+        primary_active: bool,
+    ):
+        for output_channel in dict.fromkeys((channel_key, "any")):
+            target = ("cc", output_channel, cc_number)
+            if not self._can_apply_target(target, source_tier, now):
+                continue
+            self.cc_values.setdefault(output_channel, {})[cc_number] = value
+            self.cc_source_tiers.setdefault(output_channel, {})[cc_number] = source_tier
+            self._record_primary_activity(target, source_tier, now, primary_active)
 
-    def _set_control_value(self, control_index: int, value: int, source_tier: str):
-        if not self._can_apply_source(self.value_source_tiers_by_index.get(control_index), source_tier):
+    def _merge_note_value(
+        self,
+        channel_key: str,
+        note_number: int,
+        note_value: dict[str, Any],
+        source_tier: str,
+        now: float,
+        primary_active: bool,
+    ):
+        for output_channel in dict.fromkeys((channel_key, "any")):
+            target = ("note", output_channel, note_number)
+            if not self._can_apply_target(target, source_tier, now):
+                continue
+            self.notes.setdefault(output_channel, {})[note_number] = dict(note_value)
+            self.note_source_tiers.setdefault(output_channel, {})[note_number] = source_tier
+            self._record_primary_activity(target, source_tier, now, primary_active)
+
+    def _merge_control_value(
+        self,
+        identity: tuple[Any, ...],
+        value: int,
+        source_tier: str,
+        now: float,
+        primary_active: bool,
+    ):
+        if identity not in self._composite_index_by_identity:
             return
-        self.values_by_index[control_index] = value
-        self.value_source_tiers_by_index[control_index] = source_tier
+        target = ("control", identity)
+        if not self._can_apply_target(target, source_tier, now):
+            return
+        self._values_by_identity[identity] = value
+        self._value_source_tiers_by_identity[identity] = source_tier
+        self._record_primary_activity(target, source_tier, now, primary_active)
+
+    def _has_other_initialized_primary(self, source_key: str) -> bool:
+        return any(
+            other_key != source_key
+            and source.state_initialized
+            and source.state_tier == "primary"
+            for other_key, source in self._sources.items()
+        )
+
+    @staticmethod
+    def _changed_items(current: dict[Any, Any], previous: dict[Any, Any], apply_full: bool, initialized: bool):
+        if apply_full:
+            return list(current.items())
+        if not initialized:
+            return []
+        return [(key, value) for key, value in current.items() if previous.get(key) != value]
 
     def apply_definition(self, header: MidiFrameHeader, data: bytes, offset: int):
         definition_seq, offset = _read_u32(data, offset)
         control_count, offset = _read_u8(data, offset)
         definitions_by_index: dict[int, dict[str, Any]] = {}
-        index_by_key: dict[str, int] = {}
-        index_by_cc: dict[str, int] = {}
 
         for _ in range(control_count):
             if offset + 6 > len(data):
@@ -327,44 +569,48 @@ class MidiStateStore:
             key, offset = _read_string(data, offset)
             control_id, offset = _read_string(data, offset)
             label, offset = _read_string(data, offset)
-
-            channel_key = channel_to_key(midi_channel)
-            definition = {
+            definitions_by_index[control_index] = {
                 "key": key,
                 "id": control_id,
                 "label": label,
                 "type": CONTROL_TYPES.get(control_type, "unknown"),
                 "control_type": control_type,
-                "midi_channel": channel_key,
+                "midi_channel": channel_to_key(midi_channel),
                 "number": number,
                 "default_value": default_value,
                 "flags": flags,
             }
-            definitions_by_index[control_index] = definition
 
-            clean_key = str(key or "").strip()
-            if clean_key:
-                if clean_key not in index_by_key:
-                    index_by_key[clean_key] = control_index
-                elif self.debug:
-                    print(f"[MidiStateParser] duplicate workflow key ignored: {clean_key}")
+        sender_id, offset = _read_optional_string(data, offset)
+        owner_id, offset = _read_optional_string(data, offset)
+        preset_id, offset = _read_optional_string(data, offset)
+        preset_name, offset = _read_optional_string(data, offset)
+        device_name, offset = _read_optional_string(data, offset)
+        raw_source_tier, offset = _read_optional_string(data, offset)
+        source_tier = normalize_source_tier(raw_source_tier)
 
-            channel_cc_key = cc_lookup_key(channel_key, number)
-            any_cc_key = cc_lookup_key("any", number)
-            if channel_cc_key not in index_by_cc:
-                index_by_cc[channel_cc_key] = control_index
-            if channel_key != "any" and any_cc_key not in index_by_cc:
-                index_by_cc[any_cc_key] = control_index
+        now = self._monotonic_clock()
+        self._prune_expired_sources(now)
+        source = self._get_source(sender_id, source_tier, now)
+        definition_changed = (
+            not source.definition_ready
+            or source.definition_seq != definition_seq
+            or source.definitions_by_index != definitions_by_index
+        )
+        source.owner_id = owner_id
+        source.preset_id = preset_id
+        source.preset_name = preset_name
+        source.device_name = device_name
+        source.definition_ready = True
+        source.definition_seq = definition_seq
+        source.definitions_by_index = definitions_by_index
+        if definition_changed:
+            source.state_initialized = False
 
+        self.sender_id = sender_id
+        self.source_tier = source_tier
         self.definition_seq = definition_seq
-        self.definition_ready = True
-        self.definitions_by_index = definitions_by_index
-        self.index_by_key = index_by_key
-        self.index_by_cc = index_by_cc
-        self.values_by_index = {idx: value for idx, value in self.values_by_index.items() if idx in definitions_by_index}
-        self.value_source_tiers_by_index = {
-            idx: tier for idx, tier in self.value_source_tiers_by_index.items() if idx in definitions_by_index
-        }
+        self._rebuild_composite_definition()
         self._set_packet_meta(header)
         return self.snapshot()
 
@@ -386,13 +632,18 @@ class MidiStateStore:
                 raise MidiProtocolError("truncated raw note record")
             midi_channel, note_number, velocity, flags = struct.unpack_from(">BBBB", data, offset)
             offset += 4
-            note_value = {
-                "velocity": velocity,
-                "is_on": bool(flags & 1) and velocity > 0,
-                "is_off": bool(flags & 2) or not (bool(flags & 1) and velocity > 0),
-                "flags": flags,
-            }
-            raw_note_records.append((midi_channel, note_number, note_value))
+            raw_note_records.append(
+                (
+                    midi_channel,
+                    note_number,
+                    {
+                        "velocity": velocity,
+                        "is_on": bool(flags & 1) and velocity > 0,
+                        "is_off": bool(flags & 2) or not (bool(flags & 1) and velocity > 0),
+                        "flags": flags,
+                    },
+                )
+            )
 
         control_value_count, offset = _read_u8(data, offset)
         control_values = []
@@ -406,37 +657,96 @@ class MidiStateStore:
         sender_id, offset = _read_optional_string(data, offset)
         raw_source_tier, offset = _read_optional_string(data, offset)
         source_tier = normalize_source_tier(raw_source_tier)
-        self.sender_id = sender_id
-        self.source_tier = source_tier
+        now = self._monotonic_clock()
+        self._prune_expired_sources(now)
+        source = self._get_source(sender_id, source_tier, now)
 
-        for midi_channel, cc_number, value in raw_cc_records:
-            channel_key = channel_to_key(midi_channel)
-            self._set_cc_value(channel_key, cc_number, value, source_tier)
-            self._set_cc_value("any", cc_number, value, source_tier)
+        incoming_cc = {
+            (channel_to_key(midi_channel), cc_number): value
+            for midi_channel, cc_number, value in raw_cc_records
+        }
+        incoming_notes = {
+            (channel_to_key(midi_channel), note_number): note_value
+            for midi_channel, note_number, note_value in raw_note_records
+        }
+        incoming_controls = {
+            control_index: value
+            for control_index, value, _flags in control_values
+        }
 
-        for midi_channel, note_number, note_value in raw_note_records:
-            channel_key = channel_to_key(midi_channel)
-            self._set_note_value(channel_key, note_number, note_value, source_tier)
-            self._set_note_value("any", note_number, note_value, source_tier)
+        # VMID v1 frames are full snapshots; only changes against this sender's prior snapshot are merge candidates.
+        was_initialized = source.state_initialized
+        previous_state_tier = source.state_tier
+        promoted_to_primary = previous_state_tier == "secondary" and source_tier == "primary"
+        apply_full = promoted_to_primary or (
+            not was_initialized
+            and (source_tier == "primary" or not self._has_other_initialized_primary(source.source_key))
+        )
+        primary_active = source_tier == "primary" and (promoted_to_primary or not apply_full)
 
-        if self.definition_ready and frame_definition_seq == self.definition_seq:
-            for control_index, value, _flags in control_values:
-                if control_index in self.definitions_by_index:
-                    self._set_control_value(control_index, value, source_tier)
-        elif self.debug:
+        for (channel_key, cc_number), value in self._changed_items(
+            incoming_cc,
+            source.raw_cc_values,
+            apply_full,
+            was_initialized,
+        ):
+            self._merge_cc_value(channel_key, cc_number, value, source_tier, now, primary_active)
+
+        for (channel_key, note_number), note_value in self._changed_items(
+            incoming_notes,
+            source.raw_note_values,
+            apply_full,
+            was_initialized,
+        ):
+            self._merge_note_value(channel_key, note_number, note_value, source_tier, now, primary_active)
+
+        definition_source = self._definition_source_for_state(source, frame_definition_seq)
+        if definition_source is not None:
+            for control_index, value in self._changed_items(
+                incoming_controls,
+                source.control_values,
+                apply_full,
+                was_initialized,
+            ):
+                definition = definition_source.definitions_by_index.get(control_index)
+                if definition is None:
+                    continue
+                identity = self._definition_identity(definition_source.source_key, control_index, definition)
+                self._merge_control_value(identity, value, source_tier, now, primary_active)
+        elif incoming_controls and self.debug:
             print(
                 "[MidiStateParser] state definition_seq mismatch; "
-                f"frame={frame_definition_seq}, current={self.definition_seq}"
+                f"frame={frame_definition_seq}, sender={sender_id or LEGACY_SOURCE_KEY}"
             )
 
+        source.raw_cc_values = incoming_cc
+        source.raw_note_values = incoming_notes
+        source.control_values = incoming_controls
+        source.state_initialized = True
+        source.state_tier = source_tier
+        source.last_seen = now
+        self.sender_id = sender_id
+        self.source_tier = source_tier
+        self._sync_values_by_index()
         self._set_packet_meta(header)
         return self.snapshot()
 
 
 class MidiStateParser:
-    def __init__(self, debug: bool = False):
+    def __init__(
+        self,
+        debug: bool = False,
+        monotonic_clock: Callable[[], float] | None = None,
+        primary_activity_window_seconds: float = PRIMARY_ACTIVITY_WINDOW_SECONDS,
+        source_expiry_seconds: float = SOURCE_EXPIRY_SECONDS,
+    ):
         self.debug = debug
-        self.store = MidiStateStore(debug=debug)
+        self.store = MidiStateStore(
+            debug=debug,
+            monotonic_clock=monotonic_clock,
+            primary_activity_window_seconds=primary_activity_window_seconds,
+            source_expiry_seconds=source_expiry_seconds,
+        )
 
     def __call__(self, message: bytes | bytearray | memoryview | str):
         return self.parse(message)
