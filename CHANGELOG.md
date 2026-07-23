@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.25 - 2026-07-23]
+
+### Fixed
+
+- remove the unused Gradio 5.x dependency that can downgrade `huggingface-hub` and prevent recent ComfyUI versions from starting
+- update the Music2Emotion submodule to remove its unused Gradio import and dependency
+
 ## [1.1.24 - 2026-07-22]
 
 ### Fixed
