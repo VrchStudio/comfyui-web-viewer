@@ -4,6 +4,7 @@ from .nodes.audio_nodes import *
 from .nodes.text_nodes import *
 from .nodes.key_control_nodes import *
 from .nodes.osc_control_nodes import *
+from .nodes import websocket_nodes as _vrch_websocket_nodes
 from .nodes.websocket_nodes import *
 from .nodes.midi_control_nodes import *
 from .nodes.gamepad_nodes import *
@@ -12,7 +13,7 @@ from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
 from .nodes.workflow_export_nodes import *
 
-__version__ = "1.1.25"
+__version__ = "1.1.26"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -159,6 +160,11 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchXYZOSCControlNode": "XYZ OSC Control @ vrch.ai",
     "VrchXboxControllerNode": "Xbox Controller Mapper @ vrch.ai",
 }
+
+# Publish the Safe-set capability only after every owner module and mapping
+# above loaded successfully. The Docker-side GC policy checks this marker
+# before its prompt worker can enter Realtime.
+_vrch_websocket_nodes._initialize_realtime_contract()
 
 # WEB_DIRECTORY is the comfyui nodes directory that ComfyUI will link and auto-load.
 WEB_DIRECTORY = "./web/comfyui"

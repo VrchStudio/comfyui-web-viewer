@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.26 - 2026-07-29]
+
+### Added
+
+- add the Default-off Realtime Safe-set for prompt-scoped JPEG reuse and stable external-server/cache boundaries
+- publish the `node-safe-set-v1` capability for the cross-repository `vrch-realtime-v1` contract
+
+### Changed
+
+- fail closed to Default when the matching Docker GC capability is absent or incompatible
+
 ## [1.1.25 - 2026-07-23]
 
 ### Fixed

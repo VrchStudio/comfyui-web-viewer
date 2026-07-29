@@ -1,11 +1,14 @@
 import hashlib
 import io
 import json
+import logging
+import os
 import time
 import struct
 import base64
 import re
 import tempfile
+import weakref
 import numpy as np
 import asyncio
 import websockets
@@ -36,6 +39,203 @@ AUDIO_PLAYER_QUALITY_PRESETS_KBPS = {
     "standard": 128,
     "high": 192,
 }
+
+REALTIME_CONTRACT = "vrch-realtime-v1"
+REALTIME_NODE_CAPABILITY = "node-safe-set-v1"
+REALTIME_GC_CAPABILITY = "gc-policy-v3"
+REALTIME_MODE_ENV = "VRCH_COMFYUI_PERFORMANCE_CACHE"
+REALTIME_REQUESTED_MODE_ENV = "VRCH_COMFYUI_PERFORMANCE_REQUESTED_MODE"
+REALTIME_CONTRACT_ENV = "VRCH_COMFYUI_REALTIME_CONTRACT"
+REALTIME_NODE_CAPABILITY_ENV = "VRCH_COMFYUI_REALTIME_NODE_CAPABILITY"
+REALTIME_GC_CAPABILITY_ENV = "VRCH_COMFYUI_REALTIME_GC_CAPABILITY"
+
+
+def _requested_realtime_mode():
+    value = os.environ.get(
+        REALTIME_REQUESTED_MODE_ENV,
+        os.environ.get(REALTIME_MODE_ENV, "default"),
+    )
+    return "realtime" if str(value).strip().lower() == "realtime" else "default"
+
+
+def _initialize_realtime_contract():
+    """Publish the node capability only after the owner package loads."""
+    requested = _requested_realtime_mode()
+    peer_contract = os.environ.get(REALTIME_CONTRACT_ENV, "").strip()
+    peer_capability = os.environ.get(REALTIME_GC_CAPABILITY_ENV, "").strip()
+    compatible = (
+        peer_contract == REALTIME_CONTRACT
+        and peer_capability == REALTIME_GC_CAPABILITY
+    )
+
+    if requested == "realtime" and compatible:
+        effective = "realtime"
+        status = "active"
+        os.environ[REALTIME_NODE_CAPABILITY_ENV] = REALTIME_NODE_CAPABILITY
+        log = logging.info
+    elif requested == "realtime":
+        effective = "default"
+        status = "skew-fail-closed"
+        os.environ.pop(REALTIME_NODE_CAPABILITY_ENV, None)
+        os.environ[REALTIME_MODE_ENV] = "default"
+        log = logging.error
+    else:
+        effective = "default"
+        status = "standby"
+        os.environ.pop(REALTIME_NODE_CAPABILITY_ENV, None)
+        log = logging.info
+
+    peer = peer_capability or "missing"
+    contract = peer_contract or "missing"
+    log(
+        "[VRCH_REALTIME_CAPABILITY] component=node contract=%s "
+        "capability=%s requested=%s effective=%s peer=%s "
+        "peer_contract=%s status=%s",
+        REALTIME_CONTRACT,
+        REALTIME_NODE_CAPABILITY,
+        requested,
+        effective,
+        peer,
+        contract,
+        status,
+    )
+    return {
+        "component": "node",
+        "contract": REALTIME_CONTRACT,
+        "capability": REALTIME_NODE_CAPABILITY,
+        "requested": requested,
+        "effective": effective,
+        "peer": peer,
+        "peer_contract": contract,
+        "status": status,
+    }
+
+
+def _realtime_safe_set_enabled():
+    return (
+        os.environ.get(REALTIME_MODE_ENV, "").strip().lower() == "realtime"
+        and os.environ.get(REALTIME_CONTRACT_ENV, "").strip()
+        == REALTIME_CONTRACT
+        and os.environ.get(REALTIME_GC_CAPABILITY_ENV, "").strip()
+        == REALTIME_GC_CAPABILITY
+        and os.environ.get(REALTIME_NODE_CAPABILITY_ENV, "").strip()
+        == REALTIME_NODE_CAPABILITY
+    )
+
+
+_realtime_image_encode_cache_lock = threading.Lock()
+_realtime_image_encode_cache = {
+    "images_ref": None,
+    "prompt_scope": None,
+    "key": None,
+    "payloads": None,
+    "hits": 0,
+    "misses": 0,
+}
+
+
+def _reset_realtime_image_encode_cache():
+    with _realtime_image_encode_cache_lock:
+        _realtime_image_encode_cache.update(
+            {
+                "images_ref": None,
+                "prompt_scope": None,
+                "key": None,
+                "payloads": None,
+                "hits": 0,
+                "misses": 0,
+            }
+        )
+
+
+def _realtime_image_encode_cache_stats():
+    with _realtime_image_encode_cache_lock:
+        return {
+            "hits": int(_realtime_image_encode_cache["hits"]),
+            "misses": int(_realtime_image_encode_cache["misses"]),
+        }
+
+
+def _encode_image_batch_uncached(images, image_format):
+    payloads = []
+    for tensor in images:
+        arr = 255.0 * tensor.cpu().numpy()
+        img = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
+        buf = io.BytesIO()
+        img.save(buf, format=image_format)
+        payloads.append(buf.getvalue())
+    return tuple(payloads)
+
+
+def _image_batch_cache_key(images, image_format):
+    try:
+        version = int(images._version)
+    except (AttributeError, RuntimeError, TypeError, ValueError):
+        version = None
+    return (
+        str(image_format).upper(),
+        tuple(getattr(images, "shape", ())),
+        str(getattr(images, "dtype", "")),
+        str(getattr(images, "device", "")),
+        version,
+    )
+
+
+def _encode_image_batch(images, image_format, prompt_scope=None):
+    if not _realtime_safe_set_enabled() or prompt_scope is None:
+        return _encode_image_batch_uncached(images, image_format)
+
+    try:
+        images_ref = weakref.ref(images)
+    except TypeError:
+        return _encode_image_batch_uncached(images, image_format)
+
+    cache_key = _image_batch_cache_key(images, image_format)
+    with _realtime_image_encode_cache_lock:
+        cached_ref = _realtime_image_encode_cache["images_ref"]
+        cached_prompt_scope = _realtime_image_encode_cache["prompt_scope"]
+        if (
+            cached_ref is not None
+            and cached_ref() is images
+            and cached_prompt_scope is prompt_scope
+            and _realtime_image_encode_cache["key"] == cache_key
+        ):
+            _realtime_image_encode_cache["hits"] += 1
+            payloads = _realtime_image_encode_cache["payloads"]
+            # The canonical workflow has exactly two output nodes. Consume the
+            # cached bytes on the second node so an inference tensor without a
+            # mutation version can never reuse stale bytes across prompts.
+            _realtime_image_encode_cache.update(
+                {
+                    "images_ref": None,
+                    "prompt_scope": None,
+                    "key": None,
+                    "payloads": None,
+                }
+            )
+        else:
+            payloads = _encode_image_batch_uncached(images, image_format)
+            _realtime_image_encode_cache.update(
+                {
+                    "images_ref": images_ref,
+                    "prompt_scope": prompt_scope,
+                    "key": cache_key,
+                    "payloads": payloads,
+                    "misses": _realtime_image_encode_cache["misses"] + 1,
+                }
+            )
+
+        calls = (
+            _realtime_image_encode_cache["hits"]
+            + _realtime_image_encode_cache["misses"]
+        )
+        if calls and calls % 1024 == 0:
+            print(
+                "[VRCH_REALTIME_SAFE_SET] jpeg_encode_cache "
+                f"hits={_realtime_image_encode_cache['hits']} "
+                f"misses={_realtime_image_encode_cache['misses']}"
+            )
+        return payloads
 
 
 def _describe_image_binary_payload(data):
@@ -118,7 +318,16 @@ class VrchWebSocketServerNode:
 
     @classmethod
     def IS_CHANGED(cls, **kwargs):
-        return float("NaN")  # Always trigger evaluation to check server status
+        external_server_only = bool(kwargs.get("external_server_only", False))
+        if not _realtime_safe_set_enabled() or not external_server_only:
+            return float("NaN")  # Preserve status checks outside external-only.
+        server = str(kwargs.get("server", DEFAULT_SERVER_IP))
+        port = int(kwargs.get("port", DEFAULT_SERVER_PORT))
+        debug = bool(kwargs.get("debug", False))
+        return json.dumps(
+            [server, port, external_server_only, debug],
+            separators=(",", ":"),
+        )
 
 
 class VrchImageWebSocketWebViewerNode:
@@ -148,7 +357,8 @@ class VrchImageWebSocketWebViewerNode:
                 "debug": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
-            }
+            },
+            "hidden": {"prompt_scope": "PROMPT"},
         }
     RETURN_TYPES = ("IMAGE", "STRING")
     RETURN_NAMES = ("IMAGES", "URL")
@@ -176,7 +386,8 @@ class VrchImageWebSocketWebViewerNode:
                     dev_mode,
                     debug,
                     extra_params,
-                    url):
+                    url,
+                    prompt_scope=None):
         results = []
         host, port = server.split(":")
         server = get_global_server(host, port, path="/image", debug=debug) # Ensure path is set correctly for viewer
@@ -186,12 +397,8 @@ class VrchImageWebSocketWebViewerNode:
         batch_id = (batch_id + 1) % 65536
         self._last_batch_id = batch_id
 
-        for index, tensor in enumerate(images):
-            arr = 255.0 * tensor.cpu().numpy()
-            img = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
-            buf = io.BytesIO()
-            img.save(buf, format=format)
-            binary_data = buf.getvalue()
+        encoded_images = _encode_image_batch(images, format, prompt_scope)
+        for index, binary_data in enumerate(encoded_images):
             meta = (batch_id << 16) | ((index & 0xFF) << 8) | (batch_size & 0xFF)
             header = struct.pack(">II", 1, meta)
             data = header + binary_data
@@ -240,7 +447,8 @@ class VrchImageWebSocketSimpleWebViewerNode:
                 "debug": ("BOOLEAN", {"default": False}),
                 "extra_params":("STRING", {"multiline": True, "dynamicPrompts": False}),
                 "url": ("STRING", {"default": "", "multiline": True}),
-            }
+            },
+            "hidden": {"prompt_scope": "PROMPT"},
         }
 
     RETURN_TYPES = ("IMAGE", "STRING")
@@ -263,7 +471,8 @@ class VrchImageWebSocketSimpleWebViewerNode:
                     dev_mode,
                     debug,
                     extra_params,
-                    url):
+                    url,
+                    prompt_scope=None):
         results = []
         host, port = server.split(":")
         server = get_global_server(host, port, path="/image", debug=debug) # Ensure path is set correctly for viewer
@@ -273,12 +482,8 @@ class VrchImageWebSocketSimpleWebViewerNode:
         batch_id = (batch_id + 1) % 65536
         self._last_batch_id = batch_id
 
-        for index, tensor in enumerate(images):
-            arr = 255.0 * tensor.cpu().numpy()
-            img = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
-            buf = io.BytesIO()
-            img.save(buf, format=format)
-            binary_data = buf.getvalue()
+        encoded_images = _encode_image_batch(images, format, prompt_scope)
+        for index, binary_data in enumerate(encoded_images):
             meta = (batch_id << 16) | ((index & 0xFF) << 8) | (batch_size & 0xFF)
             header = struct.pack(">II", 1, meta)
             data = header + binary_data
@@ -722,6 +927,10 @@ class WebSocketClient:
         with self.lock:
             return self.received_data, self.received_sequence
 
+    def get_received_sequence(self):
+        with self.lock:
+            return self.received_sequence
+
     def _is_latest_message_candidate(self, message):
         if self.path == "/image":
             return isinstance(message, (bytes, bytearray)) and len(message) >= 8
@@ -801,6 +1010,29 @@ class WebSocketClient:
                 pass
         if self.thread and self.thread.is_alive():
             self.thread.join(timeout=1.5)
+
+
+def _websocket_source_sequence_token(path, channel):
+    normalized_path = path if str(path).startswith("/") else f"/{path}"
+    normalized_channel = int(channel)
+    with _websocket_clients_lock:
+        sources = [
+            [
+                str(client.host),
+                int(client.port),
+                int(client.get_received_sequence()),
+            ]
+            for client in _websocket_clients.values()
+            if client.path == normalized_path and client.channel == normalized_channel
+        ]
+    if not sources:
+        return f"{normalized_path}|{normalized_channel}|no-client"
+    sources.sort()
+    return json.dumps(
+        [normalized_path, normalized_channel, sources],
+        separators=(",", ":"),
+    )
+
 
 def get_websocket_client(host, port, path, channel, data_handler=None, debug=False, latest_only=False):
     key = f"{host}:{port}:{path}:{channel}"
@@ -1413,8 +1645,10 @@ class VrchJsonWebSocketChannelLoaderNode:
     
     @classmethod
     def IS_CHANGED(cls, **kwargs):
-        # Always trigger evaluation to check for new data
-        return float("NaN")
+        if not _realtime_safe_set_enabled():
+            return float("NaN")  # Preserve the original Default behavior.
+        channel = kwargs.get("channel", 1)
+        return _websocket_source_sequence_token("/json", channel)
 
 class VrchMidiWebSocketChannelLoaderNode:
     @classmethod

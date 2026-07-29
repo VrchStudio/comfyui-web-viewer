@@ -766,7 +766,10 @@ class TestWebSocketServerIntegration(unittest.TestCase):
             proxy.send_to_channel("/image", 1, '{"settings":{"numberOfImages":1}}')
             await asyncio.sleep(0.2)
 
-            endpoint_uri = f"ws://{self.test_host}:{port}/image?channel=1"
+            endpoint_uri = (
+                f"ws://{self.test_host}:{port}/image?channel=1"
+                "&client=comfyui-output&role=service"
+            )
             queue = proxy._endpoint_queues.get(endpoint_uri)
             self.assertIsNotNone(queue, "Proxy endpoint queue should exist")
             self.assertEqual(queue.maxsize, 1, "Realtime endpoint queue must be bounded")
@@ -959,6 +962,101 @@ class TestWebSocketServerIntegration(unittest.TestCase):
             pressure_thread.join(timeout=1.0)
 
         print("✓ Proxy sender stability under downlink pressure test passed")
+
+    def test_18_proxy_recovers_when_external_endpoint_appears(self):
+        """A live proxy should deliver again after its endpoint was unavailable."""
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.bind((self.test_host, 0))
+            port = sock.getsockname()[1]
+
+        payload = struct.pack(">II", 1, (1 << 16) | (0 << 8) | 1) + b"recovered"
+        received = []
+        received_event = threading.Event()
+        server_ready = threading.Event()
+        server_loop = asyncio.new_event_loop()
+        server_holder = {"instance": None}
+
+        async def handler(websocket, _path=None):
+            try:
+                received.append(
+                    await asyncio.wait_for(websocket.recv(), timeout=4.0)
+                )
+                received_event.set()
+            except Exception:
+                pass
+
+        def run_server():
+            asyncio.set_event_loop(server_loop)
+
+            async def start_server():
+                server_holder["instance"] = await websockets.serve(
+                    handler,
+                    self.test_host,
+                    port,
+                    ping_interval=0.2,
+                    ping_timeout=0.2,
+                )
+                server_ready.set()
+
+            server_loop.run_until_complete(start_server())
+            server_loop.run_forever()
+
+        proxy = WebSocketClientProxy(self.test_host, port, debug=False)
+        proxy.register_path("/image")
+        server_thread = None
+        try:
+            # The endpoint is deliberately absent for the first delivery attempt.
+            proxy.send_to_channel("/image", 1, payload)
+            time.sleep(0.75)
+
+            server_thread = threading.Thread(target=run_server, daemon=True)
+            server_thread.start()
+            self.assertTrue(
+                server_ready.wait(timeout=3.0),
+                "Recovery test endpoint did not start",
+            )
+
+            deadline = time.monotonic() + 5.0
+            while not received_event.is_set() and time.monotonic() < deadline:
+                proxy.send_to_channel("/image", 1, payload)
+                received_event.wait(timeout=0.1)
+
+            self.assertTrue(
+                received_event.is_set(),
+                "Proxy did not recover after the external endpoint appeared",
+            )
+            self.assertEqual(received[-1], payload)
+            self.assertTrue(proxy.is_running())
+        finally:
+            try:
+                proxy.stop()
+            except Exception:
+                pass
+
+            if (
+                server_holder["instance"] is not None
+                and server_loop.is_running()
+            ):
+                try:
+                    async def shutdown_server():
+                        server_holder["instance"].close()
+                        await server_holder["instance"].wait_closed()
+
+                    future = asyncio.run_coroutine_threadsafe(
+                        shutdown_server(),
+                        server_loop,
+                    )
+                    future.result(timeout=2.0)
+                except Exception:
+                    pass
+            try:
+                server_loop.call_soon_threadsafe(server_loop.stop)
+            except Exception:
+                pass
+            if server_thread is not None:
+                server_thread.join(timeout=1.0)
+
+        print("✓ Proxy unavailable-to-available recovery test passed")
 
 
 def run_all_tests():
