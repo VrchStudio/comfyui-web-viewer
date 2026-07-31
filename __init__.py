@@ -12,6 +12,7 @@ from .nodes.logic_nodes import *
 from .nodes.midi_nodes import *
 from .nodes.audio_music2emo_node import *
 from .nodes.workflow_export_nodes import *
+from .nodes.model_nodes import *
 
 __version__ = "1.1.26"
 
@@ -68,6 +69,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchMidiDeviceLoaderNode": VrchMidiDeviceLoaderNode,
     "VrchMidiWebSocketChannelLoaderNode": VrchMidiWebSocketChannelLoaderNode,
     "VrchModelWebViewerNode": VrchModelWebViewerNode,
+    "VrchTensorRTAutoLoaderNode": VrchTensorRTAutoLoaderNode,
     "VrchOSCControlSettingsNode": VrchOSCControlSettingsNode,
     "VrchQRCodeNode": VrchQRCodeNode,
     "VrchSwitchOSCControlNode": VrchSwitchOSCControlNode,
@@ -141,6 +143,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchMidiDeviceLoaderNode": "MIDI Device Loader @ vrch.ai",
     "VrchMidiWebSocketChannelLoaderNode": "MIDI WebSocket Channel Loader @ vrch.ai",
     "VrchModelWebViewerNode": "3D MODEL Web Viewer @ vrch.ai",
+    "VrchTensorRTAutoLoaderNode": "TensorRT Auto Loader @ vrch.ai",
     "VrchOSCControlSettingsNode": "OSC Control Settings @ vrch.ai",
     "VrchQRCodeNode": "QR Code Generator @ vrch.ai",
     "VrchSwitchOSCControlNode": "SWITCH OSC Control @ vrch.ai",

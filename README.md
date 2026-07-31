@@ -170,6 +170,10 @@ To use the `AUDIO Music to Emotion Detector @ vrch.ai` node, you'll need to inst
 - Documentation: [Usage of Logic nodes](./docs/logic_nodes.md)
 - Example workflows: n/a
 
+### `Model Nodes`
+
+- Documentation: [Usage of Model nodes](./docs/model_nodes.md)
+
 ### `Text Nodes`
 
 - Documentation: [Usage of Text nodes](./docs/text_nodes.md)

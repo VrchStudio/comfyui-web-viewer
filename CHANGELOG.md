@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- add a backend-only TensorRT Auto Loader node with automatic PyTorch fallback
+
 ## [1.1.26 - 2026-07-29]
 
 ### Added
