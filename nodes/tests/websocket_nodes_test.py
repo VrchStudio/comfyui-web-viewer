@@ -8,6 +8,7 @@ import asyncio
 import base64
 import io
 import json
+import os
 import socket
 import struct
 import sys
@@ -15,6 +16,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import numpy as np
 import torch
@@ -33,6 +35,16 @@ from nodes.utils.websocket_server import (  # noqa: E402
     _port_servers,
     _server_lock,
 )
+
+
+def realtime_contract_env():
+    return {
+        ws_nodes.REALTIME_MODE_ENV: "realtime",
+        ws_nodes.REALTIME_REQUESTED_MODE_ENV: "realtime",
+        ws_nodes.REALTIME_CONTRACT_ENV: ws_nodes.REALTIME_CONTRACT,
+        ws_nodes.REALTIME_GC_CAPABILITY_ENV: ws_nodes.REALTIME_GC_CAPABILITY,
+        ws_nodes.REALTIME_NODE_CAPABILITY_ENV: ws_nodes.REALTIME_NODE_CAPABILITY,
+    }
 
 
 class TestWebSocketNodesUnit(unittest.TestCase):
@@ -293,6 +305,474 @@ class TestWebSocketNodesUnit(unittest.TestCase):
         self.assertEqual(data, ord("d"))
         self.assertEqual(sequence, 2)
         self.assertEqual(decoded_payloads, [second])
+
+    def test_14_realtime_cache_tokens_preserve_default_behavior(self):
+        with mock.patch.dict(
+            os.environ,
+            {"VRCH_COMFYUI_PERFORMANCE_CACHE": "default"},
+        ):
+            server_token = ws_nodes.VrchWebSocketServerNode.IS_CHANGED(
+                server="0.0.0.0",
+                port=8001,
+                external_server_only=True,
+                debug=False,
+            )
+            json_token = ws_nodes.VrchJsonWebSocketChannelLoaderNode.IS_CHANGED(
+                channel="2"
+            )
+
+        self.assertNotEqual(server_token, server_token)
+        self.assertNotEqual(json_token, json_token)
+
+    def test_15_realtime_cache_tokens_are_stable_and_input_sensitive(self):
+        class FakeClient:
+            def __init__(self):
+                self.host = "127.0.0.1"
+                self.port = 8001
+                self.path = "/json"
+                self.channel = 2
+                self.sequence = 0
+
+            def get_received_sequence(self):
+                return self.sequence
+
+        fake_client = FakeClient()
+        with ws_nodes._websocket_clients_lock:
+            original_clients = dict(ws_nodes._websocket_clients)
+            ws_nodes._websocket_clients.clear()
+            ws_nodes._websocket_clients["test-json"] = fake_client
+        self.addCleanup(
+            lambda: (
+                ws_nodes._websocket_clients.clear(),
+                ws_nodes._websocket_clients.update(original_clients),
+            )
+        )
+
+        with mock.patch.dict(
+            os.environ,
+            realtime_contract_env(),
+        ):
+            server_first = ws_nodes.VrchWebSocketServerNode.IS_CHANGED(
+                server="0.0.0.0",
+                port=8001,
+                external_server_only=True,
+                debug=False,
+            )
+            server_repeated = ws_nodes.VrchWebSocketServerNode.IS_CHANGED(
+                server="0.0.0.0",
+                port=8001,
+                external_server_only=True,
+                debug=False,
+            )
+            server_changed = ws_nodes.VrchWebSocketServerNode.IS_CHANGED(
+                server="0.0.0.0",
+                port=8002,
+                external_server_only=True,
+                debug=False,
+            )
+            auto_mode_first = ws_nodes.VrchWebSocketServerNode.IS_CHANGED(
+                server="0.0.0.0",
+                port=8001,
+                external_server_only=False,
+                debug=False,
+            )
+            auto_mode_second = ws_nodes.VrchWebSocketServerNode.IS_CHANGED(
+                server="0.0.0.0",
+                port=8001,
+                external_server_only=False,
+                debug=False,
+            )
+            json_first = ws_nodes.VrchJsonWebSocketChannelLoaderNode.IS_CHANGED(
+                channel="2"
+            )
+            json_repeated = ws_nodes.VrchJsonWebSocketChannelLoaderNode.IS_CHANGED(
+                channel="2"
+            )
+            fake_client.sequence = 4
+            json_changed = ws_nodes.VrchJsonWebSocketChannelLoaderNode.IS_CHANGED(
+                channel="2"
+            )
+
+        self.assertEqual(server_first, server_repeated)
+        self.assertNotEqual(server_first, server_changed)
+        self.assertNotEqual(auto_mode_first, auto_mode_first)
+        self.assertNotEqual(auto_mode_second, auto_mode_second)
+        self.assertEqual(json_first, json_repeated)
+        self.assertNotEqual(json_first, json_changed)
+
+    def test_16_realtime_image_encode_cache_reuses_only_identical_tensor(self):
+        sent_messages = []
+        encode_formats = []
+
+        class FakeServer:
+            def send_to_channel(self, path, channel, data):
+                sent_messages.append((path, channel, data))
+
+        class FakeImage:
+            def save(self, buffer, format):
+                encode_formats.append(format)
+                buffer.write(b"encoded-image")
+
+        original_get_server = ws_nodes.get_global_server
+        original_fromarray = ws_nodes.Image.fromarray
+        self.addCleanup(
+            lambda: setattr(ws_nodes, "get_global_server", original_get_server)
+        )
+        self.addCleanup(
+            lambda: setattr(ws_nodes.Image, "fromarray", original_fromarray)
+        )
+        self.addCleanup(ws_nodes._reset_realtime_image_encode_cache)
+        ws_nodes.get_global_server = lambda *args, **kwargs: FakeServer()
+        ws_nodes.Image.fromarray = lambda *args, **kwargs: FakeImage()
+        ws_nodes._reset_realtime_image_encode_cache()
+
+        first_node = ws_nodes.VrchImageWebSocketSimpleWebViewerNode()
+        second_node = ws_nodes.VrchImageWebSocketSimpleWebViewerNode()
+        image = torch.zeros((1, 2, 2, 3), dtype=torch.float32)
+        kwargs = {
+            "images": image,
+            "channel": "1",
+            "server": "127.0.0.1:8001",
+            "format": "JPEG",
+            "number_of_images": 1,
+            "image_display_duration": 50,
+            "fade_anim_duration": 10,
+            "window_width": 512,
+            "window_height": 512,
+            "show_url": False,
+            "dev_mode": False,
+            "debug": False,
+            "extra_params": "",
+            "url": "",
+            "prompt_scope": {},
+        }
+
+        with mock.patch.dict(
+            os.environ,
+            realtime_contract_env(),
+        ):
+            first_node.send_images(**kwargs)
+            kwargs["channel"] = "3"
+            second_node.send_images(**kwargs)
+            self.assertEqual(encode_formats, ["JPEG"])
+            self.assertEqual(sent_messages[0][2][8:], sent_messages[1][2][8:])
+            self.assertEqual(
+                ws_nodes._realtime_image_encode_cache_stats(),
+                {"hits": 1, "misses": 1},
+            )
+
+            image.add_(1)
+            first_node.send_images(**kwargs)
+            self.assertEqual(encode_formats, ["JPEG", "JPEG"])
+            self.assertEqual(
+                ws_nodes._realtime_image_encode_cache_stats(),
+                {"hits": 1, "misses": 2},
+            )
+
+    def test_17_default_mode_encodes_each_output_node_independently(self):
+        encode_count = 0
+
+        def fake_encode(images, image_format):
+            nonlocal encode_count
+            encode_count += 1
+            return (b"encoded-image",)
+
+        original_uncached = ws_nodes._encode_image_batch_uncached
+        self.addCleanup(
+            lambda: setattr(
+                ws_nodes,
+                "_encode_image_batch_uncached",
+                original_uncached,
+            )
+        )
+        ws_nodes._encode_image_batch_uncached = fake_encode
+        image = torch.zeros((1, 2, 2, 3), dtype=torch.float32)
+        with mock.patch.dict(
+            os.environ,
+            {"VRCH_COMFYUI_PERFORMANCE_CACHE": "default"},
+        ):
+            ws_nodes._encode_image_batch(image, "JPEG")
+            ws_nodes._encode_image_batch(image, "JPEG")
+
+        self.assertEqual(encode_count, 2)
+
+    def test_18_inference_tensor_without_version_counter_is_supported(self):
+        with torch.inference_mode():
+            image = torch.zeros((1, 2, 2, 3), dtype=torch.float32)
+        key = ws_nodes._image_batch_cache_key(image, "JPEG")
+        self.assertIsNone(key[-1])
+
+    def test_19_inference_tensor_cache_is_consumed_after_one_hit(self):
+        encoded_values = []
+
+        def fake_encode(images, image_format):
+            value = int(images[0, 0, 0, 0].item())
+            encoded_values.append(value)
+            return (f"encoded-{value}".encode(),)
+
+        original_uncached = ws_nodes._encode_image_batch_uncached
+        self.addCleanup(
+            lambda: setattr(
+                ws_nodes,
+                "_encode_image_batch_uncached",
+                original_uncached,
+            )
+        )
+        self.addCleanup(ws_nodes._reset_realtime_image_encode_cache)
+        ws_nodes._encode_image_batch_uncached = fake_encode
+        ws_nodes._reset_realtime_image_encode_cache()
+
+        with (
+            torch.inference_mode(),
+            mock.patch.dict(
+                os.environ,
+                realtime_contract_env(),
+            ),
+        ):
+            image = torch.zeros((1, 2, 2, 3), dtype=torch.float32)
+            first_prompt = {}
+            second_prompt = {}
+            first = ws_nodes._encode_image_batch(
+                image, "JPEG", first_prompt
+            )
+            second = ws_nodes._encode_image_batch(
+                image, "JPEG", first_prompt
+            )
+            image.add_(1)
+            third = ws_nodes._encode_image_batch(
+                image, "JPEG", second_prompt
+            )
+            fourth = ws_nodes._encode_image_batch(
+                image, "JPEG", second_prompt
+            )
+
+        self.assertEqual(first, second)
+        self.assertEqual(third, fourth)
+        self.assertNotEqual(first, third)
+        self.assertEqual(encoded_values, [0, 1])
+        self.assertEqual(
+            ws_nodes._realtime_image_encode_cache_stats(),
+            {"hits": 2, "misses": 2},
+        )
+
+    def test_20_image_output_resolves_server_on_every_send(self):
+        get_server_calls = []
+
+        class FakeServer:
+            def send_to_channel(self, path, channel, data):
+                pass
+
+        def fake_get_server(*args, **kwargs):
+            get_server_calls.append((args, kwargs))
+            return FakeServer()
+
+        original_get_server = ws_nodes.get_global_server
+        original_encode = ws_nodes._encode_image_batch
+        self.addCleanup(
+            lambda: setattr(ws_nodes, "get_global_server", original_get_server)
+        )
+        self.addCleanup(
+            lambda: setattr(ws_nodes, "_encode_image_batch", original_encode)
+        )
+        ws_nodes.get_global_server = fake_get_server
+        ws_nodes._encode_image_batch = lambda *args, **kwargs: (b"encoded",)
+
+        node = ws_nodes.VrchImageWebSocketSimpleWebViewerNode()
+        image = torch.zeros((1, 2, 2, 3), dtype=torch.float32)
+        with mock.patch.dict(
+            os.environ,
+            realtime_contract_env(),
+        ):
+            for _ in range(2):
+                node.send_images(
+                    image, "1", "127.0.0.1:8001", "JPEG", 1, 50, 10,
+                    512, 512, False, False, False, "", "",
+                )
+
+        self.assertEqual(len(get_server_calls), 2)
+
+    def test_21_prompt_scope_prevents_incomplete_pair_stale_hit(self):
+        encoded_values = []
+
+        def fake_encode(images, image_format):
+            value = int(images[0, 0, 0, 0].item())
+            encoded_values.append(value)
+            return (f"encoded-{value}".encode(),)
+
+        original_uncached = ws_nodes._encode_image_batch_uncached
+        self.addCleanup(
+            lambda: setattr(
+                ws_nodes,
+                "_encode_image_batch_uncached",
+                original_uncached,
+            )
+        )
+        self.addCleanup(ws_nodes._reset_realtime_image_encode_cache)
+        ws_nodes._encode_image_batch_uncached = fake_encode
+        ws_nodes._reset_realtime_image_encode_cache()
+
+        with (
+            torch.inference_mode(),
+            mock.patch.dict(
+                os.environ,
+                realtime_contract_env(),
+            ),
+        ):
+            image = torch.zeros((1, 2, 2, 3), dtype=torch.float32)
+            first_prompt = {}
+            second_prompt = {}
+            first = ws_nodes._encode_image_batch(
+                image, "JPEG", first_prompt
+            )
+            image.add_(1)
+            second = ws_nodes._encode_image_batch(
+                image, "JPEG", second_prompt
+            )
+            repeated = ws_nodes._encode_image_batch(
+                image, "JPEG", second_prompt
+            )
+
+        self.assertNotEqual(first, second)
+        self.assertEqual(second, repeated)
+        self.assertEqual(encoded_values, [0, 1])
+        self.assertEqual(
+            ws_nodes._realtime_image_encode_cache_stats(),
+            {"hits": 1, "misses": 2},
+        )
+
+    def test_22_realtime_without_prompt_scope_fails_closed(self):
+        encode_count = 0
+
+        def fake_encode(images, image_format):
+            nonlocal encode_count
+            encode_count += 1
+            return (b"encoded-image",)
+
+        original_uncached = ws_nodes._encode_image_batch_uncached
+        self.addCleanup(
+            lambda: setattr(
+                ws_nodes,
+                "_encode_image_batch_uncached",
+                original_uncached,
+            )
+        )
+        self.addCleanup(ws_nodes._reset_realtime_image_encode_cache)
+        ws_nodes._encode_image_batch_uncached = fake_encode
+        ws_nodes._reset_realtime_image_encode_cache()
+        image = torch.zeros((1, 2, 2, 3), dtype=torch.float32)
+
+        with mock.patch.dict(
+            os.environ,
+            realtime_contract_env(),
+        ):
+            ws_nodes._encode_image_batch(image, "JPEG")
+            ws_nodes._encode_image_batch(image, "JPEG")
+
+        self.assertEqual(encode_count, 2)
+        self.assertEqual(
+            ws_nodes._realtime_image_encode_cache_stats(),
+            {"hits": 0, "misses": 0},
+        )
+
+    def test_23_realtime_contract_activates_with_matching_gc_capability(self):
+        env = realtime_contract_env()
+        env.pop(ws_nodes.REALTIME_NODE_CAPABILITY_ENV)
+        with (
+            mock.patch.dict(os.environ, env, clear=True),
+            self.assertLogs(level="INFO") as captured,
+        ):
+            state = ws_nodes._initialize_realtime_contract()
+            enabled = ws_nodes._realtime_safe_set_enabled()
+
+        self.assertEqual(state["effective"], "realtime")
+        self.assertEqual(state["status"], "active")
+        self.assertTrue(enabled)
+        self.assertIn(
+            "component=node contract=vrch-realtime-v1 "
+            "capability=node-safe-set-v1 requested=realtime "
+            "effective=realtime",
+            "\n".join(captured.output),
+        )
+
+    def test_24_realtime_contract_fails_closed_without_gc_capability(self):
+        with (
+            mock.patch.dict(
+                os.environ,
+                {
+                    ws_nodes.REALTIME_MODE_ENV: "realtime",
+                    ws_nodes.REALTIME_REQUESTED_MODE_ENV: "realtime",
+                },
+                clear=True,
+            ),
+            self.assertLogs(level="ERROR") as captured,
+        ):
+            state = ws_nodes._initialize_realtime_contract()
+            effective_mode = os.environ[ws_nodes.REALTIME_MODE_ENV]
+            node_capability = os.environ.get(
+                ws_nodes.REALTIME_NODE_CAPABILITY_ENV
+            )
+            enabled = ws_nodes._realtime_safe_set_enabled()
+
+        self.assertEqual(state["effective"], "default")
+        self.assertEqual(state["status"], "skew-fail-closed")
+        self.assertEqual(state["peer"], "missing")
+        self.assertEqual(effective_mode, "default")
+        self.assertIsNone(node_capability)
+        self.assertFalse(enabled)
+        self.assertIn("status=skew-fail-closed", "\n".join(captured.output))
+
+    def test_25_realtime_contract_fails_closed_on_contract_mismatch(self):
+        with (
+            mock.patch.dict(
+                os.environ,
+                {
+                    ws_nodes.REALTIME_MODE_ENV: "realtime",
+                    ws_nodes.REALTIME_REQUESTED_MODE_ENV: "realtime",
+                    ws_nodes.REALTIME_CONTRACT_ENV: "vrch-realtime-v0",
+                    ws_nodes.REALTIME_GC_CAPABILITY_ENV:
+                        ws_nodes.REALTIME_GC_CAPABILITY,
+                },
+                clear=True,
+            ),
+            self.assertLogs(level="ERROR"),
+        ):
+            state = ws_nodes._initialize_realtime_contract()
+            effective_mode = os.environ[ws_nodes.REALTIME_MODE_ENV]
+            node_capability = os.environ.get(
+                ws_nodes.REALTIME_NODE_CAPABILITY_ENV
+            )
+
+        self.assertEqual(state["effective"], "default")
+        self.assertEqual(state["status"], "skew-fail-closed")
+        self.assertEqual(effective_mode, "default")
+        self.assertIsNone(node_capability)
+        self.assertFalse(ws_nodes._realtime_safe_set_enabled())
+
+    def test_26_unset_mode_initializes_with_default_semantics(self):
+        with (
+            mock.patch.dict(os.environ, {}, clear=True),
+            self.assertLogs(level="INFO") as captured,
+        ):
+            state = ws_nodes._initialize_realtime_contract()
+            enabled = ws_nodes._realtime_safe_set_enabled()
+            node_capability = os.environ.get(
+                ws_nodes.REALTIME_NODE_CAPABILITY_ENV
+            )
+            server_token = ws_nodes.VrchWebSocketServerNode.IS_CHANGED(
+                server="0.0.0.0",
+                port=8001,
+                external_server_only=True,
+                debug=False,
+            )
+
+        self.assertEqual(state["requested"], "default")
+        self.assertEqual(state["effective"], "default")
+        self.assertEqual(state["status"], "standby")
+        self.assertIsNone(node_capability)
+        self.assertFalse(enabled)
+        self.assertNotEqual(server_token, server_token)
+        self.assertIn("status=standby", "\n".join(captured.output))
+
 
 
 class TestWebSocketNodesIntegration(unittest.TestCase):
