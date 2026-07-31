@@ -14,7 +14,7 @@ from .nodes.audio_music2emo_node import *
 from .nodes.workflow_export_nodes import *
 from .nodes.model_nodes import *
 
-__version__ = "1.1.26"
+__version__ = "1.1.27"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
