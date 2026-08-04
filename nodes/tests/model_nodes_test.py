@@ -78,16 +78,26 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
         self.addCleanup(setattr, model_nodes, "_get_tensorrt_loader_class", self.original_get_loader)
 
         self.model = FakeModelPatcher()
-        self.tensorrt_model = object()
+        self.tensorrt_model = types.SimpleNamespace(
+            model=types.SimpleNamespace(tensorrt_metadata={})
+        )
 
-    def install_loader(self, error=None):
+    def install_loader(self, error=None, capability=None, metadata=None):
         output_model = self.tensorrt_model
+        if metadata is not None:
+            output_model.model.tensorrt_metadata = metadata
 
         class FakeLoader:
+            CONTROLNET_CAPABILITY = capability
             calls = []
 
-            def load_unet(self, engine_name, model_type):
-                self.calls.append((engine_name, model_type))
+            def load_unet(self, engine_name, model_type, require_controlnet=False):
+                if capability is None:
+                    self.calls.append((engine_name, model_type))
+                else:
+                    self.calls.append(
+                        (engine_name, model_type, bool(require_controlnet))
+                    )
                 if error is not None:
                     raise error
                 return (output_model,)
@@ -102,6 +112,11 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
         self.assertEqual(inputs["load_mode"][0], ["auto", "tensorrt", "pytorch"])
         self.assertEqual(inputs["engine_name"][0], ["test.engine"])
         self.assertEqual(inputs["debug"], ("BOOLEAN", {"default": False}))
+        optional = model_nodes.VrchTensorRTAutoLoaderNode.INPUT_TYPES()["optional"]
+        self.assertEqual(
+            optional["require_controlnet"],
+            ("BOOLEAN", {"default": False}),
+        )
         self.assertEqual(
             model_nodes.VrchTensorRTAutoLoaderNode.RETURN_NAMES,
             ("model", "backend", "status"),
@@ -110,7 +125,9 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
     def test_stale_engine_validation_only_accepts_engine_name(self):
         signature = inspect.signature(model_nodes.VrchTensorRTAutoLoaderNode.VALIDATE_INPUTS)
 
-        self.assertEqual(list(signature.parameters), ["engine_name"])
+        self.assertEqual(
+            list(signature.parameters), ["engine_name", "require_controlnet"]
+        )
         self.assertTrue(model_nodes.VrchTensorRTAutoLoaderNode.VALIDATE_INPUTS("removed.engine"))
 
     def test_pytorch_mode_bypasses_tensorrt(self):
@@ -168,6 +185,68 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "incompatible engine"):
             model_nodes.VrchTensorRTAutoLoaderNode().load_model(
                 self.model, "tensorrt", "test.engine", False
+            )
+
+    def test_controlnet_requirement_fails_closed_with_legacy_loader(self):
+        self.install_loader()
+
+        with self.assertRaisesRegex(RuntimeError, "lacks the required residual"):
+            model_nodes.VrchTensorRTAutoLoaderNode().load_model(
+                self.model,
+                "tensorrt",
+                "test.engine",
+                False,
+                require_controlnet=True,
+            )
+
+    def test_controlnet_auto_mode_falls_back_with_legacy_loader(self):
+        self.install_loader()
+
+        result = model_nodes.VrchTensorRTAutoLoaderNode().load_model(
+            self.model,
+            "auto",
+            "test.engine",
+            False,
+            require_controlnet=True,
+        )
+
+        self.assertIs(result[0], self.model)
+        self.assertEqual(result[1], "pytorch")
+        self.assertIn("required residual", result[2])
+
+    def test_controlnet_requirement_loads_qualified_residual_engine(self):
+        loader = self.install_loader(
+            capability=model_nodes.CONTROLNET_CAPABILITY,
+            metadata={"residual_schema": True},
+        )
+
+        result = model_nodes.VrchTensorRTAutoLoaderNode().load_model(
+            self.model,
+            "tensorrt",
+            "test.engine",
+            False,
+            require_controlnet=True,
+        )
+
+        self.assertIs(result[0], self.tensorrt_model)
+        self.assertEqual(result[1], "tensorrt")
+        self.assertIn("residual_schema=true", result[2])
+        self.assertIn("control_required=true", result[2])
+        self.assertEqual(loader.calls, [("test.engine", "sdxl_base", True)])
+
+    def test_controlnet_requirement_rejects_missing_residual_metadata(self):
+        self.install_loader(
+            capability=model_nodes.CONTROLNET_CAPABILITY,
+            metadata={"residual_schema": False},
+        )
+
+        with self.assertRaisesRegex(RuntimeError, "without the required residual"):
+            model_nodes.VrchTensorRTAutoLoaderNode().load_model(
+                self.model,
+                "tensorrt",
+                "test.engine",
+                False,
+                require_controlnet=True,
             )
 
     def test_missing_inventory_uses_placeholder(self):

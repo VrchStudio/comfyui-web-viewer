@@ -8,6 +8,9 @@ import folder_paths
 CATEGORY = "vrch.ai/model"
 NO_ENGINE_OPTION = "No TensorRT Engine Found"
 LOAD_MODES = ["auto", "tensorrt", "pytorch"]
+CONTROLNET_CAPABILITY = "vrch-tensorrt-controlnet-residual-v1"
+
+print(f"[comfyui-web-viewer] TensorRT capability consumer {CONTROLNET_CAPABILITY}")
 
 _TENSORRT_MODEL_TYPES = {
     "SDXL": "sdxl_base",
@@ -148,6 +151,12 @@ def _one_line_error(error):
     return f"{type(error).__name__}: {message}"[:320]
 
 
+def _tensorrt_metadata(model):
+    base_model = getattr(model, "model", None)
+    metadata = getattr(base_model, "tensorrt_metadata", None)
+    return metadata if isinstance(metadata, dict) else {}
+
+
 class VrchTensorRTAutoLoaderNode:
     @classmethod
     def INPUT_TYPES(cls):
@@ -157,7 +166,10 @@ class VrchTensorRTAutoLoaderNode:
                 "load_mode": (LOAD_MODES, {"default": "auto"}),
                 "engine_name": (_engine_options(),),
                 "debug": ("BOOLEAN", {"default": False}),
-            }
+            },
+            "optional": {
+                "require_controlnet": ("BOOLEAN", {"default": False}),
+            },
         }
 
     RETURN_TYPES = ("MODEL", "STRING", "STRING")
@@ -168,28 +180,33 @@ class VrchTensorRTAutoLoaderNode:
     def __init__(self):
         self._cached_key = None
         self._cached_model = None
+        self._cached_status = None
 
     @classmethod
-    def VALIDATE_INPUTS(cls, engine_name):
+    def VALIDATE_INPUTS(cls, engine_name, require_controlnet=False):
         # Engine choices are host-local. A workflow saved on another host, or
         # before an Engine was removed, must reach load_model() so auto mode can
         # fall back instead of failing ComfyUI's pre-execution COMBO check.
         return True
 
     @classmethod
-    def IS_CHANGED(cls, model, load_mode, engine_name, debug=False):
+    def IS_CHANGED(
+        cls, model, load_mode, engine_name, debug=False, require_controlnet=False
+    ):
         if load_mode == "pytorch":
-            return "pytorch"
+            return ("pytorch", bool(require_controlnet))
         engine_path = _resolve_engine_path(engine_name)
         if engine_path is None:
-            return (load_mode, engine_name, "missing")
+            return (load_mode, engine_name, bool(require_controlnet), "missing")
         try:
             fingerprint = _engine_fingerprint(engine_path)
         except OSError:
-            return (load_mode, engine_name, "unreadable")
-        return (load_mode, engine_name, fingerprint)
+            return (load_mode, engine_name, bool(require_controlnet), "unreadable")
+        return (load_mode, engine_name, bool(require_controlnet), fingerprint)
 
-    def load_model(self, model, load_mode, engine_name, debug=False):
+    def load_model(
+        self, model, load_mode, engine_name, debug=False, require_controlnet=False
+    ):
         if load_mode == "pytorch":
             return self._pytorch_result(
                 model,
@@ -224,6 +241,16 @@ class VrchTensorRTAutoLoaderNode:
                 debug,
             )
 
+        loader_capability = getattr(loader_class, "CONTROLNET_CAPABILITY", None)
+        if require_controlnet and loader_capability != CONTROLNET_CAPABILITY:
+            return self._load_failure(
+                model,
+                load_mode,
+                "TensorRTLoader lacks the required residual ControlNet capability "
+                f"{CONTROLNET_CAPABILITY}",
+                debug,
+            )
+
         try:
             fingerprint = _engine_fingerprint(engine_path)
         except OSError as error:
@@ -235,24 +262,45 @@ class VrchTensorRTAutoLoaderNode:
                 cause=error,
             )
 
-        cache_key = (id(model), model_type, engine_name, fingerprint)
+        cache_key = (
+            id(model),
+            model_type,
+            engine_name,
+            bool(require_controlnet),
+            fingerprint,
+        )
         if cache_key == self._cached_key and self._cached_model is not None:
             self._debug(debug, f"cache hit engine={engine_name} model_type={model_type}")
             return (
                 self._cached_model,
                 "tensorrt",
-                f"TensorRT active: {engine_name}",
+                self._cached_status,
             )
 
         self._debug(debug, f"loading engine={engine_name} model_type={model_type}")
         try:
-            loaded = loader_class().load_unet(engine_name, model_type)
+            loader = loader_class()
+            if loader_capability == CONTROLNET_CAPABILITY:
+                loaded = loader.load_unet(
+                    engine_name,
+                    model_type,
+                    require_controlnet=bool(require_controlnet),
+                )
+            else:
+                loaded = loader.load_unet(engine_name, model_type)
             if not isinstance(loaded, tuple) or not loaded or loaded[0] is None:
                 raise RuntimeError("TensorRTLoader returned no MODEL")
             tensorrt_model = loaded[0]
+            metadata = _tensorrt_metadata(tensorrt_model)
+            residual_schema = bool(metadata.get("residual_schema", False))
+            if require_controlnet and not residual_schema:
+                raise RuntimeError(
+                    "TensorRTLoader returned an Engine without the required residual schema"
+                )
         except Exception as error:
             self._cached_key = None
             self._cached_model = None
+            self._cached_status = None
             return self._load_failure(
                 model,
                 load_mode,
@@ -263,14 +311,22 @@ class VrchTensorRTAutoLoaderNode:
 
         self._cached_key = cache_key
         self._cached_model = tensorrt_model
+        self._cached_status = (
+            f"TensorRT active: {engine_name}; "
+            f"residual_schema={str(residual_schema).lower()}; "
+            f"control_required={str(bool(require_controlnet)).lower()}"
+        )
         self._debug(debug, f"TensorRT active engine={engine_name}")
         return (
             tensorrt_model,
             "tensorrt",
-            f"TensorRT active: {engine_name}",
+            self._cached_status,
         )
 
     def _load_failure(self, model, load_mode, reason, debug, cause=None):
+        self._cached_key = None
+        self._cached_model = None
+        self._cached_status = None
         self._debug(debug, reason)
         if load_mode == "tensorrt":
             error = RuntimeError(f"TensorRT Auto Loader: {reason}")
