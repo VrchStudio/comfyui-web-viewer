@@ -28,6 +28,54 @@ _TENSORRT_MODEL_TYPES = {
 _CONTROLNET_CPU_LOAD_LOCK = threading.Lock()
 
 
+class VrchCheckpointClipLoaderNode:
+    """Load only the CLIP component from a checkpoint.
+
+    TensorRT workflows do not use the checkpoint's diffusion model. Loading
+    the complete checkpoint in ``--highvram`` mode can nevertheless place that
+    unused UNet on CUDA and prevent a second TensorRT Engine from fitting.
+    """
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "ckpt_name": (
+                    folder_paths.get_filename_list("checkpoints"),
+                )
+            },
+        }
+
+    RETURN_TYPES = ("CLIP",)
+    FUNCTION = "load_clip"
+    CATEGORY = CATEGORY
+
+    def load_clip(self, ckpt_name):
+        import comfy.sd
+
+        checkpoint_path = folder_paths.get_full_path_or_raise(
+            "checkpoints",
+            ckpt_name,
+        )
+        result = comfy.sd.load_checkpoint_guess_config(
+            checkpoint_path,
+            output_vae=False,
+            output_clip=True,
+            output_clipvision=False,
+            embedding_directory=folder_paths.get_folder_paths("embeddings"),
+            output_model=False,
+        )
+        if result is None or len(result) < 2 or result[1] is None:
+            raise RuntimeError(
+                "Checkpoint does not contain a supported CLIP text encoder"
+            )
+        print(
+            "[comfyui-web-viewer] Checkpoint CLIP-only load complete: "
+            f"{ckpt_name}"
+        )
+        return (result[1],)
+
+
 def _register_output_engine_root():
     get_output_directory = getattr(folder_paths, "get_output_directory", None)
     registry = getattr(folder_paths, "folder_names_and_paths", None)

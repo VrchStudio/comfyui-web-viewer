@@ -14,7 +14,7 @@ from .nodes.audio_music2emo_node import *
 from .nodes.workflow_export_nodes import *
 from .nodes.model_nodes import *
 
-__version__ = "1.1.26"
+__version__ = "1.1.27"
 
 NODE_CLASS_MAPPINGS = {
     "VrchAnyOSCControlNode": VrchAnyOSCControlNode,
@@ -34,6 +34,7 @@ NODE_CLASS_MAPPINGS = {
     "VrchBooleanKeyControlNode": VrchBooleanKeyControlNode,
     "VrchChannelOSCControlNode": VrchChannelOSCControlNode,
     "VrchChannelX4OSCControlNode": VrchChannelX4OSCControlNode,
+    "VrchCheckpointClipLoaderNode": VrchCheckpointClipLoaderNode,
     "VrchControlNetLoaderNode": VrchControlNetLoaderNode,
     "VrchDelayNode": VrchDelayNode,
     "VrchDelayOSCControlNode": VrchDelayOSCControlNode,
@@ -110,6 +111,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VrchBooleanKeyControlNode": "BOOLEAN Key Control @ vrch.ai",
     "VrchChannelOSCControlNode": "CHANNEL OSC Control @ vrch.ai",
     "VrchChannelX4OSCControlNode": "CHANNEL x4 OSC Control @ vrch.ai",
+    "VrchCheckpointClipLoaderNode": "Checkpoint CLIP-only Loader @ vrch.ai",
     "VrchControlNetLoaderNode": "ControlNet Loader (CPU Offload) @ vrch.ai",
     "VrchDelayNode": "DELAY @ vrch.ai",
     "VrchDelayOSCControlNode": "DELAY OSC Control @ vrch.ai",

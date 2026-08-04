@@ -335,6 +335,70 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
         self.assertEqual(options, [model_nodes.NO_ENGINE_OPTION])
 
 
+class TestCheckpointClipLoaderNode(unittest.TestCase):
+    def setUp(self):
+        self.original_folder_paths = model_nodes.folder_paths
+        self.original_modules = {
+            name: sys.modules.get(name)
+            for name in ("comfy", "comfy.sd")
+        }
+        self.addCleanup(self.restore_modules)
+        self.addCleanup(
+            setattr,
+            model_nodes,
+            "folder_paths",
+            self.original_folder_paths,
+        )
+
+    def restore_modules(self):
+        for name, module in self.original_modules.items():
+            if module is None:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = module
+
+    def install_runtime(self, clip=object()):
+        calls = []
+        sd_module = types.ModuleType("comfy.sd")
+
+        def load_checkpoint_guess_config(path, **kwargs):
+            calls.append((path, kwargs))
+            return (None, clip, None, None)
+
+        sd_module.load_checkpoint_guess_config = load_checkpoint_guess_config
+        comfy_module = types.ModuleType("comfy")
+        comfy_module.sd = sd_module
+        sys.modules["comfy"] = comfy_module
+        sys.modules["comfy.sd"] = sd_module
+        model_nodes.folder_paths = types.SimpleNamespace(
+            get_filename_list=lambda _name: ["sdxl.safetensors"],
+            get_full_path_or_raise=lambda folder, name: f"/{folder}/{name}",
+            get_folder_paths=lambda folder: [f"/{folder}"],
+        )
+        return calls, clip
+
+    def test_loads_only_clip_without_constructing_checkpoint_unet(self):
+        calls, clip = self.install_runtime()
+
+        result = model_nodes.VrchCheckpointClipLoaderNode().load_clip(
+            "sdxl.safetensors"
+        )
+
+        self.assertIs(result[0], clip)
+        self.assertEqual(calls[0][0], "/checkpoints/sdxl.safetensors")
+        self.assertFalse(calls[0][1]["output_model"])
+        self.assertFalse(calls[0][1]["output_vae"])
+        self.assertTrue(calls[0][1]["output_clip"])
+
+    def test_rejects_checkpoint_without_clip(self):
+        self.install_runtime(clip=None)
+
+        with self.assertRaisesRegex(RuntimeError, "does not contain"):
+            model_nodes.VrchCheckpointClipLoaderNode().load_clip(
+                "sdxl.safetensors"
+            )
+
+
 class TestControlNetLoaderNode(unittest.TestCase):
     def setUp(self):
         self.original_folder_paths = model_nodes.folder_paths
