@@ -232,6 +232,55 @@ class VrchControlNetLoaderNode:
         return (controlnet,)
 
 
+class VrchTAESDMemoryProfileNode:
+    """Use a TAESD-specific memory estimate instead of the full-VAE estimate."""
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "vae": ("VAE",),
+                "memory_mib": (
+                    "INT",
+                    {
+                        "default": 256,
+                        "min": 64,
+                        "max": 1024,
+                        "step": 64,
+                    },
+                ),
+            }
+        }
+
+    RETURN_TYPES = ("VAE",)
+    FUNCTION = "apply_profile"
+    CATEGORY = CATEGORY
+
+    def apply_profile(self, vae, memory_mib=256):
+        first_stage_model = getattr(vae, "first_stage_model", None)
+        if type(first_stage_model).__name__ != "TAESD":
+            raise RuntimeError(
+                "TAESD memory profile requires a TAESD VAE"
+            )
+
+        memory_bytes = int(memory_mib) * 1024 * 1024
+        vae.memory_used_encode = (
+            lambda _shape, _dtype: memory_bytes
+        )
+        vae.memory_used_decode = (
+            lambda _shape, _dtype: memory_bytes
+        )
+        vae.vrch_memory_profile = {
+            "kind": "taesd",
+            "memory_mib": int(memory_mib),
+        }
+        print(
+            "[comfyui-web-viewer] TAESD memory profile active: "
+            f"{int(memory_mib)} MiB"
+        )
+        return (vae,)
+
+
 class VrchTensorRTAutoLoaderNode:
     @classmethod
     def INPUT_TYPES(cls):

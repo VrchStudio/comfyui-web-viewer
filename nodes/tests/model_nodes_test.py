@@ -439,5 +439,36 @@ class TestControlNetLoaderNode(unittest.TestCase):
         )
 
 
+class TestTAESDMemoryProfileNode(unittest.TestCase):
+    def test_applies_fixed_encode_and_decode_budget(self):
+        class TAESD:
+            pass
+
+        vae = types.SimpleNamespace(
+            first_stage_model=TAESD(),
+            memory_used_encode=lambda _shape, _dtype: 1,
+            memory_used_decode=lambda _shape, _dtype: 2,
+        )
+
+        result = model_nodes.VrchTAESDMemoryProfileNode().apply_profile(
+            vae,
+            256,
+        )
+
+        self.assertIs(result[0], vae)
+        self.assertEqual(vae.memory_used_encode(None, None), 256 * 1024 * 1024)
+        self.assertEqual(vae.memory_used_decode(None, None), 256 * 1024 * 1024)
+        self.assertEqual(
+            vae.vrch_memory_profile,
+            {"kind": "taesd", "memory_mib": 256},
+        )
+
+    def test_rejects_non_taesd_vae(self):
+        vae = types.SimpleNamespace(first_stage_model=object())
+
+        with self.assertRaisesRegex(RuntimeError, "requires a TAESD VAE"):
+            model_nodes.VrchTAESDMemoryProfileNode().apply_profile(vae, 256)
+
+
 if __name__ == "__main__":
     unittest.main()
