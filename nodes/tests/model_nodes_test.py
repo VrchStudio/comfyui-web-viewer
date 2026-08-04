@@ -79,7 +79,12 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
 
         self.model = FakeModelPatcher()
         self.tensorrt_model = types.SimpleNamespace(
-            model=types.SimpleNamespace(tensorrt_metadata={})
+            model=types.SimpleNamespace(
+                diffusion_model=types.SimpleNamespace(
+                    require_controlnet=False,
+                ),
+                tensorrt_metadata={},
+            )
         )
 
     def install_loader(self, error=None, capability=None, metadata=None):
@@ -233,6 +238,79 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
         self.assertIn("residual_schema=true", result[2])
         self.assertIn("control_required=true", result[2])
         self.assertEqual(loader.calls, [("test.engine", "sdxl_base", True)])
+
+    def test_controlnet_mode_switch_reuses_one_residual_engine(self):
+        loader = self.install_loader(
+            capability=model_nodes.CONTROLNET_CAPABILITY,
+            metadata={"residual_schema": True},
+        )
+        node = model_nodes.VrchTensorRTAutoLoaderNode()
+
+        off = node.load_model(
+            self.model,
+            "tensorrt",
+            "test.engine",
+            False,
+            require_controlnet=False,
+        )
+        on = node.load_model(
+            FakeModelPatcher(),
+            "tensorrt",
+            "test.engine",
+            False,
+            require_controlnet=True,
+        )
+        off_again = node.load_model(
+            self.model,
+            "tensorrt",
+            "test.engine",
+            False,
+            require_controlnet=False,
+        )
+
+        self.assertIs(off[0], self.tensorrt_model)
+        self.assertIs(on[0], self.tensorrt_model)
+        self.assertIs(off_again[0], self.tensorrt_model)
+        self.assertEqual(
+            loader.calls,
+            [("test.engine", "sdxl_base", False)],
+        )
+        self.assertIn("control_required=true", on[2])
+        self.assertIn("control_required=false", off_again[2])
+        self.assertFalse(
+            self.tensorrt_model.model.diffusion_model.require_controlnet
+        )
+
+    def test_controlnet_mode_switch_rejects_cached_plain_engine(self):
+        loader = self.install_loader(
+            capability=model_nodes.CONTROLNET_CAPABILITY,
+            metadata={"residual_schema": False},
+        )
+        node = model_nodes.VrchTensorRTAutoLoaderNode()
+        node.load_model(
+            self.model,
+            "tensorrt",
+            "test.engine",
+            False,
+            require_controlnet=False,
+        )
+
+        with self.assertRaisesRegex(
+            RuntimeError,
+            "ControlNet was required but the TensorRT Engine has no residual bindings",
+        ):
+            node.load_model(
+                self.model,
+                "tensorrt",
+                "test.engine",
+                False,
+                require_controlnet=True,
+            )
+
+        self.assertEqual(
+            loader.calls,
+            [("test.engine", "sdxl_base", False)],
+        )
 
     def test_controlnet_requirement_rejects_missing_residual_metadata(self):
         self.install_loader(

@@ -157,6 +157,20 @@ def _tensorrt_metadata(model):
     return metadata if isinstance(metadata, dict) else {}
 
 
+def _set_tensorrt_control_requirement(model, require_controlnet):
+    required = bool(require_controlnet)
+    base_model = getattr(model, "model", None)
+    diffusion_model = getattr(base_model, "diffusion_model", None)
+    if diffusion_model is not None and hasattr(
+        diffusion_model,
+        "require_controlnet",
+    ):
+        diffusion_model.require_controlnet = required
+    metadata = _tensorrt_metadata(model)
+    if metadata:
+        metadata["control_required"] = required
+
+
 class VrchTensorRTAutoLoaderNode:
     @classmethod
     def INPUT_TYPES(cls):
@@ -263,13 +277,30 @@ class VrchTensorRTAutoLoaderNode:
             )
 
         cache_key = (
-            id(model),
             model_type,
             engine_name,
-            bool(require_controlnet),
             fingerprint,
         )
         if cache_key == self._cached_key and self._cached_model is not None:
+            metadata = _tensorrt_metadata(self._cached_model)
+            residual_schema = bool(metadata.get("residual_schema", False))
+            if require_controlnet and not residual_schema:
+                return self._load_failure(
+                    model,
+                    load_mode,
+                    "ControlNet was required but the TensorRT Engine has no "
+                    "residual bindings",
+                    debug,
+                )
+            _set_tensorrt_control_requirement(
+                self._cached_model,
+                require_controlnet,
+            )
+            self._cached_status = self._active_status(
+                engine_name,
+                residual_schema,
+                require_controlnet,
+            )
             self._debug(debug, f"cache hit engine={engine_name} model_type={model_type}")
             return (
                 self._cached_model,
@@ -297,6 +328,10 @@ class VrchTensorRTAutoLoaderNode:
                 raise RuntimeError(
                     "TensorRTLoader returned an Engine without the required residual schema"
                 )
+            _set_tensorrt_control_requirement(
+                tensorrt_model,
+                require_controlnet,
+            )
         except Exception as error:
             self._cached_key = None
             self._cached_model = None
@@ -311,10 +346,10 @@ class VrchTensorRTAutoLoaderNode:
 
         self._cached_key = cache_key
         self._cached_model = tensorrt_model
-        self._cached_status = (
-            f"TensorRT active: {engine_name}; "
-            f"residual_schema={str(residual_schema).lower()}; "
-            f"control_required={str(bool(require_controlnet)).lower()}"
+        self._cached_status = self._active_status(
+            engine_name,
+            residual_schema,
+            require_controlnet,
         )
         self._debug(debug, f"TensorRT active engine={engine_name}")
         return (
@@ -338,6 +373,14 @@ class VrchTensorRTAutoLoaderNode:
     def _pytorch_result(self, model, status, debug):
         self._debug(debug, status)
         return (model, "pytorch", status)
+
+    @staticmethod
+    def _active_status(engine_name, residual_schema, require_controlnet):
+        return (
+            f"TensorRT active: {engine_name}; "
+            f"residual_schema={str(bool(residual_schema)).lower()}; "
+            f"control_required={str(bool(require_controlnet)).lower()}"
+        )
 
     @staticmethod
     def _debug(enabled, message):
