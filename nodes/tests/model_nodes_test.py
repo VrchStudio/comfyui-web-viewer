@@ -469,6 +469,44 @@ class TestTAESDMemoryProfileNode(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "requires a TAESD VAE"):
             model_nodes.VrchTAESDMemoryProfileNode().apply_profile(vae, 256)
 
+    def test_keeps_controlnet_and_clip_resident_during_vae_loads(self):
+        class TAESD:
+            pass
+
+        base_patcher = object()
+        control_patcher = object()
+        clip_patcher = object()
+        vae_patcher = types.SimpleNamespace(
+            model_patches_models=lambda: [base_patcher],
+        )
+        vae = types.SimpleNamespace(
+            first_stage_model=TAESD(),
+            patcher=vae_patcher,
+        )
+        control_net = types.SimpleNamespace(
+            control_model_wrapped=control_patcher,
+        )
+        clip = types.SimpleNamespace(patcher=clip_patcher)
+
+        model_nodes.VrchTAESDMemoryProfileNode().apply_profile(
+            vae,
+            64,
+            control_net=control_net,
+            clip=clip,
+        )
+        model_nodes.VrchTAESDMemoryProfileNode().apply_profile(
+            vae,
+            64,
+            control_net=control_net,
+            clip=clip,
+        )
+
+        self.assertEqual(
+            vae_patcher.model_patches_models(),
+            [base_patcher, control_patcher, clip_patcher],
+        )
+        self.assertEqual(vae.vrch_memory_profile["resident_models"], 2)
+
 
 if __name__ == "__main__":
     unittest.main()
