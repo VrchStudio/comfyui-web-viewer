@@ -1,5 +1,6 @@
 """Model loading and fallback nodes for ComfyUI workflows."""
 
+import threading
 from pathlib import Path
 
 import folder_paths
@@ -23,6 +24,8 @@ _TENSORRT_MODEL_TYPES = {
     "Flux": "flux_dev",
     "FluxSchnell": "flux_schnell",
 }
+
+_CONTROLNET_CPU_LOAD_LOCK = threading.Lock()
 
 
 def _register_output_engine_root():
@@ -169,6 +172,64 @@ def _set_tensorrt_control_requirement(model, require_controlnet):
     metadata = _tensorrt_metadata(model)
     if metadata:
         metadata["control_required"] = required
+
+
+class VrchControlNetLoaderNode:
+    """Load ControlNet weights on CPU so a resident TRT Engine is not duplicated."""
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "control_net_name": (
+                    folder_paths.get_filename_list("controlnet"),
+                )
+            }
+        }
+
+    RETURN_TYPES = ("CONTROL_NET",)
+    FUNCTION = "load_controlnet"
+    CATEGORY = CATEGORY
+
+    def load_controlnet(self, control_net_name):
+        controlnet_path = folder_paths.get_full_path_or_raise(
+            "controlnet",
+            control_net_name,
+        )
+
+        # ComfyUI's --highvram mode normally constructs ControlNet directly on
+        # CUDA. A residual TensorRT Engine can already own most of a 16 GiB
+        # device, so construction itself can OOM before model management gets a
+        # chance to stream or offload weights. Keep this override scoped to the
+        # synchronous load call and restore it even when checkpoint loading
+        # fails. ComfyUI executes model-loader nodes on its single prompt worker;
+        # the lock also prevents overlapping calls through this node.
+        import torch
+        import comfy.controlnet
+        import comfy.model_management
+
+        cpu_device = torch.device("cpu")
+        with _CONTROLNET_CPU_LOAD_LOCK:
+            original_offload_device = (
+                comfy.model_management.unet_offload_device
+            )
+            comfy.model_management.unet_offload_device = lambda: cpu_device
+            try:
+                controlnet = comfy.controlnet.load_controlnet(controlnet_path)
+            finally:
+                comfy.model_management.unet_offload_device = (
+                    original_offload_device
+                )
+
+        if controlnet is None:
+            raise RuntimeError(
+                "ControlNet checkpoint is invalid and contains no supported model"
+            )
+        print(
+            "[comfyui-web-viewer] ControlNet CPU-offload load complete: "
+            f"{control_net_name}"
+        )
+        return (controlnet,)
 
 
 class VrchTensorRTAutoLoaderNode:

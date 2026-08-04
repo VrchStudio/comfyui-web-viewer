@@ -335,5 +335,109 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
         self.assertEqual(options, [model_nodes.NO_ENGINE_OPTION])
 
 
+class TestControlNetLoaderNode(unittest.TestCase):
+    def setUp(self):
+        self.original_folder_paths = model_nodes.folder_paths
+        self.original_modules = {
+            name: sys.modules.get(name)
+            for name in (
+                "torch",
+                "comfy",
+                "comfy.controlnet",
+                "comfy.model_management",
+            )
+        }
+        self.addCleanup(self.restore_modules)
+        self.addCleanup(
+            setattr,
+            model_nodes,
+            "folder_paths",
+            self.original_folder_paths,
+        )
+
+    def restore_modules(self):
+        for name, module in self.original_modules.items():
+            if module is None:
+                sys.modules.pop(name, None)
+            else:
+                sys.modules[name] = module
+
+    def install_runtime(self, error=None):
+        calls = []
+        gpu_device = object()
+        cpu_device = object()
+        model_management = types.ModuleType("comfy.model_management")
+        original_offload = lambda: gpu_device
+        model_management.unet_offload_device = original_offload
+
+        controlnet_module = types.ModuleType("comfy.controlnet")
+
+        def load_controlnet(path):
+            calls.append((path, model_management.unet_offload_device()))
+            if error is not None:
+                raise error
+            return types.SimpleNamespace(
+                control_model_wrapped=types.SimpleNamespace(
+                    offload_device=model_management.unet_offload_device()
+                )
+            )
+
+        controlnet_module.load_controlnet = load_controlnet
+        comfy_module = types.ModuleType("comfy")
+        comfy_module.controlnet = controlnet_module
+        comfy_module.model_management = model_management
+        torch_module = types.ModuleType("torch")
+        torch_module.device = lambda name: cpu_device if name == "cpu" else name
+
+        sys.modules["torch"] = torch_module
+        sys.modules["comfy"] = comfy_module
+        sys.modules["comfy.controlnet"] = controlnet_module
+        sys.modules["comfy.model_management"] = model_management
+        return calls, model_management, original_offload, cpu_device
+
+    def test_loads_controlnet_with_cpu_offload_and_restores_global(self):
+        calls, model_management, original_offload, cpu_device = (
+            self.install_runtime()
+        )
+        model_nodes.folder_paths = types.SimpleNamespace(
+            get_full_path_or_raise=lambda folder, name: f"/{folder}/{name}",
+        )
+
+        result = model_nodes.VrchControlNetLoaderNode().load_controlnet(
+            "union.safetensors"
+        )
+
+        self.assertEqual(
+            calls,
+            [("/controlnet/union.safetensors", cpu_device)],
+        )
+        self.assertIs(
+            result[0].control_model_wrapped.offload_device,
+            cpu_device,
+        )
+        self.assertIs(
+            model_management.unet_offload_device,
+            original_offload,
+        )
+
+    def test_restores_global_after_load_failure(self):
+        _, model_management, original_offload, _ = self.install_runtime(
+            RuntimeError("broken checkpoint")
+        )
+        model_nodes.folder_paths = types.SimpleNamespace(
+            get_full_path_or_raise=lambda _folder, _name: "/broken.safetensors",
+        )
+
+        with self.assertRaisesRegex(RuntimeError, "broken checkpoint"):
+            model_nodes.VrchControlNetLoaderNode().load_controlnet(
+                "broken.safetensors"
+            )
+
+        self.assertIs(
+            model_management.unet_offload_device,
+            original_offload,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
