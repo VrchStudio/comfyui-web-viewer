@@ -55,6 +55,8 @@ class FakeFolderPaths:
         return [str(self.root)]
 
     def get_filename_list(self, folder_name):
+        if folder_name == "checkpoints":
+            return ["fallback.safetensors"]
         return sorted(path.name for path in self.root.glob("*.engine"))
 
     def get_full_path(self, folder_name, filename):
@@ -73,9 +75,16 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
 
         self.original_folder_paths = model_nodes.folder_paths
         self.original_get_loader = model_nodes._get_tensorrt_loader_class
+        self.original_load_checkpoint_model = model_nodes._load_checkpoint_model
         model_nodes.folder_paths = FakeFolderPaths(self.engine_root)
         self.addCleanup(setattr, model_nodes, "folder_paths", self.original_folder_paths)
         self.addCleanup(setattr, model_nodes, "_get_tensorrt_loader_class", self.original_get_loader)
+        self.addCleanup(
+            setattr,
+            model_nodes,
+            "_load_checkpoint_model",
+            self.original_load_checkpoint_model,
+        )
 
         self.model = FakeModelPatcher()
         self.tensorrt_model = types.SimpleNamespace(
@@ -113,11 +122,17 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
     def test_node_contract(self):
         inputs = model_nodes.VrchTensorRTAutoLoaderNode.INPUT_TYPES()["required"]
 
-        self.assertEqual(inputs["model"], ("MODEL",))
         self.assertEqual(inputs["load_mode"][0], ["auto", "tensorrt", "pytorch"])
         self.assertEqual(inputs["engine_name"][0], ["test.engine"])
         self.assertEqual(inputs["debug"], ("BOOLEAN", {"default": False}))
         optional = model_nodes.VrchTensorRTAutoLoaderNode.INPUT_TYPES()["optional"]
+        self.assertEqual(optional["model"], ("MODEL", {"lazy": True}))
+        self.assertEqual(optional["model_type"][0][0], "auto")
+        self.assertIn("sdxl_base", optional["model_type"][0])
+        self.assertEqual(
+            optional["fallback_checkpoint"][0],
+            ["fallback.safetensors"],
+        )
         self.assertEqual(
             optional["require_controlnet"],
             ("BOOLEAN", {"default": False}),
@@ -131,9 +146,39 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
         signature = inspect.signature(model_nodes.VrchTensorRTAutoLoaderNode.VALIDATE_INPUTS)
 
         self.assertEqual(
-            list(signature.parameters), ["engine_name", "require_controlnet"]
+            list(signature.parameters),
+            [
+                "engine_name",
+                "require_controlnet",
+                "model_type",
+                "fallback_checkpoint",
+            ],
         )
         self.assertTrue(model_nodes.VrchTensorRTAutoLoaderNode.VALIDATE_INPUTS("removed.engine"))
+
+    def test_explicit_model_type_and_checkpoint_keep_model_input_lazy(self):
+        node = model_nodes.VrchTensorRTAutoLoaderNode()
+
+        self.assertEqual(
+            node.check_lazy_status(
+                model=None,
+                load_mode="auto",
+                engine_name="test.engine",
+                model_type="sdxl_base",
+                fallback_checkpoint="fallback.safetensors",
+            ),
+            [],
+        )
+        self.assertEqual(
+            node.check_lazy_status(
+                model=None,
+                load_mode="auto",
+                engine_name="test.engine",
+                model_type="auto",
+                fallback_checkpoint="fallback.safetensors",
+            ),
+            ["model"],
+        )
 
     def test_pytorch_mode_bypasses_tensorrt(self):
         loader = self.install_loader()
@@ -158,6 +203,26 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
         self.assertIs(second[0], self.tensorrt_model)
         self.assertEqual(loader.calls, [("test.engine", "sdxl_base")])
 
+    def test_auto_mode_uses_explicit_type_without_loading_fallback(self):
+        loader = self.install_loader()
+        fallback_calls = []
+        model_nodes._load_checkpoint_model = (
+            lambda checkpoint: fallback_calls.append(checkpoint)
+        )
+
+        result = model_nodes.VrchTensorRTAutoLoaderNode().load_model(
+            model=None,
+            load_mode="auto",
+            engine_name="test.engine",
+            model_type="sdxl_base",
+            fallback_checkpoint="fallback.safetensors",
+        )
+
+        self.assertIs(result[0], self.tensorrt_model)
+        self.assertEqual(result[1], "tensorrt")
+        self.assertEqual(loader.calls, [("test.engine", "sdxl_base")])
+        self.assertEqual(fallback_calls, [])
+
     def test_auto_mode_falls_back_when_engine_is_missing(self):
         result = model_nodes.VrchTensorRTAutoLoaderNode().load_model(
             self.model, "auto", "removed.engine", False
@@ -166,6 +231,27 @@ class TestTensorRTAutoLoaderNode(unittest.TestCase):
         self.assertIs(result[0], self.model)
         self.assertEqual(result[1], "pytorch")
         self.assertIn("fallback", result[2])
+
+    def test_auto_mode_lazily_loads_checkpoint_after_engine_failure(self):
+        fallback_model = FakeModelPatcher()
+        fallback_calls = []
+
+        def load_fallback(checkpoint):
+            fallback_calls.append(checkpoint)
+            return fallback_model
+
+        model_nodes._load_checkpoint_model = load_fallback
+        result = model_nodes.VrchTensorRTAutoLoaderNode().load_model(
+            model=None,
+            load_mode="auto",
+            engine_name="removed.engine",
+            model_type="sdxl_base",
+            fallback_checkpoint="fallback.safetensors",
+        )
+
+        self.assertIs(result[0], fallback_model)
+        self.assertEqual(result[1], "pytorch")
+        self.assertEqual(fallback_calls, ["fallback.safetensors"])
 
     def test_tensorrt_mode_fails_when_engine_is_missing(self):
         with self.assertRaisesRegex(RuntimeError, "Engine is unavailable"):
