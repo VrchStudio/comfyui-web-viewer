@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.27 - 2026-08-05]
+
+### Added
+
+- add a checkpoint CLIP-only loader, a CPU-safe ControlNet loader, and a TAESD memory profile node
+- qualify residual ControlNet TensorRT Engines through the `vrch-tensorrt-controlnet-residual-v1` capability
+
+### Changed
+
+- make the TensorRT Auto Loader's PyTorch MODEL input lazy and optional, with explicit model-family and checkpoint fallback settings
+- reuse one qualified residual Engine across required and optional ControlNet modes without loading a duplicate TensorRT MODEL
+
+### Fixed
+
+- preserve CLIP prompt headroom and ControlNet state across TAESD decode in high-VRAM realtime workflows
+
 ## [1.1.26 - 2026-07-31]
 
 ### Added

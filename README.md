@@ -172,6 +172,10 @@ To use the `AUDIO Music to Emotion Detector @ vrch.ai` node, you'll need to inst
 
 ### `Model Nodes`
 
+- TensorRT Auto Loader with lazy PyTorch fallback and residual ControlNet qualification
+- Checkpoint CLIP-only Loader for prompt changes without an unused checkpoint UNet
+- ControlNet Loader with CPU construction/offload safety for high-VRAM TensorRT workflows
+- TAESD Memory Profile for bounded encode/decode scheduling estimates
 - Documentation: [Usage of Model nodes](./docs/model_nodes.md)
 
 ### `Text Nodes`
