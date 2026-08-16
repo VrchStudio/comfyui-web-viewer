@@ -305,7 +305,7 @@ For any inquiries, you can contact us at [hi@vrch.io](mailto:hi@vrch.io?subject=
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=VrchStudio/comfyui-web-viewer&type=Date)](https://www.star-history.com/#VrchStudio/comfyui-web-viewer&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=VrchStudio/comfyui-web-viewer&type=Date)](https://star-history.dera.page/#VrchStudio/comfyui-web-viewer&Date)
 
 ## License
 
